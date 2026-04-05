@@ -308,13 +308,40 @@ export default function AuditLanding() {
           transition={{ duration: 0.5, delay: 0.2 }}
           className="mt-5 text-center text-[16px] leading-[1.65] text-gray-500"
         >
-          Missed calls going to your competitor. Reviews with zero replies. 20 hours a week stuck doing office work instead of growing your company. We set up a system that answers your leads, runs your day-to-day, and handles your paperwork. Every single day. So you get <span className="font-semibold text-axonText">your life back</span> and keep the money you already earned!
+          Missed calls going to your competitor. Reviews with zero replies. 20 hours a week stuck doing office work instead of growing your company. We set up a system that does it all for you. Every single day. So you get <span className="font-semibold text-axonText">your life back</span> and keep the money you already earned!
         </motion.p>
+
+        {/* ═══ WHAT YOU GET (plain english, horizontal) ═══ */}
+        <motion.div
+          initial={{ opacity: 0, y: 16 }}
+          animate={{ opacity: 1, y: 0 }}
+          transition={{ duration: 0.5, delay: 0.28 }}
+          className="mt-8 space-y-2.5"
+        >
+          {[
+            { icon: Inbox, title: "We Answer Your Leads", body: "Every call, email, and form gets a fast follow-up in your voice. No more lost jobs!" },
+            { icon: Truck, title: "We Run Your Day-to-Day", body: "Confirmations, check-ins, review responses, maintenance reminders. All handled!" },
+            { icon: PieChart, title: "We Kill Your Paperwork", body: "Morning briefings, inbox sorted, weekly reports. 20+ hours off your plate!" },
+          ].map((card, i) => {
+            const Icon = card.icon;
+            return (
+              <div key={i} className="flex items-center gap-4 rounded-xl border border-gray-200 bg-white px-5 py-3.5 shadow-[0_1px_3px_rgba(0,0,0,0.04)]">
+                <div className="flex h-9 w-9 shrink-0 items-center justify-center rounded-lg bg-sky-50">
+                  <Icon className="h-4 w-4 text-axonBlue" />
+                </div>
+                <div className="min-w-0">
+                  <p className="text-[14px] font-semibold text-axonText">{card.title}</p>
+                  <p className="text-[12px] leading-[1.5] text-gray-400">{card.body}</p>
+                </div>
+              </div>
+            );
+          })}
+        </motion.div>
 
         <motion.div
           initial={{ opacity: 0, y: 16 }}
           animate={{ opacity: 1, y: 0 }}
-          transition={{ duration: 0.5, delay: 0.3 }}
+          transition={{ duration: 0.5, delay: 0.36 }}
           className="mt-8"
         >
           <a
@@ -363,261 +390,218 @@ export default function AuditLanding() {
           </div>
         </motion.div>
 
-        {/* ═══ WHAT YOU GET (plain english) ═══ */}
-        <Fade className="mt-14">
-          <p className="mb-8 text-center text-xs font-semibold tracking-[0.2em] text-axonBlue">WHAT YOU ACTUALLY GET</p>
-          <div className="grid gap-5 md:grid-cols-3">
-            {[
-              { icon: Inbox, title: "We Answer Your Leads", body: "Every call, email, and form gets a fast follow-up in your voice. No more lost jobs from slow callbacks!" },
-              { icon: Truck, title: "We Run Your Day-to-Day", body: "Booking confirmations, post-job check-ins, review responses, maintenance reminders. All handled for you!" },
-              { icon: PieChart, title: "We Kill Your Paperwork", body: "Morning briefings, inbox sorted, weekly reports with real numbers. 20+ hours of office work off your plate every week!" },
-            ].map((card, i) => {
-              const Icon = card.icon;
-              return (
-                <Card3D key={i} className="p-6">
-                  <div className="flex flex-col items-center text-center">
-                    <div className="flex h-11 w-11 items-center justify-center rounded-xl bg-gradient-to-br from-sky-50 to-white shadow-[inset_0_0_0_1px_rgba(2,132,199,0.12),0_2px_8px_rgba(0,0,0,0.04)]">
-                      <Icon className="h-5 w-5 text-axonBlue" />
-                    </div>
-                    <h3 className="mt-4 text-[16px] font-bold text-axonText">{card.title}</h3>
-                    <p className="mt-2 text-[13px] leading-[1.65] text-gray-500">{card.body}</p>
-                  </div>
-                </Card3D>
-              );
-            })}
-          </div>
-        </Fade>
-
       </div>{/* close 720px container for full-width tweet carousel */}
 
       <TweetCarousel />
 
-      <div className="mx-auto max-w-[720px] px-6">
-
-        {/* ═══ VIDEO: MARK CUBAN ON AI ═══ */}
+      {/* ── VIDEO (centered narrow) ── */}
+      <div className="mx-auto max-w-[720px] px-6 py-10">
         <VideoEmbed />
+      </div>
 
-        {/* ═══ THE NUMBERS ═══ */}
-        <Fade className="mt-24">
-          <div className="rounded-2xl border border-gray-200 bg-white p-8 shadow-card md:p-10">
-            <p className="mb-6 text-center text-xs font-semibold tracking-[0.2em] text-axonBlue">WHAT OUR CLIENTS GET BACK</p>
-            <div className="grid grid-cols-1 gap-8 md:grid-cols-3 md:gap-0 md:divide-x md:divide-gray-200">
-              {[
-                { value: "20+", label: "Hours saved per week on admin and ops" },
-                { value: "<2 hr", label: "Average lead response time" },
-                { value: "100%", label: "Follow-up rate on every inquiry" },
-              ].map((stat, i) => (
-                <div key={i} className="text-center">
-                  <p className="text-[44px] font-bold leading-none tracking-tight text-axonText md:text-[52px]">{stat.value}</p>
-                  <p className="mt-3 text-[13px] font-medium text-gray-400">{stat.label}</p>
-                </div>
-              ))}
+      {/* ── STATS (full-width band) ── */}
+      <div className="border-y border-gray-200/60 bg-white py-20 md:py-24">
+        <div className="mx-auto max-w-5xl px-6">
+          <p className="mb-8 text-center text-xs font-semibold tracking-[0.2em] text-axonBlue">WHAT OUR CLIENTS GET BACK</p>
+          <div className="grid grid-cols-1 gap-8 md:grid-cols-3 md:gap-0 md:divide-x md:divide-gray-200">
+            {[
+              { value: "20+", label: "Hours saved per week on admin and ops" },
+              { value: "<2 hr", label: "Average lead response time" },
+              { value: "100%", label: "Follow-up rate on every inquiry" },
+            ].map((stat, i) => (
+              <div key={i} className="text-center">
+                <p className="text-[44px] font-bold leading-none tracking-tight text-axonText md:text-[56px]">{stat.value}</p>
+                <p className="mt-3 text-[13px] font-medium text-gray-400">{stat.label}</p>
+              </div>
+            ))}
+          </div>
+        </div>
+      </div>
+
+      {/* ── SERVICE CARDS (wide, 2x2 grid on desktop) ── */}
+      <div className="py-24 md:py-32">
+        <div className="mx-auto max-w-5xl px-6">
+          <Fade>
+            <div className="text-center">
+              <p className="text-xs font-semibold tracking-[0.2em] text-axonBlue">YOUR INBOUND MACHINE</p>
+              <h2 className="mt-3 text-3xl font-bold tracking-[-0.02em] md:text-4xl">
+                Every Part of This Feeds Your Growth!
+              </h2>
+              <p className="mx-auto mt-4 max-w-xl text-[16px] leading-[1.75] text-gray-500">
+                Fast follow-ups win jobs. Great follow-up earns 5-star reviews. Reviews drive free Google traffic. Happy customers refer their neighbors. And you are not stuck doing any of it because we handle the admin too. It all connects. It all compounds. And it plugs right into the tools you already use!
+              </p>
             </div>
-          </div>
-        </Fade>
+          </Fade>
 
-        {/* ═══ WHAT WE RUN FOR YOU ═══ */}
-        <Fade className="mt-24">
-          <div className="text-center">
-            <p className="text-xs font-semibold tracking-[0.2em] text-axonBlue">HOW IT WORKS</p>
-            <h2 className="mt-3 text-3xl font-bold tracking-[-0.02em] md:text-4xl">
-              Your Leads. Your Customers. Your Paperwork. We Handle It All!
-            </h2>
-            <p className="mx-auto mt-4 max-w-lg text-[16px] leading-[1.75] text-gray-500">
-              We plug into <span className="font-semibold text-axonText">your email, calendar, CRM, and the tools you already use</span>. Then we run everything for you. Every single day. No new software to learn. No new people to hire. Just results!
-            </p>
-          </div>
-        </Fade>
-
-        <div className="mt-12 space-y-5">
-          {[
-            {
-              icon: Inbox,
-              title: "We Answer Every Single Lead",
-              desc: "Every call, email, form fill, and voicemail gets a personalized follow-up in your voice within hours. Even the ones that come in at 10pm on a Saturday! Old quotes that went cold? We bring them back to life. Your pipeline stays packed without you lifting a finger.",
-              points: ["After-hours leads caught", "Follow-up in your voice", "Old estimates re-engaged"],
-            },
-            {
-              icon: Truck,
-              title: "We Run Your Customer Experience",
-              desc: "The second a job gets booked, your customer gets a welcome email, a what-to-expect rundown, and a prep checklist. After the job they get a thank-you, a review request, and seasonal maintenance reminders. It all happens automatically and it sounds just like you!",
-              points: ["Booking confirmations sent", "Post-job follow-up handled", "Maintenance reminders on autopilot"],
-            },
-            {
-              icon: MessageCircle,
-              title: "We Build Your Reputation for You",
-              desc: "Every Google review gets a thoughtful, personal response within hours. Happy customers get a nudge to refer their friends and family. Old clients get re-engaged with seasonal tune-up offers. Here is the thing most HVAC owners miss: Google reviews are the #1 driver of organic traffic for local businesses. Every 5-star review you stack is a customer who finds you WITHOUT you paying for an ad. Combine that with amazing post-job follow-up that turns one-time customers into lifelong referral sources, and you have a business that grows itself!",
-              points: ["Reviews answered in hours", "Referral engine built in", "#1 source of organic traffic"],
-            },
-            {
-              icon: PieChart,
-              title: "We Handle All Your Paperwork",
-              desc: "Every morning you get a clean briefing: what happened overnight, what needs your attention, and what we already took care of. Every week you get a written report with your numbers, trends, and clear next steps. Those 20+ hours of office work you were doing yourself? Done. Gone. Over!",
-              points: ["Daily morning briefing", "Inbox sorted for you", "Weekly reports with real numbers"],
-            },
-          ].map((item, i) => {
-            const Icon = item.icon;
-            return (
-              <Fade key={item.title} delay={i * 0.06}>
-                <Card3D className="p-6 md:p-7">
-                  <div className="flex flex-col gap-5 sm:flex-row sm:gap-6">
-                    <div className="flex h-12 w-12 shrink-0 items-center justify-center rounded-2xl border border-gray-200 bg-gradient-to-br from-sky-50 to-white shadow-[inset_0_1px_0_rgba(255,255,255,0.8),0_2px_8px_rgba(0,0,0,0.04)]">
+          <div className="mt-14 grid gap-5 md:grid-cols-2">
+            {[
+              {
+                icon: Inbox,
+                title: "Fast Follow-Up = More Jobs Won",
+                desc: "Every call, email, form fill, and voicemail gets a personalized follow-up in your voice within hours. Even the ones that come in at 10pm on a Saturday! Old quotes that went cold? We bring them back to life. Fast response is the #1 reason homeowners pick one HVAC company over another!",
+                points: ["After-hours leads caught", "Follow-up in your voice", "Old estimates re-engaged"],
+              },
+              {
+                icon: Truck,
+                title: "Great Service = 5-Star Reviews",
+                desc: "The second a job gets booked, your customer gets a welcome email, a what-to-expect rundown, and a prep checklist. After the job they get a thank-you, a review request, and seasonal maintenance reminders. This level of follow-up is what turns a one-time customer into a 5-star review and a lifelong referral source!",
+                points: ["Booking confirmations sent", "Review requests automated", "Maintenance reminders on autopilot"],
+              },
+              {
+                icon: MessageCircle,
+                title: "More Reviews = Free Google Traffic",
+                desc: "Every Google review gets a thoughtful, personal response within hours. Google reviews are the #1 factor in local search rankings. Every review you stack makes you more visible to homeowners searching \"HVAC near me\" right now. That is free traffic and free leads without paying for a single ad!",
+                points: ["Reviews answered in hours", "Higher Google rankings", "Free organic leads"],
+              },
+              {
+                icon: PieChart,
+                title: "Zero Admin = You Focus on Growth",
+                desc: "Every morning you get a clean briefing: what happened overnight, what needs your attention, and what we already took care of. Weekly reports with your numbers and clear next steps. Those 20+ hours of office work you were doing? Gone. Now you can spend that time on sales calls, job sites, and actually growing your business!",
+                points: ["Daily morning briefing", "Inbox sorted for you", "20+ hours back every week"],
+              },
+            ].map((item, i) => {
+              const Icon = item.icon;
+              return (
+                <Fade key={item.title} delay={i * 0.06}>
+                  <Card3D className="h-full p-6 md:p-7">
+                    <div className="flex h-12 w-12 items-center justify-center rounded-2xl border border-gray-200 bg-gradient-to-br from-sky-50 to-white shadow-[inset_0_1px_0_rgba(255,255,255,0.8),0_2px_8px_rgba(0,0,0,0.04)]">
                       <Icon className="h-5 w-5 text-axonBlue" />
                     </div>
-                    <div className="flex-1">
-                      <h3 className="text-lg font-semibold">{item.title}</h3>
-                      <p className="mt-2 text-[14px] leading-[1.7] text-gray-500">{item.desc}</p>
-                      <div className="mt-3 flex flex-wrap gap-2">
-                        {item.points.map((p) => (
-                          <span key={p} className="inline-flex items-center gap-1.5 rounded-full bg-sky-50 px-3 py-1 text-[12px] font-medium text-axonBlue shadow-[inset_0_0_0_1px_rgba(2,132,199,0.12)]">
-                            <Check className="h-3 w-3" /> {p}
-                          </span>
-                        ))}
-                      </div>
+                    <h3 className="mt-4 text-lg font-semibold">{item.title}</h3>
+                    <p className="mt-2 text-[14px] leading-[1.7] text-gray-500">{item.desc}</p>
+                    <div className="mt-4 flex flex-wrap gap-2">
+                      {item.points.map((p) => (
+                        <span key={p} className="inline-flex items-center gap-1.5 rounded-full bg-sky-50 px-3 py-1 text-[12px] font-medium text-axonBlue shadow-[inset_0_0_0_1px_rgba(2,132,199,0.12)]">
+                          <Check className="h-3 w-3" /> {p}
+                        </span>
+                      ))}
                     </div>
-                  </div>
-                </Card3D>
-              </Fade>
-            );
-          })}
+                  </Card3D>
+                </Fade>
+              );
+            })}
+          </div>
         </div>
+      </div>
 
-        {/* ═══ THE REAL GROWTH ENGINE ═══ */}
-        <Fade className="mt-16">
-          <div className="rounded-2xl border border-gray-200 bg-white p-7 shadow-card md:p-8">
-            <p className="text-xs font-semibold tracking-[0.2em] text-axonBlue">THE BEST HVAC COMPANIES ALREADY KNOW THIS</p>
-            <h3 className="mt-3 text-xl font-bold tracking-tight md:text-2xl">
-              Great Customer Service Builds Referrals. Google Reviews Drive Organic Traffic. You Stop Paying for Ads.
-            </h3>
-            <p className="mt-4 text-[14px] leading-[1.7] text-gray-500">
-              Think about where your best customers came from. It was not a Facebook ad. It was a neighbor who told them to call you. Or a Google search where your 4.8 stars and 200+ reviews made the decision easy.
-            </p>
-            <p className="mt-3 text-[14px] leading-[1.7] text-gray-500">
-              That is what Axon builds for you. When every customer gets amazing follow-up, when every review gets a personal response, when maintenance reminders keep you top-of-mind, you create a reputation engine. Referrals go up. Reviews stack. Organic traffic grows. And one day you look at your ad budget and realize you do not need it anymore!
-            </p>
-            <p className="mt-3 text-[14px] leading-[1.7] text-gray-500">
-              <span className="font-semibold text-axonText">Google reviews are the #1 factor in local search rankings.</span> Every single review you respond to makes you more visible to homeowners searching &ldquo;HVAC near me&rdquo; right now. That is free traffic. That is free leads. That is how the best HVAC companies in the country grow without spending a fortune on marketing!
-            </p>
-          </div>
-        </Fade>
-
-        {/* ═══ COMPARISON TABLE ═══ */}
-        <Fade className="mt-16">
-          <div className="text-center">
-            <p className="text-xs font-semibold tracking-[0.2em] text-axonBlue">HOW WE COMPARE</p>
-            <h2 className="mt-3 text-2xl font-bold tracking-[-0.02em] md:text-3xl">
-              Hiring vs. Software vs. Axon
-            </h2>
-          </div>
-          <div className="mt-8 overflow-x-auto rounded-2xl border border-gray-200/80 bg-white p-1 shadow-[0_1px_2px_rgba(0,0,0,0.04),0_12px_40px_-8px_rgba(2,132,199,0.12),0_24px_60px_-12px_rgba(0,0,0,0.06)]">
-            <table className="w-full min-w-[520px] border-separate border-spacing-0 text-left text-[13px]">
-              <thead>
-                <tr>
-                  <th className="rounded-tl-xl bg-gray-50/80 px-4 py-3.5 font-semibold text-gray-600" />
-                  <th className="bg-gradient-to-b from-sky-50 to-white px-4 py-3.5 text-center font-semibold text-axonBlue">Axon</th>
-                  <th className="bg-gray-50/80 px-4 py-3.5 text-center font-semibold text-gray-600">Hiring Someone</th>
-                  <th className="rounded-tr-xl bg-gray-50/80 px-4 py-3.5 text-center font-semibold text-gray-600">DIY Software</th>
-                </tr>
-              </thead>
-              <tbody>
-                {[
-                  { label: "Answers every lead in under 2 hours", axon: "ok", hire: "partial", diy: "no" },
-                  { label: "Responds to Google reviews daily", axon: "ok", hire: "partial", diy: "partial" },
-                  { label: "Sends post-job follow-ups automatically", axon: "ok", hire: "partial", diy: "no" },
-                  { label: "Morning briefing + weekly reports", axon: "ok", hire: "no", diy: "no" },
-                  { label: "Works nights, weekends, holidays", axon: "ok", hire: "no", diy: "ok" },
-                  { label: "Builds referral and review engine", axon: "ok", hire: "partial", diy: "no" },
-                  { label: "No training or management needed", axon: "ok", hire: "no", diy: "partial" },
-                  { label: "Live in 2 weeks", axon: "ok", hire: "no", diy: "partial" },
-                  { label: "Costs less than $60K/yr", axon: "ok", hire: "no", diy: "ok" },
-                ].map((row) => (
-                  <tr key={row.label} className="border-t border-gray-100">
-                    <td className="px-4 py-3.5 font-medium text-gray-800">{row.label}</td>
-                    <td className="bg-sky-50/30 px-4 py-3.5 text-center">
-                      {row.axon === "ok" && <span className="inline-flex h-7 w-7 items-center justify-center rounded-full bg-emerald-50 text-emerald-600"><Check className="h-3.5 w-3.5" strokeWidth={2.5} /></span>}
-                      {row.axon === "partial" && <span className="inline-flex h-7 w-7 items-center justify-center rounded-full bg-amber-50 text-amber-600"><Minus className="h-3.5 w-3.5" strokeWidth={2.5} /></span>}
-                      {row.axon === "no" && <span className="inline-flex h-7 w-7 items-center justify-center rounded-full bg-gray-100 text-gray-400"><X className="h-3.5 w-3.5" strokeWidth={2.5} /></span>}
-                    </td>
-                    <td className="px-4 py-3.5 text-center">
-                      {row.hire === "ok" && <span className="inline-flex h-7 w-7 items-center justify-center rounded-full bg-emerald-50 text-emerald-600"><Check className="h-3.5 w-3.5" strokeWidth={2.5} /></span>}
-                      {row.hire === "partial" && <span className="inline-flex h-7 w-7 items-center justify-center rounded-full bg-amber-50 text-amber-600"><Minus className="h-3.5 w-3.5" strokeWidth={2.5} /></span>}
-                      {row.hire === "no" && <span className="inline-flex h-7 w-7 items-center justify-center rounded-full bg-gray-100 text-gray-400"><X className="h-3.5 w-3.5" strokeWidth={2.5} /></span>}
-                    </td>
-                    <td className="px-4 py-3.5 text-center">
-                      {row.diy === "ok" && <span className="inline-flex h-7 w-7 items-center justify-center rounded-full bg-emerald-50 text-emerald-600"><Check className="h-3.5 w-3.5" strokeWidth={2.5} /></span>}
-                      {row.diy === "partial" && <span className="inline-flex h-7 w-7 items-center justify-center rounded-full bg-amber-50 text-amber-600"><Minus className="h-3.5 w-3.5" strokeWidth={2.5} /></span>}
-                      {row.diy === "no" && <span className="inline-flex h-7 w-7 items-center justify-center rounded-full bg-gray-100 text-gray-400"><X className="h-3.5 w-3.5" strokeWidth={2.5} /></span>}
-                    </td>
+      {/* ── COMPARISON (sky band) ── */}
+      <div className="border-y border-gray-200/40 bg-gradient-to-b from-sky-50/60 via-sky-50/40 to-axonBg py-24 md:py-32">
+        <div className="mx-auto max-w-3xl px-6">
+          <Fade>
+            <div className="text-center">
+              <p className="text-xs font-semibold tracking-[0.2em] text-axonBlue">YOUR OPTIONS</p>
+              <h2 className="mt-3 text-2xl font-bold tracking-[-0.02em] md:text-3xl">
+                Hire Someone. DIY It. Or Let Axon Run It.
+              </h2>
+            </div>
+            <div className="mt-10 overflow-x-auto rounded-2xl border border-gray-200/80 bg-white p-1 shadow-[0_1px_2px_rgba(0,0,0,0.04),0_12px_40px_-8px_rgba(2,132,199,0.12)]">
+              <table className="w-full min-w-[520px] border-separate border-spacing-0 text-left text-[13px]">
+                <thead>
+                  <tr>
+                    <th className="rounded-tl-xl bg-gray-50/80 px-4 py-3 font-semibold text-gray-600" />
+                    <th className="bg-gradient-to-b from-sky-50 to-white px-4 py-3 text-center font-semibold text-axonBlue">Axon</th>
+                    <th className="bg-gray-50/80 px-4 py-3 text-center font-semibold text-gray-600">Office Hire</th>
+                    <th className="rounded-tr-xl bg-gray-50/80 px-4 py-3 text-center font-semibold text-gray-600">DIY Software</th>
                   </tr>
-                ))}
-              </tbody>
-            </table>
-          </div>
-        </Fade>
+                </thead>
+                <tbody>
+                  {[
+                    { label: "Annual cost", axon: "$3-6K", hire: "$45-65K", diy: "$1-3K" },
+                    { label: "Setup time", axon: "2 weeks", hire: "2-3 months", diy: "Ongoing" },
+                    { label: "Lead follow-up speed", axon: "<2 hours", hire: "Next day", diy: "Manual" },
+                    { label: "Review response", axon: "Every review, same day", hire: "When they remember", diy: "You do it" },
+                    { label: "Post-job follow-up", axon: "Automatic", hire: "Sometimes", diy: "None" },
+                    { label: "Morning briefing + reports", axon: "Daily + weekly", hire: "No", diy: "No" },
+                    { label: "Works nights + weekends", axon: "Always", hire: "No", diy: "If you do" },
+                    { label: "Builds referrals + reviews", axon: "Built in", hire: "Inconsistent", diy: "No" },
+                    { label: "Management needed", axon: "None", hire: "Significant", diy: "All you" },
+                  ].map((row, idx) => (
+                    <tr key={idx} className="border-t border-gray-100">
+                      <td className="px-4 py-3 font-medium text-gray-800">{row.label}</td>
+                      <td className="bg-sky-50/30 px-4 py-3 text-center text-[12px] font-semibold text-axonBlue">{row.axon}</td>
+                      <td className="px-4 py-3 text-center text-[12px] text-gray-500">{row.hire}</td>
+                      <td className="px-4 py-3 text-center text-[12px] text-gray-500">{row.diy}</td>
+                    </tr>
+                  ))}
+                </tbody>
+              </table>
+            </div>
+          </Fade>
+        </div>
+      </div>
 
-        {/* ═══ MID-PAGE CTA — SELL THE DREAM ═══ */}
-        <Fade className="mt-16">
-          <div className="rounded-2xl border border-sky-200/60 bg-gradient-to-br from-white to-sky-50/50 p-8 text-center shadow-card">
-            <h3 className="text-xl font-bold tracking-tight md:text-2xl">
+      {/* ── DREAM CTA (full-width band) ── */}
+      <div className="border-b border-gray-200/40 bg-white py-24 md:py-28">
+        <div className="mx-auto max-w-3xl px-6 text-center">
+          <Fade>
+            <h3 className="text-2xl font-bold tracking-tight md:text-4xl">
               Stop Working in Your Business. Start Working on It.
             </h3>
-            <p className="mx-auto mt-3 max-w-md text-[14px] leading-[1.7] text-gray-500">
+            <p className="mx-auto mt-4 max-w-xl text-[15px] leading-[1.7] text-gray-500">
               Imagine waking up to a clean briefing instead of chaos. Every lead already followed up. Every review already answered. Your reputation growing while you sleep. No more Sunday nights catching up on emails. That is what HVAC owners get with Axon, and it starts in just two weeks!
             </p>
             <a
               href="#book"
-              className="mt-6 inline-flex items-center gap-2 rounded-full bg-axonBlue px-8 py-3.5 text-[14px] font-semibold text-white shadow-glow transition-all hover:-translate-y-0.5 hover:shadow-[0_0_50px_-4px_rgba(2,132,199,0.4)]"
+              className="mt-8 inline-flex items-center gap-2 rounded-full bg-axonBlue px-10 py-4 text-[15px] font-semibold text-white shadow-glow transition-all hover:-translate-y-0.5 hover:shadow-[0_0_50px_-4px_rgba(2,132,199,0.4)]"
             >
               Take the Next Step <ChevronRight className="h-4 w-4" />
             </a>
-            <p className="mt-3 text-[12px] text-gray-400">For HVAC companies ready to grow without adding headcount</p>
-          </div>
-        </Fade>
-
-        {/* ═══ REVIEWS ═══ */}
-        <Fade className="mt-24">
-          <p className="mb-6 text-center text-xs font-semibold tracking-[0.2em] text-gray-400">
-            HVAC OWNERS ARE LOVING THIS
-          </p>
-        </Fade>
-        <div className="space-y-3">
-          {reviews.map((review, i) => (
-            <ReviewCard key={i} review={review} delay={i * 0.04} />
-          ))}
+            <p className="mt-4 text-[12px] text-gray-400">For HVAC companies ready to grow without adding headcount</p>
+          </Fade>
         </div>
+      </div>
 
-        {/* ═══ WHAT HAPPENS ON THE CALL ═══ */}
-        <Fade className="mt-24">
-          <div className="text-center">
-            <p className="text-xs font-semibold tracking-[0.2em] text-axonBlue">YOUR 30-MINUTE STRATEGY CALL</p>
-            <h2 className="mt-3 text-2xl font-bold tracking-[-0.02em] md:text-3xl">
-              Here&apos;s Exactly How We Get You There.
-            </h2>
+      {/* ── REVIEWS (wider, 2-col on desktop) ── */}
+      <div className="py-24 md:py-32">
+        <div className="mx-auto max-w-5xl px-6">
+          <Fade>
+            <p className="mb-8 text-center text-xs font-semibold tracking-[0.2em] text-gray-400">
+              HVAC OWNERS ARE LOVING THIS
+            </p>
+          </Fade>
+          <div className="columns-1 gap-4 space-y-4 md:columns-2">
+            {reviews.map((review, i) => (
+              <div key={i} className="break-inside-avoid">
+                <ReviewCard review={review} delay={i * 0.04} />
+              </div>
+            ))}
           </div>
-        </Fade>
-        <div className="mt-8 space-y-4">
-          {[
-            { step: "1", title: "We learn exactly how your HVAC company runs", body: "How your leads come in. How jobs get booked. How follow-ups happen (or don't). Where your time actually goes every week. We figure out exactly how much money and time your current setup is costing you!" },
-            { step: "2", title: "We show you everything that can run on autopilot", body: "Lead follow-up, review responses, customer onboarding, daily admin, weekly reporting. We go through every single task that doesn't need a human and show you what it looks like when it just... runs itself!" },
-            { step: "3", title: "We build a custom system just for your business", body: "Not a cookie-cutter template. A system built around your tools, your voice, and the way you actually work. Plugs right into your email, CRM, and calendar. Live in two weeks. You review and approve, we handle everything else!" },
-          ].map((item, i) => (
-            <Fade key={i} delay={i * 0.06}>
-              <Card3D className="px-5 py-5">
-                <div className="flex items-start gap-4">
-                  <div className="flex h-8 w-8 shrink-0 items-center justify-center rounded-full bg-axonBlue text-[13px] font-bold text-white shadow-glow">
+        </div>
+      </div>
+
+      {/* ── CALL STEPS (wide, 3-col on desktop) ── */}
+      <div className="border-y border-gray-200/40 bg-gradient-to-b from-sky-50/40 via-white to-axonBg py-24 md:py-32">
+        <div className="mx-auto max-w-5xl px-6">
+          <Fade>
+            <div className="text-center">
+              <p className="text-xs font-semibold tracking-[0.2em] text-axonBlue">YOUR 30-MINUTE STRATEGY CALL</p>
+              <h2 className="mt-3 text-2xl font-bold tracking-[-0.02em] md:text-3xl">
+                Here&apos;s Exactly How We Get You There.
+              </h2>
+            </div>
+          </Fade>
+          <div className="mt-12 grid gap-6 md:grid-cols-3">
+            {[
+              { step: "1", title: "We learn exactly how your HVAC company runs", body: "How your leads come in. How jobs get booked. How follow-ups happen (or don't). Where your time actually goes every week. We figure out exactly how much money and time your current setup is costing you!" },
+              { step: "2", title: "We show you everything that can run on autopilot", body: "Lead follow-up, review responses, customer onboarding, daily admin, weekly reporting. We go through every single task that doesn't need a human and show you what it looks like when it just... runs itself!" },
+              { step: "3", title: "We build a custom system just for your business", body: "Not a cookie-cutter template. A system built around your tools, your voice, and the way you actually work. Plugs right into your email, CRM, and calendar. Live in two weeks. You review and approve, we handle everything else!" },
+            ].map((item, i) => (
+              <Fade key={i} delay={i * 0.08}>
+                <Card3D className="h-full p-6">
+                  <div className="flex h-10 w-10 items-center justify-center rounded-full bg-axonBlue text-[15px] font-bold text-white shadow-glow">
                     {item.step}
                   </div>
-                  <div>
-                    <p className="text-[15px] font-semibold text-axonText">{item.title}</p>
-                    <p className="mt-1.5 text-[14px] leading-[1.65] text-gray-500">{item.body}</p>
-                  </div>
-                </div>
-              </Card3D>
-            </Fade>
-          ))}
+                  <p className="mt-4 text-[15px] font-semibold text-axonText">{item.title}</p>
+                  <p className="mt-2 text-[13px] leading-[1.65] text-gray-500">{item.body}</p>
+                </Card3D>
+              </Fade>
+            ))}
+          </div>
         </div>
+      </div>
 
-        {/* ═══ CALENDLY EMBED ═══ */}
+      {/* ── CALENDLY (centered) ── */}
+      <div className="mx-auto max-w-[720px] px-6">
         <div id="book" />
         <Fade className="mt-24">
           <div className="text-center">
