@@ -308,7 +308,7 @@ export default function AuditLanding() {
           transition={{ duration: 0.5, delay: 0.2 }}
           className="mt-5 text-center text-[16px] leading-[1.65] text-gray-500"
         >
-          Missed calls going to your competitor. Reviews with zero replies. 20 hours a week stuck doing office work instead of growing your company. We set up a system that does it all for you. Every single day. So you get <span className="font-semibold text-axonText">your life back</span> and keep the money you already earned!
+          Axon manages your lead follow-up, customer service, reviews, and daily admin so your HVAC company gets more referrals, more 5-star reviews, and more organic traffic. Customers come to you instead of you chasing them. At a fraction of the cost of hiring and with <span className="font-semibold text-axonText">20+ fewer hours of work every week</span>!
         </motion.p>
 
         {/* ═══ WHAT YOU GET (plain english, horizontal) ═══ */}
@@ -525,37 +525,108 @@ export default function AuditLanding() {
       </div>
 
       {/* ══════════════════════════════════════════════════════════════════
-          WHAT THIS DOES FOR YOUR BUSINESS (outcomes)
+          THE GROWTH FLYWHEEL (infographic)
          ══════════════════════════════════════════════════════════════════ */}
-      <div className="border-y border-gray-200/60 bg-gradient-to-b from-sky-50/50 via-sky-50/30 to-axonBg py-24 md:py-28">
+      <div className="border-y border-gray-200/60 bg-gradient-to-b from-sky-50/50 via-sky-50/30 to-axonBg py-24 md:py-32">
         <div className="mx-auto max-w-5xl px-6">
           <Fade>
             <div className="text-center">
-              <p className="text-xs font-semibold tracking-[0.2em] text-axonBlue">WHAT THIS DOES FOR YOUR BUSINESS</p>
+              <p className="text-xs font-semibold tracking-[0.2em] text-axonBlue">THE AXON GROWTH FLYWHEEL</p>
               <h2 className="mt-3 text-3xl font-bold tracking-[-0.02em] md:text-4xl">
-                It All Connects. It All Compounds.
+                The Most Complete Inbound System for HVAC Companies.
               </h2>
               <p className="mx-auto mt-4 max-w-2xl text-[16px] leading-[1.75] text-gray-500">
-                Fast follow-up wins the job. Great customer experience earns a 5-star review. Reviews push you higher on Google. Higher rankings bring free leads. Referrals bring warm customers who already trust you. And none of it requires you to be in the office at 6am. This is how an HVAC company grows without burning out the owner.
+                Every piece of Axon feeds the next. The result is a self-reinforcing growth engine where customers come to you instead of you paying to find them.
               </p>
             </div>
           </Fade>
-          <div className="mx-auto mt-14 grid max-w-4xl gap-5 md:grid-cols-2 lg:grid-cols-4">
-            {[
-              { num: "1", label: "Fast follow-up", result: "wins more jobs" },
-              { num: "2", label: "Great experience", result: "earns 5-star reviews" },
-              { num: "3", label: "More reviews", result: "drives free Google traffic" },
-              { num: "4", label: "Free traffic + referrals", result: "replaces paid ads" },
-            ].map((item, i) => (
-              <Fade key={i} delay={i * 0.06}>
-                <div className="rounded-2xl border border-gray-200 bg-white p-5 text-center shadow-[0_1px_3px_rgba(0,0,0,0.04)]">
-                  <div className="mx-auto flex h-10 w-10 items-center justify-center rounded-full bg-axonBlue text-[15px] font-bold text-white">{item.num}</div>
-                  <p className="mt-3 text-[14px] font-semibold text-axonText">{item.label}</p>
-                  <p className="mt-1 text-[13px] text-gray-400">{item.result}</p>
+
+          {/* ── FLYWHEEL DIAGRAM ── */}
+          <Fade delay={0.1}>
+            <div className="relative mx-auto mt-16 max-w-3xl">
+              {/* Center label */}
+              <div className="absolute inset-0 z-10 flex items-center justify-center pointer-events-none">
+                <div className="rounded-full bg-axonBlue px-6 py-3 text-center shadow-glow">
+                  <p className="text-[11px] font-bold tracking-[0.15em] text-sky-200">YOUR BUSINESS</p>
+                  <p className="text-[15px] font-bold text-white">Grows on Autopilot</p>
                 </div>
-              </Fade>
-            ))}
-          </div>
+              </div>
+              {/* Ring of steps */}
+              <div className="grid grid-cols-2 gap-4 md:gap-6">
+                {[
+                  { step: "1", title: "Fast Lead Response", desc: "Every inquiry answered in hours. You win more jobs because you are always first to call back.", color: "from-sky-50 to-white" },
+                  { step: "2", title: "Amazing Customer Experience", desc: "Welcome emails, post-job check-ins, maintenance reminders. Customers feel taken care of from day one.", color: "from-sky-50 to-white" },
+                  { step: "3", title: "5-Star Reviews Stack Up", desc: "Happy customers leave reviews. You respond to every one. Your Google rating climbs and climbs.", color: "from-sky-50 to-white" },
+                  { step: "4", title: "Free Traffic and Referrals", desc: "Higher Google rankings bring free leads. Happy customers tell their neighbors. Growth without ad spend!", color: "from-sky-50 to-white" },
+                ].map((item, i) => (
+                  <div key={i} className={`relative rounded-2xl border border-gray-200 bg-gradient-to-br ${item.color} p-5 shadow-[0_1px_3px_rgba(0,0,0,0.04)] md:p-6 ${i === 0 ? "md:text-right" : ""} ${i === 1 ? "md:text-left" : ""} ${i === 2 ? "md:text-right" : ""} ${i === 3 ? "md:text-left" : ""}`}>
+                    <div className={`flex h-8 w-8 items-center justify-center rounded-full bg-axonBlue text-[13px] font-bold text-white ${i === 0 || i === 2 ? "md:ml-auto" : ""}`}>{item.step}</div>
+                    <p className="mt-3 text-[15px] font-semibold text-axonText">{item.title}</p>
+                    <p className="mt-1 text-[13px] leading-[1.55] text-gray-500">{item.desc}</p>
+                  </div>
+                ))}
+              </div>
+              {/* Arrows connecting steps */}
+              <div className="pointer-events-none absolute inset-0 hidden md:block">
+                <svg className="h-full w-full" viewBox="0 0 600 400" fill="none">
+                  {/* Top arrow: 1 → 2 */}
+                  <path d="M 260 80 C 280 40, 320 40, 340 80" stroke="#0284C7" strokeWidth="2" strokeDasharray="6 4" markerEnd="url(#arrowhead)" />
+                  {/* Right arrow: 2 → 4 */}
+                  <path d="M 440 170 C 480 190, 480 210, 440 230" stroke="#0284C7" strokeWidth="2" strokeDasharray="6 4" markerEnd="url(#arrowhead)" />
+                  {/* Bottom arrow: 4 → 3 */}
+                  <path d="M 340 320 C 320 360, 280 360, 260 320" stroke="#0284C7" strokeWidth="2" strokeDasharray="6 4" markerEnd="url(#arrowhead)" />
+                  {/* Left arrow: 3 → 1 */}
+                  <path d="M 160 230 C 120 210, 120 190, 160 170" stroke="#0284C7" strokeWidth="2" strokeDasharray="6 4" markerEnd="url(#arrowhead)" />
+                  <defs>
+                    <marker id="arrowhead" markerWidth="8" markerHeight="6" refX="8" refY="3" orient="auto">
+                      <path d="M 0 0 L 8 3 L 0 6 Z" fill="#0284C7" />
+                    </marker>
+                  </defs>
+                </svg>
+              </div>
+              {/* Mobile arrows (simple text between cards) */}
+              <div className="mt-4 text-center md:hidden">
+                <p className="text-[12px] font-medium text-axonBlue">↓ Each step feeds the next. The cycle never stops! ↓</p>
+              </div>
+            </div>
+          </Fade>
+        </div>
+      </div>
+
+      {/* ── NEVER MARKET AGAIN ── */}
+      <div className="bg-white py-24 md:py-28">
+        <div className="mx-auto max-w-5xl px-6">
+          <Fade>
+            <div className="grid items-center gap-12 lg:grid-cols-[1.2fr_1fr]">
+              <div>
+                <p className="text-xs font-semibold tracking-[0.2em] text-axonBlue">WHY THIS CHANGES EVERYTHING</p>
+                <h2 className="mt-3 text-2xl font-bold tracking-[-0.02em] md:text-[36px] md:leading-[1.15]">
+                  Build a Business Where Customers Come to You.
+                </h2>
+                <p className="mt-5 text-[15px] leading-[1.75] text-gray-500">
+                  Think about where your best customers came from. It was not a Facebook ad. It was a neighbor who told them to call you. Or a Google search where your 4.8 stars and 200+ reviews made the decision easy.
+                </p>
+                <p className="mt-3 text-[15px] leading-[1.75] text-gray-500">
+                  That is exactly what Axon builds. When every customer gets an incredible experience, reviews stack up. When reviews stack up, Google sends you free traffic. When happy customers refer their friends, you get warm leads that already trust you. The flywheel spins faster every month and eventually you look at your ad budget and realize you do not need it anymore.
+                </p>
+                <p className="mt-3 text-[15px] leading-[1.75] text-gray-500">
+                  <span className="font-semibold text-axonText">Google reviews are the #1 factor in local search rankings.</span> Every review you respond to makes you more visible to homeowners searching &ldquo;HVAC near me&rdquo; right now. That is free traffic. Free leads. Customers finding you without you spending a dime on marketing!
+                </p>
+              </div>
+              <div className="space-y-4">
+                {[
+                  { number: "87%", text: "of consumers read Google reviews before choosing a local business" },
+                  { number: "#1", text: "Google reviews are the top factor in local search rankings" },
+                  { number: "4.5x", text: "more likely to get a referral from a customer who had a great follow-up experience" },
+                ].map((stat, i) => (
+                  <div key={i} className="rounded-xl border border-gray-200 bg-axonBg p-5">
+                    <p className="text-2xl font-bold text-axonBlue">{stat.number}</p>
+                    <p className="mt-1 text-[13px] leading-[1.55] text-gray-500">{stat.text}</p>
+                  </div>
+                ))}
+              </div>
+            </div>
+          </Fade>
         </div>
       </div>
 
@@ -673,15 +744,15 @@ export default function AuditLanding() {
         </div>
       </div>
 
-      {/* ── BOTTOM CTA (simple, no inline Calendly) ── */}
+      {/* ── BOTTOM CTA ── */}
       <div id="book" className="bg-gradient-to-b from-axonBg to-sky-50/30 py-24 md:py-32">
         <div className="mx-auto max-w-3xl px-6 text-center">
           <Fade>
             <h2 className="text-3xl font-bold tracking-[-0.02em] md:text-[44px] md:leading-[1.1]">
-              Get Your Nights and Weekends Back!
+              Stop Chasing Customers. Let Them Come to You.
             </h2>
             <p className="mx-auto mt-5 max-w-xl text-[16px] leading-[1.75] text-gray-500">
-              In 30 minutes we will learn how your HVAC company runs, show you what is costing you money, and walk you through exactly how we fix it. If it is a fit, your custom system can be live in two weeks!
+              We build a complete inbound system for your HVAC company so you get referrals, 5-star reviews, and free Google traffic instead of paying for ads. One tenth the cost of hiring. 20 fewer hours of work every week. Live in two weeks!
             </p>
             <a
               href="https://calendly.com/axon-operations/30min"
@@ -699,11 +770,49 @@ export default function AuditLanding() {
       </div>
 
       {/* ── FOOTER ── */}
-      <div className="border-t border-gray-200/60 py-8">
-        <p className="text-center text-xs text-gray-400">
-          © {new Date().getFullYear()} Axon · axonservices.dev
-        </p>
-      </div>
+      <footer className="border-t border-gray-200/60 bg-white">
+        <div className="mx-auto max-w-6xl px-6 py-14 md:py-16">
+          <div className="grid gap-10 md:grid-cols-4">
+            <div>
+              <div className="flex items-center gap-2">
+                <Thermometer className="h-4 w-4 text-axonBlue" />
+                <p className="text-sm font-bold tracking-[0.2em] text-axonText">AXON</p>
+              </div>
+              <p className="mt-3 text-[13px] leading-[1.6] text-gray-400">
+                The complete inbound operations system for HVAC companies. More referrals. More reviews. More organic traffic. Less work.
+              </p>
+            </div>
+            <div>
+              <p className="text-[12px] font-semibold tracking-[0.15em] text-gray-400">PRODUCT</p>
+              <div className="mt-4 space-y-2.5">
+                {["Lead Follow-Up", "Customer Experience", "Reviews & Reputation", "Admin & Reporting"].map((link) => (
+                  <a key={link} href="#" className="block text-[13px] text-gray-500 transition-colors hover:text-axonText">{link}</a>
+                ))}
+              </div>
+            </div>
+            <div>
+              <p className="text-[12px] font-semibold tracking-[0.15em] text-gray-400">COMPANY</p>
+              <div className="mt-4 space-y-2.5">
+                {["About", "Blog", "Careers", "Contact"].map((link) => (
+                  <a key={link} href="#" className="block text-[13px] text-gray-500 transition-colors hover:text-axonText">{link}</a>
+                ))}
+              </div>
+            </div>
+            <div>
+              <p className="text-[12px] font-semibold tracking-[0.15em] text-gray-400">LEGAL</p>
+              <div className="mt-4 space-y-2.5">
+                {["Privacy Policy", "Terms of Service", "Cookie Policy"].map((link) => (
+                  <a key={link} href="#" className="block text-[13px] text-gray-500 transition-colors hover:text-axonText">{link}</a>
+                ))}
+              </div>
+            </div>
+          </div>
+          <div className="mt-12 flex flex-col items-center justify-between gap-4 border-t border-gray-200 pt-8 md:flex-row">
+            <p className="text-[12px] text-gray-400">© {new Date().getFullYear()} Axon Operations. All rights reserved.</p>
+            <a href="mailto:hello@axonops.com" className="text-[12px] text-gray-400 transition-colors hover:text-axonText">hello@axonops.com</a>
+          </div>
+        </div>
+      </footer>
     </div>
   );
 }
