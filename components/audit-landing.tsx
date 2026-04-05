@@ -404,13 +404,13 @@ export default function AuditLanding() {
           Each section explains one aspect and leads into the next.
          ══════════════════════════════════════════════════════════════════ */}
 
-      {/* ── 1. LEAD FOLLOW-UP (text left, visual right) ── */}
+      {/* ── 1. LEAD FOLLOW-UP — color: emerald (speed, winning) ── */}
       <div className="border-t border-gray-200/60 bg-white py-24 md:py-28">
         <div className="mx-auto max-w-5xl px-6">
           <Fade>
             <div className="grid items-center gap-12 lg:grid-cols-2">
               <div>
-                <p className="text-xs font-semibold tracking-[0.2em] text-axonBlue">LEAD FOLLOW-UP</p>
+                <p className="text-xs font-semibold tracking-[0.2em] text-emerald-600">LEAD FOLLOW-UP</p>
                 <h2 className="mt-3 text-2xl font-bold tracking-[-0.02em] md:text-[36px] md:leading-[1.15]">
                   Every Lead Gets a Response. Fast. In Your Voice.
                 </h2>
@@ -421,34 +421,84 @@ export default function AuditLanding() {
                   Old estimates that went cold? Axon re-engages them automatically with a friendly check-in. Your pipeline stays full and nothing slips through the cracks. Speed is the #1 reason homeowners pick one HVAC company over another, and with Axon you are always first to respond!
                 </p>
               </div>
-              <div className="space-y-3">
-                {["After-hours inquiries caught and responded to automatically", "Personalized follow-ups written in your voice and tone", "Stale estimates and old quotes re-engaged on a schedule", "Every lead tracked so nothing gets lost or forgotten"].map((line) => (
-                  <div key={line} className="flex items-start gap-3 rounded-xl border border-gray-200 bg-axonBg px-5 py-3.5">
-                    <Check className="mt-0.5 h-4 w-4 shrink-0 text-axonBlue" />
-                    <p className="text-[14px] leading-[1.6] text-gray-600">{line}</p>
+              {/* INFOGRAPHIC: Speed race timeline */}
+              <div className="rounded-2xl border border-emerald-200/60 bg-gradient-to-br from-emerald-50/80 to-white p-6 md:p-8">
+                <p className="text-[11px] font-bold tracking-[0.15em] text-emerald-600">RESPONSE SPEED COMPARISON</p>
+                <div className="mt-5 space-y-5">
+                  {/* Axon bar */}
+                  <div>
+                    <div className="flex items-center justify-between">
+                      <p className="text-[13px] font-semibold text-axonText">With Axon</p>
+                      <p className="text-[13px] font-bold text-emerald-600">&lt;2 hours</p>
+                    </div>
+                    <div className="mt-2 h-3 rounded-full bg-emerald-100">
+                      <div className="h-full w-[15%] rounded-full bg-gradient-to-r from-emerald-500 to-emerald-400 shadow-[0_0_8px_rgba(16,185,129,0.4)]" />
+                    </div>
                   </div>
-                ))}
+                  {/* Average bar */}
+                  <div>
+                    <div className="flex items-center justify-between">
+                      <p className="text-[13px] font-semibold text-gray-400">Average HVAC company</p>
+                      <p className="text-[13px] font-bold text-gray-400">24+ hours</p>
+                    </div>
+                    <div className="mt-2 h-3 rounded-full bg-gray-100">
+                      <div className="h-full w-[85%] rounded-full bg-gray-300" />
+                    </div>
+                  </div>
+                </div>
+                <div className="mt-6 rounded-xl bg-emerald-600 px-4 py-3 text-center">
+                  <p className="text-[20px] font-bold text-white">78%</p>
+                  <p className="text-[11px] leading-tight text-emerald-100">of customers hire the first company that responds</p>
+                </div>
+                <div className="mt-4 grid grid-cols-3 gap-2">
+                  {[{ val: "Email", sub: "caught" }, { val: "Forms", sub: "caught" }, { val: "Voicemail", sub: "caught" }].map((item) => (
+                    <div key={item.val} className="rounded-lg bg-emerald-50 px-3 py-2 text-center">
+                      <p className="text-[12px] font-bold text-emerald-700">{item.val}</p>
+                      <p className="text-[10px] text-emerald-500">{item.sub}</p>
+                    </div>
+                  ))}
+                </div>
               </div>
             </div>
           </Fade>
         </div>
       </div>
 
-      {/* ── 2. CUSTOMER EXPERIENCE (visual left, text right) ── */}
+      {/* ── 2. CUSTOMER EXPERIENCE — color: violet (premium, VIP) ── */}
       <div className="py-24 md:py-28">
         <div className="mx-auto max-w-5xl px-6">
           <Fade>
             <div className="grid items-center gap-12 lg:grid-cols-2">
-              <div className="space-y-3 lg:order-1">
-                {["Welcome email with confirmation and what-to-expect details", "Post-job thank-you and satisfaction check-in", "Automatic review request at the perfect moment", "Seasonal maintenance reminders that keep you top-of-mind"].map((line) => (
-                  <div key={line} className="flex items-start gap-3 rounded-xl border border-gray-200 bg-white px-5 py-3.5 shadow-[0_1px_3px_rgba(0,0,0,0.04)]">
-                    <Check className="mt-0.5 h-4 w-4 shrink-0 text-axonBlue" />
-                    <p className="text-[14px] leading-[1.6] text-gray-600">{line}</p>
-                  </div>
-                ))}
+              {/* INFOGRAPHIC: Customer journey timeline */}
+              <div className="rounded-2xl border border-violet-200/60 bg-gradient-to-br from-violet-50/80 to-white p-6 md:p-8 lg:order-1">
+                <p className="text-[11px] font-bold tracking-[0.15em] text-violet-600">THE CUSTOMER JOURNEY</p>
+                <div className="mt-5 space-y-0">
+                  {[
+                    { step: "Job Booked", detail: "Welcome email + prep checklist sent", dot: "bg-violet-500" },
+                    { step: "Day Before", detail: "Appointment reminder with details", dot: "bg-violet-400" },
+                    { step: "Job Complete", detail: "Thank-you + satisfaction check-in", dot: "bg-violet-500" },
+                    { step: "3 Days After", detail: "Review request at the perfect moment", dot: "bg-amber-400" },
+                    { step: "Quarterly", detail: "Seasonal maintenance reminder", dot: "bg-violet-400" },
+                    { step: "Ongoing", detail: "Customer stays in your orbit forever", dot: "bg-violet-500" },
+                  ].map((item, i) => (
+                    <div key={i} className="flex items-start gap-3 py-2.5">
+                      <div className="flex flex-col items-center">
+                        <div className={`h-3 w-3 rounded-full ${item.dot} ring-4 ring-white shadow-sm`} />
+                        {i < 5 && <div className="h-full w-px bg-violet-200" style={{ minHeight: 20 }} />}
+                      </div>
+                      <div className="-mt-0.5">
+                        <p className="text-[13px] font-semibold text-axonText">{item.step}</p>
+                        <p className="text-[12px] text-gray-400">{item.detail}</p>
+                      </div>
+                    </div>
+                  ))}
+                </div>
+                <div className="mt-4 rounded-xl bg-violet-600 px-4 py-3 text-center">
+                  <p className="text-[12px] font-semibold text-violet-100">Every touchpoint sounds like you. Zero emails written by you!</p>
+                </div>
               </div>
               <div className="lg:order-2">
-                <p className="text-xs font-semibold tracking-[0.2em] text-axonBlue">CUSTOMER EXPERIENCE</p>
+                <p className="text-xs font-semibold tracking-[0.2em] text-violet-600">CUSTOMER EXPERIENCE</p>
                 <h2 className="mt-3 text-2xl font-bold tracking-[-0.02em] md:text-[36px] md:leading-[1.15]">
                   Every Customer Gets the VIP Treatment. Automatically.
                 </h2>
@@ -464,13 +514,13 @@ export default function AuditLanding() {
         </div>
       </div>
 
-      {/* ── 3. REVIEWS & REPUTATION (text left, visual right) ── */}
+      {/* ── 3. REVIEWS & REPUTATION — color: amber (stars, gold, trust) ── */}
       <div className="border-y border-gray-200/60 bg-white py-24 md:py-28">
         <div className="mx-auto max-w-5xl px-6">
           <Fade>
             <div className="grid items-center gap-12 lg:grid-cols-2">
               <div>
-                <p className="text-xs font-semibold tracking-[0.2em] text-axonBlue">REVIEWS &amp; REPUTATION</p>
+                <p className="text-xs font-semibold tracking-[0.2em] text-amber-600">REVIEWS &amp; REPUTATION</p>
                 <h2 className="mt-3 text-2xl font-bold tracking-[-0.02em] md:text-[36px] md:leading-[1.15]">
                   5-Star Reviews Are the Best Marketing You Will Ever Have.
                 </h2>
@@ -481,34 +531,86 @@ export default function AuditLanding() {
                   Axon responds to every Google review within hours with a thoughtful, personal reply. Happy customers get a gentle nudge to refer friends and family. Dormant clients get re-engaged with seasonal tune-up offers. Your reputation compounds month after month, and your organic traffic grows with it. This is how the best HVAC companies grow without throwing money at ads!
                 </p>
               </div>
-              <div className="space-y-3">
-                {["Every Google review responded to within hours", "Happy customers nudged to refer friends and family", "Dormant clients re-engaged with seasonal offers", "Higher Google rankings from active review management", "Free organic traffic that replaces paid ad spend"].map((line) => (
-                  <div key={line} className="flex items-start gap-3 rounded-xl border border-gray-200 bg-axonBg px-5 py-3.5">
-                    <Check className="mt-0.5 h-4 w-4 shrink-0 text-axonBlue" />
-                    <p className="text-[14px] leading-[1.6] text-gray-600">{line}</p>
+              {/* INFOGRAPHIC: Review growth chart */}
+              <div className="rounded-2xl border border-amber-200/60 bg-gradient-to-br from-amber-50/80 to-white p-6 md:p-8">
+                <p className="text-[11px] font-bold tracking-[0.15em] text-amber-600">YOUR REVIEW GROWTH</p>
+                {/* Star rating visualization */}
+                <div className="mt-5 flex items-end justify-between gap-2">
+                  {[
+                    { month: "Now", stars: 3.8, h: "h-16", color: "bg-gray-300" },
+                    { month: "Mo 1", stars: 4.1, h: "h-20", color: "bg-amber-300" },
+                    { month: "Mo 2", stars: 4.3, h: "h-24", color: "bg-amber-400" },
+                    { month: "Mo 3", stars: 4.5, h: "h-28", color: "bg-amber-400" },
+                    { month: "Mo 4", stars: 4.6, h: "h-32", color: "bg-amber-500" },
+                    { month: "Mo 6", stars: 4.8, h: "h-36", color: "bg-amber-500" },
+                  ].map((bar) => (
+                    <div key={bar.month} className="flex flex-1 flex-col items-center gap-1.5">
+                      <p className="text-[11px] font-bold text-amber-700">{bar.stars}</p>
+                      <div className={`w-full rounded-t-lg ${bar.color} ${bar.h} transition-all`} />
+                      <p className="text-[10px] text-gray-400">{bar.month}</p>
+                    </div>
+                  ))}
+                </div>
+                <div className="mt-5 grid grid-cols-2 gap-3">
+                  <div className="rounded-xl bg-amber-600 px-4 py-3 text-center">
+                    <p className="text-[18px] font-bold text-white">#1</p>
+                    <p className="text-[10px] leading-tight text-amber-100">factor in local search rankings</p>
                   </div>
-                ))}
+                  <div className="rounded-xl bg-amber-500 px-4 py-3 text-center">
+                    <p className="text-[18px] font-bold text-white">87%</p>
+                    <p className="text-[10px] leading-tight text-amber-100">read reviews before calling</p>
+                  </div>
+                </div>
+                <div className="mt-3 flex items-center justify-center gap-1">
+                  {[...Array(5)].map((_, i) => (
+                    <Star key={i} className="h-5 w-5 fill-amber-400 text-amber-400" />
+                  ))}
+                  <p className="ml-2 text-[13px] font-semibold text-axonText">Every review responded to!</p>
+                </div>
               </div>
             </div>
           </Fade>
         </div>
       </div>
 
-      {/* ── 4. ADMIN & REPORTING (visual left, text right) ── */}
+      {/* ── 4. ADMIN & REPORTING — color: sky/teal (clean, organized) ── */}
       <div className="py-24 md:py-28">
         <div className="mx-auto max-w-5xl px-6">
           <Fade>
             <div className="grid items-center gap-12 lg:grid-cols-2">
-              <div className="space-y-3 lg:order-1">
-                {["Daily morning briefing delivered to your inbox", "Inbox triaged and organized so you see what matters", "Weekly written report with revenue trends and next steps", "Calendar and file management handled automatically", "20+ hours of office work removed from your week"].map((line) => (
-                  <div key={line} className="flex items-start gap-3 rounded-xl border border-gray-200 bg-white px-5 py-3.5 shadow-[0_1px_3px_rgba(0,0,0,0.04)]">
-                    <Check className="mt-0.5 h-4 w-4 shrink-0 text-axonBlue" />
-                    <p className="text-[14px] leading-[1.6] text-gray-600">{line}</p>
-                  </div>
-                ))}
+              {/* INFOGRAPHIC: Time saved breakdown */}
+              <div className="rounded-2xl border border-teal-200/60 bg-gradient-to-br from-teal-50/80 to-white p-6 md:p-8 lg:order-1">
+                <p className="text-[11px] font-bold tracking-[0.15em] text-teal-600">YOUR WEEK BEFORE vs AFTER AXON</p>
+                <div className="mt-5 space-y-4">
+                  {[
+                    { task: "Email sorting + replies", before: "6 hrs", after: "0 hrs", pct: 100 },
+                    { task: "Lead follow-up", before: "4 hrs", after: "0 hrs", pct: 100 },
+                    { task: "Scheduling + confirmations", before: "3 hrs", after: "0 hrs", pct: 100 },
+                    { task: "Review responses", before: "2 hrs", after: "0 hrs", pct: 100 },
+                    { task: "Invoicing + data entry", before: "3 hrs", after: "15 min", pct: 92 },
+                    { task: "Reporting + planning", before: "2 hrs", after: "0 hrs", pct: 100 },
+                  ].map((row) => (
+                    <div key={row.task}>
+                      <div className="flex items-center justify-between">
+                        <p className="text-[12px] font-medium text-gray-600">{row.task}</p>
+                        <div className="flex items-center gap-2">
+                          <span className="text-[11px] text-gray-400 line-through">{row.before}</span>
+                          <span className="text-[11px] font-bold text-teal-600">{row.after}</span>
+                        </div>
+                      </div>
+                      <div className="mt-1.5 h-2 rounded-full bg-gray-100">
+                        <div className="h-full rounded-full bg-gradient-to-r from-teal-500 to-teal-400" style={{ width: `${row.pct}%` }} />
+                      </div>
+                    </div>
+                  ))}
+                </div>
+                <div className="mt-6 rounded-xl bg-teal-600 px-4 py-4 text-center">
+                  <p className="text-[28px] font-bold leading-none text-white">20+ hrs</p>
+                  <p className="mt-1 text-[12px] text-teal-100">saved every single week</p>
+                </div>
               </div>
               <div className="lg:order-2">
-                <p className="text-xs font-semibold tracking-[0.2em] text-axonBlue">ADMIN &amp; REPORTING</p>
+                <p className="text-xs font-semibold tracking-[0.2em] text-teal-600">ADMIN &amp; REPORTING</p>
                 <h2 className="mt-3 text-2xl font-bold tracking-[-0.02em] md:text-[36px] md:leading-[1.15]">
                   20+ Hours of Office Work. Gone. Every Single Week.
                 </h2>
