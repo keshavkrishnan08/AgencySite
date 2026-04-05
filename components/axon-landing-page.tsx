@@ -25,7 +25,7 @@ const HeroParticlesScene = dynamic(() => import("@/components/hero-particles-sce
   ssr: false,
 });
 
-const calendlyHref = "https://calendly.com/keshavkrishnanbusiness/30min";
+const calendlyHref = "https://calendly.com/axon-operations/30min";
 
 function Reveal({
   children,
@@ -325,12 +325,12 @@ export default function AxonLandingPage() {
                       <PieChart className="h-5 w-5 text-axonBlue" />
                     </div>
                     <h3 className="mt-5 text-3xl font-semibold tracking-tight">Reports, Documents & Intelligence</h3>
-                    <p className="mt-4 text-[16px] leading-[1.8] text-gray-500">Proposals are drafted from real conversation details. Invoices are generated and tracked. Every week you get a <span className="font-semibold text-axonText">written revenue analysis</span>, client health report, pipeline forecast, and competitor monitoring. Not a dashboard. A <span className="font-semibold text-axonText">written report with recommendations</span> you can act on.</p>
+                    <p className="mt-4 text-[16px] leading-[1.8] text-gray-500">Proposals and documents are drafted from real conversation details. Every week you get a <span className="font-semibold text-axonText">written revenue analysis</span>, client health report, pipeline forecast, and competitor monitoring. Not a dashboard. A <span className="font-semibold text-axonText">written report with recommendations</span> you can act on.</p>
                   </div>
                   <Card3D className="p-6 md:p-8">
                     <p className="mb-5 text-xs font-semibold tracking-[0.15em] text-axonBlue">WHAT RUNS DAILY</p>
                     <div className="space-y-3.5">
-                      {["Weekly written insights", "Proposal and invoice generation", "Decision-ready briefings", "Competitor monitoring"].map((p) => (
+                      {["Weekly written insights", "Proposal and document drafting", "Decision-ready briefings", "Competitor monitoring"].map((p) => (
                         <div key={p} className="flex items-center gap-3">
                           <div className="flex h-5 w-5 shrink-0 items-center justify-center rounded-full bg-sky-50"><Check className="h-3 w-3 text-axonBlue" /></div>
                           <p className="text-sm text-gray-600">{p}</p>
@@ -348,14 +348,14 @@ export default function AxonLandingPage() {
                     <div className="inline-flex h-11 w-11 items-center justify-center rounded-xl border border-gray-200 bg-white shadow-[0_2px_8px_rgba(0,0,0,0.04)]">
                       <FileCheck className="h-5 w-5 text-axonBlue" />
                     </div>
-                    <h3 className="mt-5 text-3xl font-semibold tracking-tight">Administration & Daily Operations</h3>
-                    <p className="mt-4 text-[16px] leading-[1.8] text-gray-500">All the miscellaneous tasks that eat away at your day are handled automatically. <span className="font-semibold text-axonText">Job scheduling, employee follow-ups, vendor coordination</span>, data entry across your CRM, accounting platform, and every other tool you use. Calendar management, file organization, and recurring operational tasks are completed daily without you touching them.</p>
+                    <h3 className="mt-5 text-3xl font-semibold tracking-tight">Daily Admin & Morning Briefings</h3>
+                    <p className="mt-4 text-[16px] leading-[1.8] text-gray-500">Your inbox is triaged and organized every morning. Customer info is compiled, notes are summarized, and everything is structured so <span className="font-semibold text-axonText">updating your CRM or accounting tools takes minutes instead of hours</span>. Calendar management, file organization, and recurring communication tasks are handled daily without you touching them.</p>
                     <p className="mt-4 text-[16px] leading-[1.8] text-gray-500">Every morning, a briefing is ready with everything that happened overnight, what needs your decision today, and what was already handled. The small stuff that <span className="font-semibold text-axonText">silently eats 3 to 4 hours of your day</span> is gone.</p>
                   </div>
                   <Card3D className="p-6 md:p-8">
                     <p className="mb-5 text-xs font-semibold tracking-[0.15em] text-axonBlue">WHAT RUNS DAILY</p>
                     <div className="space-y-3.5">
-                      {["Job scheduling and updates", "Employee follow-ups and coordination", "Vendor and supplier communications", "Data entry across all your tools", "Daily morning briefing", "Calendar and file management"].map((p) => (
+                      {["Inbox triage and organization", "Customer info compiled and prepped", "Calendar and file management", "Data structured for your tools", "Daily morning briefing", "Recurring communication handled"].map((p) => (
                         <div key={p} className="flex items-center gap-3">
                           <div className="flex h-5 w-5 shrink-0 items-center justify-center rounded-full bg-sky-50"><Check className="h-3 w-3 text-axonBlue" /></div>
                           <p className="text-sm text-gray-600">{p}</p>

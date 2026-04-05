@@ -2,13 +2,13 @@ import type { Metadata } from "next";
 import Script from "next/script";
 
 export const metadata: Metadata = {
-  title: "Free Operations Audit — Axon",
+  title: "Free HVAC Operations Audit — Axon",
   description:
-    "Find out exactly where your service business is losing leads and wasting time. 30-minute audit. Free. No obligation.",
+    "Find out exactly where your HVAC company is losing jobs, missing leads, and wasting time on admin. Free 30-minute audit built for HVAC owners.",
   openGraph: {
-    title: "Free Operations Audit — Axon",
+    title: "Free HVAC Operations Audit — Axon",
     description:
-      "Find out exactly where your service business is losing leads and wasting time. 30-minute audit. Free. No obligation.",
+      "Find out exactly where your HVAC company is losing jobs, missing leads, and wasting time on admin. Free 30-minute audit built for HVAC owners.",
   },
 };
 
