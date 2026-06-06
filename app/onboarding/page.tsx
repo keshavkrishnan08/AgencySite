@@ -3,7 +3,7 @@
 import { useMemo, useState } from "react";
 import { useRouter } from "next/navigation";
 import { AnimatePresence, motion } from "framer-motion";
-import { ArrowLeft, ArrowRight, Lock, Search } from "lucide-react";
+import { ArrowLeft, ArrowRight, Check, Lock, Search } from "lucide-react";
 import { Logo } from "@/components/ui/Logo";
 import { Button } from "@/components/ui/Button";
 import { ROLES } from "@/lib/roles";
@@ -53,9 +53,21 @@ export default function OnboardingPage() {
   };
 
   return (
-    <main className="relative flex min-h-screen flex-col">
+    <main className="relative flex min-h-screen flex-col overflow-hidden">
+      {/* animated backdrop */}
+      <div
+        aria-hidden
+        className="pointer-events-none absolute -left-24 top-8 h-72 w-72 animate-float rounded-full opacity-50 blur-3xl"
+        style={{ background: "radial-gradient(circle, rgba(25,169,184,0.22), transparent 70%)" }}
+      />
+      <div
+        aria-hidden
+        className="pointer-events-none absolute -right-24 bottom-10 h-80 w-80 animate-float rounded-full opacity-40 blur-3xl"
+        style={{ background: "radial-gradient(circle, rgba(184,137,59,0.2), transparent 70%)", animationDelay: "1.6s" }}
+      />
+
       {/* top bar */}
-      <div className="container-wide flex items-center justify-between py-6">
+      <div className="container-wide relative flex items-center justify-between py-6">
         <Logo />
         <span className="chip">
           <Lock size={13} /> No account needed
@@ -63,7 +75,7 @@ export default function OnboardingPage() {
       </div>
 
       {/* progress */}
-      <div className="container-content">
+      <div className="container-content relative">
         <div className="mx-auto flex max-w-xs items-center gap-2">
           {[0, 1, 2].map((i) => (
             <div
@@ -71,19 +83,64 @@ export default function OnboardingPage() {
               className="h-1.5 flex-1 overflow-hidden rounded-full"
               style={{ background: "var(--bg-tint)" }}
             >
-              <div
-                className="h-full rounded-full transition-all duration-500"
-                style={{
-                  width: i <= step ? "100%" : "0%",
-                  background: "linear-gradient(90deg, var(--primary), var(--primary-bright))",
-                }}
+              <motion.div
+                className="h-full rounded-full"
+                initial={false}
+                animate={{ width: i <= step ? "100%" : "0%" }}
+                transition={{ duration: 0.5, ease: [0.22, 1, 0.36, 1] }}
+                style={{ background: "linear-gradient(90deg, var(--primary), var(--primary-bright))" }}
               />
             </div>
           ))}
         </div>
+
+        {/* live highlight chips of your picks */}
+        <div className="mt-5 flex min-h-[2rem] flex-wrap items-center justify-center gap-2">
+          <AnimatePresence mode="popLayout">
+            {situation && (
+              <motion.span
+                key="c-sit"
+                layout
+                initial={{ opacity: 0, scale: 0.7 }}
+                animate={{ opacity: 1, scale: 1 }}
+                exit={{ opacity: 0, scale: 0.7 }}
+                transition={{ type: "spring", stiffness: 420, damping: 26 }}
+                className="inline-flex items-center gap-1.5 rounded-full bg-primary-soft px-3 py-1 text-sm font-medium text-primary-ink"
+              >
+                {SITUATION_META[situation].emoji} {SITUATION_META[situation].short}
+              </motion.span>
+            )}
+            {(role || query) && (
+              <motion.span
+                key="c-role"
+                layout
+                initial={{ opacity: 0, scale: 0.7 }}
+                animate={{ opacity: 1, scale: 1 }}
+                exit={{ opacity: 0, scale: 0.7 }}
+                transition={{ type: "spring", stiffness: 420, damping: 26 }}
+                className="inline-flex items-center gap-1.5 rounded-full bg-bg-tint px-3 py-1 text-sm font-medium text-ink-2"
+              >
+                Preparing for:&nbsp;<strong className="text-ink">{role || query}</strong>
+              </motion.span>
+            )}
+            {gap && (
+              <motion.span
+                key="c-gap"
+                layout
+                initial={{ opacity: 0, scale: 0.7 }}
+                animate={{ opacity: 1, scale: 1 }}
+                exit={{ opacity: 0, scale: 0.7 }}
+                transition={{ type: "spring", stiffness: 420, damping: 26 }}
+                className="inline-flex items-center gap-1.5 rounded-full bg-bg-tint px-3 py-1 text-sm font-medium text-ink-2"
+              >
+                {GAPS.find((g) => g.value === gap)?.label}
+              </motion.span>
+            )}
+          </AnimatePresence>
+        </div>
       </div>
 
-      <div className="container-content flex flex-1 items-center justify-center py-10">
+      <div className="container-content relative flex flex-1 items-center justify-center py-10">
         <div className="w-full">
           <AnimatePresence mode="wait" custom={dir}>
             {/* STEP 1 */}
@@ -104,24 +161,49 @@ export default function OnboardingPage() {
                   We&apos;ll tailor every question to your exact situation.
                 </p>
                 <div className="mt-9 grid gap-3.5 sm:grid-cols-2">
-                  {SITUATIONS.map((s) => {
+                  {SITUATIONS.map((s, i) => {
                     const meta = SITUATION_META[s];
                     const active = situation === s;
                     return (
-                      <button
+                      <motion.button
                         key={s}
+                        initial={{ opacity: 0, y: 16 }}
+                        animate={{ opacity: 1, y: 0 }}
+                        transition={{ delay: 0.05 + i * 0.07, duration: 0.4, ease: [0.22, 1, 0.36, 1] }}
+                        whileHover={{ y: -4 }}
+                        whileTap={{ scale: 0.97 }}
                         onClick={() => {
                           setSituation(s);
-                          setTimeout(() => go(1), 180);
+                          setTimeout(() => go(1), 220);
                         }}
-                        className="group flex items-center gap-4 rounded-xl border-2 bg-surface p-5 text-left shadow-sm transition-all hover:-translate-y-0.5 hover:shadow-lg"
+                        className="group flex items-center gap-4 rounded-xl border-2 bg-surface p-5 text-left shadow-sm transition-shadow hover:shadow-lg"
                         style={{ borderColor: active ? "var(--primary)" : "var(--border)" }}
                       >
-                        <span className="grid h-12 w-12 shrink-0 place-items-center rounded-xl bg-bg-tint text-2xl transition-colors group-hover:bg-primary-soft">
+                        <span
+                          className="grid h-12 w-12 shrink-0 place-items-center rounded-xl text-2xl transition-colors"
+                          style={{ background: active ? "var(--primary-soft)" : "var(--bg-tint)" }}
+                        >
                           {meta.emoji}
                         </span>
                         <span className="font-medium text-ink">{meta.label}</span>
-                      </button>
+                        <span className="ml-auto">
+                          {active ? (
+                            <motion.span
+                              initial={{ scale: 0 }}
+                              animate={{ scale: 1 }}
+                              transition={{ type: "spring", stiffness: 500, damping: 22 }}
+                              className="grid h-6 w-6 place-items-center rounded-full bg-primary text-white"
+                            >
+                              <Check size={14} />
+                            </motion.span>
+                          ) : (
+                            <ArrowRight
+                              size={18}
+                              className="text-ink-3 opacity-0 transition-opacity group-hover:opacity-100"
+                            />
+                          )}
+                        </span>
+                      </motion.button>
                     );
                   })}
                 </div>

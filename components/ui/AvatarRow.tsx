@@ -1,24 +1,20 @@
 import { cn } from "@/lib/utils";
+import { Avatar } from "./Avatar";
 
+/* Real photos via randomuser.me (free, keyless), with graceful fallback. */
 const PEOPLE = [
-  { initials: "RM", from: "#19a9b8", to: "#0c5660" },
-  { initials: "LK", from: "#dd8b3d", to: "#a8631f" },
-  { initials: "PA", from: "#3e9d6e", to: "#2a6e4d" },
-  { initials: "CJ", from: "#b8893b", to: "#8a6526" },
-  { initials: "DT", from: "#14808e", to: "#19a9b8" },
+  { src: "https://randomuser.me/api/portraits/thumb/women/68.jpg", name: "Rachel M" },
+  { src: "https://randomuser.me/api/portraits/thumb/men/32.jpg", name: "David K" },
+  { src: "https://randomuser.me/api/portraits/thumb/women/44.jpg", name: "Priya N" },
+  { src: "https://randomuser.me/api/portraits/thumb/men/51.jpg", name: "Marcus T" },
+  { src: "https://randomuser.me/api/portraits/thumb/women/65.jpg", name: "Janet R" },
 ];
 
 export function AvatarRow({ className }: { className?: string }) {
   return (
     <div className={cn("flex -space-x-2.5", className)}>
       {PEOPLE.map((p) => (
-        <span
-          key={p.initials}
-          className="grid h-9 w-9 place-items-center rounded-full text-2xs font-bold text-white ring-2 ring-bg"
-          style={{ background: `linear-gradient(140deg, ${p.from}, ${p.to})` }}
-        >
-          {p.initials}
-        </span>
+        <Avatar key={p.name} src={p.src} name={p.name} size={36} className="ring-2 ring-bg" />
       ))}
     </div>
   );

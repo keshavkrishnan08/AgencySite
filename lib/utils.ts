@@ -50,6 +50,15 @@ export const DIMENSIONS: { key: Dimension; label: string; blurb: string }[] = [
   { key: "conciseness", label: "Conciseness", blurb: "The right length — no rambling" },
 ];
 
+/** Short, plain advice per dimension — used in hover tooltips. */
+export const DIMENSION_HELP: Record<Dimension, { what: string; tip: string }> = {
+  clarity: { what: "How easy your answer is to follow.", tip: "Go in order: the situation, what you did, then the result." },
+  relevance: { what: "Whether you answered the real question.", tip: "Make your very first sentence answer it head-on." },
+  specificity: { what: "Real details, numbers, and outcomes.", tip: "Add one number or result to every story." },
+  confidence: { what: "How sure of yourself you sound.", tip: "Cut 'I just', 'I guess', and 'um'." },
+  conciseness: { what: "The right length — not too short, not rambling.", tip: "Aim for 60–150 words. Trim the slow start." },
+};
+
 export const SITUATION_META: Record<
   Situation,
   { label: string; short: string; emoji: string }
