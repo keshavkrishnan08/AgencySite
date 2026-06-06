@@ -47,7 +47,7 @@ export default function DebriefPage() {
     <ToolShell
       icon={DebriefIcon}
       title="Post-Interview Debrief"
-      description="Just walked out wondering 'did that go well?' Type what they asked and what you said. Get honest scoring — so you know exactly what to fix before the next one."
+      description="Just walked out wondering 'did that go well?' Type what they asked and what you said. Get honest scoring. So you know exactly what to fix before the next one."
     >
       <div className="card p-7">
         <label className="block">

@@ -12,13 +12,13 @@ Generate exactly 8 realistic interview questions for the given role and candidat
 Follow this arc:
 - Q1-2: Warmup (easy, confidence-building, e.g. "tell me about yourself")
 - Q3-5: Core behavioral (STAR-format expected)
-- Q6-7: Situation-specific — directly address the candidate's situation (returning to work / laid off / promotion / career change)
+- Q6-7: Situation-specific. Directly address the candidate's situation (returning to work / laid off / promotion / career change)
 - Q8: Closer ("what questions do you have for us?")
 
 If a company name is given, reference it naturally in the opener and closer.
 If a job posting is given, mine it for the role's real priorities (the skills, the
 language they used, "fast-paced", customer-facing, leadership, accuracy, targets)
-and make at least two behavioral questions probe exactly those things — like a real
+and make at least two behavioral questions probe exactly those things. Like a real
 hiring manager for THIS job would.
 
 For each question include a short, practical tip (1 sentence).

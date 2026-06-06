@@ -2,7 +2,7 @@ import Link from "next/link";
 import { cn } from "@/lib/utils";
 
 /**
- * PrepPath mark — an abstract rising arc to a spark. No box, no tile.
+ * PrepPath mark. An abstract rising arc to a spark. No box, no tile.
  * Reads as growth + readiness. Teal gradient stroke, stands on its own.
  */
 export function LogoMark({

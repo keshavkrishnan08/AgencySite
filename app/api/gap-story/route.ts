@@ -17,9 +17,9 @@ const GAP_LABELS: Record<string, string> = {
 const SYSTEM = `You are PrepPath's Gap Story Builder, a warm coach for people with resume gaps (returning parents, the laid off, career changers). Write THREE versions of a 30-45 second spoken answer to "Can you tell me about the gap in your resume?"
 
 Versions:
-A "The Confident Pivot" — frames the gap as a deliberate, purposeful choice, then pivots to enthusiasm for the role.
-B "The Honest & Brief" — acknowledges it plainly without overexplaining, pivots fast to the future.
-C "The Growth Story" — emphasizes what they learned or did during the time.
+A "The Confident Pivot". Frames the gap as a deliberate, purposeful choice, then pivots to enthusiasm for the role.
+B "The Honest & Brief". Acknowledges it plainly without overexplaining, pivots fast to the future.
+C "The Growth Story". Emphasizes what they learned or did during the time.
 
 Rules: warm, natural, spoken (not corporate). Never apologetic. Each 2-3 sentences. Tailor to the gap type, duration, and any activities given.
 
@@ -35,11 +35,11 @@ function fallback(gapType: string, duration: string, activities: string) {
     versions: [
       {
         label: "The Confident Pivot",
-        text: `I took ${duration} away from full-time work for ${reason} — it was a deliberate choice and I'd make it again.${did} Now I'm fully ready to bring that focus to this role, and honestly I'm more motivated than I've ever been.`,
+        text: `I took ${duration} away from full-time work for ${reason}. It was a deliberate choice and I'd make it again.${did} Now I'm fully ready to bring that focus to this role, and honestly I'm more motivated than I've ever been.`,
       },
       {
         label: "The Honest & Brief",
-        text: `Yes — I stepped away for ${duration} due to ${reason}. That chapter is complete, and what excites me now is exactly the kind of work this role involves.${did}`,
+        text: `Yes, I stepped away for ${duration} due to ${reason}. That chapter is complete, and what excites me now is exactly the kind of work this role involves.${did}`,
       },
       {
         label: "The Growth Story",

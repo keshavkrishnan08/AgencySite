@@ -42,10 +42,10 @@ import type { Dimension, Session } from "@/lib/types";
 const DAILY_TIPS = [
   "When asked your greatest weakness, never say 'perfectionist.' Name a real skill you're improving and what you're doing about it.",
   "Pause instead of saying 'um.' A one-second silence reads as thoughtful; a filler word reads as nervous.",
-  "End every behavioral answer with a result — ideally a number. 'Cut wait times 30%' beats 'it got better.'",
-  "Replace 'I just' and 'I only' with nothing. You didn't *just* manage a team — you managed a team.",
+  "End every behavioral answer with a result. Ideally a number. 'Cut wait times 30%' beats 'it got better.'",
+  "Replace 'I just' and 'I only' with nothing. You didn't *just* manage a team. You managed a team.",
   "Research one recent piece of company news. Mentioning it makes you sound like you've followed them for years.",
-  "Mirror the energy of the job posting. 'Fast-paced' means they'll ask how you handle pressure — have a story ready.",
+  "Mirror the energy of the job posting. 'Fast-paced' means they'll ask how you handle pressure. Have a story ready.",
   "Always ask two questions at the end. It signals genuine interest more than any answer you give.",
 ];
 
@@ -173,7 +173,7 @@ export default function DashboardPage() {
                   </h2>
                   <p className="mt-2 max-w-sm text-white/80">
                     Based on your last {Math.min(sessions.length, 5)} sessions. Most users feel confident at
-                    80%+{readiness < 80 ? " — you're almost there." : "."}
+                    80%+{readiness < 80 ? ". You're almost there." : "."}
                   </p>
                   <ButtonLink
                     href="/practice"
@@ -302,7 +302,7 @@ export default function DashboardPage() {
               </div>
               <p className="mt-2 text-sm text-white/85">
                 {streak.current > 0
-                  ? "Keep it going — practice today to extend it."
+                  ? "Keep it going. Practice today to extend it."
                   : "Practice today to start a streak."}
               </p>
             </div>
@@ -347,7 +347,7 @@ export default function DashboardPage() {
                 </div>
               ) : (
                 <p className="text-sm text-ink-2">
-                  Got a real interview lined up? Track it here — offers are the point, not just scores.
+                  Got a real interview lined up? Track it here. Offers are the point, not just scores.
                 </p>
               )}
             </div>

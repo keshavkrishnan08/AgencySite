@@ -62,7 +62,7 @@ export default function InterviewDayPage() {
       const verdict =
         delta >= -3
           ? "You're ready. Your practice held up under pressure."
-          : "Pressure pulled your scores down. Consider 2–3 more practice sessions before the real thing.";
+          : "Pressure pulled your scores down. Consider 2-3 more practice sessions before the real thing.";
       setResult({ session, verdict, delta });
       setPhase("results");
     },
@@ -133,7 +133,7 @@ export default function InterviewDayPage() {
           </span>
           <h1 className="mt-6 font-serif text-3xl font-semibold text-white">Interview Day is Premium</h1>
           <p className="mt-3 text-white/70">
-            Simulate real interview pressure the night before — timed answers, no going back, a final
+            Simulate real interview pressure the night before. Timed answers, no going back, a final
             readiness check. Unlock it with Premium.
           </p>
           <ButtonLink href="/upgrade" variant="gold" size="lg" className="mt-7">
@@ -170,7 +170,7 @@ export default function InterviewDayPage() {
           </Button>
           <div className="mt-4">
             <Link href="/dashboard" className="text-sm text-white/60 hover:text-white">
-              Not yet — back to dashboard
+              Not yet. Back to dashboard
             </Link>
           </div>
         </motion.div>

@@ -113,10 +113,10 @@ function keywords(text: string): Set<string> {
   return new Set(words(text).filter((w) => w.length > 3 && !STOP.has(w)));
 }
 
-/* ---------------- Dimension scorers (0–100) ---------------- */
+/* ---------------- Dimension scorers (0-100) ---------------- */
 
 function scoreConciseness(wc: number): number {
-  // Sweet spot ~70–190 words for a spoken behavioral answer.
+  // Sweet spot ~70-190 words for a spoken behavioral answer.
   if (wc === 0) return 0;
   if (wc < 20) return Math.round(clamp(28 + wc * 1.4));
   if (wc < 70) return Math.round(clamp(58 + (wc - 20) * 0.7));
@@ -135,7 +135,7 @@ function scoreClarity(text: string): { score: number; avgLen: number } {
   const burstiness = Math.min(Math.sqrt(variance), 12); // reward varied rhythm
 
   let s = 56;
-  // ideal average sentence length 11–22 words
+  // ideal average sentence length 11-22 words
   if (avgLen >= 9 && avgLen <= 24) s += 18;
   else if (avgLen < 6) s -= 14;
   else if (avgLen > 34) s -= 18;
@@ -245,20 +245,20 @@ function feedbackFor(
     case "clarity":
       if (good)
         return pick([
-          "Strong, easy-to-follow shape — you set the scene and moved through it in order.",
+          "Strong, easy-to-follow shape. You set the scene and moved through it in order.",
           "Clean structure. A listener could repeat your story back after hearing it once.",
         ], seed);
       if (mid)
         return "The bones are there. Open with one sentence that frames the whole story before you dive into details.";
       return ctx.avgLen > 30
-        ? "Your sentences run long, so the thread gets lost. Break them up — one idea per sentence."
+        ? "Your sentences run long, so the thread gets lost. Break them up. One idea per sentence."
         : "It's a little hard to follow. Try Situation → Action → Result so each part has a clear job.";
 
     case "relevance":
       if (good)
         return pick([
           "You answered exactly what was asked and stayed on topic the whole way through.",
-          "Right on target — no detours, no filler. You addressed the real question.",
+          "Right on target. No detours, no filler. You addressed the real question.",
         ], seed);
       if (mid)
         return "You're close, but you drifted. Re-read the question and make your first sentence answer it directly.";
@@ -267,50 +267,50 @@ function feedbackFor(
     case "specificity":
       if (good)
         return ctx.numbers
-          ? "Excellent — you backed it with real numbers, which is what makes an answer believable."
+          ? "Excellent. You backed it with real numbers, which is what makes an answer believable."
           : "Concrete and detailed. The specific actions you named are what interviewers remember.";
       if (mid)
-        return "Good start. Add one number or outcome — 'cut response time by 30%' beats 'it got faster.'";
+        return "Good start. Add one number or outcome, 'cut response time by 30%' beats 'it got faster.'";
       return "You told us it went well, but not how you know. Swap one vague phrase for a measurable result.";
 
     case "confidence": {
       if (ctx.anx.underminerCount > 0) {
         const u = ctx.anx.underminers[0] ?? "I just";
-        return `You undermined yourself with "${u}." You didn't *${u.replace(/^i /, "")}* do it — you did it. Drop the qualifier.`;
+        return `You undermined yourself with "${u}." You didn't *${u.replace(/^i /, "")}* do it. You did it. Drop the qualifier.`;
       }
       if (ctx.anx.apologyCount > 0)
-        return "You apologized inside your answer. Never apologize for your experience — state it plainly.";
+        return "You apologized inside your answer. Never apologize for your experience. State it plainly.";
       if (ctx.anx.hedgeCount > 1)
         return `You hedged ${ctx.anx.hedgeCount} times ("${ctx.anx.hedges[0]}"). Replace it with "In my experience" and watch this jump.`;
       if (ctx.anx.fillerCount > 2)
         return `${ctx.anx.fillerCount} filler words slipped in. A short pause reads as far more confident than "um."`;
       if (good)
-        return "You sound sure of yourself — no hedging, no apologizing. That's exactly the tone that lands.";
+        return "You sound sure of yourself. No hedging, no apologizing. That's exactly the tone that lands.";
       return "Steady tone. Trim any 'I think' or 'maybe' and let your statements stand on their own.";
     }
 
     case "conciseness":
-      if (ctx.wc < 25) return "Too brief — the interviewer is left wanting more. Add the action you took and how it ended.";
-      if (ctx.wc > 260) return `That's ${ctx.wc} words — you're rambling a bit. Aim for 60–150 and cut the setup.`;
+      if (ctx.wc < 25) return "Too brief. The interviewer is left wanting more. Add the action you took and how it ended.";
+      if (ctx.wc > 260) return `That's ${ctx.wc} words. You're rambling a bit. Aim for 60-150 and cut the setup.`;
       if (good) return "Great length. Long enough to be complete, short enough to hold attention.";
       return "Reasonable length. A tighter opening would give your result more room to shine.";
   }
 }
 
 const STRENGTH_LINE: Record<Dimension, string> = {
-  clarity: "Clarity — your answers are easy to follow and well structured.",
-  relevance: "Relevance — you stay on topic and address the question directly.",
-  specificity: "Specificity — you back your stories with concrete detail.",
-  confidence: "Confidence — your language is self-assured and direct.",
-  conciseness: "Conciseness — you say what matters without rambling.",
+  clarity: "Clarity: your answers are easy to follow and well structured.",
+  relevance: "Relevance: you stay on topic and address the question directly.",
+  specificity: "Specificity: you back your stories with concrete detail.",
+  confidence: "Confidence: your language is self-assured and direct.",
+  conciseness: "Conciseness: you say what matters without rambling.",
 };
 
 const GROWTH_LINE: Record<Dimension, string> = {
-  clarity: "Clarity — structure each answer as Situation → Action → Result.",
-  relevance: "Relevance — make your first sentence answer the exact question.",
-  specificity: "Specificity — add one number or outcome to every answer. This is the fastest way to raise your score.",
-  confidence: "Confidence — cut hedging and self-undermining words like 'just' and 'I guess.'",
-  conciseness: "Conciseness — aim for 60–150 words. Trim the setup, keep the result.",
+  clarity: "Clarity: structure each answer as Situation → Action → Result.",
+  relevance: "Relevance: make your first sentence answer the exact question.",
+  specificity: "Specificity: add one number or outcome to every answer. This is the fastest way to raise your score.",
+  confidence: "Confidence: cut hedging and self-undermining words like 'just' and 'I guess.'",
+  conciseness: "Conciseness: aim for 60-150 words. Trim the setup, keep the result.",
 };
 
 export function scoreAnswer(input: {

@@ -6,7 +6,7 @@ import type { Dimension, Question, Situation } from "./types";
 
 const WARMUP = (role: string): string[] => [
   `Tell me about yourself and what brought you to apply for this ${role} position.`,
-  `Walk me through your background — what should I know about your experience as it relates to ${role}?`,
+  `Walk me through your background. What should I know about your experience as it relates to ${role}?`,
   `What got you interested in this ${role} role specifically?`,
 ];
 
@@ -52,13 +52,13 @@ const TIPS: Record<string, string> = {
   warmup:
     "Keep it to about 60 seconds. Present → past → future: who you are now, what you've done, why you're here.",
   behavioral:
-    "Use STAR — Situation, Task, Action, Result. End on a concrete result, not 'and it worked out.'",
+    "Use STAR: Situation, Task, Action, Result. End on a concrete result, not 'and it worked out.'",
   gap:
     "State it plainly, keep it to ~30 seconds, then pivot to why you're excited about this role. No apologizing.",
   situation:
     "Be honest and specific, then bridge to the value you bring now. Frame the change as a deliberate choice.",
   closer:
-    "Always ask 1–2 thoughtful questions. It signals genuine interest and that you've done your homework.",
+    "Always ask 1-2 thoughtful questions. It signals genuine interest and that you've done your homework.",
 };
 
 function categoryFor(index: number): string {
@@ -139,7 +139,7 @@ export function generateQuestions(
 /** A focused single-dimension drill set, used by "Practice your focus area." */
 const FOCUS_QS: Record<Dimension, string[]> = {
   specificity: [
-    "Tell me about your single biggest accomplishment — and put real numbers on it.",
+    "Tell me about your single biggest accomplishment. And put real numbers on it.",
     "Describe a time you saved money or time. Exactly how much?",
     "Walk me through a result you're proud of, with the before-and-after metrics.",
   ],

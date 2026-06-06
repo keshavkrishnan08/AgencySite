@@ -17,18 +17,18 @@ function fallback(company: string, role: string) {
   return {
     whatTheyDo: `${c} operates in its market by serving customers who rely on it for quality and consistency. Before your interview, read their homepage and "About" page so you can describe their mission in one plain sentence. Knowing their core product and who they serve is the single fastest way to sound prepared.`,
     recentNews: [
-      `Check their LinkedIn and newsroom for anything from the last 6 months — a launch, a leadership change, an expansion, or a funding round.`,
+      `Check their LinkedIn and newsroom for anything from the last 6 months. A launch, a leadership change, an expansion, or a funding round.`,
       `Scan recent Glassdoor reviews to learn what current employees praise and complain about.`,
       `Look for any award, partnership, or press mention you can reference naturally in the interview.`,
     ],
     culture: [
-      `Read their careers page — the values they list out loud are the ones they'll screen for.`,
+      `Read their careers page. The values they list out loud are the ones they'll screen for.`,
       `Note the tone of their job posting (fast-paced, mission-driven, detail-oriented) and mirror it.`,
       `Find one value that genuinely resonates with you and be ready to give an example of living it.`,
     ],
     roleFocus: [
       `For a ${r}, expect them to care about reliability and how you handle competing priorities.`,
-      `Be ready to show measurable impact from a past role — numbers beat adjectives.`,
+      `Be ready to show measurable impact from a past role. Numbers beat adjectives.`,
       `Prepare one story that proves you can ramp up quickly in a new environment.`,
     ],
     questionsToAsk: [

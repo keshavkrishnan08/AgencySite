@@ -4,7 +4,7 @@ import { useState } from "react";
 import { cn } from "@/lib/utils";
 
 /* Loads a real photo from the internet, but degrades to a gradient + initials
-   if it ever fails — so the UI never shows a broken image. */
+   if it ever fails. So the UI never shows a broken image. */
 export function Avatar({
   src,
   name = "",
