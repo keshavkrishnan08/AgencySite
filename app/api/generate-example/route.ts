@@ -5,7 +5,7 @@ import { callClaude, hasAI } from "@/lib/ai";
 export const runtime = "nodejs";
 export const dynamic = "force-dynamic";
 
-const SYSTEM = `You are PrepPath, an interview coach. Write ONE strong example answer to the interview question, tailored to the candidate's role. Use the STAR method where it fits. Keep it natural and spoken (not corporate), 110-180 words. Return only the answer text. No preamble, no quotes, no labels.`;
+const SYSTEM = `You are PrepPath, an interview coach. Write ONE strong example answer to the interview question, tailored to the candidate's role. Use the STAR method where it fits. Keep it natural and spoken (not corporate), 110-180 words. Return only the answer text. No preamble, no quotes, no labels.\n\nWrite in plain words a 6th grader can read. Never use em dashes or en dashes; use a period, comma, or colon instead.`;
 
 export async function POST(req: Request) {
   let body: any;

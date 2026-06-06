@@ -24,7 +24,7 @@ hiring manager for THIS job would.
 For each question include a short, practical tip (1 sentence).
 
 Return ONLY valid minified JSON, no backticks:
-{"questions":[{"number":1,"text":"...","category":"warmup|behavioral|gap|situation|closer","tip":"..."}]}`;
+{"questions":[{"number":1,"text":"...","category":"warmup|behavioral|gap|situation|closer","tip":"..."}]}\n\nWrite in plain words a 6th grader can read. Never use em dashes or en dashes; use a period, comma, or colon instead.`;
 
 export async function POST(req: Request) {
   let body: any;
