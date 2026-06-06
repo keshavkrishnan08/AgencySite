@@ -292,10 +292,10 @@ function PracticeInner() {
                 <div className="mt-2 flex items-center justify-between px-1">
                   <span className="text-xs text-ink-3">
                     {wordCount < 8
-                      ? `${wordCount} words — aim for at least a few sentences`
+                      ? `${wordCount} words. Aim for at least a few sentences`
                       : `${wordCount} words`}
                   </span>
-                  <span className="text-xs text-ink-3">Tip: 60–150 words is the sweet spot</span>
+                  <span className="text-xs text-ink-3">Tip: 60-150 words is the sweet spot</span>
                 </div>
               </div>
 
@@ -506,7 +506,7 @@ function BlockedCard() {
           full scoring, and every tool.
         </p>
         <ButtonLink href="/upgrade" variant="gold" size="lg" className="mt-7 w-full">
-          Upgrade to Premium — $9.99/mo
+          Upgrade to Premium, $9.99/mo
         </ButtonLink>
         <ButtonLink href="/dashboard" variant="ghost" size="sm" className="mt-2">
           Back to dashboard

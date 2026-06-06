@@ -4,10 +4,12 @@ import { SiteFooter } from "@/components/layout/SiteFooter";
 import { HeroDemo } from "@/components/landing/HeroDemo";
 import { Avatar } from "@/components/ui/Avatar";
 import { ProductFeatures } from "@/components/landing/features";
+import { FlowDiagram } from "@/components/landing/FlowDiagram";
 import { TestimonialMarquee, TestimonialGrid } from "@/components/landing/testimonials";
 import { StickyCTA } from "@/components/landing/StickyCTA";
 import { Reveal } from "@/components/ui/Reveal";
-import { AnimatedNumber } from "@/components/ui/AnimatedNumber";
+import { ScoreRing } from "@/components/ui/Score";
+import { ProgressLineChart, MiniBars } from "@/components/charts/Charts";
 import { AvatarRow } from "@/components/ui/AvatarRow";
 import { ButtonLink } from "@/components/ui/Button";
 
@@ -56,14 +58,14 @@ function Hero() {
           <Reveal delay={0.12}>
             <p className="mt-7 max-w-prose text-lg leading-relaxed text-ink-2">
               The interview isn&apos;t the hard part. Not knowing if you&apos;re ready is.
-              So practice in private with AI. See where you stand. Walk in sure — because
-              you&apos;ve already done it once.
+              So practice in private with AI. See where you stand. Walk in sure. You&apos;ve
+              already done it once.
             </p>
           </Reveal>
           <Reveal delay={0.18}>
             <div className="mt-9 flex flex-col items-start gap-3 sm:flex-row sm:items-center">
               <ButtonLink href="/onboarding" size="lg" className="group">
-                Start your first practice — free
+                Start your first practice, free
                 <ArrowRight size={18} className="transition-transform group-hover:translate-x-0.5" />
               </ButtonLink>
               <span className="text-sm text-ink-3">No credit card. No account. Takes 30 seconds.</span>
@@ -132,17 +134,17 @@ const QUESTIONS = [
   {
     q: "Tell me about yourself.",
     pain: "You have 90 seconds to summarize your entire career and it never comes out right. You ramble, forget the important parts, and somehow end up six years in the past wondering why.",
-    fix: "Our Story Builder walks you through a 60-second answer that sounds natural, hits the key points, and ends strong — practiced until it flows like you've said it your whole life.",
+    fix: "Our Story Builder walks you through a 60-second answer that sounds natural, hits the key points, and ends strong. You practice it until it flows like you've said it your whole life.",
   },
   {
     q: "Explain this gap on your résumé.",
     pain: "If you were laid off, it feels like admitting failure. If you took time off for your kids, you worry they'll see you as uncommitted. And the silence while you figure out what to say tells them everything.",
-    fix: "The Gap Story Builder frames any gap — layoff, family, health, career change — into a confident 30-second answer that satisfies the interviewer without oversharing. Your gap isn't a flaw. It's a chapter.",
+    fix: "The Gap Story Builder frames any gap (layoff, family, health, career change) into a confident 30-second answer that satisfies the interviewer without oversharing. Your gap isn't a flaw. It's a chapter.",
   },
   {
     q: "Tell me about a time you failed.",
     pain: "Admitting failure to a stranger deciding your future feels terrible. Too honest and you look bad. Too polished and you sound fake. You can feel them evaluating you mid-sentence.",
-    fix: "AI helps you find the right failure story — real enough to be credible, recovered enough to show growth — and you practice until telling it feels natural, not painful.",
+    fix: "AI helps you find the right failure story: real enough to be credible, recovered enough to show growth. You practice until telling it feels natural, not painful.",
   },
   {
     q: "What's your biggest weakness?",
@@ -151,7 +153,7 @@ const QUESTIONS = [
   },
   {
     q: "Where do you see yourself in five years?",
-    pain: "In 2026, predicting five years feels absurd. The honest answer is 'I have no idea, and neither do you' — but that's not what they want to hear.",
+    pain: "In 2026, predicting five years feels absurd. The honest answer is 'I have no idea, and neither do you,' but that's not what they want to hear.",
     fix: "AI helps you build a forward-looking answer that sounds ambitious without being unrealistic, and aligned with the company without sounding scripted.",
   },
 ];
@@ -207,7 +209,7 @@ function FiveQuestions() {
         <Reveal delay={0.1}>
           <div className="mt-12 text-center">
             <ButtonLink href="/onboarding" size="lg">
-              Practice all five — free
+              Practice all five, free
               <ArrowRight size={18} />
             </ButtonLink>
           </div>
@@ -217,65 +219,44 @@ function FiveQuestions() {
   );
 }
 
-/* ===================== HOW IT WORKS ===================== */
-const STEPS = [
-  {
-    n: "1",
-    title: "Tell us your situation",
-    body: "Your role, and what's going on — returning, laid off, a promotion, a new field. We build questions a real hiring manager for your job would ask.",
-  },
-  {
-    n: "2",
-    title: "Practice and get scored",
-    body: "Answer 8 questions. Get scored on 5 things, with one clear fix each. Not 'do better' — but 'swap I guess for In my experience.'",
-  },
-  {
-    n: "3",
-    title: "Watch your score climb",
-    body: "Every session shows up on your dashboard. The line goes up. The nerves go down. You stop guessing and start knowing.",
-  },
-];
-
+/* ===================== HOW IT WORKS (flow diagram) ===================== */
 function HowItWorks() {
   return (
-    <section id="how" className="scroll-mt-20 border-y py-24 sm:py-32" style={{ background: "var(--bg-sunk)", borderColor: "var(--border)" }}>
-      <div className="container-wide">
+    <section id="how" className="scroll-mt-20 border-y py-24 sm:py-28" style={{ background: "var(--bg-sunk)", borderColor: "var(--border)" }}>
+      <div className="container-wide mb-14 text-center">
         <Reveal>
           <Eyebrow>How it works</Eyebrow>
         </Reveal>
         <Reveal delay={0.05}>
-          <h2 className="text-balance text-center font-serif text-display font-semibold text-ink">
-            Three steps. Ten minutes. Real improvement.
+          <h2 className="mx-auto max-w-2xl text-balance font-serif text-display font-semibold text-ink">
+            From nervous to hired, one simple path.
           </h2>
         </Reveal>
-
-        <div className="mt-16 grid gap-6 md:grid-cols-3">
-          {STEPS.map((s, i) => (
-            <Reveal key={s.n} delay={i * 0.1}>
-              <div className="card-elevated relative h-full p-8">
-                <span
-                  className="grid h-14 w-14 place-items-center rounded-2xl font-serif text-2xl font-semibold text-white shadow-sm"
-                  style={{ background: "linear-gradient(140deg, var(--primary-bright), var(--primary-ink))" }}
-                >
-                  {s.n}
-                </span>
-                <h3 className="mt-6 font-serif text-xl font-semibold text-ink">{s.title}</h3>
-                <p className="mt-3 leading-relaxed text-ink-2">{s.body}</p>
-              </div>
-            </Reveal>
-          ))}
-        </div>
+        <Reveal delay={0.1}>
+          <p className="mx-auto mt-4 max-w-prose text-lg text-ink-2">
+            Ten minutes a session. Here is the whole journey.
+          </p>
+        </Reveal>
       </div>
+      <FlowDiagram />
     </section>
   );
 }
 
-/* ===================== NUMBERS ===================== */
-const STATS = [
-  { value: 79, prefix: "", suffix: "", label: "Average score after 10 sessions", sub: "up from 48 at the start", animate: true },
-  { value: 93, prefix: "", suffix: "%", label: "feel more sure after 5 sessions", animate: true },
-  { value: 10, prefix: "", suffix: " min", label: "A session is shorter than dinner", animate: true },
-  { value: 2, prefix: "", suffix: " wk", label: "From nervous to ready", animate: true },
+/* ===================== DATA (graphs, not numbers) ===================== */
+const CLIMB = [
+  { label: "S1", score: 48 },
+  { label: "S2", score: 55 },
+  { label: "S4", score: 64 },
+  { label: "S6", score: 71 },
+  { label: "S8", score: 76 },
+  { label: "S10", score: 79 },
+];
+const FILLER = [
+  { label: "Wk 1", value: 6.2 },
+  { label: "Wk 2", value: 4.4 },
+  { label: "Wk 3", value: 3.1 },
+  { label: "Wk 4", value: 2.1 },
 ];
 
 function Numbers() {
@@ -287,24 +268,48 @@ function Numbers() {
         </Reveal>
         <Reveal delay={0.05}>
           <h2 className="text-balance text-center font-serif text-display font-semibold text-ink">
-            It works — and you can watch it happen.
+            It works, and you can watch it happen.
           </h2>
         </Reveal>
 
-        <div className="mt-16 grid gap-5 sm:grid-cols-2 lg:grid-cols-4">
-          {STATS.map((s, i) => (
-            <Reveal key={s.label} delay={i * 0.08}>
-              <div className="card-elevated h-full p-8 text-center">
-                <div className="font-serif text-5xl font-semibold" style={{ color: "var(--primary-ink)" }}>
-                  {s.prefix}
-                  <AnimatedNumber value={s.value} duration={1500} />
-                  {s.suffix}
-                </div>
-                <p className="mt-4 text-sm leading-relaxed text-ink-2">{s.label}</p>
-                {s.sub && <p className="mt-1 text-xs text-ink-3">{s.sub}</p>}
+        <div className="mt-16 grid gap-5 lg:grid-cols-3">
+          {/* score climb */}
+          <Reveal>
+            <div className="card-elevated h-full p-7">
+              <h3 className="font-serif text-lg font-semibold text-ink">Scores climb fast</h3>
+              <p className="mt-1 text-sm text-ink-2">Average score over your first 10 sessions.</p>
+              <div className="mt-4">
+                <ProgressLineChart data={CLIMB} height={200} showReady={false} />
               </div>
-            </Reveal>
-          ))}
+            </div>
+          </Reveal>
+
+          {/* confidence ring */}
+          <Reveal delay={0.08}>
+            <div className="card-elevated flex h-full flex-col p-7">
+              <h3 className="font-serif text-lg font-semibold text-ink">Confidence goes up</h3>
+              <p className="mt-1 text-sm text-ink-2">Feel more sure after just 5 sessions.</p>
+              <div className="flex flex-1 items-center justify-center py-2">
+                <ScoreRing value={93} size={180} stroke={14} ringColor="var(--sage)" trackColor="var(--bg-tint)">
+                  <div className="text-center">
+                    <div className="font-serif text-4xl font-semibold text-sage-ink">93%</div>
+                    <div className="mt-1 text-2xs uppercase tracking-wider text-ink-3">feel more sure</div>
+                  </div>
+                </ScoreRing>
+              </div>
+            </div>
+          </Reveal>
+
+          {/* filler words drop */}
+          <Reveal delay={0.16}>
+            <div className="card-elevated h-full p-7">
+              <h3 className="font-serif text-lg font-semibold text-ink">Filler words drop</h3>
+              <p className="mt-1 text-sm text-ink-2">Average &ldquo;um&rdquo; per answer, over 4 weeks.</p>
+              <div className="mt-4">
+                <MiniBars data={FILLER} height={200} />
+              </div>
+            </div>
+          </Reveal>
         </div>
         <Reveal delay={0.1}>
           <p className="mt-8 text-center text-xs text-ink-3">
@@ -322,7 +327,7 @@ const STORIES = [
     tag: "The 3 AM panic",
     name: "Maria, 38",
     photo: "https://randomuser.me/api/portraits/women/90.jpg",
-    body: "It's 3 AM. Your interview is at 9. Every answer sounds wrong and you can't call anyone. So you open PrepPath. Five questions. Score hits 78. You close your eyes — you've done this before.",
+    body: "It's 3 AM. Your interview is at 9. Every answer sounds wrong and you can't call anyone. So you open PrepPath. Five questions. Score hits 78. You close your eyes. You've done this before.",
   },
   {
     tag: "The parking lot",
@@ -334,7 +339,7 @@ const STORIES = [
     tag: "The career change",
     name: "James, 45",
     photo: "https://randomuser.me/api/portraits/men/45.jpg",
-    body: "You loved teaching. The burnout didn't. Now everyone asks 'why leave education?' and you hear judgment that isn't there. PrepPath helped you find the answer. You practiced twelve times. It sounds true — because it is.",
+    body: "You loved teaching. The burnout didn't. Now everyone asks 'why leave education?' and you hear judgment that isn't there. PrepPath helped you find the answer. You practiced twelve times. It sounds true, because it is.",
   },
 ];
 
@@ -374,7 +379,7 @@ function Stories() {
 
 /* ===================== COMPARISON ===================== */
 const ROWS: [string, string, string][] = [
-  ["Cost", "$150–300 / hour", "$9.99 / month"],
+  ["Cost", "$150-300 / hour", "$9.99 / month"],
   ["Availability", "Business hours, by appointment", "24/7, including 3 AM"],
   ["Privacy", "Face-to-face, potentially awkward", "Completely private, on your couch"],
   ["Feedback", "Subjective, varies by coach", "Scored on 5 dimensions, consistent"],
@@ -424,7 +429,7 @@ function Comparison() {
               style={{ borderColor: "var(--border)", background: "var(--primary-soft)" }}
             >
               <div className="p-5 font-bold text-ink">Total for one month</div>
-              <div className="p-5 text-center font-semibold text-ink-2">$600–1,200</div>
+              <div className="p-5 text-center font-semibold text-ink-2">$600-1,200</div>
               <div className="p-5 text-center font-serif text-xl font-bold text-primary-ink">$9.99</div>
             </div>
           </div>
@@ -460,7 +465,7 @@ function Privacy() {
         <Reveal delay={0.1}>
           <p className="mx-auto mt-5 max-w-prose text-lg leading-relaxed text-ink-2">
             No profiles. No leaderboards. No posts to your contacts. We don&apos;t share your data, and we
-            don&apos;t email anyone. It&apos;s just you and your screen — a safe place to be bad at this until
+            don&apos;t email anyone. It&apos;s just you and your screen. A safe place to be bad at this until
             you&apos;re good. That&apos;s the whole point.
           </p>
         </Reveal>
@@ -550,7 +555,7 @@ function Pricing() {
                 7-day free trial · or $79/year (save 34%) · cancel anytime
               </p>
               <ButtonLink href="/onboarding" className="mt-7 w-full">
-                Start free — no card needed
+                Start free, no card needed
               </ButtonLink>
               <ul className="mt-7 grid gap-3 sm:grid-cols-1">
                 {PREMIUM_FEATURES.map((f) => (
@@ -595,7 +600,7 @@ function FinalCTA() {
         <Reveal delay={0.16}>
           <div className="mt-10 flex flex-col items-center gap-3">
             <ButtonLink href="/onboarding" size="lg" className="group">
-              Start practicing — free
+              Start practicing, free
               <ArrowRight size={18} className="transition-transform group-hover:translate-x-0.5" />
             </ButtonLink>
             <span className="text-sm text-ink-3">

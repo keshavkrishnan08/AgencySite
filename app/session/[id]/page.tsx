@@ -128,7 +128,7 @@ export default function SessionPage() {
               <div className="flex h-[260px] flex-col items-center justify-center text-center">
                 <TrendingUp size={32} className="text-primary" />
                 <p className="mt-3 max-w-xs text-sm text-ink-2">
-                  This is your first session — your baseline. Come back tomorrow and watch the line climb.
+                  This is your first session. Your baseline. Come back tomorrow and watch the line climb.
                 </p>
               </div>
             )}
@@ -142,7 +142,7 @@ export default function SessionPage() {
               <Trophy size={14} /> Your strength
             </div>
             <p className="text-ink-2">
-              <strong className="text-ink">{labelOf(strongest)}</strong> — this is what you do best. Keep
+              <strong className="text-ink">{labelOf(strongest)}</strong>. This is what you do best. Keep
               leaning on it.
             </p>
           </div>

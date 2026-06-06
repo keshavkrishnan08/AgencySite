@@ -3,7 +3,7 @@
 @tailwind utilities;
 
 /* ============================================================
-   PrepPath — Design System  ("Calm Confidence, elevated")
+   PrepPath - Design System  ("Calm Confidence, elevated")
    Warm editorial premium: ivory canvas, deep teal, warm gold.
    ============================================================ */
 
@@ -24,33 +24,33 @@
   --border: #ece7da;
   --border-strong: #ddd6c5;
 
-  /* Primary — deep calm teal */
+  /* Primary - deep calm teal */
   --primary: #14808e;
   --primary-bright: #19a9b8;
   --primary-ink: #0c5660;
   --primary-soft: #e3f1f1;
 
-  /* Sage — success / improvement */
+  /* Sage - success / improvement */
   --sage: #3e9d6e;
   --sage-ink: #2a6e4d;
   --sage-soft: #e6f2ea;
 
-  /* Amber — growth areas / warning */
+  /* Amber - growth areas / warning */
   --amber: #dd8b3d;
   --amber-ink: #a8631f;
   --amber-soft: #faeeda;
 
-  /* Coral — danger (used sparingly) */
+  /* Coral - danger (used sparingly) */
   --coral: #db5e4a;
   --coral-ink: #b1402f;
   --coral-soft: #fae6e0;
 
-  /* Gold — premium (replaces cliché purple) */
+  /* Gold - premium (replaces cliché purple) */
   --gold: #b8893b;
   --gold-ink: #8a6526;
   --gold-soft: #f6edd7;
 
-  /* Shadows — layered, soft, premium */
+  /* Shadows - layered, soft, premium */
   --shadow-xs: 0 1px 2px rgba(27, 32, 48, 0.04);
   --shadow-sm: 0 1px 2px rgba(27, 32, 48, 0.04), 0 2px 6px rgba(27, 32, 48, 0.05);
   --shadow: 0 2px 8px rgba(27, 32, 48, 0.05), 0 10px 28px rgba(27, 32, 48, 0.06);
@@ -228,7 +228,7 @@ h1, h2, h3, h4, h5 {
       0 16px 36px rgba(20, 128, 142, 0.36);
     transform: translateY(-1.5px);
   }
-  /* sheen sweep on hover — tactile, premium */
+  /* sheen sweep on hover - tactile, premium */
   .btn-primary::after,
   .btn-gold::after {
     content: "";

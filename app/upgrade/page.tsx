@@ -13,7 +13,7 @@ const INCLUDED = [
   "Unlimited practice sessions",
   "Full 5-dimension scoring & detailed feedback",
   "Progress dashboard with charts and trends",
-  "Gap Story Builder — unlimited revisions",
+  "Gap Story Builder. Unlimited revisions",
   "Company Research Briefing",
   "Question Predictor",
   "Anxiety Detector with trend tracking",
@@ -56,7 +56,7 @@ export default function UpgradePage() {
 
   const price = interval === "annual" ? "$79" : "$9.99";
   const cadence = interval === "annual" ? "per year" : "per month";
-  const sub = interval === "annual" ? "Just $6.58/mo, billed yearly — save 34%" : "Billed monthly · cancel anytime";
+  const sub = interval === "annual" ? "Just $6.58/mo, billed yearly. Save 34%" : "Billed monthly · cancel anytime";
 
   return (
     <>
@@ -90,7 +90,7 @@ export default function UpgradePage() {
                 &ldquo;I practiced my gap answer nine times. On the tenth it sounded like I&apos;d been saying it
                 my whole life. I got the job.&rdquo;
               </p>
-              <p className="mt-2 text-sm font-semibold text-primary-ink">— Rachel, returning to work after 4 years</p>
+              <p className="mt-2 text-sm font-semibold text-primary-ink">,  Rachel, returning to work after 4 years</p>
             </div>
           </div>
 

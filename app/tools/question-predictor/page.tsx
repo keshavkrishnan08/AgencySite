@@ -44,7 +44,7 @@ export default function QuestionPredictorPage() {
     <ToolShell
       icon={PredictorIcon}
       title="Question Predictor"
-      description="Paste the job posting. AI reads the role, seniority, and exact language they used — then predicts the five questions they're most likely to ask. Stop guessing."
+      description="Paste the job posting. AI reads the role, seniority, and exact language they used. Then predicts the five questions they're most likely to ask. Stop guessing."
     >
       <div className="card p-7">
         <label className="block">
@@ -52,7 +52,7 @@ export default function QuestionPredictorPage() {
           <textarea
             value={posting}
             onChange={(e) => setPosting(e.target.value)}
-            placeholder="Paste the entire job description here — responsibilities, requirements, the company blurb, everything…"
+            placeholder="Paste the entire job description here. Responsibilities, requirements, the company blurb, everything…"
             className="field min-h-[200px] resize-y leading-relaxed"
             autoFocus
           />
@@ -97,7 +97,7 @@ export default function QuestionPredictorPage() {
             </article>
           ))}
           <div className="rounded-xl border bg-surface p-5 text-center" style={{ borderColor: "var(--border)" }}>
-            <p className="text-ink-2">Now practice answering them out loud — scored, with feedback.</p>
+            <p className="text-ink-2">Now practice answering them out loud. Scored, with feedback.</p>
             <ButtonLink href="/practice" className="mt-3">Start a practice session</ButtonLink>
           </div>
         </motion.div>

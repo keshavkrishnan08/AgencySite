@@ -4,11 +4,11 @@ import type { ReactNode } from "react";
 import { ArrowRight, Check, Mic } from "lucide-react";
 import { Reveal } from "@/components/ui/Reveal";
 import { ButtonLink } from "@/components/ui/Button";
-import { ScoreNumber, DimensionBars } from "@/components/ui/Score";
-import { ProgressLineChart, Sparkline } from "@/components/charts/Charts";
+import { Sparkline } from "@/components/charts/Charts";
 import { cn } from "@/lib/utils";
 
-/* A full section per key feature — alternating text / visual, simple copy. */
+/* Fewer, combined sections. Each one folds related features into a single
+   layered visual. Simple copy, no em dashes. */
 
 const TEAL = "linear-gradient(135deg, var(--primary-bright), var(--primary-ink))";
 
@@ -47,98 +47,96 @@ const Bubble = ({ children, you }: { children: ReactNode; you?: boolean }) => (
     {children}
   </div>
 );
+const Divider = () => <div className="my-4 hairline" />;
 
-/* ---------------- visuals ---------------- */
+/* ---------------- combined visuals ---------------- */
 
-const ScoringVisual = () => (
+// Practice + voice + conversational + scoring
+const PracticeVisual = () => (
   <Mock>
-    <div className="flex items-center justify-between border-b pb-3" style={{ borderColor: "var(--border)" }}>
-      <Label>Session score</Label>
-      <span className="rounded-full bg-sage-soft px-2.5 py-1 text-xs font-semibold text-sage-ink">+14 this week</span>
+    <div className="flex items-center justify-between">
+      <Label>Question 3 of 8</Label>
+      <span className="rounded-full bg-sage-soft px-2.5 py-1 text-xs font-bold text-sage-ink">84 / 100</span>
     </div>
-    <div className="flex items-end gap-2 pt-4">
-      <ScoreNumber value={84} className="text-5xl" />
-      <span className="mb-1.5 text-sm text-ink-3">/ 100</span>
-    </div>
-    <div className="mt-4">
-      <DimensionBars dimensions={{ clarity: 86, relevance: 90, specificity: 74, confidence: 80, conciseness: 88 }} />
-    </div>
-  </Mock>
-);
-
-const ConversationVisual = () => (
-  <Mock>
-    <Label>Question 3 of 8</Label>
-    <p className="mt-1 font-medium text-ink">Tell me about a tough teammate.</p>
-    <div className="mt-4 flex justify-end">
+    <p className="mt-2 font-medium text-ink">Tell me about a tough teammate.</p>
+    <div className="mt-3 flex justify-end">
       <Bubble you>
-        When two people left at once, I cross-trained the team in a week… <Mic size={12} className="ml-0.5 inline" />
+        When two people left at once, I cross-trained the team in a week. <Mic size={12} className="ml-0.5 inline" />
       </Bubble>
     </div>
-    <div className="mt-3 flex items-start gap-2">
+    <div className="mt-2.5 flex items-start gap-2">
       <HM />
       <Bubble>How did they react?</Bubble>
     </div>
+    <Divider />
+    <div className="flex flex-wrap gap-1.5">
+      {[["Clarity", 86], ["Specificity", 74], ["Confidence", 80]].map(([k, v]) => (
+        <span key={k as string} className="rounded-full bg-bg-tint px-2.5 py-1 text-xs font-medium text-ink-2">
+          {k} <b className="text-sage-ink">{v as number}</b>
+        </span>
+      ))}
+    </div>
   </Mock>
 );
 
-const GapVisual = () => {
+// Gap Story + Your Story + Anxiety Detector
+const AnswersVisual = () => {
   const rows = [
-    { t: "The Confident Pivot", l: "I took two years for my kids — a choice I'd make again.", sel: true },
-    { t: "The Honest & Brief", l: "I stepped away, that chapter's done, and I'm ready now." },
-    { t: "The Growth Story", l: "The time taught me to stay organized under real pressure." },
+    { t: "The Confident Pivot", sel: true },
+    { t: "The Honest & Brief", sel: false },
+    { t: "The Growth Story", sel: false },
   ];
   return (
     <Mock>
       <Label>Your gap, 3 ways</Label>
-      <div className="mt-3 space-y-2.5">
+      <div className="mt-2.5 space-y-2">
         {rows.map((r) => (
-          <div key={r.t} className="rounded-xl border-2 p-3" style={{ borderColor: r.sel ? "var(--primary)" : "var(--border)", background: r.sel ? "var(--primary-soft)" : "transparent" }}>
-            <div className="flex items-center justify-between">
-              <span className="text-sm font-semibold text-primary-ink">{r.t}</span>
-              {r.sel && <Check size={15} className="text-primary" />}
-            </div>
-            <p className="mt-0.5 line-clamp-1 text-xs text-ink-3">&ldquo;{r.l}&rdquo;</p>
+          <div
+            key={r.t}
+            className="flex items-center justify-between rounded-xl border-2 px-3 py-2"
+            style={{ borderColor: r.sel ? "var(--primary)" : "var(--border)", background: r.sel ? "var(--primary-soft)" : "transparent" }}
+          >
+            <span className="text-sm font-semibold text-primary-ink">{r.t}</span>
+            {r.sel && <Check size={15} className="text-primary" />}
           </div>
         ))}
       </div>
-    </Mock>
-  );
-};
-
-const AnxietyVisual = () => {
-  const Pill = ({ children }: { children: ReactNode }) => (
-    <span className="rounded-md bg-amber-soft px-1.5 py-0.5 font-medium text-amber-ink">{children}</span>
-  );
-  return (
-    <Mock>
-      <Label>What interviewers hear</Label>
-      <p className="mt-2 text-sm leading-relaxed text-ink-2">
-        <Pill>Um</Pill>, <Pill>I guess</Pill> I <Pill>just</Pill> handled it, <Pill>you know</Pill>?
-      </p>
-      <div className="mt-4 flex items-center justify-between rounded-xl bg-bg-sunk p-3.5">
-        <span className="text-sm text-ink-2">Filler words</span>
+      <Divider />
+      <div className="flex items-center justify-between rounded-xl bg-bg-sunk p-3">
+        <span className="text-sm text-ink-2">Filler words dropping</span>
         <div className="flex items-center gap-2">
-          <span className="font-serif text-lg font-semibold text-ink">6</span>
-          <span className="text-ink-3">→</span>
-          <span className="font-serif text-lg font-semibold text-sage-ink">2</span>
-          <Sparkline values={[6, 5, 5, 4, 3, 2]} width={56} height={24} color="var(--sage)" />
+          <span className="font-serif text-base font-semibold text-ink">6</span>
+          <span className="text-ink-3">to</span>
+          <span className="font-serif text-base font-semibold text-sage-ink">2</span>
+          <Sparkline values={[6, 5, 5, 4, 3, 2]} width={52} height={22} color="var(--sage)" />
         </div>
       </div>
     </Mock>
   );
 };
 
-const PredictorVisual = () => {
+// Company Briefing + Question Predictor
+const ResearchVisual = () => {
   const qs = [
-    { q: "Tell me about a conflict…", p: 90 },
+    { q: "Tell me about a conflict.", p: 90 },
     { q: "How do you handle pressure?", p: 84 },
-    { q: "Why do you want this role?", p: 78 },
   ];
   return (
     <Mock>
-      <Label>Most likely questions</Label>
-      <div className="mt-3 space-y-3">
+      <p className="font-serif text-lg font-semibold text-ink">Mercy Hospital</p>
+      <div className="mt-2 space-y-2">
+        <div>
+          <p className="text-2xs font-semibold uppercase tracking-wider text-primary-ink">What they do</p>
+          <p className="text-sm text-ink-2">A regional care network. Patients first.</p>
+        </div>
+        <div>
+          <p className="text-2xs font-semibold uppercase tracking-wider text-primary-ink">Ask them</p>
+          <p className="text-sm text-ink-2">What does success look like in 90 days?</p>
+        </div>
+      </div>
+      <Divider />
+      <Label>Likely questions</Label>
+      <div className="mt-2 space-y-2.5">
         {qs.map((x) => (
           <div key={x.q}>
             <div className="flex items-center justify-between text-sm">
@@ -155,27 +153,7 @@ const PredictorVisual = () => {
   );
 };
 
-const CompanyVisual = () => {
-  const rows = [
-    ["What they do", "A regional care network. Patients first."],
-    ["Recent news", "Opened a new clinic last quarter."],
-    ["Ask them", "What does success look like in 90 days?"],
-  ];
-  return (
-    <Mock>
-      <p className="font-serif text-lg font-semibold text-ink">Mercy Hospital</p>
-      <div className="mt-3 space-y-3">
-        {rows.map(([h, l]) => (
-          <div key={h}>
-            <p className="text-2xs font-semibold uppercase tracking-wider text-primary-ink">{h}</p>
-            <p className="text-sm text-ink-2">{l}</p>
-          </div>
-        ))}
-      </div>
-    </Mock>
-  );
-};
-
+// Interview Day (solo, dark)
 const InterviewDayVisual = () => (
   <Mock dark>
     <div className="flex items-center justify-between text-xs text-white/55">
@@ -188,42 +166,24 @@ const InterviewDayVisual = () => (
   </Mock>
 );
 
-const SalaryVisual = () => (
+// Salary + Debrief + Tracker
+const AfterVisual = () => (
   <Mock>
-    <Label>The money talk</Label>
-    <div className="mt-3 flex items-start gap-2">
+    <Label>The pay talk</Label>
+    <div className="mt-2.5 flex items-start gap-2">
       <HM />
-      <Bubble>$65,000 — can you do that?</Bubble>
+      <Bubble>$65,000. Can you do that?</Bubble>
     </div>
-    <div className="mt-2.5 flex justify-end">
+    <div className="mt-2 flex justify-end">
       <Bubble you>$72,000, based on market rate.</Bubble>
     </div>
-    <div className="mt-3 flex gap-2">
-      <span className="rounded-full bg-bg-tint px-2.5 py-1 text-xs font-medium text-ink-2">Confidence <b className="text-sage-ink">82</b></span>
-      <span className="rounded-full bg-bg-tint px-2.5 py-1 text-xs font-medium text-ink-2">Composure <b className="text-sage-ink">78</b></span>
-    </div>
-  </Mock>
-);
-
-const ProgressVisual = () => (
-  <Mock>
+    <Divider />
     <div className="flex items-center justify-between">
-      <Label>Your progress</Label>
-      <span className="rounded-full bg-sage-soft px-2.5 py-1 text-xs font-semibold text-sage-ink">Offer 🎉</span>
-    </div>
-    <div className="mt-2">
-      <ProgressLineChart
-        data={[
-          { label: "W1", score: 48 },
-          { label: "W2", score: 58 },
-          { label: "W3", score: 66 },
-          { label: "W4", score: 72 },
-          { label: "W5", score: 79 },
-          { label: "W6", score: 84 },
-        ]}
-        height={150}
-        showReady={false}
-      />
+      <div>
+        <p className="text-sm font-semibold text-ink">Mercy Hospital</p>
+        <p className="text-xs text-ink-3">Office Manager</p>
+      </div>
+      <span className="rounded-full bg-sage-soft px-3 py-1 text-sm font-bold text-sage-ink">Offer 🎉</span>
     </div>
   </Mock>
 );
@@ -242,72 +202,42 @@ interface Feat {
 const FEATURES: Feat[] = [
   {
     eyebrow: "The core",
-    title: "Answer real questions. Get a real score.",
-    body: "Pick your role. Answer 8 questions. Get scored on five things, with one clear fix each time.",
-    bullets: ["Scored on 5 things", "One simple fix per answer", "About 10 minutes"],
-    visual: <ScoringVisual />,
+    title: "Practice out loud. Get scored.",
+    body: "Pick your role. Speak or type your answers. AI scores you on five things, gives one clear fix, and asks follow-ups like a real interviewer.",
+    bullets: ["Speak or type, your choice", "Smart follow-up questions", "Scored on 5 things, one fix each"],
+    visual: <PracticeVisual />,
     href: "/onboarding",
   },
   {
-    eyebrow: "Speak, don't just type",
-    title: "Say it out loud. It asks follow-ups.",
-    body: "Talk like a real interview. PrepPath listens and writes it down. Then it asks a follow-up — just like a real interviewer would.",
-    bullets: ["Speak or type", "Smart follow-up questions", "Great for calming nerves"],
-    visual: <ConversationVisual />,
-  },
-  {
     eyebrow: "Most popular",
-    title: "Turn your résumé gap into a strong answer.",
-    body: "Took time off? Got laid off? We write three ways to explain it in 30 seconds. Pick the one that sounds like you.",
-    bullets: ["3 ready answers", "Sounds like you, not a script", "Practice till it's smooth"],
-    visual: <GapVisual />,
+    title: "Your hardest answers, made strong.",
+    body: "The gap question. The 'tell me about yourself.' The little words that make you sound unsure. We help you fix all three.",
+    bullets: ["3 ready gap answers", "Your 60-second intro", "Catches 'um' and 'I just'"],
+    visual: <AnswersVisual />,
     href: "/tools/gap-story",
   },
   {
-    eyebrow: "Sound more sure",
-    title: "Catch the words that make you sound nervous.",
-    body: "&ldquo;Um.&rdquo; &ldquo;I guess.&rdquo; &ldquo;I just.&rdquo; You don't hear them. Interviewers do. We show you, and help you drop them.",
-    bullets: ["Spots filler and hedging", "Tracks it over time", "Most people cut it 60% in 2 weeks"],
-    visual: <AnxietyVisual />,
-  },
-  {
-    eyebrow: "Know what's coming",
-    title: "See the questions before you walk in.",
-    body: "Paste the job post. We guess the 5 questions they're most likely to ask, and what a strong answer needs.",
-    bullets: ["Top 5 likely questions", "Why they ask each one", "What to include"],
-    visual: <PredictorVisual />,
-    href: "/tools/question-predictor",
-  },
-  {
-    eyebrow: "Do your homework fast",
-    title: "Walk in knowing the company.",
-    body: "Type a company name. Get a one-page brief: what they do, recent news, and smart questions to ask them.",
-    bullets: ["What they do, in plain words", "Recent news to mention", "3 questions to ask"],
-    visual: <CompanyVisual />,
+    eyebrow: "Done for you",
+    title: "In-depth research, for your benefit.",
+    body: "Give us the company and the job post. We dig up what they do, recent news, and the questions they'll likely ask, so you walk in over-prepared.",
+    bullets: ["One-page company brief", "The 5 likely questions", "Smart questions to ask them"],
+    visual: <ResearchVisual />,
     href: "/tools/company-research",
   },
   {
     eyebrow: "The night before",
-    title: "A real-pressure dress rehearsal.",
-    body: "A timer. No do-overs. No scores till the end. If you hold up here, you're ready for the real thing.",
+    title: "A real-pressure rehearsal.",
+    body: "A timer. No do-overs. No scores until the end. If you hold up here, you're ready for the real thing.",
     bullets: ["60 seconds per answer", "No going back", "See how you held up"],
     visual: <InterviewDayVisual />,
   },
   {
-    eyebrow: "Get paid what you're worth",
-    title: "Practice the money talk.",
-    body: "They ask your number. Most people freeze and lose thousands. Practice here until your voice stays steady.",
-    bullets: ["Real back-and-forth", "It pushes back", "Scored on confidence"],
-    visual: <SalaryVisual />,
+    eyebrow: "After the interview",
+    title: "From the offer to the signature.",
+    body: "Practice the pay talk so you don't leave money behind. Debrief how the real one went. Track every interview through to the offer.",
+    bullets: ["Practice the pay talk", "Debrief the real interview", "Track every interview to the offer"],
+    visual: <AfterVisual />,
     href: "/tools/salary",
-  },
-  {
-    eyebrow: "Watch it work",
-    title: "See your score climb. Track real offers.",
-    body: "Every session moves the line. Your dashboard shows it. Then track your real interviews — because offers are the point.",
-    bullets: ["Charts that go up", "Daily streaks", "Track interviews to offers"],
-    visual: <ProgressVisual />,
-    href: "/dashboard",
   },
 ];
 
@@ -321,7 +251,7 @@ function FeatureRow({ f, i }: { f: Feat; i: number }) {
           <h3 className="mt-3 text-balance font-serif text-3xl font-semibold text-ink sm:text-[2.5rem] sm:leading-[1.1]">
             {f.title}
           </h3>
-          <p className="mt-4 max-w-md text-lg leading-relaxed text-ink-2" dangerouslySetInnerHTML={{ __html: f.body }} />
+          <p className="mt-4 max-w-md text-lg leading-relaxed text-ink-2">{f.body}</p>
           <ul className="mt-6 space-y-3">
             {f.bullets.map((b) => (
               <li key={b} className="flex items-center gap-3 font-medium text-ink">

@@ -3,7 +3,10 @@
 import {
   Area,
   AreaChart,
+  Bar,
+  BarChart,
   CartesianGrid,
+  Cell,
   Line,
   LineChart,
   PolarAngleAxis,
@@ -143,6 +146,37 @@ export function RadarScoreChart({
         />
         <Tooltip content={<ChartTooltip />} />
       </RadarChart>
+    </ResponsiveContainer>
+  );
+}
+
+/* ----------------- Mini bar chart (colored by value) ----------------- */
+export function MiniBars({
+  data,
+  height = 150,
+}: {
+  data: { label: string; value: number }[];
+  height?: number;
+}) {
+  return (
+    <ResponsiveContainer width="100%" height={height}>
+      <BarChart data={data} margin={{ top: 10, right: 6, bottom: 0, left: -22 }}>
+        <CartesianGrid stroke={grid} strokeDasharray="4 6" vertical={false} />
+        <XAxis
+          dataKey="label"
+          tick={{ fill: ink2, fontSize: 11, fontFamily: "var(--font-sans)" }}
+          axisLine={false}
+          tickLine={false}
+          dy={6}
+        />
+        <YAxis hide domain={[0, "dataMax + 1"]} />
+        <Tooltip content={<ChartTooltip />} cursor={{ fill: "rgba(27,32,48,0.04)" }} />
+        <Bar dataKey="value" name="Avg" radius={[6, 6, 0, 0]} maxBarSize={30} animationDuration={900}>
+          {data.map((d, i) => (
+            <Cell key={i} fill={scoreColor(100 - d.value * 10)} />
+          ))}
+        </Bar>
+      </BarChart>
     </ResponsiveContainer>
   );
 }

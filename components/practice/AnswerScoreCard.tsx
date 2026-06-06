@@ -24,7 +24,7 @@ function FeedbackRow({ dim, score, text }: { dim: Dimension; score: number; text
         <span className="font-semibold text-ink">
           {label} ({score})
         </span>
-        <InfoTip title={`${label} — ${help.what}`} className="mx-1">
+        <InfoTip title={`${label}: ${help.what}`} className="mx-1">
           {help.tip}
         </InfoTip>
         : {text}
@@ -46,7 +46,7 @@ function AnxietyPanel({ answer }: { answer: ScoredAnswer }) {
     return (
       <div className="rounded-xl border bg-sage-soft/60 p-4" style={{ borderColor: "var(--border)" }}>
         <p className="flex items-center gap-2 text-sm font-medium text-sage-ink">
-          <CheckCircle2 size={16} /> Clean delivery — no filler words, hedging, or apologies detected.
+          <CheckCircle2 size={16} /> Clean delivery. No filler words, hedging, or apologies detected.
         </p>
       </div>
     );
@@ -143,7 +143,7 @@ export function AnswerScoreCard({
         {open && (
           <div className="border-t px-5 pb-6 pt-4" style={{ borderColor: "var(--border)" }}>
             <p className="mb-2 text-2xs uppercase tracking-wider text-ink-3">
-              Example — not the only right answer, just one approach
+              Example. Not the only right answer, just one approach
             </p>
             {loading ? (
               <p className="text-ink-3">Writing an example…</p>
