@@ -1,7 +1,7 @@
 "use client";
 
 import { useEffect, useState } from "react";
-import type { LucideIcon } from "lucide-react";
+import type { ComponentType } from "react";
 import { ArrowRight, Sparkles } from "lucide-react";
 import { AppNav } from "@/components/layout/AppNav";
 import { ButtonLink } from "@/components/ui/Button";
@@ -14,7 +14,7 @@ export function ToolShell({
   badge,
   children,
 }: {
-  icon: LucideIcon;
+  icon: ComponentType<{ size?: number; className?: string }>;
   title: string;
   description: string;
   badge?: string;

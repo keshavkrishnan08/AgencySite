@@ -4,6 +4,7 @@ import { useEffect, useRef, useState } from "react";
 import { motion } from "framer-motion";
 import { Loader2, MessageSquare, Send, Sparkles, TrendingUp } from "lucide-react";
 import { ToolShell } from "@/components/layout/ToolShell";
+import { SalaryIcon } from "@/components/icons";
 import { Button } from "@/components/ui/Button";
 import { ScoreNumber } from "@/components/ui/Score";
 import { getProfile } from "@/lib/store";
@@ -98,7 +99,7 @@ export default function SalaryPage() {
 
   return (
     <ToolShell
-      icon={MessageSquare}
+      icon={SalaryIcon}
       title="Salary Negotiation Practice"
       description="They offered the job — then asked your number. Most people leave $5,000–$15,000 on the table. Practice the conversation until your voice doesn't shake."
     >

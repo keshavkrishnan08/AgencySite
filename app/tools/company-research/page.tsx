@@ -4,6 +4,7 @@ import { useEffect, useState } from "react";
 import { motion } from "framer-motion";
 import { Building2, Loader2, MessageCircleQuestion, Newspaper, Heart, Target, Sparkles } from "lucide-react";
 import { ToolShell } from "@/components/layout/ToolShell";
+import { CompanyIcon } from "@/components/icons";
 import { Button } from "@/components/ui/Button";
 import { getBriefings, getProfile, saveBriefing } from "@/lib/store";
 import { uid } from "@/lib/utils";
@@ -53,7 +54,7 @@ export default function CompanyResearchPage() {
 
   return (
     <ToolShell
-      icon={Building2}
+      icon={CompanyIcon}
       title="Company Research Briefing"
       description="47% of interview failures come from not knowing the company. Get a one-page briefing in seconds — and walk in knowing more than every other candidate."
     >
