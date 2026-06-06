@@ -202,7 +202,13 @@ function AccountPrompt({ onDone }: { onDone: () => void }) {
   const [name, setName] = useState("");
   const save = () => {
     if (!email.includes("@")) return;
-    setProfile({ email, name: name || email.split("@")[0] });
+    const finalName = name || email.split("@")[0];
+    setProfile({ email, name: finalName });
+    fetch("/api/notify", {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({ type: "welcome", to: email, name: finalName }),
+    }).catch(() => {});
     onDone();
   };
   return (

@@ -1,12 +1,13 @@
 "use client";
 
 import { useEffect, useRef, useState } from "react";
-import { Mic, MicOff, Square } from "lucide-react";
+import { Mic, MicOff } from "lucide-react";
 import { cn } from "@/lib/utils";
+import type { DeliveryMetrics } from "@/lib/types";
 
 /* Browser-native speech-to-text. PrepPath listens; it doesn't speak back.
-   Uses the Web Speech API (Chrome / Edge / Safari). No API key needed.
-   onTranscript receives each finalized chunk; the parent appends it. */
+   It also measures delivery: how long you spoke, your pace, and your pauses,
+   so it can coach the speaking, not just the words. */
 
 /* eslint-disable @typescript-eslint/no-explicit-any */
 declare global {
@@ -22,15 +23,19 @@ function getRecognizer(): any | null {
   return SR ? new SR() : null;
 }
 
+const PAUSE_MS = 2500; // a gap longer than this counts as a long pause
+
 export function VoiceButton({
   onTranscript,
   onInterim,
+  onDelivery,
   className,
   compact = false,
   tone = "light",
 }: {
   onTranscript: (text: string) => void;
   onInterim?: (text: string) => void;
+  onDelivery?: (m: DeliveryMetrics) => void;
   className?: string;
   compact?: boolean;
   tone?: "light" | "dark";
@@ -38,6 +43,13 @@ export function VoiceButton({
   const [supported, setSupported] = useState(true);
   const [listening, setListening] = useState(false);
   const recogRef = useRef<any>(null);
+  // delivery tracking
+  const startRef = useRef(0);
+  const lastTickRef = useRef(0);
+  const wordsRef = useRef(0);
+  const pauseCountRef = useRef(0);
+  const longestPauseRef = useRef(0);
+  const emittedRef = useRef(false);
 
   useEffect(() => {
     setSupported(Boolean(window.SpeechRecognition || window.webkitSpeechRecognition));
@@ -50,6 +62,21 @@ export function VoiceButton({
     };
   }, []);
 
+  const emitDelivery = () => {
+    if (emittedRef.current || !onDelivery) return;
+    if (startRef.current === 0 || wordsRef.current === 0) return;
+    emittedRef.current = true;
+    const durationSec = (performance.now() - startRef.current) / 1000;
+    const wpm = durationSec > 0 ? Math.round(wordsRef.current / (durationSec / 60)) : 0;
+    onDelivery({
+      durationSec: Math.round(durationSec),
+      wordCount: wordsRef.current,
+      wpm,
+      pauseCount: pauseCountRef.current,
+      longestPauseSec: Math.round(longestPauseRef.current),
+    });
+  };
+
   const start = () => {
     const recog = getRecognizer();
     if (!recog) {
@@ -60,7 +87,25 @@ export function VoiceButton({
     recog.continuous = true;
     recog.interimResults = true;
 
+    // reset delivery counters
+    startRef.current = performance.now();
+    lastTickRef.current = 0;
+    wordsRef.current = 0;
+    pauseCountRef.current = 0;
+    longestPauseRef.current = 0;
+    emittedRef.current = false;
+
     recog.onresult = (event: any) => {
+      const now = performance.now();
+      if (lastTickRef.current !== 0) {
+        const gap = now - lastTickRef.current;
+        if (gap > PAUSE_MS) {
+          pauseCountRef.current += 1;
+          longestPauseRef.current = Math.max(longestPauseRef.current, gap / 1000);
+        }
+      }
+      lastTickRef.current = now;
+
       let interim = "";
       let final = "";
       for (let i = event.resultIndex; i < event.results.length; i++) {
@@ -68,11 +113,20 @@ export function VoiceButton({
         if (res.isFinal) final += res[0].transcript;
         else interim += res[0].transcript;
       }
-      if (final.trim()) onTranscript(final.trim());
+      if (final.trim()) {
+        wordsRef.current += final.trim().split(/\s+/).filter(Boolean).length;
+        onTranscript(final.trim());
+      }
       if (interim && onInterim) onInterim(interim);
     };
-    recog.onerror = () => setListening(false);
-    recog.onend = () => setListening(false);
+    recog.onerror = () => {
+      emitDelivery();
+      setListening(false);
+    };
+    recog.onend = () => {
+      emitDelivery();
+      setListening(false);
+    };
 
     recogRef.current = recog;
     try {
@@ -89,6 +143,7 @@ export function VoiceButton({
     } catch {
       /* noop */
     }
+    emitDelivery();
     setListening(false);
   };
 
