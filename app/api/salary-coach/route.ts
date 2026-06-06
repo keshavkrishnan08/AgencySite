@@ -16,7 +16,7 @@ Set accepted=true only if the negotiation has reached a fair agreement.`;
 
 const LINES = [
   "What are your salary expectations for this role?",
-  "That's a bit above the range we had budgeted — we were thinking closer to the lower end. Could that work?",
+  "That's a bit above the range we had budgeted. We were thinking closer to the lower end. Could that work?",
   "We might be able to get there with a signing bonus instead of base. How does that sound?",
   "Okay. Here's our best and final: let's meet in the middle on base plus the bonus. Do we have a deal?",
 ];
@@ -32,9 +32,9 @@ function heuristic(round: number, message: string, target: number) {
   const composure = clamp(82 - (folded ? 34 : 0) - anx.hedgeCount * 7);
 
   let feedback: string;
-  if (folded) feedback = "You folded a little fast. It's okay to hold — try: 'I understand budget constraints. Based on my experience I think the target is fair — are there other components we could flex?'";
+  if (folded) feedback = "You folded a little fast. It's okay to hold. Try: 'I understand budget constraints. Based on my experience I think the target is fair. Are there other components we could flex?'";
   else if (!hasNumber && round === 0) feedback = "Name a specific number (or tight range) anchored high. A vague answer hands them the pen.";
-  else if (!hasData) feedback = "Good stance — now justify it. Tie your number to market data or the specific value you bring.";
+  else if (!hasData) feedback = "Good stance. Now justify it. Tie your number to market data or the specific value you bring.";
   else feedback = "Strong: you held your number and backed it with a reason. That's exactly how this should sound.";
 
   return {

@@ -10,7 +10,7 @@ export default function NotFound() {
       <p className="mt-10 font-serif text-7xl font-semibold text-primary-ink">404</p>
       <h1 className="mt-4 font-serif text-2xl font-semibold text-ink">This page took a different path.</h1>
       <p className="mt-2 max-w-sm text-ink-2">
-        The page you&apos;re looking for isn&apos;t here — but your next practice session is.
+        The page you&apos;re looking for isn&apos;t here. But your next practice session is.
       </p>
       <ButtonLink href="/" className="mt-8">
         <ArrowLeft size={16} /> Back home

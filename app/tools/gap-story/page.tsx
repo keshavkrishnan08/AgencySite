@@ -19,11 +19,11 @@ const GAP_TYPES = [
   { key: "health", emoji: "🏥", label: "A health situation" },
   { key: "personal", emoji: "🌍", label: "Personal reasons" },
 ];
-const DURATIONS = ["Less than 1 year", "1–2 years", "2–3 years", "3–5 years", "5+ years"];
+const DURATIONS = ["Less than 1 year", "1-2 years", "2-3 years", "3-5 years", "5+ years"];
 
 export default function GapStoryPage() {
   const [gapType, setGapType] = useState("children");
-  const [duration, setDuration] = useState("1–2 years");
+  const [duration, setDuration] = useState("1-2 years");
   const [activities, setActivities] = useState("");
   const [loading, setLoading] = useState(false);
   const [versions, setVersions] = useState<{ label: string; text: string }[]>([]);
@@ -80,7 +80,7 @@ export default function GapStoryPage() {
       icon={GapStoryIcon}
       badge="Most popular"
       title="Gap Story Builder"
-      description="Turn your résumé gap into a confident 30-second answer that sounds like you — not a script. Practice it until your voice doesn't shake."
+      description="Turn your résumé gap into a confident 30-second answer that sounds like you. Not a script. Practice it until your voice doesn't shake."
     >
       {/* Builder */}
       <div className="card p-7">
@@ -119,7 +119,7 @@ export default function GapStoryPage() {
         <textarea
           value={activities}
           onChange={(e) => setActivities(e.target.value)}
-          placeholder="Freelance work, volunteering, online courses, caregiving, personal projects — anything that shows you stayed engaged."
+          placeholder="Freelance work, volunteering, online courses, caregiving, personal projects. Anything that shows you stayed engaged."
           className="field mt-3 min-h-[90px] resize-y"
         />
 

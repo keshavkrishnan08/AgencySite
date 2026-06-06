@@ -1,7 +1,7 @@
 import "server-only";
 import Anthropic from "@anthropic-ai/sdk";
 
-/* Server-side Claude wrapper. The app works fully without this — every route
+/* Server-side Claude wrapper. The app works fully without this. Every route
    falls back to the local heuristic engine when no key is present. */
 
 const MODEL = process.env.ANTHROPIC_MODEL || "claude-sonnet-4-6";

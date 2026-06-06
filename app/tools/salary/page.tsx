@@ -20,7 +20,7 @@ const MAX_ROUNDS = 4;
 export default function SalaryPage() {
   const [phase, setPhase] = useState<"setup" | "chat" | "done">("setup");
   const [role, setRole] = useState("");
-  const [range, setRange] = useState("$55,000–$70,000");
+  const [range, setRange] = useState("$55,000-$70,000");
   const [target, setTarget] = useState("70000");
   const [walkaway, setWalkaway] = useState("60000");
   const [thread, setThread] = useState<Turn[]>([]);
@@ -101,7 +101,7 @@ export default function SalaryPage() {
     <ToolShell
       icon={SalaryIcon}
       title="Salary Negotiation Practice"
-      description="They offered the job — then asked your number. Most people leave $5,000–$15,000 on the table. Practice the conversation until your voice doesn't shake."
+      description="They offered the job. Then asked your number. Most people leave $5,000-$15,000 on the table. Practice the conversation until your voice doesn't shake."
     >
       {phase === "setup" && (
         <div className="card p-7">
@@ -148,7 +148,7 @@ export default function SalaryPage() {
                   ? "Strong. You held your number and justified it with value. That's exactly how this should sound."
                   : finalScore >= 55
                   ? "Solid start. Next time, anchor higher and tie your number to data so you don't fold when they push."
-                  : "You left money on the table. Practice holding firm: 'Based on my experience and the value I'd bring, I think my target is fair — are there other components we can flex?'"}
+                  : "You left money on the table. Practice holding firm: 'Based on my experience and the value I'd bring, I think my target is fair. Are there other components we can flex?'"}
               </p>
               <Button onClick={() => { setPhase("setup"); setThread([]); setRound(0); setOveralls([]); }} className="mt-6">
                 <TrendingUp size={16} /> Practice again

@@ -5,7 +5,7 @@ import { Mic, MicOff, Square } from "lucide-react";
 import { cn } from "@/lib/utils";
 
 /* Browser-native speech-to-text. PrepPath listens; it doesn't speak back.
-   Uses the Web Speech API (Chrome / Edge / Safari) — no API key needed.
+   Uses the Web Speech API (Chrome / Edge / Safari). No API key needed.
    onTranscript receives each finalized chunk; the parent appends it. */
 
 /* eslint-disable @typescript-eslint/no-explicit-any */

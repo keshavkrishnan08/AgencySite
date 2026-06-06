@@ -11,8 +11,8 @@ import type {
 import { todayKey } from "./utils";
 
 /* Client-side persistence layer.
- * Uses localStorage so the whole product — sessions, streaks, dashboard,
- * paywall — works instantly with zero backend. The API surface mirrors what a
+ * Uses localStorage so the whole product. Sessions, streaks, dashboard,
+ * paywall. Works instantly with zero backend. The API surface mirrors what a
  * Supabase-backed implementation would expose, so swapping later is a drop-in. */
 
 const KEYS = {

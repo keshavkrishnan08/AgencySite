@@ -28,7 +28,7 @@ export function StickyCTA() {
             <p className="font-serif text-base font-semibold text-ink">Your next interview is coming.</p>
             <p className="text-xs text-ink-2">Free to start · no credit card · takes 30 seconds.</p>
           </div>
-          <p className="text-sm font-medium text-ink sm:hidden">Practice free — no card</p>
+          <p className="text-sm font-medium text-ink sm:hidden">Practice free. No card</p>
           <div className="flex items-center gap-1">
             <ButtonLink href="/onboarding" size="sm" className="group whitespace-nowrap">
               Start free <ArrowRight size={15} className="transition-transform group-hover:translate-x-0.5" />

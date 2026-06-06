@@ -13,9 +13,9 @@ import type { ScoredAnswer } from "@/lib/types";
 
 const STEPS = [
   { key: "who", label: "Who are you?", hint: "One sentence. Your role and the thing you're known for.", ph: "I'm an operations coordinator who keeps busy teams calm and organized." },
-  { key: "done", label: "What have you done?", hint: "Two sentences. Your proudest, most relevant wins — with a number if you can.", ph: "At my last job I ran scheduling for a team of 15 and cut missed appointments by 22%. Before that I rebuilt our intake process from scratch." },
+  { key: "done", label: "What have you done?", hint: "Two sentences. Your proudest, most relevant wins. With a number if you can.", ph: "At my last job I ran scheduling for a team of 15 and cut missed appointments by 22%. Before that I rebuilt our intake process from scratch." },
   { key: "why", label: "Why are you here?", hint: "One sentence. Why this role, this company, right now.", ph: "I'm here because this role lets me own a process end-to-end and make it measurably better." },
-  { key: "next", label: "What's next?", hint: "One sentence. Where you're headed — ambitious but grounded.", ph: "Next, I want to take on a bigger team and build something that lasts." },
+  { key: "next", label: "What's next?", hint: "One sentence. Where you're headed. Ambitious but grounded.", ph: "Next, I want to take on a bigger team and build something that lasts." },
 ] as const;
 
 export default function YourStoryPage() {
@@ -61,7 +61,7 @@ export default function YourStoryPage() {
     <ToolShell
       icon={StoryIcon}
       title="Your Story Builder"
-      description="The hardest question is the first one. Build your 'tell me about yourself' in four steps — five sentences, sixty seconds, sounds like you wrote it. Because you did."
+      description="The hardest question is the first one. Build your 'tell me about yourself' in four steps. Five sentences, sixty seconds, sounds like you wrote it. Because you did."
     >
       <div className="grid gap-6 lg:grid-cols-2">
         {/* Inputs */}
