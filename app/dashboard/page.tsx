@@ -16,6 +16,7 @@ import {
 import { AppNav } from "@/components/layout/AppNav";
 import { Button, ButtonLink } from "@/components/ui/Button";
 import { ScoreRing } from "@/components/ui/Score";
+import { InfoTip } from "@/components/ui/Tooltip";
 import { ProgressLineChart, Sparkline } from "@/components/charts/Charts";
 import {
   getInterviews,
@@ -157,8 +158,11 @@ export default function DashboardPage() {
                   </ScoreRing>
                 </div>
                 <div className="text-center sm:text-left">
-                  <p className="text-2xs font-semibold uppercase tracking-[0.2em] text-white/70">
+                  <p className="flex items-center gap-1.5 text-2xs font-semibold uppercase tracking-[0.2em] text-white/70">
                     Interview readiness
+                    <InfoTip title="How this is figured" iconSize={13} className="text-white/70 hover:text-white">
+                      The average of your last 5 session scores. Most people feel ready at 80%+.
+                    </InfoTip>
                   </p>
                   <h2 className="mt-2 font-serif text-2xl font-semibold">
                     {readiness >= 80
@@ -215,7 +219,13 @@ export default function DashboardPage() {
 
             {/* Skills breakdown */}
             <div className="card p-7">
-              <h2 className="mb-5 font-serif text-lg font-semibold text-ink">Skills breakdown</h2>
+              <h2 className="mb-5 flex items-center gap-1.5 font-serif text-lg font-semibold text-ink">
+                Skills breakdown
+                <InfoTip title="Your five scores">
+                  Clarity, relevance, specificity, confidence, and conciseness. Tap any row to practice
+                  that one on its own.
+                </InfoTip>
+              </h2>
               <div className="space-y-1">
                 {dimTrends.map((d) => (
                   <Link

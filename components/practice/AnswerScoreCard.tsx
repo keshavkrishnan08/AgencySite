@@ -9,20 +9,25 @@ import {
   TrendingUp,
 } from "lucide-react";
 import { ScoreNumber, DimensionBars } from "@/components/ui/Score";
-import { DIMENSIONS, scoreLabel, scoreColor, cn } from "@/lib/utils";
+import { InfoTip } from "@/components/ui/Tooltip";
+import { DIMENSIONS, DIMENSION_HELP, scoreLabel, scoreColor, cn } from "@/lib/utils";
 import type { Dimension, ScoredAnswer } from "@/lib/types";
 
 function FeedbackRow({ dim, score, text }: { dim: Dimension; score: number; text: string }) {
   const label = DIMENSIONS.find((d) => d.key === dim)?.label ?? dim;
   const Icon = score >= 75 ? CheckCircle2 : score >= 55 ? TrendingUp : AlertCircle;
+  const help = DIMENSION_HELP[dim];
   return (
     <div className="flex gap-3">
       <Icon size={18} className="mt-0.5 shrink-0" style={{ color: scoreColor(score) }} />
       <p className="text-[0.95rem] leading-relaxed text-ink-2">
         <span className="font-semibold text-ink">
-          {label} ({score}):
-        </span>{" "}
-        {text}
+          {label} ({score})
+        </span>
+        <InfoTip title={`${label} — ${help.what}`} className="mx-1">
+          {help.tip}
+        </InfoTip>
+        : {text}
       </p>
     </div>
   );
