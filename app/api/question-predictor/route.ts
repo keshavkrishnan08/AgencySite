@@ -10,7 +10,7 @@ const SYSTEM = `You are PrepPath's Question Predictor. Read the pasted job posti
 For each: the question, why they're asking it (what it reveals about what they care about), 2-3 bullets on what a strong answer includes, and a probability (0-100, descending).
 
 Return ONLY valid minified JSON:
-{"questions":[{"question":"...","why":"...","strongAnswer":["...","..."],"probability":92}]}`;
+{"questions":[{"question":"...","why":"...","strongAnswer":["...","..."],"probability":92}]}\n\nWrite in plain words a 6th grader can read. Never use em dashes or en dashes; use a period, comma, or colon instead.`;
 
 const SIGNALS: { test: RegExp; q: PredictedQuestion }[] = [
   {

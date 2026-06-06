@@ -12,7 +12,7 @@ Score the candidate's turn 0-100 on: confidence, specificity (did they justify w
 
 Return ONLY valid minified JSON:
 {"confidence":N,"specificity":N,"composure":N,"feedback":"one warm, specific coaching sentence","interviewerLine":"your next line as the hiring manager","accepted":false}
-Set accepted=true only if the negotiation has reached a fair agreement.`;
+Set accepted=true only if the negotiation has reached a fair agreement.\n\nWrite in plain words a 6th grader can read. Never use em dashes or en dashes; use a period, comma, or colon instead.`;
 
 const LINES = [
   "What are your salary expectations for this role?",
