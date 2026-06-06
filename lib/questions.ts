@@ -74,27 +74,58 @@ function rotate<T>(arr: T[], by: number): T[] {
   return [...arr.slice(k), ...arr.slice(0, k)];
 }
 
+/** Pick a behavioral question implied by the pasted job posting. */
+function postingSignalQuestion(posting: string): string | null {
+  if (!posting) return null;
+  const checks: [RegExp, string][] = [
+    [/fast[- ]?paced|deadline|under pressure|high[- ]?volume/i, "Tell me about a time you stayed organized when everything was happening at once."],
+    [/customer|client|patient|guest|member/i, "Tell me about a difficult customer or client situation and how you handled it."],
+    [/lead|manage|supervis|mentor|own(ership)?/i, "Tell me about a time you took the lead on something without being asked."],
+    [/detail|accura|complian|quality|audit/i, "Give me an example of how you keep your work accurate when the details matter."],
+    [/budget|cost|revenue|sales|target|quota/i, "Tell me about a time you were responsible for hitting a number. What happened?"],
+  ];
+  for (const [re, q] of checks) if (re.test(posting)) return q;
+  return null;
+}
+
+export interface JobContext {
+  company?: string;
+  posting?: string;
+}
+
 export function generateQuestions(
   situation: Situation | null,
   role: string,
-  seed = 0
+  seed = 0,
+  context?: JobContext
 ): Question[] {
   const r = role.trim() || "the";
+  const company = context?.company?.trim();
+  const posting = context?.posting?.trim() || "";
+
   const warm = rotate(WARMUP(r), seed);
   const beh = rotate(BEHAVIORAL(r), seed);
   const sit = SITUATION_QS[situation ?? "career_change"](r);
   const sitR = rotate(sit, seed);
   const close = rotate(CLOSER(r), seed);
 
+  const opener = company
+    ? `Tell me about yourself and why you applied to ${company} for this ${r} role.`
+    : warm[0];
+  const closer = company
+    ? `What questions do you have for us about the ${r} role at ${company}?`
+    : close[0];
+  const signal = postingSignalQuestion(posting);
+
   const arc: { text: string; cat: string }[] = [
-    { text: warm[0], cat: "warmup" },
+    { text: opener, cat: "warmup" },
     { text: beh[0], cat: "behavioral" },
     { text: beh[1], cat: "behavioral" },
-    { text: beh[2], cat: "behavioral" },
+    { text: signal ?? beh[2], cat: "behavioral" },
     { text: sitR[0], cat: situation === "returning" || situation === "laid_off" ? "gap" : "situation" },
     { text: sitR[1], cat: "situation" },
     { text: beh[3], cat: "behavioral" },
-    { text: close[0], cat: "closer" },
+    { text: closer, cat: "closer" },
   ];
 
   return arc.map((a, i) => ({

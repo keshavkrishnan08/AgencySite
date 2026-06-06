@@ -14,6 +14,8 @@ export async function apiGenerateQuestions(args: {
   interviewGap?: string | null;
   seed?: number;
   focusDimension?: Dimension;
+  company?: string;
+  posting?: string;
 }): Promise<{ questions: Question[]; source: string }> {
   try {
     const res = await fetch("/api/generate-questions", {
@@ -30,7 +32,10 @@ export async function apiGenerateQuestions(args: {
   }
   const questions = args.focusDimension
     ? generateFocusQuestions(args.focusDimension, args.targetRole, args.seed ?? 0)
-    : localQuestions(args.situation, args.targetRole, args.seed ?? 0);
+    : localQuestions(args.situation, args.targetRole, args.seed ?? 0, {
+        company: args.company,
+        posting: args.posting,
+      });
   return { questions, source: "heuristic" };
 }
 
