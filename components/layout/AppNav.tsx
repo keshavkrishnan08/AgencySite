@@ -13,6 +13,7 @@ import { getProfile, getStreak, isPremium, onStoreChange } from "@/lib/store";
 const NAV = [
   { href: "/dashboard", label: "Dashboard" },
   { href: "/practice", label: "Practice" },
+  { href: "/plan", label: "My Plan" },
   { href: "/interview-day", label: "Interview Day" },
 ];
 

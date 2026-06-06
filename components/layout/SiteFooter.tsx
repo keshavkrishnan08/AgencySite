@@ -35,8 +35,8 @@ export function SiteFooter() {
               title="Company"
               links={[
                 { href: "#pricing", label: "Pricing" },
+                { href: "/whats-changed", label: "What's changed in interviews" },
                 { href: "#", label: "Privacy" },
-                { href: "#", label: "Terms" },
                 { href: "#", label: "Contact" },
               ]}
             />

@@ -22,7 +22,7 @@ import {
 } from "@/lib/store";
 import { average, cn, uid } from "@/lib/utils";
 import { track } from "@/lib/analytics";
-import type { Dimension, Question, ScoredAnswer, Session, Situation } from "@/lib/types";
+import type { Dimension, DeliveryMetrics, Question, ScoredAnswer, Session, Situation } from "@/lib/types";
 
 type Phase = "setup" | "loading" | "answer" | "score" | "blocked";
 
@@ -49,8 +49,12 @@ function PracticeInner() {
   const [followUpScored, setFollowUpScored] = useState<ScoredAnswer | null>(null);
   const [submittingFollowUp, setSubmittingFollowUp] = useState(false);
   const sessionStart = useRef<number>(0);
+  const [gentle, setGentle] = useState(false);
   // Per-user personalization computed from history, fed into every AI call.
   const perso = useRef({ weakestDimension: "", recentAverage: 0, name: "", interviewGap: "" });
+  // Spoken-delivery metrics captured by the mic for the current answers.
+  const deliveryRef = useRef<DeliveryMetrics | null>(null);
+  const fuDeliveryRef = useRef<DeliveryMetrics | null>(null);
 
   const start = useCallback(
     async (r: string, s: Situation | null) => {
@@ -80,6 +84,7 @@ function PracticeInner() {
         }
       }
       perso.current = { weakestDimension, recentAverage, name: profile.name, interviewGap: profile.interviewGap || "" };
+      setGentle(hist.length === 0);
 
       const { questions } = await apiGenerateQuestions({
         situation: s,
@@ -147,6 +152,7 @@ function PracticeInner() {
       },
       false
     );
+    result.delivery = deliveryRef.current ?? undefined;
     setScored(result);
     setSubmitting(false);
     setPhase("score");
@@ -182,6 +188,7 @@ function PracticeInner() {
       weakestDimension: perso.current.weakestDimension,
       recentAverage: perso.current.recentAverage,
     });
+    result.delivery = fuDeliveryRef.current ?? undefined;
     setFollowUpScored(result);
     setSubmittingFollowUp(false);
   };
@@ -223,6 +230,8 @@ function PracticeInner() {
     setFollowUpScored(null);
     setFollowUpAnswer("");
     setAnswerText("");
+    deliveryRef.current = null;
+    fuDeliveryRef.current = null;
     setPhase("answer");
     window.scrollTo({ top: 0, behavior: "smooth" });
   };
@@ -344,7 +353,10 @@ function PracticeInner() {
               </div>
 
               <div className="mt-6 flex flex-wrap items-center justify-between gap-3">
-                <VoiceButton onTranscript={(t) => setAnswerText((p) => (p ? p.trim() + " " : "") + t)} />
+                <VoiceButton
+                  onTranscript={(t) => setAnswerText((p) => (p ? p.trim() + " " : "") + t)}
+                  onDelivery={(m) => (deliveryRef.current = m)}
+                />
                 <Button onClick={submit} disabled={!canSubmit} size="lg">
                   {submitting ? (
                     <>
@@ -370,6 +382,7 @@ function PracticeInner() {
             </div>
             <AnswerScoreCard
               answer={scored}
+              gentle={gentle}
               loadExample={(a) => apiGenerateExample(a.questionText, role, a.category)}
             />
 
@@ -396,7 +409,10 @@ function PracticeInner() {
                       className="field mt-4 min-h-[120px] resize-y bg-white leading-relaxed"
                     />
                     <div className="mt-3 flex flex-wrap items-center justify-between gap-3">
-                      <VoiceButton onTranscript={(t) => setFollowUpAnswer((p) => (p ? p.trim() + " " : "") + t)} />
+                      <VoiceButton
+                        onTranscript={(t) => setFollowUpAnswer((p) => (p ? p.trim() + " " : "") + t)}
+                        onDelivery={(m) => (fuDeliveryRef.current = m)}
+                      />
                       <div className="flex items-center gap-2">
                         <button onClick={() => setFollowUp(null)} className="btn-ghost text-sm">
                           Skip
