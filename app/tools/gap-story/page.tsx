@@ -4,6 +4,7 @@ import { useEffect, useState } from "react";
 import { motion } from "framer-motion";
 import { Check, Copy, Loader2, Save, Sparkles, Trash2 } from "lucide-react";
 import { ToolShell } from "@/components/layout/ToolShell";
+import { GapStoryIcon } from "@/components/icons";
 import { Button } from "@/components/ui/Button";
 import { cn } from "@/lib/utils";
 import { deleteGapAnswer, getGapAnswers, getProfile, saveGapAnswer } from "@/lib/store";
@@ -76,7 +77,7 @@ export default function GapStoryPage() {
 
   return (
     <ToolShell
-      icon={Sparkles}
+      icon={GapStoryIcon}
       badge="Most popular"
       title="Gap Story Builder"
       description="Turn your résumé gap into a confident 30-second answer that sounds like you — not a script. Practice it until your voice doesn't shake."

@@ -206,29 +206,57 @@ h1, h2, h3, h4, h5 {
 
   /* Buttons */
   .btn {
-    @apply inline-flex select-none items-center justify-center gap-2 whitespace-nowrap rounded-full font-medium transition-all duration-200;
+    @apply relative inline-flex select-none items-center justify-center gap-2 overflow-hidden whitespace-nowrap rounded-full font-medium transition-all duration-200;
     font-family: var(--font-sans);
+    isolation: isolate;
   }
   .btn:active {
     transform: scale(0.98);
   }
+  .btn:focus-visible {
+    outline: 2px solid var(--primary);
+    outline-offset: 2px;
+  }
   .btn-primary {
-    @apply btn px-7 py-3 text-white shadow-sm;
-    background: linear-gradient(135deg, var(--primary-bright) 0%, var(--primary) 60%, var(--primary-ink) 130%);
-    box-shadow: 0 1px 2px rgba(12, 86, 96, 0.3), 0 8px 22px rgba(20, 128, 142, 0.26);
+    @apply btn px-7 py-3 text-white;
+    background: linear-gradient(135deg, var(--primary-bright) 0%, var(--primary) 58%, var(--primary-ink) 130%);
+    box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.3), 0 1px 2px rgba(12, 86, 96, 0.3),
+      0 8px 22px rgba(20, 128, 142, 0.26);
   }
   .btn-primary:hover {
-    box-shadow: 0 2px 4px rgba(12, 86, 96, 0.32), 0 14px 34px rgba(20, 128, 142, 0.34);
-    transform: translateY(-1px);
+    box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.35), 0 2px 4px rgba(12, 86, 96, 0.32),
+      0 16px 36px rgba(20, 128, 142, 0.36);
+    transform: translateY(-1.5px);
+  }
+  /* sheen sweep on hover — tactile, premium */
+  .btn-primary::after,
+  .btn-gold::after {
+    content: "";
+    position: absolute;
+    inset: 0;
+    z-index: -1;
+    border-radius: inherit;
+    background: linear-gradient(115deg, transparent 36%, rgba(255, 255, 255, 0.32) 50%, transparent 64%);
+    transform: translateX(-130%);
+    transition: transform 0.7s cubic-bezier(0.22, 1, 0.36, 1);
+    pointer-events: none;
+  }
+  .btn-primary:hover::after,
+  .btn-gold:hover::after {
+    transform: translateX(130%);
   }
   .btn-secondary {
     @apply btn border px-7 py-3;
-    border-color: var(--primary);
+    border-color: var(--border-strong);
     color: var(--primary-ink);
-    background: transparent;
+    background: var(--surface);
+    box-shadow: var(--shadow-xs);
   }
   .btn-secondary:hover {
+    border-color: var(--primary);
     background: var(--primary-soft);
+    transform: translateY(-1px);
+    box-shadow: var(--shadow-sm);
   }
   .btn-ghost {
     @apply btn px-4 py-2;
@@ -240,12 +268,14 @@ h1, h2, h3, h4, h5 {
   }
   .btn-gold {
     @apply btn px-7 py-3 text-white;
-    background: linear-gradient(135deg, #cda04f 0%, var(--gold) 60%, var(--gold-ink) 130%);
-    box-shadow: 0 1px 2px rgba(138, 101, 38, 0.3), 0 8px 22px rgba(184, 137, 59, 0.26);
+    background: linear-gradient(135deg, #d7ad5c 0%, var(--gold) 58%, var(--gold-ink) 130%);
+    box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.32), 0 1px 2px rgba(138, 101, 38, 0.3),
+      0 8px 22px rgba(184, 137, 59, 0.26);
   }
   .btn-gold:hover {
-    transform: translateY(-1px);
-    box-shadow: 0 2px 4px rgba(138, 101, 38, 0.32), 0 14px 34px rgba(184, 137, 59, 0.34);
+    transform: translateY(-1.5px);
+    box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.38), 0 2px 4px rgba(138, 101, 38, 0.32),
+      0 16px 36px rgba(184, 137, 59, 0.36);
   }
 
   /* Pills / chips / badges */

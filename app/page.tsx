@@ -1,20 +1,14 @@
+import { ArrowRight, Check, CreditCard, Lock, RefreshCw, ShieldCheck, Briefcase, Sparkles } from "lucide-react";
 import {
-  ArrowRight,
-  Check,
-  CreditCard,
-  Lock,
-  RefreshCw,
-  Building2,
-  FileSearch,
-  Sparkles,
-  ShieldCheck,
-  MessageSquare,
-  Mic,
-  Timer,
-  ClipboardCheck,
-  Target,
-  Briefcase,
-} from "lucide-react";
+  GapStoryIcon,
+  CompanyIcon,
+  PredictorIcon,
+  AnxietyIcon,
+  StopwatchIcon,
+  SalaryIcon,
+  DebriefIcon,
+  StoryIcon,
+} from "@/components/icons";
 import { SiteNav } from "@/components/layout/SiteNav";
 import { SiteFooter } from "@/components/layout/SiteFooter";
 import { HeroDemo } from "@/components/landing/HeroDemo";
@@ -289,43 +283,43 @@ function HowItWorks() {
 /* ===================== FEATURES ===================== */
 const FEATURES = [
   {
-    icon: Sparkles,
+    icon: GapStoryIcon,
     badge: "Most popular",
     title: "Gap Story Builder",
     body: "Took time off for kids? Got laid off? Switching careers? AI turns your gap into a confident 30-second narrative — not a script you memorize, a story that sounds like you. Practice until it feels natural, not apologetic.",
   },
   {
-    icon: Building2,
+    icon: CompanyIcon,
     title: "Company Research Briefing",
     body: "47% of interview failures come from not knowing the company. Enter a name and get a one-page briefing: what they do, recent news, culture, and the questions to ask them. Walk in knowing more than every other candidate.",
   },
   {
-    icon: FileSearch,
+    icon: PredictorIcon,
     title: "Question Predictor",
     body: "Paste the job posting. AI reads the role, seniority, and exact language they used, then predicts the 5 questions they're most likely to ask — plus why, and what a strong answer includes. Stop guessing.",
   },
   {
-    icon: Mic,
+    icon: AnxietyIcon,
     title: "Anxiety Detector",
     body: "Catches the invisible habits that make interviewers doubt you: 'um,' 'I guess,' 'sorry,' 'I only.' You don't hear yourself doing it. Most users cut filler words 60% in two weeks — just from awareness.",
   },
   {
-    icon: Timer,
+    icon: StopwatchIcon,
     title: "Interview Day Mode",
     body: "The night before the real thing. No scores mid-session, a 30-second countdown to start each answer, no going back. Real pressure. If your practice holds up, you're ready. If it drops, you know what to fix by morning.",
   },
   {
-    icon: MessageSquare,
+    icon: SalaryIcon,
     title: "Salary Negotiation Practice",
     body: "They offered the job — then asked your number. Most people leave $5,000–$15,000 on the table. PrepPath simulates the negotiation and pushes back, so by the third try your voice doesn't shake.",
   },
   {
-    icon: ClipboardCheck,
+    icon: DebriefIcon,
     title: "Post-Interview Debrief",
     body: "Sitting in your car wondering 'did that go well?' Come back, type what they asked and what you said, and get honest scoring — so you know exactly what to fix before the next one. No more waiting in the dark.",
   },
   {
-    icon: Target,
+    icon: StoryIcon,
     title: "Your Story Narrative Builder",
     body: "The hardest question is the first one. The narrative builder walks you through it in four steps — who you are, what you've done, why you're here, what's next. Five sentences. Sixty seconds. Sounds like you wrote it.",
   },

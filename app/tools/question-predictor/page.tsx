@@ -4,6 +4,7 @@ import { useEffect, useState } from "react";
 import { motion } from "framer-motion";
 import { FileSearch, Loader2, Sparkles, Check } from "lucide-react";
 import { ToolShell } from "@/components/layout/ToolShell";
+import { PredictorIcon } from "@/components/icons";
 import { Button, ButtonLink } from "@/components/ui/Button";
 import { getProfile } from "@/lib/store";
 import type { PredictedQuestion } from "@/lib/types";
@@ -41,7 +42,7 @@ export default function QuestionPredictorPage() {
 
   return (
     <ToolShell
-      icon={FileSearch}
+      icon={PredictorIcon}
       title="Question Predictor"
       description="Paste the job posting. AI reads the role, seniority, and exact language they used — then predicts the five questions they're most likely to ask. Stop guessing."
     >
