@@ -4,6 +4,7 @@ import { useEffect, useState } from "react";
 import { motion } from "framer-motion";
 import { CalendarCheck, Plus, Trash2, Trophy } from "lucide-react";
 import { ToolShell } from "@/components/layout/ToolShell";
+import { TrackerIcon } from "@/components/icons";
 import { Button } from "@/components/ui/Button";
 import { deleteInterview, getInterviews, getProfile, saveInterview } from "@/lib/store";
 import { cn, formatDateLong, todayKey, uid } from "@/lib/utils";
@@ -58,7 +59,7 @@ export default function TrackerPage() {
 
   return (
     <ToolShell
-      icon={CalendarCheck}
+      icon={TrackerIcon}
       title="Interview Tracker"
       description="Practice is the input. Offers are the point. Track every real interview here so you can see what's actually working — and prove PrepPath got you there."
     >

@@ -4,6 +4,7 @@ import { useEffect, useState } from "react";
 import { motion } from "framer-motion";
 import { ClipboardCheck, Loader2, Plus, Sparkles } from "lucide-react";
 import { ToolShell } from "@/components/layout/ToolShell";
+import { DebriefIcon } from "@/components/icons";
 import { Button } from "@/components/ui/Button";
 import { AnswerScoreCard } from "@/components/practice/AnswerScoreCard";
 import { VoiceButton } from "@/components/ui/VoiceButton";
@@ -44,7 +45,7 @@ export default function DebriefPage() {
 
   return (
     <ToolShell
-      icon={ClipboardCheck}
+      icon={DebriefIcon}
       title="Post-Interview Debrief"
       description="Just walked out wondering 'did that go well?' Type what they asked and what you said. Get honest scoring — so you know exactly what to fix before the next one."
     >

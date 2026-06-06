@@ -1,24 +1,24 @@
 import Link from "next/link";
-import {
-  ArrowRight,
-  Sparkles,
-  Building2,
-  FileSearch,
-  MessageSquare,
-  ClipboardCheck,
-  BookOpen,
-  CalendarCheck,
-} from "lucide-react";
+import { ArrowRight } from "lucide-react";
 import { AppNav } from "@/components/layout/AppNav";
+import {
+  GapStoryIcon,
+  CompanyIcon,
+  PredictorIcon,
+  SalaryIcon,
+  DebriefIcon,
+  StoryIcon,
+  TrackerIcon,
+} from "@/components/icons";
 
 const TOOLS = [
-  { href: "/tools/gap-story", icon: Sparkles, title: "Gap Story Builder", desc: "Turn any résumé gap into a confident 30-second answer.", badge: "Most popular" },
-  { href: "/tools/company-research", icon: Building2, title: "Company Research Briefing", desc: "A one-page briefing so you walk in knowing the company." },
-  { href: "/tools/question-predictor", icon: FileSearch, title: "Question Predictor", desc: "Paste the posting — get the 5 questions they'll likely ask." },
-  { href: "/tools/salary", icon: MessageSquare, title: "Salary Negotiation", desc: "Practice the offer conversation until your voice is steady." },
-  { href: "/tools/debrief", icon: ClipboardCheck, title: "Post-Interview Debrief", desc: "Score how the real interview actually went." },
-  { href: "/tools/your-story", icon: BookOpen, title: "Your Story Builder", desc: "Build your 'tell me about yourself' in four steps." },
-  { href: "/tools/tracker", icon: CalendarCheck, title: "Interview Tracker", desc: "Track real interviews and outcomes — offers are the point." },
+  { href: "/tools/gap-story", icon: GapStoryIcon, title: "Gap Story Builder", desc: "Turn any résumé gap into a confident 30-second answer.", badge: "Most popular" },
+  { href: "/tools/company-research", icon: CompanyIcon, title: "Company Research Briefing", desc: "A one-page briefing so you walk in knowing the company." },
+  { href: "/tools/question-predictor", icon: PredictorIcon, title: "Question Predictor", desc: "Paste the posting — get the 5 questions they'll likely ask." },
+  { href: "/tools/salary", icon: SalaryIcon, title: "Salary Negotiation", desc: "Practice the offer conversation until your voice is steady." },
+  { href: "/tools/debrief", icon: DebriefIcon, title: "Post-Interview Debrief", desc: "Score how the real interview actually went." },
+  { href: "/tools/your-story", icon: StoryIcon, title: "Your Story Builder", desc: "Build your 'tell me about yourself' in four steps." },
+  { href: "/tools/tracker", icon: TrackerIcon, title: "Interview Tracker", desc: "Track real interviews and outcomes — offers are the point." },
 ];
 
 export default function ToolsPage() {

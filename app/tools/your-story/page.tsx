@@ -4,6 +4,7 @@ import { useEffect, useMemo, useState } from "react";
 import { motion } from "framer-motion";
 import { BookOpen, Copy, Check, Loader2, Sparkles } from "lucide-react";
 import { ToolShell } from "@/components/layout/ToolShell";
+import { StoryIcon } from "@/components/icons";
 import { Button } from "@/components/ui/Button";
 import { AnswerScoreCard } from "@/components/practice/AnswerScoreCard";
 import { apiScoreAnswer } from "@/lib/client";
@@ -58,7 +59,7 @@ export default function YourStoryPage() {
 
   return (
     <ToolShell
-      icon={BookOpen}
+      icon={StoryIcon}
       title="Your Story Builder"
       description="The hardest question is the first one. Build your 'tell me about yourself' in four steps — five sentences, sixty seconds, sounds like you wrote it. Because you did."
     >
