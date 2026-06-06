@@ -5,13 +5,45 @@ import {
   AlertCircle,
   CheckCircle2,
   ChevronDown,
+  Heart,
   Lightbulb,
+  Mic,
   TrendingUp,
 } from "lucide-react";
 import { ScoreNumber, DimensionBars } from "@/components/ui/Score";
 import { InfoTip } from "@/components/ui/Tooltip";
+import { deliveryNotes } from "@/lib/delivery";
 import { DIMENSIONS, DIMENSION_HELP, scoreLabel, scoreColor, cn } from "@/lib/utils";
 import type { Dimension, ScoredAnswer } from "@/lib/types";
+
+function DeliveryPanel({ answer }: { answer: ScoredAnswer }) {
+  if (!answer.delivery) return null;
+  const notes = deliveryNotes(answer.delivery);
+  return (
+    <div className="card p-7">
+      <h3 className="mb-1 flex items-center gap-2 font-serif text-lg font-semibold text-ink">
+        <Mic size={18} className="text-primary" /> How you sounded
+      </h3>
+      <p className="mb-4 text-sm text-ink-3">From your spoken answer, not just the words.</p>
+      <div className="grid gap-3 sm:grid-cols-3">
+        {notes.map((n) => (
+          <div key={n.label} className="rounded-xl border p-4" style={{ borderColor: "var(--border)" }}>
+            <div className="flex items-baseline justify-between">
+              <span className="text-2xs font-semibold uppercase tracking-wider text-ink-3">{n.label}</span>
+              <span
+                className="font-mono text-sm font-bold"
+                style={{ color: n.tone === "good" ? "var(--sage-ink)" : "var(--amber-ink)" }}
+              >
+                {n.value}
+              </span>
+            </div>
+            <p className="mt-1.5 text-[0.82rem] leading-relaxed text-ink-2">{n.text}</p>
+          </div>
+        ))}
+      </div>
+    </div>
+  );
+}
 
 function FeedbackRow({ dim, score, text }: { dim: Dimension; score: number; text: string }) {
   const label = DIMENSIONS.find((d) => d.key === dim)?.label ?? dim;
@@ -77,10 +109,12 @@ function AnxietyPanel({ answer }: { answer: ScoredAnswer }) {
 export function AnswerScoreCard({
   answer,
   animate = true,
+  gentle = false,
   loadExample,
 }: {
   answer: ScoredAnswer;
   animate?: boolean;
+  gentle?: boolean;
   loadExample?: (a: ScoredAnswer) => Promise<string>;
 }) {
   const [open, setOpen] = useState(false);
@@ -104,6 +138,27 @@ export function AnswerScoreCard({
 
   return (
     <div className="space-y-6">
+      {/* Gentle first-time reframe */}
+      {gentle && (
+        <div className="rounded-2xl border-2 p-5" style={{ borderColor: "var(--primary)", background: "var(--primary-soft)" }}>
+          <p className="flex items-center gap-2 font-serif text-lg font-semibold text-primary-ink">
+            <Heart size={18} /> This is your starting line.
+          </p>
+          <p className="mt-1 text-sm text-ink-2">
+            Everyone&apos;s first answer is rough. That is the whole point. You will watch this number climb fast.
+          </p>
+        </div>
+      )}
+
+      {/* Lead with what went right */}
+      <div className="flex gap-2.5 rounded-xl border bg-sage-soft/50 p-4" style={{ borderColor: "var(--border)" }}>
+        <CheckCircle2 size={18} className="mt-0.5 shrink-0 text-sage-ink" />
+        <p className="text-[0.95rem] text-ink">
+          <span className="font-semibold">What went right: </span>
+          {answer.strengthSummary}
+        </p>
+      </div>
+
       {/* Overall + dimensions */}
       <div className="card-elevated grid items-center gap-8 p-7 sm:grid-cols-[auto_1fr] sm:p-8">
         <div className="text-center sm:border-r sm:pr-8" style={{ borderColor: "var(--border)" }}>
@@ -115,6 +170,9 @@ export function AnswerScoreCard({
         </div>
         <DimensionBars dimensions={answer.scores} />
       </div>
+
+      {/* How you sounded (spoken delivery) */}
+      <DeliveryPanel answer={answer} />
 
       {/* Coach's notes */}
       <div className="card p-7">

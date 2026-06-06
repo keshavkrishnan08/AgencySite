@@ -28,6 +28,14 @@ export interface AnxietyFlags {
   total: number;
 }
 
+export interface DeliveryMetrics {
+  durationSec: number;
+  wordCount: number;
+  wpm: number;
+  pauseCount: number;
+  longestPauseSec: number;
+}
+
 export interface ScoredAnswer {
   questionNumber: number;
   questionText: string;
@@ -41,6 +49,7 @@ export interface ScoredAnswer {
   exampleAnswer: string;
   wordCount: number;
   durationSeconds?: number;
+  delivery?: DeliveryMetrics;
   source: "ai" | "heuristic";
 }
 
@@ -108,6 +117,26 @@ export interface PredictedQuestion {
   why: string;
   strongAnswer: string[];
   probability: number;
+}
+
+export interface PlanTask {
+  id: string;
+  label: string;
+  href: string;
+  done: boolean;
+}
+export interface PlanDay {
+  label: string;
+  whenISO: string;
+  tasks: PlanTask[];
+}
+export interface InterviewPlan {
+  id: string;
+  company: string;
+  role: string;
+  dateISO: string;
+  createdAt: string;
+  days: PlanDay[];
 }
 
 export type InterviewStatus = "upcoming" | "completed" | "callback" | "offer" | "rejected";

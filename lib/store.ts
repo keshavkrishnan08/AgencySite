@@ -2,6 +2,7 @@
 
 import type {
   CompanyBriefing,
+  InterviewPlan,
   InterviewRecord,
   SavedGapAnswer,
   Session,
@@ -23,6 +24,7 @@ const KEYS = {
   briefings: "pp:briefings",
   onboarding: "pp:onboarding",
   interviews: "pp:interviews",
+  plan: "pp:plan",
 } as const;
 
 function read<T>(key: string, fallback: T): T {
@@ -189,6 +191,31 @@ export function saveInterview(rec: InterviewRecord): void {
 }
 export function deleteInterview(id: string): void {
   write(KEYS.interviews, getInterviews().filter((x) => x.id !== id));
+}
+
+/* ----------------------- Interview prep plan ----------------------- */
+
+export function getPlan(): InterviewPlan | null {
+  return read<InterviewPlan | null>(KEYS.plan, null);
+}
+export function savePlan(plan: InterviewPlan): void {
+  write(KEYS.plan, plan);
+}
+export function clearPlan(): void {
+  if (typeof window !== "undefined") window.localStorage.removeItem(KEYS.plan);
+  window.dispatchEvent?.(new CustomEvent("pp:change", { detail: { key: KEYS.plan } }));
+}
+export function togglePlanTask(taskId: string): void {
+  const plan = getPlan();
+  if (!plan) return;
+  for (const day of plan.days) {
+    const task = day.tasks.find((t) => t.id === taskId);
+    if (task) {
+      task.done = !task.done;
+      break;
+    }
+  }
+  savePlan(plan);
 }
 
 /* ----------------------- Onboarding draft ----------------------- */
