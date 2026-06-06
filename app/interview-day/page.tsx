@@ -283,17 +283,7 @@ function DarkShell({ children }: { children: React.ReactNode }) {
       style={{ background: "radial-gradient(120% 80% at 50% -10%, #1b2740, #10141f 60%)" }}
     >
       <div className="container-wide flex items-center justify-between py-6">
-        <Link href="/dashboard" className="opacity-90">
-          <span className="inline-flex items-center gap-2.5">
-            <span className="grid h-9 w-9 place-items-center rounded-[11px] bg-white/10 text-white">
-              <svg width="20" height="20" viewBox="0 0 24 24" fill="none">
-                <path d="M4 16.5L9 11l3.2 3.2L20 6.5" stroke="white" strokeWidth="2.1" strokeLinecap="round" strokeLinejoin="round" />
-                <circle cx="20" cy="6.5" r="2.1" fill="white" />
-              </svg>
-            </span>
-            <span className="font-serif text-[1.35rem] font-semibold text-white">PrepPath</span>
-          </span>
-        </Link>
+        <Logo href="/dashboard" dark size={32} />
         <span className="chip border-white/15 bg-white/10 text-white/70">Interview Day Mode</span>
       </div>
       <div className="container-content flex flex-1 items-center justify-center py-10">{children}</div>
