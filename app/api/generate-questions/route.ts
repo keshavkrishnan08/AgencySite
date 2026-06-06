@@ -15,6 +15,12 @@ Follow this arc:
 - Q6-7: Situation-specific — directly address the candidate's situation (returning to work / laid off / promotion / career change)
 - Q8: Closer ("what questions do you have for us?")
 
+If a company name is given, reference it naturally in the opener and closer.
+If a job posting is given, mine it for the role's real priorities (the skills, the
+language they used, "fast-paced", customer-facing, leadership, accuracy, targets)
+and make at least two behavioral questions probe exactly those things — like a real
+hiring manager for THIS job would.
+
 For each question include a short, practical tip (1 sentence).
 
 Return ONLY valid minified JSON, no backticks:
@@ -27,7 +33,15 @@ export async function POST(req: Request) {
   } catch {
     return NextResponse.json({ error: "Bad request" }, { status: 400 });
   }
-  const { situation = null, targetRole = "", interviewGap = "", seed = 0, focusDimension } = body ?? {};
+  const {
+    situation = null,
+    targetRole = "",
+    interviewGap = "",
+    seed = 0,
+    focusDimension,
+    company = "",
+    posting = "",
+  } = body ?? {};
 
   if (focusDimension) {
     return NextResponse.json({
@@ -38,7 +52,11 @@ export async function POST(req: Request) {
 
   if (hasAI()) {
     try {
-      const user = `Role: ${targetRole || "general professional"}\nSituation: ${situation || "unspecified"}\nTime since last interview: ${interviewGap || "unspecified"}`;
+      const user = `Role: ${targetRole || "general professional"}
+Company: ${company || "unspecified"}
+Situation: ${situation || "unspecified"}
+Time since last interview: ${interviewGap || "unspecified"}
+${posting ? `\nJob posting:\n"""${String(posting).slice(0, 5000)}"""` : ""}`;
       const text = await callClaude({ system: SYSTEM, user, maxTokens: 1100, temperature: 0.6 });
       const parsed = extractJson<{ questions: Question[] }>(text);
       if (parsed?.questions?.length) {
@@ -56,7 +74,7 @@ export async function POST(req: Request) {
   }
 
   return NextResponse.json({
-    questions: generateQuestions(situation, targetRole, seed),
+    questions: generateQuestions(situation, targetRole, seed, { company, posting }),
     source: "heuristic",
   });
 }
