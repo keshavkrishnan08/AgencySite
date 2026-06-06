@@ -30,7 +30,7 @@ Compute overall as a weighted average: clarity 20%, relevance 20%, specificity 2
 Also write strengthSummary (their best dimension, one sentence) and growthSummary (their weakest dimension + the single most valuable fix, one sentence).
 
 Return ONLY valid minified JSON, no backticks, no prose:
-{"scores":{"clarity":N,"relevance":N,"specificity":N,"confidence":N,"conciseness":N,"overall":N},"feedback":{"clarity":"...","relevance":"...","specificity":"...","confidence":"...","conciseness":"..."},"strengthSummary":"...","growthSummary":"..."}`;
+{"scores":{"clarity":N,"relevance":N,"specificity":N,"confidence":N,"conciseness":N,"overall":N},"feedback":{"clarity":"...","relevance":"...","specificity":"...","confidence":"...","conciseness":"..."},"strengthSummary":"...","growthSummary":"..."}\n\nWrite in plain words a 6th grader can read. Never use em dashes or en dashes; use a period, comma, or colon instead.`;
 
 export async function POST(req: Request) {
   let body: any;

@@ -24,7 +24,7 @@ C "The Growth Story". Emphasizes what they learned or did during the time.
 Rules: warm, natural, spoken (not corporate). Never apologetic. Each 2-3 sentences. Tailor to the gap type, duration, and any activities given.
 
 Return ONLY valid minified JSON:
-{"versions":[{"label":"The Confident Pivot","text":"..."},{"label":"The Honest & Brief","text":"..."},{"label":"The Growth Story","text":"..."}]}`;
+{"versions":[{"label":"The Confident Pivot","text":"..."},{"label":"The Honest & Brief","text":"..."},{"label":"The Growth Story","text":"..."}]}\n\nWrite in plain words a 6th grader can read. Never use em dashes or en dashes; use a period, comma, or colon instead.`;
 
 function fallback(gapType: string, duration: string, activities: string) {
   const reason = GAP_LABELS[gapType] || "time away";
