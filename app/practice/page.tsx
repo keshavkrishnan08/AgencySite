@@ -3,7 +3,7 @@
 import { Suspense, useCallback, useEffect, useRef, useState } from "react";
 import { useRouter, useSearchParams } from "next/navigation";
 import { motion, AnimatePresence } from "framer-motion";
-import { ArrowRight, Sparkles, X, Loader2, Lock } from "lucide-react";
+import { ArrowRight, Sparkles, X, Loader2, Lock, Building2, ChevronDown } from "lucide-react";
 import { Logo } from "@/components/ui/Logo";
 import { Button, ButtonLink } from "@/components/ui/Button";
 import { AnswerScoreCard } from "@/components/practice/AnswerScoreCard";
@@ -18,7 +18,7 @@ import {
   FREE_WEEKLY_LIMIT,
   isPremium,
 } from "@/lib/store";
-import { uid } from "@/lib/utils";
+import { cn, uid } from "@/lib/utils";
 import type { Dimension, Question, ScoredAnswer, Session, Situation } from "@/lib/types";
 
 type Phase = "setup" | "loading" | "answer" | "score" | "blocked";
@@ -32,6 +32,8 @@ function PracticeInner() {
   const [phase, setPhase] = useState<Phase>("loading");
   const [role, setRole] = useState("");
   const [situation, setSituation] = useState<Situation | null>(null);
+  const [company, setCompany] = useState("");
+  const [posting, setPosting] = useState("");
   const [questions, setQuestions] = useState<Question[]>([]);
   const [index, setIndex] = useState(0);
   const [answerText, setAnswerText] = useState("");
@@ -55,6 +57,8 @@ function PracticeInner() {
         interviewGap: getProfile().interviewGap,
         seed: Math.floor(Date.now() / 1000) % 7,
         focusDimension: focusDim,
+        company: company.trim(),
+        posting: posting.trim(),
       });
       setQuestions(questions);
       setIndex(0);
@@ -64,7 +68,7 @@ function PracticeInner() {
       sessionStart.current = Date.now();
       setPhase("answer");
     },
-    [focusDim]
+    [focusDim, company, posting]
   );
 
   useEffect(() => {
@@ -115,6 +119,7 @@ function PracticeInner() {
       id: uid("s"),
       createdAt: new Date().toISOString(),
       targetRole: role,
+      company: company.trim() || undefined,
       situation,
       mode: focusDim ? "focus" : "practice",
       overall: computeOverall(dimensions),
@@ -181,15 +186,23 @@ function PracticeInner() {
       <div className="container-content pt-10">
         {/* role chip */}
         {(phase === "answer" || phase === "score") && (
-          <div className="mb-6 flex items-center gap-2">
+          <div className="mb-6 flex flex-wrap items-center gap-2">
             <span className="chip">Preparing for: <strong className="text-ink">{role}</strong></span>
+            {company && <span className="chip">at <strong className="text-ink">{company}</strong></span>}
             {focusDim && <span className="chip bg-primary-soft text-primary-ink">Focus: {focusDim}</span>}
           </div>
         )}
 
         {/* SETUP */}
         {phase === "setup" && (
-          <SetupCard role={role} onStart={() => start(role || "Office Manager", situation)} />
+          <SetupCard
+            role={role}
+            company={company}
+            posting={posting}
+            setCompany={setCompany}
+            setPosting={setPosting}
+            onStart={() => start(role || "Office Manager", situation)}
+          />
         )}
 
         {/* BLOCKED (paywall) */}
@@ -296,34 +309,98 @@ function PracticeInner() {
 
 /* ---------------- sub-views ---------------- */
 
-function SetupCard({ role, onStart }: { role: string; onStart: () => void }) {
+function SetupCard({
+  role,
+  company,
+  posting,
+  setCompany,
+  setPosting,
+  onStart,
+}: {
+  role: string;
+  company: string;
+  posting: string;
+  setCompany: (v: string) => void;
+  setPosting: (v: string) => void;
+  onStart: () => void;
+}) {
   const premium = typeof window !== "undefined" && isPremium();
   const used = typeof window !== "undefined" ? sessionsThisWeek() : 0;
+  const [showContext, setShowContext] = useState(Boolean(company || posting));
   return (
-    <div className="mx-auto max-w-lg text-center">
-      <motion.div initial={{ opacity: 0, y: 16 }} animate={{ opacity: 1, y: 0 }} className="card-elevated p-9">
-        <span
-          className="mx-auto grid h-14 w-14 place-items-center rounded-2xl text-white shadow-sm"
-          style={{ background: "linear-gradient(140deg, var(--primary-bright), var(--primary-ink))" }}
-        >
-          <Sparkles size={24} />
-        </span>
-        <h1 className="mt-6 font-serif text-3xl font-semibold text-ink">Ready to practice?</h1>
-        <p className="mt-3 text-ink-2">
-          8 tailored questions for{" "}
-          <strong className="text-ink">{role || "your role"}</strong>. About 10 minutes. Scored as you go.
-        </p>
-        <Button onClick={onStart} size="lg" className="mt-7 w-full">
+    <div className="mx-auto max-w-xl">
+      <motion.div initial={{ opacity: 0, y: 16 }} animate={{ opacity: 1, y: 0 }} className="card-elevated p-8 sm:p-9">
+        <div className="text-center">
+          <span
+            className="mx-auto grid h-14 w-14 place-items-center rounded-2xl text-white shadow-sm"
+            style={{ background: "linear-gradient(140deg, var(--primary-bright), var(--primary-ink))" }}
+          >
+            <Sparkles size={24} />
+          </span>
+          <h1 className="mt-6 font-serif text-3xl font-semibold text-ink">Ready to practice?</h1>
+          <p className="mt-3 text-ink-2">
+            8 tailored questions for <strong className="text-ink">{role || "your role"}</strong>. About 10
+            minutes. Scored as you go.
+          </p>
+        </div>
+
+        {/* Job context (optional) */}
+        <div className="mt-7 rounded-xl border bg-bg-sunk/60 p-5" style={{ borderColor: "var(--border)" }}>
+          <button
+            onClick={() => setShowContext((v) => !v)}
+            className="flex w-full items-center justify-between text-left"
+          >
+            <span className="flex items-center gap-2 font-medium text-ink">
+              <Building2 size={17} className="text-primary" />
+              Tailor to a specific job
+              <span className="text-sm font-normal text-ink-3">(optional)</span>
+            </span>
+            <ChevronDown size={18} className={cn("text-ink-3 transition-transform", showContext && "rotate-180")} />
+          </button>
+
+          {showContext && (
+            <div className="mt-4 space-y-4">
+              <p className="text-sm text-ink-2">
+                Add the company and paste the posting, and we&apos;ll write questions a real hiring manager
+                for <em>this exact job</em> would ask.
+              </p>
+              <label className="block">
+                <span className="mb-1.5 block text-sm font-medium text-ink-2">Company name</span>
+                <input
+                  value={company}
+                  onChange={(e) => setCompany(e.target.value)}
+                  placeholder="e.g., Mercy Hospital"
+                  className="field"
+                />
+              </label>
+              <label className="block">
+                <span className="mb-1.5 block text-sm font-medium text-ink-2">
+                  Job description / posting
+                </span>
+                <textarea
+                  value={posting}
+                  onChange={(e) => setPosting(e.target.value)}
+                  placeholder="Paste the responsibilities and requirements here. The more you add, the more specific your questions get."
+                  className="field min-h-[120px] resize-y leading-relaxed text-sm"
+                />
+              </label>
+            </div>
+          )}
+        </div>
+
+        <Button onClick={onStart} size="lg" className="mt-6 w-full">
           Start session <ArrowRight size={18} />
         </Button>
         {!premium && (
-          <p className="mt-4 text-xs text-ink-3">
+          <p className="mt-4 text-center text-xs text-ink-3">
             Free plan: {Math.max(0, FREE_WEEKLY_LIMIT - used)} of {FREE_WEEKLY_LIMIT} sessions left this week
           </p>
         )}
-        <ButtonLink href="/onboarding" variant="ghost" size="sm" className="mt-2">
-          Change role or situation
-        </ButtonLink>
+        <div className="text-center">
+          <ButtonLink href="/onboarding" variant="ghost" size="sm" className="mt-2">
+            Change role or situation
+          </ButtonLink>
+        </div>
       </motion.div>
     </div>
   );

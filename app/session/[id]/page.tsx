@@ -110,6 +110,7 @@ export default function SessionPage() {
           <p className="mt-3 text-white/85">
             You answered {session.answers.length} questions in {formatDuration(session.durationSeconds)} ·
             preparing for {session.targetRole}
+            {session.company ? ` at ${session.company}` : ""}
           </p>
         </motion.div>
 

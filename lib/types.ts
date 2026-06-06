@@ -55,6 +55,7 @@ export interface Session {
   id: string;
   createdAt: string;
   targetRole: string;
+  company?: string;
   situation: Situation | null;
   mode: SessionMode;
   overall: number;
