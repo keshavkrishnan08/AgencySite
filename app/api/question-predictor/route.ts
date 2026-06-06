@@ -1,11 +1,14 @@
 import { NextResponse } from "next/server";
 import { callClaude, extractJson, hasAI } from "@/lib/ai";
+import { COACH_PERSONA } from "@/lib/prompt";
 import type { PredictedQuestion } from "@/lib/types";
 
 export const runtime = "nodejs";
 export const dynamic = "force-dynamic";
 
-const SYSTEM = `You are PrepPath's Question Predictor. Read the pasted job posting and predict the 5 interview questions this employer is most likely to ask, in order of probability.
+const SYSTEM = `${COACH_PERSONA}
+
+Your task as the Question Predictor: read the pasted job posting and predict the 5 interview questions this exact employer is most likely to ask, in order of probability.
 
 For each: the question, why they're asking it (what it reveals about what they care about), 2-3 bullets on what a strong answer includes, and a probability (0-100, descending).
 

@@ -1,10 +1,13 @@
 import { NextResponse } from "next/server";
 import { callClaude, extractJson, hasAI } from "@/lib/ai";
+import { COACH_PERSONA } from "@/lib/prompt";
 
 export const runtime = "nodejs";
 export const dynamic = "force-dynamic";
 
-const SYSTEM = `You are PrepPath's Company Research Briefing tool. Given a company name and a role the candidate is interviewing for, produce a concise one-page briefing that helps them answer "Why do you want to work here?" and ask smart questions.
+const SYSTEM = `${COACH_PERSONA}
+
+Your task as the Company Research Briefing tool: given a company name and the candidate's role, produce a concise one-page briefing that helps them answer "Why do you want to work here?" and ask smart questions, written for someone in their exact role.
 
 Return ONLY valid minified JSON:
 {"whatTheyDo":"2-3 sentences, plain English","recentNews":["bullet","bullet","bullet"],"culture":["value/theme","value/theme","value/theme"],"roleFocus":["what this role likely cares about","...","..."],"questionsToAsk":["informed question","...","..."]}
