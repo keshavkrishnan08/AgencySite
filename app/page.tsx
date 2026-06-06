@@ -1,17 +1,10 @@
 import { ArrowRight, Check, CreditCard, Lock, RefreshCw, ShieldCheck, Briefcase, Sparkles } from "lucide-react";
-import {
-  GapStoryIcon,
-  CompanyIcon,
-  PredictorIcon,
-  AnxietyIcon,
-  StopwatchIcon,
-  SalaryIcon,
-  DebriefIcon,
-  StoryIcon,
-} from "@/components/icons";
 import { SiteNav } from "@/components/layout/SiteNav";
 import { SiteFooter } from "@/components/layout/SiteFooter";
 import { HeroDemo } from "@/components/landing/HeroDemo";
+import { Avatar } from "@/components/ui/Avatar";
+import { ProductFeatures } from "@/components/landing/features";
+import { TestimonialMarquee, TestimonialGrid } from "@/components/landing/testimonials";
 import { StickyCTA } from "@/components/landing/StickyCTA";
 import { Reveal } from "@/components/ui/Reveal";
 import { AnimatedNumber } from "@/components/ui/AnimatedNumber";
@@ -62,9 +55,9 @@ function Hero() {
           </Reveal>
           <Reveal delay={0.12}>
             <p className="mt-7 max-w-prose text-lg leading-relaxed text-ink-2">
-              The interview isn&apos;t the hard part. The not-knowing-if-you&apos;re-ready is.
-              PrepPath lets you practice privately with AI, see exactly where you stand, and walk
-              in knowing your answers are good enough — because you&apos;ve already proven it to yourself.
+              The interview isn&apos;t the hard part. Not knowing if you&apos;re ready is.
+              So practice in private with AI. See where you stand. Walk in sure — because
+              you&apos;ve already done it once.
             </p>
           </Reveal>
           <Reveal delay={0.18}>
@@ -110,25 +103,22 @@ function NotYourFault() {
         <Reveal delay={0.1}>
           <div className="mx-auto mt-8 max-w-prose space-y-5 text-left text-lg leading-loose text-ink-2">
             <p>
-              The average job posting in 2026 receives <strong className="text-ink">340 applications</strong>.
-              Only <strong className="text-ink">2%</strong> of applicants make it to an interview. The median
-              time from search to offer is <strong className="text-ink">108 days</strong> — the longest on record.
+              Today the average job post gets <strong className="text-ink">340 applicants</strong>. Only{" "}
+              <strong className="text-ink">2%</strong> get an interview. The wait can stretch{" "}
+              <strong className="text-ink">108 days</strong>.
             </p>
             <p>
-              You&apos;re competing against AI-optimized résumés, algorithmic screening, and a hiring process
-              that filters you out before a human ever reads your name. If you feel like the system is stacked
-              against you, it&apos;s because it is. That isn&apos;t a reflection of your talent. It&apos;s a
-              reflection of a broken process.
+              You&apos;re up against AI-screened résumés and filters that cut you before a person sees your name.
+              The system is stacked. That&apos;s not about your talent. It&apos;s a broken process.
             </p>
             <p>
-              And when you finally do get the interview — <strong className="text-ink">93% of people</strong> feel
-              anxiety walking in. Not because they&apos;re unqualified. Because they haven&apos;t practiced in a
-              room where it&apos;s safe to be imperfect.
+              And when you do get the interview, <strong className="text-ink">93% of people</strong> feel
+              anxious. Not because they&apos;re not good enough. Because they&apos;ve never practiced where
+              it&apos;s safe to mess up.
             </p>
             <p className="text-ink">
-              That&apos;s what PrepPath is. A private room where you practice until the anxiety turns into
-              confidence. Where a score of 44 today becomes an 82 next week. Where you see, in actual numbers,
-              that you&apos;re getting better — because you proved it to yourself.
+              That&apos;s PrepPath. A private place to practice until the fear turns into calm. Where a 44 today
+              becomes an 82 next week. You&apos;ll see it in real numbers. You&apos;ll prove it to yourself.
             </p>
           </div>
         </Reveal>
@@ -232,17 +222,17 @@ const STEPS = [
   {
     n: "1",
     title: "Tell us your situation",
-    body: "Returning to work? Laid off? Changing careers? Going for a promotion? We tailor every question to your exact role — not generic, but questions a real hiring manager for your job would actually ask.",
+    body: "Your role, and what's going on — returning, laid off, a promotion, a new field. We build questions a real hiring manager for your job would ask.",
   },
   {
     n: "2",
     title: "Practice and get scored",
-    body: "Answer 8 interview questions. AI scores each on clarity, relevance, specificity, confidence, and conciseness — with one specific fix per answer. Not 'do better,' but 'swap I guess for In my experience.'",
+    body: "Answer 8 questions. Get scored on 5 things, with one clear fix each. Not 'do better' — but 'swap I guess for In my experience.'",
   },
   {
     n: "3",
     title: "Watch your score climb",
-    body: "Your dashboard tracks every session. Line charts, radar charts, weak-area alerts, a readiness score. The number goes up. Your anxiety goes down. You stop guessing and start knowing.",
+    body: "Every session shows up on your dashboard. The line goes up. The nerves go down. You stop guessing and start knowing.",
   },
 ];
 
@@ -280,105 +270,12 @@ function HowItWorks() {
   );
 }
 
-/* ===================== FEATURES ===================== */
-const FEATURES = [
-  {
-    icon: GapStoryIcon,
-    badge: "Most popular",
-    title: "Gap Story Builder",
-    body: "Took time off for kids? Got laid off? Switching careers? AI turns your gap into a confident 30-second narrative — not a script you memorize, a story that sounds like you. Practice until it feels natural, not apologetic.",
-  },
-  {
-    icon: CompanyIcon,
-    title: "Company Research Briefing",
-    body: "47% of interview failures come from not knowing the company. Enter a name and get a one-page briefing: what they do, recent news, culture, and the questions to ask them. Walk in knowing more than every other candidate.",
-  },
-  {
-    icon: PredictorIcon,
-    title: "Question Predictor",
-    body: "Paste the job posting. AI reads the role, seniority, and exact language they used, then predicts the 5 questions they're most likely to ask — plus why, and what a strong answer includes. Stop guessing.",
-  },
-  {
-    icon: AnxietyIcon,
-    title: "Anxiety Detector",
-    body: "Catches the invisible habits that make interviewers doubt you: 'um,' 'I guess,' 'sorry,' 'I only.' You don't hear yourself doing it. Most users cut filler words 60% in two weeks — just from awareness.",
-  },
-  {
-    icon: StopwatchIcon,
-    title: "Interview Day Mode",
-    body: "The night before the real thing. No scores mid-session, a 30-second countdown to start each answer, no going back. Real pressure. If your practice holds up, you're ready. If it drops, you know what to fix by morning.",
-  },
-  {
-    icon: SalaryIcon,
-    title: "Salary Negotiation Practice",
-    body: "They offered the job — then asked your number. Most people leave $5,000–$15,000 on the table. PrepPath simulates the negotiation and pushes back, so by the third try your voice doesn't shake.",
-  },
-  {
-    icon: DebriefIcon,
-    title: "Post-Interview Debrief",
-    body: "Sitting in your car wondering 'did that go well?' Come back, type what they asked and what you said, and get honest scoring — so you know exactly what to fix before the next one. No more waiting in the dark.",
-  },
-  {
-    icon: StoryIcon,
-    title: "Your Story Narrative Builder",
-    body: "The hardest question is the first one. The narrative builder walks you through it in four steps — who you are, what you've done, why you're here, what's next. Five sentences. Sixty seconds. Sounds like you wrote it.",
-  },
-];
-
-function Features() {
-  return (
-    <section id="features" className="scroll-mt-20 py-24 sm:py-32">
-      <div className="container-wide">
-        <Reveal>
-          <Eyebrow>Everything you need</Eyebrow>
-        </Reveal>
-        <Reveal delay={0.05}>
-          <h2 className="text-balance text-center font-serif text-display font-semibold text-ink">
-            Built to get you walking in ready
-          </h2>
-        </Reveal>
-        <Reveal delay={0.1}>
-          <p className="mx-auto mt-5 max-w-prose text-center text-lg text-ink-2">
-            Every tool exists for one reason: the interview that stands between you and the work
-            you&apos;re meant to be doing.
-          </p>
-        </Reveal>
-
-        <div className="mt-16 grid gap-5 sm:grid-cols-2 lg:grid-cols-2">
-          {FEATURES.map((f, i) => {
-            const Icon = f.icon;
-            return (
-              <Reveal key={f.title} delay={(i % 2) * 0.06}>
-                <article className="card group relative h-full p-7 transition-all hover:-translate-y-0.5 hover:shadow-lg">
-                  {f.badge && (
-                    <span className="absolute right-6 top-6 rounded-full bg-gold-soft px-2.5 py-1 text-2xs font-bold uppercase tracking-wider text-gold-ink">
-                      ⭐ {f.badge}
-                    </span>
-                  )}
-                  <span
-                    className="grid h-12 w-12 place-items-center rounded-xl text-white shadow-sm transition-transform group-hover:scale-105"
-                    style={{ background: "linear-gradient(140deg, var(--primary-bright), var(--primary-ink))" }}
-                  >
-                    <Icon size={22} />
-                  </span>
-                  <h3 className="mt-5 font-serif text-xl font-semibold text-ink">{f.title}</h3>
-                  <p className="mt-2.5 text-[0.95rem] leading-relaxed text-ink-2">{f.body}</p>
-                </article>
-              </Reveal>
-            );
-          })}
-        </div>
-      </div>
-    </section>
-  );
-}
-
 /* ===================== NUMBERS ===================== */
 const STATS = [
-  { value: 79, prefix: "", suffix: "", label: "Average score after 10 sessions", sub: "up from 48 at session one", animate: true },
-  { value: 93, prefix: "", suffix: "%", label: "feel more confident after 5 sessions", animate: true },
-  { value: 10, prefix: "", suffix: " min", label: "Average session — shorter than making dinner", animate: true },
-  { value: 2, prefix: "", suffix: " wk", label: "Average time to feeling interview-ready", animate: true },
+  { value: 79, prefix: "", suffix: "", label: "Average score after 10 sessions", sub: "up from 48 at the start", animate: true },
+  { value: 93, prefix: "", suffix: "%", label: "feel more sure after 5 sessions", animate: true },
+  { value: 10, prefix: "", suffix: " min", label: "A session is shorter than dinner", animate: true },
+  { value: 2, prefix: "", suffix: " wk", label: "From nervous to ready", animate: true },
 ];
 
 function Numbers() {
@@ -423,15 +320,21 @@ function Numbers() {
 const STORIES = [
   {
     tag: "The 3 AM panic",
-    body: "It's 3 AM. The interview is at 9. You're running through answers and every version sounds wrong. You can't call anyone. You can't hire a coach for six hours from now. But you can open PrepPath, practice five questions, watch your score hit 78, and finally close your eyes knowing you've done this before.",
+    name: "Maria, 38",
+    photo: "https://randomuser.me/api/portraits/women/90.jpg",
+    body: "It's 3 AM. Your interview is at 9. Every answer sounds wrong and you can't call anyone. So you open PrepPath. Five questions. Score hits 78. You close your eyes — you've done this before.",
   },
   {
     tag: "The parking lot",
-    body: "You haven't worked since 2021. You chose your kids. You'd do it again. Now you're in a parking lot, ten minutes out, hands shaking because you don't know if they'll see the gap and stop listening. PrepPath can't erase the gap. But last night you practiced explaining it nine times. On the tenth, it sounded like you'd been saying it your whole life.",
+    name: "Rachel, 41",
+    photo: "https://randomuser.me/api/portraits/women/33.jpg",
+    body: "You haven't worked since 2021. You chose your kids. Now you're in the parking lot, ten minutes out, hands shaking about the gap. But last night you practiced explaining it nine times. On the tenth, it sounded easy.",
   },
   {
     tag: "The career change",
-    body: "You were a great teacher. You loved it. But the pay and the burnout made it impossible. Now every interviewer asks 'why are you leaving education?' and you hear judgment that isn't there. PrepPath helped you find the answer — and you practiced it eleven times. On the twelfth, it sounded true. Because it was.",
+    name: "James, 45",
+    photo: "https://randomuser.me/api/portraits/men/45.jpg",
+    body: "You loved teaching. The burnout didn't. Now everyone asks 'why leave education?' and you hear judgment that isn't there. PrepPath helped you find the answer. You practiced twelve times. It sounds true — because it is.",
   },
 ];
 
@@ -444,17 +347,22 @@ function Stories() {
         </Reveal>
         <Reveal delay={0.05}>
           <h2 className="text-balance text-center font-serif text-display font-semibold text-ink">
-            Built for the moments no one talks about.
+            For the moments no one talks about.
           </h2>
         </Reveal>
 
         <div className="mt-16 grid gap-6 lg:grid-cols-3">
           {STORIES.map((s, i) => (
             <Reveal key={s.tag} delay={i * 0.1}>
-              <figure className="card relative h-full p-8">
-                <span className="font-serif text-5xl leading-none text-primary-soft">&ldquo;</span>
-                <p className="-mt-4 text-[1.02rem] leading-relaxed text-ink-2">{s.body}</p>
-                <figcaption className="mt-6 text-sm font-semibold text-primary-ink">{s.tag}</figcaption>
+              <figure className="card h-full p-7">
+                <div className="flex items-center gap-3">
+                  <Avatar src={s.photo} name={s.name} size={48} className="ring-2 ring-white" />
+                  <div>
+                    <div className="text-sm font-semibold text-ink">{s.name}</div>
+                    <div className="text-xs font-medium text-primary-ink">{s.tag}</div>
+                  </div>
+                </div>
+                <p className="mt-4 leading-relaxed text-ink-2">{s.body}</p>
               </figure>
             </Reveal>
           ))}
@@ -551,10 +459,9 @@ function Privacy() {
         </Reveal>
         <Reveal delay={0.1}>
           <p className="mx-auto mt-5 max-w-prose text-lg leading-relaxed text-ink-2">
-            No public profiles. No leaderboards. No social features. No notifications to your contacts.
-            We don&apos;t share your data with employers, we don&apos;t post to your social media, and we
-            don&apos;t email anyone. This is a safe space to be bad at something until you&apos;re good at it.
-            That&apos;s the whole point.
+            No profiles. No leaderboards. No posts to your contacts. We don&apos;t share your data, and we
+            don&apos;t email anyone. It&apos;s just you and your screen — a safe place to be bad at this until
+            you&apos;re good. That&apos;s the whole point.
           </p>
         </Reveal>
       </div>
@@ -680,10 +587,9 @@ function FinalCTA() {
         </Reveal>
         <Reveal delay={0.08}>
           <p className="mx-auto mt-7 max-w-prose text-lg leading-loose text-ink-2">
-            Not a job you settled for because you were too nervous to interview for the one you wanted. The
-            job where you walk in on Monday morning and think: <em className="text-ink">I earned this.</em>{" "}
-            PrepPath won&apos;t get you that job. You will. We just help you stop being afraid of the
-            conversation that stands between you and the work you&apos;re supposed to be doing.
+            Not one you settled for because the interview scared you. The job where you walk in Monday and think:{" "}
+            <em className="text-ink">I earned this.</em> PrepPath won&apos;t get it for you. You will. We just
+            help you stop fearing the conversation in the way.
           </p>
         </Reveal>
         <Reveal delay={0.16}>
@@ -790,14 +696,16 @@ export default function LandingPage() {
       <SiteNav />
       <main>
         <Hero />
+        <TestimonialMarquee />
         <TrustStrip />
-        <NotYourFault />
-        <FiveQuestions />
         <HowItWorks />
-        <Features />
+        <ProductFeatures />
         <Numbers />
         <Stories />
+        <NotYourFault />
+        <FiveQuestions />
         <Comparison />
+        <TestimonialGrid />
         <Privacy />
         <Pricing />
         <FAQ />
