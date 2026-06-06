@@ -1,6 +1,6 @@
 "use client";
 
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { useRouter } from "next/navigation";
 import { motion } from "framer-motion";
 import { Check, Lock, ShieldCheck, Loader2, PartyPopper } from "lucide-react";
@@ -8,6 +8,7 @@ import { AppNav } from "@/components/layout/AppNav";
 import { Button, ButtonLink } from "@/components/ui/Button";
 import { PremiumBadge } from "@/components/ui/PremiumBadge";
 import { getProfile, upgradeToPremium } from "@/lib/store";
+import { track } from "@/lib/analytics";
 
 const INCLUDED = [
   "Unlimited practice sessions",
@@ -29,8 +30,13 @@ export default function UpgradePage() {
   const [state, setState] = useState<"idle" | "processing" | "done">("idle");
   const [interval, setIntervalPlan] = useState<"monthly" | "annual">("monthly");
 
+  useEffect(() => {
+    track("upgrade_view");
+  }, []);
+
   const subscribe = async () => {
     setState("processing");
+    track("upgrade_click", { interval });
     // Try real Stripe Checkout first; fall back to demo if not configured.
     try {
       const res = await fetch("/api/checkout", {
@@ -49,6 +55,7 @@ export default function UpgradePage() {
     // Demo path (no Stripe keys): optimistic local upgrade.
     setTimeout(() => {
       upgradeToPremium();
+      track("upgrade_success", { interval, mode: "demo" });
       setState("done");
       setTimeout(() => router.push("/dashboard"), 1700);
     }, 1100);
