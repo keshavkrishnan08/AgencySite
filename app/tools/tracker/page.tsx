@@ -7,6 +7,7 @@ import { ToolShell } from "@/components/layout/ToolShell";
 import { TrackerIcon } from "@/components/icons";
 import { Button } from "@/components/ui/Button";
 import { deleteInterview, getInterviews, getProfile, saveInterview } from "@/lib/store";
+import { track } from "@/lib/analytics";
 import { cn, formatDateLong, todayKey, uid } from "@/lib/utils";
 import type { InterviewRecord, InterviewStatus } from "@/lib/types";
 
@@ -42,11 +43,13 @@ export default function TrackerPage() {
     });
     setItems(getInterviews());
     setCompany("");
+    track("interview_tracked", {});
   };
 
   const setStatus = (rec: InterviewRecord, status: InterviewStatus) => {
     saveInterview({ ...rec, status });
     setItems(getInterviews());
+    if (status === "offer") track("offer_logged", { company: rec.company });
   };
   const remove = (id: string) => {
     deleteInterview(id);

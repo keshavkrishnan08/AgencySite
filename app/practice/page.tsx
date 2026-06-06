@@ -20,6 +20,7 @@ import {
   isPremium,
 } from "@/lib/store";
 import { cn, uid } from "@/lib/utils";
+import { track } from "@/lib/analytics";
 import type { Dimension, Question, ScoredAnswer, Session, Situation } from "@/lib/types";
 
 type Phase = "setup" | "loading" | "answer" | "score" | "blocked";
@@ -159,6 +160,7 @@ function PracticeInner() {
       focusDimension: focusDim,
     };
     saveSession(session);
+    track("session_complete", { overall: session.overall, mode: session.mode, role });
     router.push(`/session/${session.id}`);
   };
 
