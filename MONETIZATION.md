@@ -39,14 +39,14 @@ stripe listen --forward-to localhost:3000/api/stripe-webhook
 
 `/api/checkout` builds the session; `/api/stripe-webhook` verifies the signature and reacts to subscription events. Both no-op safely until keys exist.
 
-## Step 3 — Make Premium stick across devices (the one real gap)
-Today the Premium flag lives in the buyer's browser (`localStorage`). That's fine for a demo and even for launch-day, but to gate Premium for real you need server-side truth:
+## Step 3 — Make Premium stick across devices
+Today the Premium flag lives in the buyer's browser (`localStorage`). That's fine for a demo, but to enforce Premium for real you need server-side truth. Most of this is now wired:
 
-1. Stand up Supabase (the `lib/store.ts` API is already shaped to match — swap the localStorage reads/writes for Supabase queries).
-2. In `/api/stripe-webhook`, at the two `TODO(persistence)` marks, write `plan = premium/free` keyed by customer email.
-3. On load, read the plan from the DB instead of localStorage.
+1. Run `supabase/schema.sql` in your Supabase project (creates `profiles`, `sessions`, `subscriptions` with RLS).
+2. Set `NEXT_PUBLIC_SUPABASE_URL`, `NEXT_PUBLIC_SUPABASE_ANON_KEY`, and `SUPABASE_SERVICE_ROLE_KEY`.
+3. Done automatically: `/api/stripe-webhook` now records each subscription to Supabase, and `lib/supabase.ts` exposes `isEmailPremium(email)` for enforcement.
 
-That's the only piece between "collects money" and "enforces access" for real customers.
+The one remaining piece is client auth: swap the demo email capture for Supabase Auth (email + Google), then read the plan via `isEmailPremium` instead of localStorage. That's the last step between "collects money" and "enforces access," and it needs your Supabase project to build and test against.
 
 ## Step 4 — Deploy (10 min)
 ```bash
