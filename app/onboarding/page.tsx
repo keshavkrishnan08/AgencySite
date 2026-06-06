@@ -43,7 +43,7 @@ export default function OnboardingPage() {
     const finalRole = role.trim() || query.trim() || "Office Manager";
     setOnboarding({ situation, targetRole: finalRole, interviewGap: selectedGap });
     setProfile({ situation, targetRole: finalRole, interviewGap: selectedGap });
-    router.push("/practice?autostart=1");
+    router.push("/practice");
   };
 
   const variants = {
