@@ -12,7 +12,9 @@ PrepPath gives them a private room to practice in. You answer real interview que
 
 The core loop is simple: **Practice → Score → Feedback → Improve → watch your score rise → practice more.**
 
-- **Tailored practice sessions.** Eight questions matched to your role and situation (returning, laid off, promotion, career change), scored on clarity, relevance, specificity, confidence, and conciseness — with one specific fix per answer.
+- **Tailored practice sessions.** Eight questions matched to your role, situation, and the actual company + job posting you paste in, scored on clarity, relevance, specificity, confidence, and conciseness — with one specific fix per answer.
+- **You can speak your answers.** A built-in voice button transcribes speech to text in the browser (no key). PrepPath listens; it doesn't talk back.
+- **A conversational interviewer.** After each answer, Claude asks a real follow-up that probes what you actually said — the way a live interviewer tests whether your story holds up.
 - **A retention-grade dashboard.** Readiness ring, a progress line that climbs toward a "Ready" marker at 80, per-skill sparklines with deltas, streaks, and stats.
 - **An honest Anxiety Detector** baked into every score. It catches the filler words, hedging, apologies, and self-undermining qualifiers you don't hear yourself say.
 
@@ -26,6 +28,7 @@ And a full toolkit around the interview:
 | **Salary Negotiation** | A live, multi-round negotiation that pushes back |
 | **Post-Interview Debrief** | Score how the real interview actually went |
 | **Your Story Builder** | Build "tell me about yourself" in four steps |
+| **Interview Tracker** | Log real interviews and outcomes — because offers are the point, not scores |
 | **Interview Day Mode** | A timed, no-going-back pressure simulation for the night before |
 
 ---
@@ -94,7 +97,7 @@ lib/
 
 **Stack:** Next.js 14 (App Router) · TypeScript · Tailwind · Framer Motion · Recharts · Anthropic SDK.
 
-**Persistence** is `localStorage` today, behind a small data layer whose API mirrors a Supabase implementation — so swapping in a real backend later is a drop-in. **Payments** are a simulated Stripe checkout (the production path is Checkout + webhooks).
+**Persistence** is `localStorage` today, behind a small data layer whose API mirrors a Supabase implementation — so swapping in a real backend later is a drop-in. **Payments** are real, key-gated Stripe Checkout (with a 7-day trial and monthly/annual prices): set the Stripe env vars and it charges live; leave them unset and `/upgrade` runs a demo flow so the app stays runnable. The full go-live runbook for getting paying customers is in **[MONETIZATION.md](./MONETIZATION.md)**.
 
 ---
 

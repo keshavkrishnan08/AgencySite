@@ -23,6 +23,7 @@ const TOOLS = [
   { href: "/tools/salary", label: "Salary Practice", emoji: "💬" },
   { href: "/tools/debrief", label: "Post-Interview Debrief", emoji: "📝" },
   { href: "/tools/your-story", label: "Your Story Builder", emoji: "✨" },
+  { href: "/tools/tracker", label: "Interview Tracker", emoji: "📅" },
 ];
 
 export function AppNav() {

@@ -7,6 +7,7 @@ import {
   MessageSquare,
   ClipboardCheck,
   BookOpen,
+  CalendarCheck,
 } from "lucide-react";
 import { AppNav } from "@/components/layout/AppNav";
 
@@ -17,6 +18,7 @@ const TOOLS = [
   { href: "/tools/salary", icon: MessageSquare, title: "Salary Negotiation", desc: "Practice the offer conversation until your voice is steady." },
   { href: "/tools/debrief", icon: ClipboardCheck, title: "Post-Interview Debrief", desc: "Score how the real interview actually went." },
   { href: "/tools/your-story", icon: BookOpen, title: "Your Story Builder", desc: "Build your 'tell me about yourself' in four steps." },
+  { href: "/tools/tracker", icon: CalendarCheck, title: "Interview Tracker", desc: "Track real interviews and outcomes — offers are the point." },
 ];
 
 export default function ToolsPage() {

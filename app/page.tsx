@@ -1,7 +1,9 @@
 import {
   ArrowRight,
   Check,
-  Clock,
+  CreditCard,
+  Lock,
+  RefreshCw,
   Building2,
   FileSearch,
   Sparkles,
@@ -11,11 +13,12 @@ import {
   Timer,
   ClipboardCheck,
   Target,
-  TrendingUp,
+  Briefcase,
 } from "lucide-react";
 import { SiteNav } from "@/components/layout/SiteNav";
 import { SiteFooter } from "@/components/layout/SiteFooter";
 import { HeroDemo } from "@/components/landing/HeroDemo";
+import { StickyCTA } from "@/components/landing/StickyCTA";
 import { Reveal } from "@/components/ui/Reveal";
 import { AnimatedNumber } from "@/components/ui/AnimatedNumber";
 import { AvatarRow } from "@/components/ui/AvatarRow";
@@ -642,9 +645,11 @@ function Pricing() {
               <div className="mt-6 font-serif text-5xl font-semibold text-ink">
                 $9.99<span className="font-sans text-base font-medium text-ink-3"> / month</span>
               </div>
-              <p className="mt-1 text-sm text-sage-ink">Cancel anytime</p>
+              <p className="mt-1 text-sm text-sage-ink">
+                7-day free trial · or $79/year (save 34%) · cancel anytime
+              </p>
               <ButtonLink href="/onboarding" className="mt-7 w-full">
-                Start free, upgrade when ready
+                Start free — no card needed
               </ButtonLink>
               <ul className="mt-7 grid gap-3 sm:grid-cols-1">
                 {PREMIUM_FEATURES.map((f) => (
@@ -658,8 +663,10 @@ function Pricing() {
           </Reveal>
         </div>
         <Reveal delay={0.1}>
-          <p className="mt-8 text-center text-sm text-ink-3">
-            No credit card required to start. Upgrade in 10 seconds when you&apos;re ready.
+          <p className="mt-8 flex flex-wrap items-center justify-center gap-x-6 gap-y-2 text-center text-sm text-ink-2">
+            <span className="inline-flex items-center gap-1.5"><ShieldCheck size={15} className="text-sage" /> 7-day free trial</span>
+            <span className="inline-flex items-center gap-1.5"><CreditCard size={15} className="text-sage" /> No card to start</span>
+            <span className="inline-flex items-center gap-1.5"><RefreshCw size={15} className="text-sage" /> Cancel in two clicks</span>
           </p>
         </Reveal>
       </div>
@@ -701,6 +708,87 @@ function FinalCTA() {
   );
 }
 
+/* ===================== TRUST STRIP ===================== */
+const TRUST = [
+  { icon: CreditCard, label: "No credit card to start" },
+  { icon: Lock, label: "Completely private" },
+  { icon: RefreshCw, label: "Cancel anytime" },
+  { icon: Briefcase, label: "Works for any role" },
+];
+
+function TrustStrip() {
+  return (
+    <div className="border-y" style={{ borderColor: "var(--border)", background: "var(--surface)" }}>
+      <div className="container-wide grid grid-cols-2 gap-4 py-6 sm:grid-cols-4">
+        {TRUST.map((t) => {
+          const Icon = t.icon;
+          return (
+            <div key={t.label} className="flex items-center justify-center gap-2.5 text-sm font-medium text-ink-2">
+              <Icon size={18} className="text-primary" />
+              {t.label}
+            </div>
+          );
+        })}
+      </div>
+    </div>
+  );
+}
+
+/* ===================== FAQ ===================== */
+const FAQS: [string, string][] = [
+  [
+    "Is it really free to start?",
+    "Yes. You can run your first practice with no account and no credit card. You only create an account when you want to save your progress, and you only pay if you upgrade to Premium after the 7-day free trial.",
+  ],
+  [
+    "I haven't interviewed in years. Will this work for me?",
+    "That's exactly who PrepPath is built for. We tailor questions to how long it's been and ease you in. Returning-to-work, recently-laid-off, and career-changers are our core users, not 22-year-old engineers.",
+  ],
+  [
+    "Is my practice private?",
+    "Completely. No public profiles, no leaderboards, no posting to your social media, no emailing your contacts. It's between you and your screen. A safe place to be bad at something until you're good.",
+  ],
+  [
+    "I'm not techy. Is it complicated?",
+    "No. Two actions per screen, plain language, nothing to install. If you can type or talk, you can use it. You can even speak your answers out loud and we'll transcribe them.",
+  ],
+  [
+    "Does practicing typed answers actually help out loud?",
+    "It builds the muscle: structure, specifics, and cutting the filler words and 'I just' that leak confidence. You can also speak your answers in the app, and the Interview Day mode rehearses you under real time pressure.",
+  ],
+  [
+    "What if I want to cancel?",
+    "Two clicks, anytime, from settings. Most people use PrepPath hard for a couple of weeks, land the job, and pause. That's a win in our book.",
+  ],
+];
+
+function FAQ() {
+  return (
+    <section className="border-t py-24 sm:py-28" style={{ borderColor: "var(--border)" }}>
+      <div className="container-content">
+        <Reveal>
+          <Eyebrow>Questions, answered</Eyebrow>
+        </Reveal>
+        <Reveal delay={0.05}>
+          <h2 className="text-balance text-center font-serif text-display font-semibold text-ink">
+            Everything you might be wondering.
+          </h2>
+        </Reveal>
+        <div className="mt-12 grid gap-x-8 gap-y-8 sm:grid-cols-2">
+          {FAQS.map(([q, a], i) => (
+            <Reveal key={q} delay={(i % 2) * 0.06}>
+              <div>
+                <h3 className="font-serif text-lg font-semibold text-ink">{q}</h3>
+                <p className="mt-2 leading-relaxed text-ink-2">{a}</p>
+              </div>
+            </Reveal>
+          ))}
+        </div>
+      </div>
+    </section>
+  );
+}
+
 /* ============================== PAGE ============================== */
 export default function LandingPage() {
   return (
@@ -708,6 +796,7 @@ export default function LandingPage() {
       <SiteNav />
       <main>
         <Hero />
+        <TrustStrip />
         <NotYourFault />
         <FiveQuestions />
         <HowItWorks />
@@ -717,9 +806,11 @@ export default function LandingPage() {
         <Comparison />
         <Privacy />
         <Pricing />
+        <FAQ />
         <FinalCTA />
       </main>
       <SiteFooter />
+      <StickyCTA />
     </>
   );
 }
