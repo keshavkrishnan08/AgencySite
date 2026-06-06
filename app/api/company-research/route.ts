@@ -9,7 +9,7 @@ const SYSTEM = `You are PrepPath's Company Research Briefing tool. Given a compa
 Return ONLY valid minified JSON:
 {"whatTheyDo":"2-3 sentences, plain English","recentNews":["bullet","bullet","bullet"],"culture":["value/theme","value/theme","value/theme"],"roleFocus":["what this role likely cares about","...","..."],"questionsToAsk":["informed question","...","..."]}
 
-If you are not certain about real recent news, give the kinds of developments to look for rather than inventing specifics. Keep everything practical and confident.`;
+If you are not certain about real recent news, give the kinds of developments to look for rather than inventing specifics. Keep everything practical and confident.\n\nWrite in plain words a 6th grader can read. Never use em dashes or en dashes; use a period, comma, or colon instead.`;
 
 function fallback(company: string, role: string) {
   const c = company.trim() || "this company";
