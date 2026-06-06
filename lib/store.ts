@@ -2,6 +2,7 @@
 
 import type {
   CompanyBriefing,
+  InterviewRecord,
   SavedGapAnswer,
   Session,
   Streak,
@@ -21,6 +22,7 @@ const KEYS = {
   gaps: "pp:gaps",
   briefings: "pp:briefings",
   onboarding: "pp:onboarding",
+  interviews: "pp:interviews",
 } as const;
 
 function read<T>(key: string, fallback: T): T {
@@ -171,6 +173,22 @@ export function saveBriefing(b: CompanyBriefing): void {
   const all = getBriefings().filter((x) => x.id !== b.id);
   all.unshift(b);
   write(KEYS.briefings, all.slice(0, 12));
+}
+
+/* ----------------------- Interview tracker (outcome loop) ----------------------- */
+
+export function getInterviews(): InterviewRecord[] {
+  return read<InterviewRecord[]>(KEYS.interviews, []).sort(
+    (a, b) => (b.date || "").localeCompare(a.date || "")
+  );
+}
+export function saveInterview(rec: InterviewRecord): void {
+  const all = getInterviews().filter((x) => x.id !== rec.id);
+  all.push(rec);
+  write(KEYS.interviews, all);
+}
+export function deleteInterview(id: string): void {
+  write(KEYS.interviews, getInterviews().filter((x) => x.id !== id));
 }
 
 /* ----------------------- Onboarding draft ----------------------- */

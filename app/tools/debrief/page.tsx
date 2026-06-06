@@ -6,6 +6,7 @@ import { ClipboardCheck, Loader2, Plus, Sparkles } from "lucide-react";
 import { ToolShell } from "@/components/layout/ToolShell";
 import { Button } from "@/components/ui/Button";
 import { AnswerScoreCard } from "@/components/practice/AnswerScoreCard";
+import { VoiceButton } from "@/components/ui/VoiceButton";
 import { apiGenerateExample, apiScoreAnswer } from "@/lib/client";
 import { getProfile } from "@/lib/store";
 import { average, scoreColor } from "@/lib/utils";
@@ -64,9 +65,12 @@ export default function DebriefPage() {
             className="field min-h-[140px] resize-y leading-relaxed"
             value={answer}
             onChange={(e) => setAnswer(e.target.value)}
-            placeholder="Type your remembered answer…"
+            placeholder="Type or speak your remembered answer…"
           />
         </label>
+        <div className="mt-3">
+          <VoiceButton onTranscript={(t) => setAnswer((p) => (p ? p.trim() + " " : "") + t)} />
+        </div>
         <Button onClick={score} disabled={loading} size="lg" className="mt-5 w-full">
           {loading ? (<><Loader2 size={18} className="animate-spin" /> Scoring honestly…</>) : (<>Score this answer <Sparkles size={16} /></>)}
         </Button>
