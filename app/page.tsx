@@ -27,7 +27,7 @@ function Hero() {
         <div>
           <Reveal>
             <span className="chip border bg-white/70 text-primary-ink shadow-xs" style={{ borderColor: "var(--border)" }}>
-              <Sparkles size={14} /> AI interview coaching, built for real life
+              <Sparkles size={14} /> Land the job. Five minutes a day.
             </span>
           </Reveal>
           <Reveal delay={0.06}>
@@ -58,8 +58,8 @@ function Hero() {
           <Reveal delay={0.12}>
             <p className="mt-7 max-w-prose text-lg leading-relaxed text-ink-2">
               The interview isn&apos;t the hard part. Not knowing if you&apos;re ready is.
-              So practice in private with AI. See where you stand. Walk in sure. You&apos;ve
-              already done it once.
+              So practice in private with AI, just five minutes a day. See where you stand,
+              and walk in sure. You&apos;ve already done it once.
             </p>
           </Reveal>
           <Reveal delay={0.18}>

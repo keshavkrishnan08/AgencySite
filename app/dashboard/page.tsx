@@ -20,6 +20,7 @@ import { InfoTip } from "@/components/ui/Tooltip";
 import { ProgressLineChart, Sparkline } from "@/components/charts/Charts";
 import {
   getInterviews,
+  getPlan,
   getProfile,
   getSessions,
   getStreak,
@@ -27,7 +28,8 @@ import {
   onStoreChange,
   upgradeToPremium,
 } from "@/lib/store";
-import type { InterviewRecord } from "@/lib/types";
+import { daysUntil } from "@/lib/plan";
+import type { InterviewPlan, InterviewRecord } from "@/lib/types";
 import { seedSampleData } from "@/lib/seed";
 import {
   DIMENSIONS,
@@ -57,6 +59,7 @@ export default function DashboardPage() {
   const [name, setName] = useState("");
   const [range, setRange] = useState<7 | 30 | 0>(0);
   const [interviews, setInterviews] = useState<InterviewRecord[]>([]);
+  const [plan, setPlan] = useState<InterviewPlan | null>(null);
 
   useEffect(() => {
     setMounted(true);
@@ -72,6 +75,7 @@ export default function DashboardPage() {
       setPremium(isPremium());
       setName(getProfile().name || "");
       setInterviews(getInterviews());
+      setPlan(getPlan());
     };
     sync();
     return onStoreChange(sync);
@@ -135,6 +139,30 @@ export default function DashboardPage() {
           </h1>
           <p className="mt-1 text-ink-2">Every session moves the line. Here&apos;s where you stand.</p>
         </header>
+
+        {plan &&
+          (() => {
+            const all = plan.days.flatMap((d) => d.tasks);
+            const next = all.find((t) => !t.done);
+            const left = daysUntil(plan.dateISO);
+            return (
+              <Link
+                href="/plan"
+                className="mb-6 flex flex-wrap items-center justify-between gap-3 rounded-2xl border-2 p-5 transition-shadow hover:shadow-sm"
+                style={{ borderColor: "var(--primary)", background: "var(--primary-soft)" }}
+              >
+                <div>
+                  <p className="font-serif text-lg font-semibold text-primary-ink">
+                    {left === 0 ? `${plan.company || "Your interview"} is today` : `${plan.company || "Your interview"} in ${left} day${left === 1 ? "" : "s"}`}
+                  </p>
+                  <p className="text-sm text-ink-2">
+                    {next ? `Next up: ${next.label}` : "Every task done. You are ready."}
+                  </p>
+                </div>
+                <span className="btn-primary !px-5 !py-2 text-sm">Open plan <ArrowRight size={15} /></span>
+              </Link>
+            );
+          })()}
 
         <div className="grid gap-6 lg:grid-cols-[1.8fr_1fr]">
           {/* LEFT */}
