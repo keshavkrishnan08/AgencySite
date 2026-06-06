@@ -70,6 +70,28 @@ export async function apiScoreAnswer(
   };
 }
 
+export async function apiFollowUp(args: {
+  question: string;
+  answer: string;
+  targetRole: string;
+  company?: string;
+}): Promise<string> {
+  try {
+    const res = await fetch("/api/follow-up", {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify(args),
+    });
+    if (res.ok) {
+      const data = await res.json();
+      if (data?.followUp) return data.followUp as string;
+    }
+  } catch {
+    /* fall through */
+  }
+  return "What was the hardest part of that, and how did you handle it?";
+}
+
 export async function apiGenerateExample(
   question: string,
   targetRole: string,

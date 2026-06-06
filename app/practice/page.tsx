@@ -7,7 +7,8 @@ import { ArrowRight, Sparkles, X, Loader2, Lock, Building2, ChevronDown } from "
 import { Logo } from "@/components/ui/Logo";
 import { Button, ButtonLink } from "@/components/ui/Button";
 import { AnswerScoreCard } from "@/components/practice/AnswerScoreCard";
-import { apiGenerateExample, apiGenerateQuestions, apiScoreAnswer } from "@/lib/client";
+import { VoiceButton } from "@/components/ui/VoiceButton";
+import { apiFollowUp, apiGenerateExample, apiGenerateQuestions, apiScoreAnswer } from "@/lib/client";
 import { aggregateDimensions, computeOverall } from "@/lib/scoring";
 import {
   canStartSession,
@@ -40,6 +41,11 @@ function PracticeInner() {
   const [scored, setScored] = useState<ScoredAnswer | null>(null);
   const [answers, setAnswers] = useState<ScoredAnswer[]>([]);
   const [submitting, setSubmitting] = useState(false);
+  // Conversational follow-up (B)
+  const [followUp, setFollowUp] = useState<string | null>(null);
+  const [followUpAnswer, setFollowUpAnswer] = useState("");
+  const [followUpScored, setFollowUpScored] = useState<ScoredAnswer | null>(null);
+  const [submittingFollowUp, setSubmittingFollowUp] = useState(false);
   const sessionStart = useRef<number>(0);
 
   const start = useCallback(
@@ -96,6 +102,9 @@ function PracticeInner() {
   const submit = async () => {
     if (!canSubmit || !current) return;
     setSubmitting(true);
+    setFollowUp(null);
+    setFollowUpScored(null);
+    setFollowUpAnswer("");
     const result = await apiScoreAnswer(
       {
         question: current.text,
@@ -111,6 +120,27 @@ function PracticeInner() {
     setSubmitting(false);
     setPhase("score");
     window.scrollTo({ top: 0, behavior: "smooth" });
+    // Conversational interviewer: probe deeper into what they just said.
+    if (current.category !== "closer") {
+      apiFollowUp({ question: current.text, answer: answerText, targetRole: role, company })
+        .then(setFollowUp)
+        .catch(() => setFollowUp(null));
+    }
+  };
+
+  const submitFollowUp = async () => {
+    if (!current || !followUp || followUpAnswer.trim().split(/\s+/).length < 5) return;
+    setSubmittingFollowUp(true);
+    const result = await apiScoreAnswer({
+      question: followUp,
+      answer: followUpAnswer,
+      targetRole: role,
+      situation: situation || "",
+      category: current.category,
+      questionNumber: current.number,
+    });
+    setFollowUpScored(result);
+    setSubmittingFollowUp(false);
   };
 
   const finishSession = (finalAnswers: ScoredAnswer[]) => {
@@ -132,9 +162,12 @@ function PracticeInner() {
     router.push(`/session/${session.id}`);
   };
 
+  const collectAnswers = () =>
+    [...answers, scored, followUpScored].filter(Boolean) as ScoredAnswer[];
+
   const next = () => {
     if (!scored) return;
-    const updated = [...answers, scored];
+    const updated = collectAnswers();
     setAnswers(updated);
     if (index + 1 >= total) {
       finishSession(updated);
@@ -142,13 +175,16 @@ function PracticeInner() {
     }
     setIndex((i) => i + 1);
     setScored(null);
+    setFollowUp(null);
+    setFollowUpScored(null);
+    setFollowUpAnswer("");
     setAnswerText("");
     setPhase("answer");
     window.scrollTo({ top: 0, behavior: "smooth" });
   };
 
   const endEarly = () => {
-    const finalAnswers = scored ? [...answers, scored] : answers;
+    const finalAnswers = scored ? collectAnswers() : answers;
     if (finalAnswers.length > 0) finishSession(finalAnswers);
     else router.push("/dashboard");
   };
@@ -263,7 +299,8 @@ function PracticeInner() {
                 </div>
               </div>
 
-              <div className="mt-6 flex justify-end">
+              <div className="mt-6 flex flex-wrap items-center justify-between gap-3">
+                <VoiceButton onTranscript={(t) => setAnswerText((p) => (p ? p.trim() + " " : "") + t)} />
                 <Button onClick={submit} disabled={!canSubmit} size="lg">
                   {submitting ? (
                     <>
@@ -291,6 +328,56 @@ function PracticeInner() {
               answer={scored}
               loadExample={(a) => apiGenerateExample(a.questionText, role, a.category)}
             />
+
+            {/* Conversational follow-up */}
+            {followUp && (
+              <motion.div
+                initial={{ opacity: 0, y: 12 }}
+                animate={{ opacity: 1, y: 0 }}
+                className="mt-6 rounded-2xl border-2 p-6"
+                style={{ borderColor: "var(--primary)", background: "var(--primary-soft)" }}
+              >
+                <div className="mb-2 flex items-center gap-2 text-2xs font-semibold uppercase tracking-wider text-primary-ink">
+                  <span className="grid h-6 w-6 place-items-center rounded-full bg-ink text-[10px] font-bold text-white">HM</span>
+                  The interviewer follows up
+                </div>
+                <p className="font-serif text-lg font-semibold text-ink">&ldquo;{followUp}&rdquo;</p>
+
+                {!followUpScored ? (
+                  <>
+                    <textarea
+                      value={followUpAnswer}
+                      onChange={(e) => setFollowUpAnswer(e.target.value)}
+                      placeholder="Answer the follow-up… this is where real interviews are won or lost."
+                      className="field mt-4 min-h-[120px] resize-y bg-white leading-relaxed"
+                    />
+                    <div className="mt-3 flex flex-wrap items-center justify-between gap-3">
+                      <VoiceButton onTranscript={(t) => setFollowUpAnswer((p) => (p ? p.trim() + " " : "") + t)} />
+                      <div className="flex items-center gap-2">
+                        <button onClick={() => setFollowUp(null)} className="btn-ghost text-sm">
+                          Skip
+                        </button>
+                        <Button
+                          onClick={submitFollowUp}
+                          disabled={submittingFollowUp || followUpAnswer.trim().split(/\s+/).length < 5}
+                        >
+                          {submittingFollowUp ? (
+                            <><Loader2 size={16} className="animate-spin" /> Scoring…</>
+                          ) : (
+                            <>Answer it</>
+                          )}
+                        </Button>
+                      </div>
+                    </div>
+                  </>
+                ) : (
+                  <div className="mt-4">
+                    <AnswerScoreCard answer={followUpScored} animate={false} />
+                  </div>
+                )}
+              </motion.div>
+            )}
+
             <div className="mt-8 flex items-center justify-between">
               <button onClick={endEarly} className="btn-ghost text-sm">
                 End session

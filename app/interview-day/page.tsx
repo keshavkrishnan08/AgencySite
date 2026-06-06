@@ -7,6 +7,7 @@ import { ArrowRight, Clock, Lock, Loader2, ShieldAlert, Timer } from "lucide-rea
 import { Logo } from "@/components/ui/Logo";
 import { Button, ButtonLink } from "@/components/ui/Button";
 import { AnimatedNumber } from "@/components/ui/AnimatedNumber";
+import { VoiceButton } from "@/components/ui/VoiceButton";
 import { apiGenerateQuestions, apiScoreAnswer } from "@/lib/client";
 import { aggregateDimensions, computeOverall } from "@/lib/scoring";
 import { getProfile, getSessions, isPremium, saveSession } from "@/lib/store";
@@ -256,8 +257,8 @@ export default function InterviewDayPage() {
           className="mt-7 min-h-[200px] w-full resize-y rounded-xl border border-white/15 bg-white/5 p-4 leading-relaxed text-white outline-none transition-colors placeholder:text-white/35 focus:border-white/40"
         />
 
-        <div className="mt-6 flex items-center justify-between">
-          <span className="text-sm text-white/45">No scores shown until the end. No going back.</span>
+        <div className="mt-6 flex flex-wrap items-center justify-between gap-3">
+          <VoiceButton tone="dark" onTranscript={(t) => setAnswerText((p) => (p ? p.trim() + " " : "") + t)} />
           <Button onClick={submit} variant="gold" disabled={phase === "scoring"}>
             {phase === "scoring" ? (
               <>
