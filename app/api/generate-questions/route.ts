@@ -1,30 +1,32 @@
 import { NextResponse } from "next/server";
 import { generateQuestions, generateFocusQuestions } from "@/lib/questions";
 import { callClaude, extractJson, hasAI } from "@/lib/ai";
+import { COACH_PERSONA, candidateBlock } from "@/lib/prompt";
 import type { Question } from "@/lib/types";
 
 export const runtime = "nodejs";
 export const dynamic = "force-dynamic";
 
-const SYSTEM = `You are PrepPath, an interview coach for non-tech professionals.
-Generate exactly 8 realistic interview questions for the given role and candidate.
+const SYSTEM = `${COACH_PERSONA}
 
-Follow this arc:
-- Q1-2: Warmup (easy, confidence-building, e.g. "tell me about yourself")
-- Q3-5: Core behavioral (STAR-format expected)
-- Q6-7: Situation-specific. Directly address the candidate's situation (returning to work / laid off / promotion / career change)
-- Q8: Closer ("what questions do you have for us?")
+Your task: write exactly 8 interview questions a real hiring manager for THIS candidate's exact job would ask. Not generic interview questions.
 
-If a company name is given, reference it naturally in the opener and closer.
-If a job posting is given, mine it for the role's real priorities (the skills, the
-language they used, "fast-paced", customer-facing, leadership, accuracy, targets)
-and make at least two behavioral questions probe exactly those things. Like a real
-hiring manager for THIS job would.
+Arc:
+- Q1 to Q2: warmup, easy and confidence-building, like "tell me about yourself".
+- Q3 to Q5: core behavioral, expecting STAR stories.
+- Q6 to Q7: situation-specific, speaking straight to their situation (returning to work, laid off, promotion, or career change).
+- Q8: closer, "what questions do you have for us?".
 
-For each question include a short, practical tip (1 sentence).
+Personalize hard:
+- If a company is given, name it naturally in the opener and closer.
+- If a job posting is given, mine it for the real priorities (the exact skills and words they used, fast-paced, customer-facing, leadership, accuracy, targets) and make at least two behavioral questions probe those exact things.
+- If a weak area is given, include one question that pushes on it.
+- Calibrate difficulty to how long since they last interviewed. Ease in if it has been years.
+
+Each question gets a short, practical, one-sentence tip.
 
 Return ONLY valid minified JSON, no backticks:
-{"questions":[{"number":1,"text":"...","category":"warmup|behavioral|gap|situation|closer","tip":"..."}]}\n\nWrite in plain words a 6th grader can read. Never use em dashes or en dashes; use a period, comma, or colon instead.`;
+{"questions":[{"number":1,"text":"...","category":"warmup|behavioral|gap|situation|closer","tip":"..."}]}`;
 
 export async function POST(req: Request) {
   let body: any;
@@ -41,6 +43,8 @@ export async function POST(req: Request) {
     focusDimension,
     company = "",
     posting = "",
+    name = "",
+    weakestDimension = "",
   } = body ?? {};
 
   if (focusDimension) {
@@ -52,11 +56,7 @@ export async function POST(req: Request) {
 
   if (hasAI()) {
     try {
-      const user = `Role: ${targetRole || "general professional"}
-Company: ${company || "unspecified"}
-Situation: ${situation || "unspecified"}
-Time since last interview: ${interviewGap || "unspecified"}
-${posting ? `\nJob posting:\n"""${String(posting).slice(0, 5000)}"""` : ""}`;
+      const user = `${candidateBlock({ name, situation: situation || "", targetRole, company, interviewGap, posting, weakestDimension })}\n\nWrite their 8 questions now.`;
       const text = await callClaude({ system: SYSTEM, user, maxTokens: 1100, temperature: 0.6 });
       const parsed = extractJson<{ questions: Question[] }>(text);
       if (parsed?.questions?.length) {

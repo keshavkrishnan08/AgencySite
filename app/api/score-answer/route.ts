@@ -2,6 +2,7 @@ import { NextResponse } from "next/server";
 import { scoreAnswer } from "@/lib/scoring";
 import { exampleAnswer } from "@/lib/examples";
 import { callClaude, extractJson, hasAI } from "@/lib/ai";
+import { COACH_PERSONA, SCORING_RUBRIC, candidateBlock } from "@/lib/prompt";
 import type { AnswerScores, Dimension } from "@/lib/types";
 
 export const runtime = "nodejs";
@@ -14,23 +15,25 @@ interface AiScore {
   growthSummary: string;
 }
 
-const SYSTEM = `You are PrepPath, a warm and supportive interview coach for non-tech professionals (ages 28-55). Career changers, people returning to work, and the recently laid off. Your demographic is anxious, so you are encouraging, never harsh.
+const SYSTEM = `${COACH_PERSONA}
 
-Score one interview answer on five dimensions, each 0-100:
-1. clarity. Easy to follow and well structured
-2. relevance. Actually answers the question asked
-3. specificity. Concrete examples, numbers, outcomes (not vague)
-4. confidence. Language projects confidence; penalize hedging/filler/apology/self-undermining
-5. conciseness. Right length; too short is vague, too long rambles
+Your task: score ONE interview answer on five dimensions, each 0 to 100.
+1. clarity: easy to follow and well structured.
+2. relevance: actually answers the question asked.
+3. specificity: concrete examples, numbers, outcomes, not vague.
+4. confidence: language projects confidence; penalize hedging, filler, apology, self-undermining.
+5. conciseness: right length; too short is vague, too long rambles.
 
-For each dimension write ONE sentence of feedback. ALWAYS start with what they did right, then give ONE specific, actionable improvement (quote their words when useful). Be warm.
+${SCORING_RUBRIC}
 
-Compute overall as a weighted average: clarity 20%, relevance 20%, specificity 25%, confidence 20%, conciseness 15% (round to integer).
+For each dimension write ONE sentence of feedback. Start with what they did right, then give ONE specific fix, and quote their own words when it helps. Tie the feedback to their role, situation, and weak area.
 
-Also write strengthSummary (their best dimension, one sentence) and growthSummary (their weakest dimension + the single most valuable fix, one sentence).
+Compute overall as a weighted average: clarity 20%, relevance 20%, specificity 25%, confidence 20%, conciseness 15%, rounded to an integer.
+
+Also write strengthSummary (their best dimension, one sentence) and growthSummary (their weakest dimension plus the single most valuable fix, one sentence).
 
 Return ONLY valid minified JSON, no backticks, no prose:
-{"scores":{"clarity":N,"relevance":N,"specificity":N,"confidence":N,"conciseness":N,"overall":N},"feedback":{"clarity":"...","relevance":"...","specificity":"...","confidence":"...","conciseness":"..."},"strengthSummary":"...","growthSummary":"..."}\n\nWrite in plain words a 6th grader can read. Never use em dashes or en dashes; use a period, comma, or colon instead.`;
+{"scores":{"clarity":N,"relevance":N,"specificity":N,"confidence":N,"conciseness":N,"overall":N},"feedback":{"clarity":"...","relevance":"...","specificity":"...","confidence":"...","conciseness":"..."},"strengthSummary":"...","growthSummary":"..."}`;
 
 export async function POST(req: Request) {
   let body: any;
@@ -48,6 +51,11 @@ export async function POST(req: Request) {
     category = "behavioral",
     questionNumber = 1,
     withExample = false,
+    name = "",
+    company = "",
+    interviewGap = "",
+    weakestDimension = "",
+    recentAverage = 0,
   } = body ?? {};
 
   if (typeof answer !== "string" || answer.trim().length === 0) {
@@ -61,7 +69,8 @@ export async function POST(req: Request) {
 
   if (hasAI()) {
     try {
-      const user = `Question (${category}): ${question}\nRole: ${targetRole || "unspecified"}\nCandidate situation: ${situation || "unspecified"}\n\nCandidate's answer:\n"""${answer.slice(0, 4000)}"""`;
+      const ctx = candidateBlock({ name, situation, targetRole, company, interviewGap, weakestDimension, recentAverage });
+      const user = `${ctx}\n\nQuestion (${category}): ${question}\n\nTheir answer:\n"""${answer.slice(0, 4000)}"""`;
       const text = await callClaude({ system: SYSTEM, user, maxTokens: 700, temperature: 0.3 });
       const parsed = extractJson<AiScore>(text);
       if (parsed?.scores && parsed.feedback) {

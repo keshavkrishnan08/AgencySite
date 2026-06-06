@@ -1,5 +1,6 @@
 import { NextResponse } from "next/server";
 import { callClaude, extractJson, hasAI } from "@/lib/ai";
+import { COACH_PERSONA } from "@/lib/prompt";
 
 export const runtime = "nodejs";
 export const dynamic = "force-dynamic";
@@ -14,7 +15,9 @@ const GAP_LABELS: Record<string, string> = {
   other: "time away",
 };
 
-const SYSTEM = `You are PrepPath's Gap Story Builder, a warm coach for people with resume gaps (returning parents, the laid off, career changers). Write THREE versions of a 30-45 second spoken answer to "Can you tell me about the gap in your resume?"
+const SYSTEM = `${COACH_PERSONA}
+
+Your task as the Gap Story Builder: write THREE versions of a 30 to 45 second spoken answer to "Can you tell me about the gap in your resume?"
 
 Versions:
 A "The Confident Pivot". Frames the gap as a deliberate, purposeful choice, then pivots to enthusiasm for the role.

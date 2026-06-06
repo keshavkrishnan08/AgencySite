@@ -14,12 +14,13 @@ import {
   canStartSession,
   getOnboarding,
   getProfile,
+  getSessions,
   saveSession,
   sessionsThisWeek,
   FREE_WEEKLY_LIMIT,
   isPremium,
 } from "@/lib/store";
-import { cn, uid } from "@/lib/utils";
+import { average, cn, uid } from "@/lib/utils";
 import { track } from "@/lib/analytics";
 import type { Dimension, Question, ScoredAnswer, Session, Situation } from "@/lib/types";
 
@@ -48,6 +49,8 @@ function PracticeInner() {
   const [followUpScored, setFollowUpScored] = useState<ScoredAnswer | null>(null);
   const [submittingFollowUp, setSubmittingFollowUp] = useState(false);
   const sessionStart = useRef<number>(0);
+  // Per-user personalization computed from history, fed into every AI call.
+  const perso = useRef({ weakestDimension: "", recentAverage: 0, name: "", interviewGap: "" });
 
   const start = useCallback(
     async (r: string, s: Situation | null) => {
@@ -58,14 +61,36 @@ function PracticeInner() {
       setPhase("loading");
       setRole(r);
       setSituation(s);
+
+      // Build per-user personalization from their history.
+      const profile = getProfile();
+      const hist = getSessions();
+      const recent = hist.slice(-5);
+      const recentAverage = recent.length ? average(recent.map((x) => x.overall)) : 0;
+      const dimKeys: Dimension[] = ["clarity", "relevance", "specificity", "confidence", "conciseness"];
+      let weakestDimension = "";
+      if (recent.length) {
+        let lowest = 101;
+        for (const k of dimKeys) {
+          const avg = average(recent.map((x) => x.dimensions[k] || 0));
+          if (avg < lowest) {
+            lowest = avg;
+            weakestDimension = k;
+          }
+        }
+      }
+      perso.current = { weakestDimension, recentAverage, name: profile.name, interviewGap: profile.interviewGap || "" };
+
       const { questions } = await apiGenerateQuestions({
         situation: s,
         targetRole: r,
-        interviewGap: getProfile().interviewGap,
+        interviewGap: profile.interviewGap,
         seed: Math.floor(Date.now() / 1000) % 7,
         focusDimension: focusDim,
         company: company.trim(),
         posting: posting.trim(),
+        name: profile.name,
+        weakestDimension,
       });
       setQuestions(questions);
       setIndex(0);
@@ -114,6 +139,11 @@ function PracticeInner() {
         situation: situation || "",
         category: current.category,
         questionNumber: current.number,
+        name: perso.current.name,
+        company: company.trim(),
+        interviewGap: perso.current.interviewGap,
+        weakestDimension: perso.current.weakestDimension,
+        recentAverage: perso.current.recentAverage,
       },
       false
     );
@@ -123,7 +153,14 @@ function PracticeInner() {
     window.scrollTo({ top: 0, behavior: "smooth" });
     // Conversational interviewer: probe deeper into what they just said.
     if (current.category !== "closer") {
-      apiFollowUp({ question: current.text, answer: answerText, targetRole: role, company })
+      apiFollowUp({
+        question: current.text,
+        answer: answerText,
+        targetRole: role,
+        company: company.trim(),
+        situation: situation || "",
+        interviewGap: perso.current.interviewGap,
+      })
         .then(setFollowUp)
         .catch(() => setFollowUp(null));
     }
@@ -139,6 +176,11 @@ function PracticeInner() {
       situation: situation || "",
       category: current.category,
       questionNumber: current.number,
+      name: perso.current.name,
+      company: company.trim(),
+      interviewGap: perso.current.interviewGap,
+      weakestDimension: perso.current.weakestDimension,
+      recentAverage: perso.current.recentAverage,
     });
     setFollowUpScored(result);
     setSubmittingFollowUp(false);

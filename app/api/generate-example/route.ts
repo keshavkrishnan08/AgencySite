@@ -1,11 +1,14 @@
 import { NextResponse } from "next/server";
 import { exampleAnswer } from "@/lib/examples";
 import { callClaude, hasAI } from "@/lib/ai";
+import { COACH_PERSONA, candidateBlock } from "@/lib/prompt";
 
 export const runtime = "nodejs";
 export const dynamic = "force-dynamic";
 
-const SYSTEM = `You are PrepPath, an interview coach. Write ONE strong example answer to the interview question, tailored to the candidate's role. Use the STAR method where it fits. Keep it natural and spoken (not corporate), 110-180 words. Return only the answer text. No preamble, no quotes, no labels.\n\nWrite in plain words a 6th grader can read. Never use em dashes or en dashes; use a period, comma, or colon instead.`;
+const SYSTEM = `${COACH_PERSONA}
+
+Your task: write ONE strong example answer to the interview question, in the candidate's own likely voice for their exact role and situation. Use STAR where it fits. Natural and spoken, not corporate, 110 to 180 words. Make it realistic for someone in their shoes, not a polished executive. Return only the answer text, no preamble, no quotes, no labels.`;
 
 export async function POST(req: Request) {
   let body: any;
@@ -14,11 +17,11 @@ export async function POST(req: Request) {
   } catch {
     return NextResponse.json({ error: "Bad request" }, { status: 400 });
   }
-  const { question = "", targetRole = "", category = "behavioral" } = body ?? {};
+  const { question = "", targetRole = "", category = "behavioral", situation = "", company = "" } = body ?? {};
 
   if (hasAI()) {
     try {
-      const user = `Question: ${question}\nRole: ${targetRole || "general professional"}`;
+      const user = `${candidateBlock({ situation, targetRole, company })}\n\nQuestion: ${question}`;
       const text = await callClaude({ system: SYSTEM, user, maxTokens: 360, temperature: 0.6 });
       if (text.trim().length > 40) {
         return NextResponse.json({ example: text.trim(), source: "ai" });
