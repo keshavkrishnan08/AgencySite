@@ -40,7 +40,7 @@ export function HeroDemo() {
         <div className="flex items-end justify-between px-6 pt-6">
           <div>
             <ScoreNumber value={84} className="text-[4.5rem]" suffix />
-            <p className="mt-1 text-sm font-medium text-sage-ink">Excellent — you&apos;re interview-ready.</p>
+            <p className="mt-1 text-sm font-medium text-sage-ink">Excellent. You&apos;re interview-ready.</p>
           </div>
         </div>
 
@@ -55,7 +55,7 @@ export function HeroDemo() {
             <Sparkles size={13} /> Coach&apos;s note
           </div>
           <p className="text-sm leading-relaxed text-ink-2">
-            Strong, specific story — and you cut the word &ldquo;just&rdquo; this time. To push past 90,
+            Strong, specific story. And you cut the word &ldquo;just&rdquo; this time. To push past 90,
             add one number to your result.
           </p>
         </div>

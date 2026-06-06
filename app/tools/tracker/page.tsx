@@ -35,7 +35,7 @@ export default function TrackerPage() {
     saveInterview({
       id: uid("iv"),
       company: company.trim(),
-      role: role.trim() || "—",
+      role: role.trim() || ", ",
       date,
       status: "upcoming",
       createdAt: new Date().toISOString(),
@@ -61,7 +61,7 @@ export default function TrackerPage() {
     <ToolShell
       icon={TrackerIcon}
       title="Interview Tracker"
-      description="Practice is the input. Offers are the point. Track every real interview here so you can see what's actually working — and prove PrepPath got you there."
+      description="Practice is the input. Offers are the point. Track every real interview here so you can see what's actually working. And prove PrepPath got you there."
     >
       {/* stats */}
       {items.length > 0 && (

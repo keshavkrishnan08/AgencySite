@@ -15,19 +15,19 @@ export function exampleAnswer(question: string, role: string, category = "behavi
   }
 
   if (q.includes("weakness")) {
-    return `Early on, I held onto too much myself instead of delegating — I thought it was faster to just do it. About a year ago I started using a shared task board and a weekly handoff with my team. Since then my team's output has gone up and I've freed myself to focus on the work only I can do. So it's a real thing I've worked on, and I have the results to show the fix is sticking.`;
+    return `Early on, I held onto too much myself instead of delegating, I thought it was faster to just do it. About a year ago I started using a shared task board and a weekly handoff with my team. Since then my team's output has gone up and I've freed myself to focus on the work only I can do. So it's a real thing I've worked on, and I have the results to show the fix is sticking.`;
   }
 
   if (q.includes("why did you leave") || q.includes("gap") || category === "gap") {
-    return `My position was eliminated in a restructuring — it had nothing to do with my performance, and I'm proud of what I built there. I used the time deliberately: I completed a certification in ${r.toLowerCase().includes("manager") ? "operations management" : "my field"} and did some freelance work to stay sharp. Honestly, the break gave me clarity on the kind of team I want to join next, which is exactly why I'm excited about this one.`;
+    return `My position was eliminated in a restructuring. It had nothing to do with my performance, and I'm proud of what I built there. I used the time deliberately: I completed a certification in ${r.toLowerCase().includes("manager") ? "operations management" : "my field"} and did some freelance work to stay sharp. Honestly, the break gave me clarity on the kind of team I want to join next, which is exactly why I'm excited about this one.`;
   }
 
   if (q.includes("five years") || q.includes("5 years")) {
-    return `In five years I want to be the person this team relies on to own a function and make it run better than it ever has. Realistically the tools will change a lot, so I'm less attached to a title than to a direction — I want to keep taking on bigger problems and developing the people around me. From what I've read about where you're headed, this role is a strong first step toward exactly that.`;
+    return `In five years I want to be the person this team relies on to own a function and make it run better than it ever has. Realistically the tools will change a lot, so I'm less attached to a title than to a direction, I want to keep taking on bigger problems and developing the people around me. From what I've read about where you're headed, this role is a strong first step toward exactly that.`;
   }
 
   if (category === "closer" || q.includes("questions for")) {
-    return `Yes — two things. First, what does success look like in this role in the first ninety days, so I know exactly what to aim for? And second, you mentioned the team is growing — how is that changing the way the group works day to day? I ask because the teams I do my best work on are the ones that are actively building something, and it sounds like that's where you are.`;
+    return `Yes. Two things. First, what does success look like in this role in the first ninety days, so I know exactly what to aim for? And second, you mentioned the team is growing. How is that changing the way the group works day to day? I ask because the teams I do my best work on are the ones that are actively building something, and it sounds like that's where you are.`;
   }
 
   // Default behavioral STAR

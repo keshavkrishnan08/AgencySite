@@ -26,7 +26,7 @@ const SIGNALS: { test: RegExp; q: PredictedQuestion }[] = [
     test: /team|collaborat|cross[- ]?functional|stakeholder/i,
     q: {
       question: "Describe a time you had a conflict or disagreement with a coworker.",
-      why: "They mention teamwork heavily — they're screening for whether you handle friction professionally.",
+      why: "They mention teamwork heavily. They're screening for whether you handle friction professionally.",
       strongAnswer: ["The disagreement, stated without blame", "How you listened and found common ground", "The resolution and what the relationship looked like after"],
       probability: 84,
     },
@@ -36,7 +36,7 @@ const SIGNALS: { test: RegExp; q: PredictedQuestion }[] = [
     q: {
       question: "Tell me about a time you led or took ownership of something.",
       why: "The role implies responsibility, so they want evidence you step up without being told.",
-      strongAnswer: ["A moment you owned an outcome", "What you actually did (not the team — you)", "The measurable result"],
+      strongAnswer: ["A moment you owned an outcome", "What you actually did (not the team. You)", "The measurable result"],
       probability: 80,
     },
   },
@@ -45,7 +45,7 @@ const SIGNALS: { test: RegExp; q: PredictedQuestion }[] = [
     q: {
       question: "Tell me about a difficult customer or client situation you handled.",
       why: "This is a customer-facing role, so composure and empathy under pressure matter to them.",
-      strongAnswer: ["The situation and the customer's real concern", "How you stayed calm and solved it", "How it ended — ideally a saved relationship"],
+      strongAnswer: ["The situation and the customer's real concern", "How you stayed calm and solved it", "How it ended. Ideally a saved relationship"],
       probability: 78,
     },
   },
@@ -63,7 +63,7 @@ const SIGNALS: { test: RegExp; q: PredictedQuestion }[] = [
 const DEFAULTS: PredictedQuestion[] = [
   {
     question: "Tell me about yourself and why this role.",
-    why: "The opener — they want a tight, relevant summary that connects you to this specific job.",
+    why: "The opener. They want a tight, relevant summary that connects you to this specific job.",
     strongAnswer: ["A 60-second present → past → future arc", "One or two relevant wins", "A clear reason you want THIS role"],
     probability: 95,
   },

@@ -5,7 +5,7 @@ import { Reveal } from "@/components/ui/Reveal";
 import { Avatar } from "@/components/ui/Avatar";
 
 /* Real photos pulled from randomuser.me (free, no key, stable CDN).
-   Quotes are sample copy — swap for verified reviews before launch. */
+   Quotes are sample copy. Swap for verified reviews before launch. */
 
 interface T {
   quote: string;

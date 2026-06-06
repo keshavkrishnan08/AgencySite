@@ -56,7 +56,7 @@ export default function CompanyResearchPage() {
     <ToolShell
       icon={CompanyIcon}
       title="Company Research Briefing"
-      description="47% of interview failures come from not knowing the company. Get a one-page briefing in seconds — and walk in knowing more than every other candidate."
+      description="47% of interview failures come from not knowing the company. Get a one-page briefing in seconds. And walk in knowing more than every other candidate."
     >
       <div className="card p-7">
         <div className="grid gap-4 sm:grid-cols-2">

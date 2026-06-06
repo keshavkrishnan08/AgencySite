@@ -1,6 +1,6 @@
 import type { ReactNode } from "react";
 
-/* PrepPath custom icon set — a cohesive duotone line style (soft fill + crisp
+/* PrepPath custom icon set. A cohesive duotone line style (soft fill + crisp
    stroke) drawn for the brand, so the product doesn't wear a stock icon pack.
    They use currentColor, so they sit correctly white-on-teal inside the tiles. */
 
@@ -28,7 +28,7 @@ function Base({ size = 24, className, children }: IconProps & { children: ReactN
 const soft = { fill: "currentColor", fillOpacity: 0.16, stroke: "none" } as const;
 const dot = { fill: "currentColor", stroke: "none" } as const;
 
-/* Gap Story — a sprout: your gap becomes a chapter of growth */
+/* Gap Story. A sprout: your gap becomes a chapter of growth */
 export const GapStoryIcon = (p: IconProps) => (
   <Base {...p}>
     <path {...soft} d="M4.5 10c5 0 7.5 2 7.5 7.5C7 17.5 4.5 15.5 4.5 10Z" />
@@ -39,7 +39,7 @@ export const GapStoryIcon = (p: IconProps) => (
   </Base>
 );
 
-/* Company Briefing — a building */
+/* Company Briefing. A building */
 export const CompanyIcon = (p: IconProps) => (
   <Base {...p}>
     <path {...soft} d="M4 20V6l9-2.5V20z" />
@@ -50,7 +50,7 @@ export const CompanyIcon = (p: IconProps) => (
   </Base>
 );
 
-/* Question Predictor — a bullseye: predict the exact questions */
+/* Question Predictor. A bullseye: predict the exact questions */
 export const PredictorIcon = (p: IconProps) => (
   <Base {...p}>
     <circle {...soft} cx="12" cy="12" r="9" />
@@ -60,7 +60,7 @@ export const PredictorIcon = (p: IconProps) => (
   </Base>
 );
 
-/* Anxiety Detector — a speech waveform */
+/* Anxiety Detector. A speech waveform */
 export const AnxietyIcon = (p: IconProps) => (
   <Base {...p}>
     <path {...soft} d="M2.5 9.5h19v5h-19z" />
@@ -72,7 +72,7 @@ export const AnxietyIcon = (p: IconProps) => (
   </Base>
 );
 
-/* Interview Day — a stopwatch under pressure */
+/* Interview Day. A stopwatch under pressure */
 export const StopwatchIcon = (p: IconProps) => (
   <Base {...p}>
     <circle {...soft} cx="12" cy="14" r="7.5" />
@@ -84,7 +84,7 @@ export const StopwatchIcon = (p: IconProps) => (
   </Base>
 );
 
-/* Salary — a chat bubble with a dollar sign */
+/* Salary. A chat bubble with a dollar sign */
 export const SalaryIcon = (p: IconProps) => (
   <Base {...p}>
     <path {...soft} d="M4 5h16v11H9.5L5.5 20v-4H4z" />
@@ -94,7 +94,7 @@ export const SalaryIcon = (p: IconProps) => (
   </Base>
 );
 
-/* Post-Interview Debrief — clipboard with a check */
+/* Post-Interview Debrief. Clipboard with a check */
 export const DebriefIcon = (p: IconProps) => (
   <Base {...p}>
     <path {...soft} d="M5 5h14v16H5z" />
@@ -104,7 +104,7 @@ export const DebriefIcon = (p: IconProps) => (
   </Base>
 );
 
-/* Your Story — an open book */
+/* Your Story. An open book */
 export const StoryIcon = (p: IconProps) => (
   <Base {...p}>
     <path {...soft} d="M12 6.5C10 5.2 7.5 4.5 5 4.5v13c2.5 0 5 .7 7 2 2-1.3 4.5-2 7-2v-13c-2.5 0-5 .7-7 2z" />
@@ -113,7 +113,7 @@ export const StoryIcon = (p: IconProps) => (
   </Base>
 );
 
-/* Interview Tracker — a calendar with a check */
+/* Interview Tracker. A calendar with a check */
 export const TrackerIcon = (p: IconProps) => (
   <Base {...p}>
     <path {...soft} d="M4 6.5h16V20H4z" />
@@ -124,7 +124,7 @@ export const TrackerIcon = (p: IconProps) => (
   </Base>
 );
 
-/* Sparkle — brand accent */
+/* Sparkle. Brand accent */
 export const SparkIcon = (p: IconProps) => (
   <Base {...p}>
     <path {...soft} d="M12 3.5 14 9l5.5 2L14 13l-2 5.5L10 13 4.5 11 10 9z" />

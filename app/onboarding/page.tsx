@@ -14,8 +14,8 @@ import type { InterviewGap, Situation } from "@/lib/types";
 const SITUATIONS: Situation[] = ["returning", "laid_off", "promotion", "career_change"];
 const GAPS: { value: InterviewGap; label: string }[] = [
   { value: "<1yr", label: "Less than 1 year" },
-  { value: "1-3yr", label: "1–3 years" },
-  { value: "3-5yr", label: "3–5 years" },
+  { value: "1-3yr", label: "1-3 years" },
+  { value: "3-5yr", label: "3-5 years" },
   { value: "5+yr", label: "5+ years" },
 ];
 
@@ -225,7 +225,7 @@ export default function OnboardingPage() {
                   What job are you preparing for?
                 </h1>
                 <p className="mt-3 text-center text-ink-2">
-                  Type any role — our AI adapts to anything you enter.
+                  Type any role. Our AI adapts to anything you enter.
                 </p>
                 <div className="relative mx-auto mt-9 max-w-md">
                   <div className="relative">
@@ -268,7 +268,7 @@ export default function OnboardingPage() {
                     </div>
                   )}
                   <p className="mt-3 text-center text-sm text-ink-3">
-                    Don&apos;t see your role? Just type it — our AI adapts to any position.
+                    Don&apos;t see your role? Just type it. Our AI adapts to any position.
                   </p>
                 </div>
 
