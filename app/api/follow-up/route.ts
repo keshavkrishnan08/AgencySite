@@ -1,10 +1,13 @@
 import { NextResponse } from "next/server";
 import { callClaude, hasAI } from "@/lib/ai";
+import { COACH_PERSONA, candidateBlock } from "@/lib/prompt";
 
 export const runtime = "nodejs";
 export const dynamic = "force-dynamic";
 
-const SYSTEM = `You are PrepPath playing a warm but sharp hiring manager in a live interview. The candidate just answered a question. Ask ONE natural follow-up that probes deeper into what they actually said. The kind a real interviewer asks to test if the story holds up ("how did they react?", "what would you do differently?", "what was the hardest part?"). Reference a specific detail from their answer. Keep it to one sentence, conversational. Return ONLY the question text. No preamble, no quotes.\n\nWrite in plain words a 6th grader can read. Never use em dashes or en dashes; use a period, comma, or colon instead.`;
+const SYSTEM = `${COACH_PERSONA}
+
+Right now you are role-playing a real hiring manager for the candidate's job, mid-interview. They just answered. Ask ONE natural follow-up that digs into what they actually said, the kind that tests if the story holds up (how did they react, what would you do differently, what was the hardest part). Reference a specific detail from their answer and fit it to their role and company. One sentence, conversational. Return ONLY the question text, no preamble, no quotes.`;
 
 const GENERIC = [
   "What was the hardest part of that situation for you?",
@@ -34,14 +37,15 @@ export async function POST(req: Request) {
   } catch {
     return NextResponse.json({ error: "Bad request" }, { status: 400 });
   }
-  const { question = "", answer = "", targetRole = "", company = "" } = body ?? {};
+  const { question = "", answer = "", targetRole = "", company = "", situation = "", interviewGap = "" } = body ?? {};
   if (!answer || answer.trim().length < 10) {
     return NextResponse.json({ followUp: fallback(answer || ""), source: "heuristic" });
   }
 
   if (hasAI()) {
     try {
-      const user = `Role: ${targetRole || "unspecified"}${company ? ` at ${company}` : ""}\nQuestion asked: ${question}\nTheir answer: "${answer.slice(0, 2000)}"`;
+      const ctx = candidateBlock({ situation, targetRole, company, interviewGap });
+      const user = `${ctx}\n\nQuestion asked: ${question}\nTheir answer: "${answer.slice(0, 2000)}"`;
       const text = await callClaude({ system: SYSTEM, user, maxTokens: 120, temperature: 0.6 });
       const cleaned = text.trim().replace(/^["']|["']$/g, "");
       if (cleaned.length > 8) return NextResponse.json({ followUp: cleaned, source: "ai" });

@@ -1,12 +1,15 @@
 import { NextResponse } from "next/server";
 import { analyzeAnxiety } from "@/lib/scoring";
 import { callClaude, extractJson, hasAI } from "@/lib/ai";
+import { COACH_PERSONA } from "@/lib/prompt";
 import { clamp } from "@/lib/utils";
 
 export const runtime = "nodejs";
 export const dynamic = "force-dynamic";
 
-const SYSTEM = `You are PrepPath's Salary Negotiation coach playing a fair but firm hiring manager. You are in a multi-round negotiation. Evaluate the candidate's latest message, then deliver your next line as the hiring manager.
+const SYSTEM = `${COACH_PERSONA}
+
+Now you are role-playing a fair but firm hiring manager in a multi-round salary negotiation for the candidate's job. Evaluate the candidate's latest message, then deliver your next line as the hiring manager.
 
 Score the candidate's turn 0-100 on: confidence, specificity (did they justify with data/value?), composure (did they hold or fold?).
 

@@ -16,6 +16,8 @@ export async function apiGenerateQuestions(args: {
   focusDimension?: Dimension;
   company?: string;
   posting?: string;
+  name?: string;
+  weakestDimension?: string;
 }): Promise<{ questions: Question[]; source: string }> {
   try {
     const res = await fetch("/api/generate-questions", {
@@ -47,6 +49,11 @@ export async function apiScoreAnswer(
     situation?: string;
     category?: string;
     questionNumber?: number;
+    name?: string;
+    company?: string;
+    interviewGap?: string;
+    weakestDimension?: string;
+    recentAverage?: number;
   },
   withExample = false
 ): Promise<ScoredAnswer> {
@@ -75,6 +82,8 @@ export async function apiFollowUp(args: {
   answer: string;
   targetRole: string;
   company?: string;
+  situation?: string;
+  interviewGap?: string;
 }): Promise<string> {
   try {
     const res = await fetch("/api/follow-up", {
