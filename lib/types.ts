@@ -109,3 +109,15 @@ export interface PredictedQuestion {
   strongAnswer: string[];
   probability: number;
 }
+
+export type InterviewStatus = "upcoming" | "completed" | "callback" | "offer" | "rejected";
+
+export interface InterviewRecord {
+  id: string;
+  company: string;
+  role: string;
+  date: string;
+  status: InterviewStatus;
+  notes?: string;
+  createdAt: string;
+}

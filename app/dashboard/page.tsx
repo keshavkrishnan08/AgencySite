@@ -18,12 +18,15 @@ import { Button, ButtonLink } from "@/components/ui/Button";
 import { ScoreRing } from "@/components/ui/Score";
 import { ProgressLineChart, Sparkline } from "@/components/charts/Charts";
 import {
+  getInterviews,
   getProfile,
   getSessions,
   getStreak,
   isPremium,
   onStoreChange,
+  upgradeToPremium,
 } from "@/lib/store";
+import type { InterviewRecord } from "@/lib/types";
 import { seedSampleData } from "@/lib/seed";
 import {
   DIMENSIONS,
@@ -52,15 +55,22 @@ export default function DashboardPage() {
   const [premium, setPremium] = useState(false);
   const [name, setName] = useState("");
   const [range, setRange] = useState<7 | 30 | 0>(0);
+  const [interviews, setInterviews] = useState<InterviewRecord[]>([]);
 
   useEffect(() => {
     setMounted(true);
+    // Stripe success redirect (or demo): activate premium, then clean the URL.
+    if (typeof window !== "undefined" && new URLSearchParams(window.location.search).get("upgraded") === "1") {
+      upgradeToPremium();
+      window.history.replaceState({}, "", "/dashboard");
+    }
     const sync = () => {
       setSessions(getSessions());
       const s = getStreak();
       setStreak({ current: s.current, longest: s.longest });
       setPremium(isPremium());
       setName(getProfile().name || "");
+      setInterviews(getInterviews());
     };
     sync();
     return onStoreChange(sync);
@@ -296,6 +306,40 @@ export default function DashboardPage() {
                 <Stat label="Total practice time" value={formatDuration(stats.time)} icon={<Clock size={14} />} />
                 <Stat label="Best session" value={`${stats.best}/100`} highlight />
               </div>
+            </div>
+
+            {/* Real interviews (outcome loop) */}
+            <div className="card p-6">
+              <div className="mb-3 flex items-center justify-between">
+                <h3 className="font-serif text-base font-semibold text-ink">Your interviews</h3>
+                <Link href="/tools/tracker" className="text-xs font-medium text-primary-ink hover:underline">
+                  {interviews.length ? "Manage" : "Track"}
+                </Link>
+              </div>
+              {interviews.length ? (
+                <div className="space-y-2.5">
+                  <div className="flex items-center justify-between text-sm">
+                    <span className="text-ink-2">Offers</span>
+                    <span className="font-mono font-semibold text-sage-ink">
+                      {interviews.filter((i) => i.status === "offer").length}
+                    </span>
+                  </div>
+                  <div className="flex items-center justify-between text-sm">
+                    <span className="text-ink-2">Upcoming</span>
+                    <span className="font-mono font-semibold text-ink">
+                      {interviews.filter((i) => i.status === "upcoming").length}
+                    </span>
+                  </div>
+                  <div className="flex items-center justify-between text-sm">
+                    <span className="text-ink-2">Total tracked</span>
+                    <span className="font-mono font-semibold text-ink">{interviews.length}</span>
+                  </div>
+                </div>
+              ) : (
+                <p className="text-sm text-ink-2">
+                  Got a real interview lined up? Track it here — offers are the point, not just scores.
+                </p>
+              )}
             </div>
 
             {/* Weak area focus */}

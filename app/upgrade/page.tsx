@@ -7,7 +7,7 @@ import { Check, Lock, ShieldCheck, Loader2, PartyPopper } from "lucide-react";
 import { AppNav } from "@/components/layout/AppNav";
 import { Button, ButtonLink } from "@/components/ui/Button";
 import { PremiumBadge } from "@/components/ui/PremiumBadge";
-import { upgradeToPremium } from "@/lib/store";
+import { getProfile, upgradeToPremium } from "@/lib/store";
 
 const INCLUDED = [
   "Unlimited practice sessions",
@@ -27,15 +27,36 @@ const INCLUDED = [
 export default function UpgradePage() {
   const router = useRouter();
   const [state, setState] = useState<"idle" | "processing" | "done">("idle");
+  const [interval, setIntervalPlan] = useState<"monthly" | "annual">("monthly");
 
-  const subscribe = () => {
+  const subscribe = async () => {
     setState("processing");
+    // Try real Stripe Checkout first; fall back to demo if not configured.
+    try {
+      const res = await fetch("/api/checkout", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ plan: interval, email: getProfile().email || undefined }),
+      });
+      const data = await res.json();
+      if (data?.url) {
+        window.location.href = data.url; // real Stripe Checkout
+        return;
+      }
+    } catch {
+      /* fall through to demo */
+    }
+    // Demo path (no Stripe keys): optimistic local upgrade.
     setTimeout(() => {
       upgradeToPremium();
       setState("done");
       setTimeout(() => router.push("/dashboard"), 1700);
-    }, 1300);
+    }, 1100);
   };
+
+  const price = interval === "annual" ? "$79" : "$9.99";
+  const cadence = interval === "annual" ? "per year" : "per month";
+  const sub = interval === "annual" ? "Just $6.58/mo, billed yearly — save 34%" : "Billed monthly · cancel anytime";
 
   return (
     <>
@@ -86,20 +107,36 @@ export default function UpgradePage() {
                 </motion.div>
               ) : (
                 <>
+                  {/* billing interval toggle */}
+                  <div className="mb-5 flex rounded-full bg-bg-tint p-1">
+                    {(["monthly", "annual"] as const).map((opt) => (
+                      <button
+                        key={opt}
+                        onClick={() => setIntervalPlan(opt)}
+                        className={`flex-1 rounded-full px-4 py-2 text-sm font-medium capitalize transition-all ${
+                          interval === opt ? "bg-white text-ink shadow-xs" : "text-ink-2 hover:text-ink"
+                        }`}
+                      >
+                        {opt}
+                        {opt === "annual" && <span className="ml-1.5 text-2xs font-bold text-sage-ink">−34%</span>}
+                      </button>
+                    ))}
+                  </div>
+
                   <div className="flex items-baseline justify-between">
                     <h2 className="font-serif text-xl font-semibold text-ink">PrepPath Premium</h2>
                     <span className="font-serif text-3xl font-semibold" style={{ color: "var(--primary-ink)" }}>
-                      $9.99
+                      {price}
                     </span>
                   </div>
-                  <p className="text-sm text-ink-3">per month · cancel anytime</p>
+                  <p className="text-sm text-ink-3">{cadence} · {sub}</p>
 
                   <div className="my-6 hairline" />
 
                   <div className="space-y-2 text-sm">
-                    <Row label="Monthly subscription" value="$9.99" />
-                    <Row label="Setup fee" value="$0.00" />
-                    <Row label="Due today" value="$9.99" bold />
+                    <Row label="7-day free trial" value="$0.00" />
+                    <Row label={interval === "annual" ? "Then per year" : "Then per month"} value={price} />
+                    <Row label="Due today" value="$0.00" bold />
                   </div>
 
                   <Button onClick={subscribe} disabled={state === "processing"} size="lg" className="mt-6 w-full">
@@ -109,15 +146,12 @@ export default function UpgradePage() {
                       </>
                     ) : (
                       <>
-                        <Lock size={16} /> Subscribe securely
+                        <Lock size={16} /> Start 7-day free trial
                       </>
                     )}
                   </Button>
                   <p className="mt-3 flex items-center justify-center gap-1.5 text-xs text-ink-3">
-                    <ShieldCheck size={13} /> Secure checkout · powered by Stripe
-                  </p>
-                  <p className="mt-4 text-center text-2xs text-ink-3">
-                    Demo checkout — no card is charged. Real deployment uses Stripe Checkout + webhooks.
+                    <ShieldCheck size={13} /> Secure checkout · powered by Stripe · cancel anytime
                   </p>
                 </>
               )}
