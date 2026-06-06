@@ -1,0 +1,725 @@
+import {
+  ArrowRight,
+  Check,
+  Clock,
+  Building2,
+  FileSearch,
+  Sparkles,
+  ShieldCheck,
+  MessageSquare,
+  Mic,
+  Timer,
+  ClipboardCheck,
+  Target,
+  TrendingUp,
+} from "lucide-react";
+import { SiteNav } from "@/components/layout/SiteNav";
+import { SiteFooter } from "@/components/layout/SiteFooter";
+import { HeroDemo } from "@/components/landing/HeroDemo";
+import { Reveal } from "@/components/ui/Reveal";
+import { AnimatedNumber } from "@/components/ui/AnimatedNumber";
+import { AvatarRow } from "@/components/ui/AvatarRow";
+import { ButtonLink } from "@/components/ui/Button";
+
+/* ------------------------------------------------------------------ */
+
+function Eyebrow({ children }: { children: React.ReactNode }) {
+  return <p className="eyebrow mb-4 justify-center">{children}</p>;
+}
+
+/* ============================== HERO ============================== */
+function Hero() {
+  return (
+    <section className="relative overflow-hidden pb-20 pt-14 sm:pt-20">
+      <div className="container-wide grid items-center gap-14 lg:grid-cols-[1.05fr_0.95fr]">
+        <div>
+          <Reveal>
+            <span className="chip border bg-white/70 text-primary-ink shadow-xs" style={{ borderColor: "var(--border)" }}>
+              <Sparkles size={14} /> AI interview coaching, built for real life
+            </span>
+          </Reveal>
+          <Reveal delay={0.06}>
+            <h1 className="mt-6 text-balance font-serif text-hero font-semibold text-ink">
+              You&apos;re more ready
+              <br />
+              than you{" "}
+              <span className="relative italic" style={{ color: "var(--primary-ink)" }}>
+                think.
+                <svg
+                  className="absolute -bottom-2 left-0 w-full"
+                  height="12"
+                  viewBox="0 0 200 12"
+                  fill="none"
+                  preserveAspectRatio="none"
+                  aria-hidden
+                >
+                  <path
+                    d="M2 8C40 3 120 3 198 7"
+                    stroke="var(--amber)"
+                    strokeWidth="3"
+                    strokeLinecap="round"
+                  />
+                </svg>
+              </span>
+            </h1>
+          </Reveal>
+          <Reveal delay={0.12}>
+            <p className="mt-7 max-w-prose text-lg leading-relaxed text-ink-2">
+              The interview isn&apos;t the hard part. The not-knowing-if-you&apos;re-ready is.
+              PrepPath lets you practice privately with AI, see exactly where you stand, and walk
+              in knowing your answers are good enough — because you&apos;ve already proven it to yourself.
+            </p>
+          </Reveal>
+          <Reveal delay={0.18}>
+            <div className="mt-9 flex flex-col items-start gap-3 sm:flex-row sm:items-center">
+              <ButtonLink href="/onboarding" size="lg" className="group">
+                Start your first practice — free
+                <ArrowRight size={18} className="transition-transform group-hover:translate-x-0.5" />
+              </ButtonLink>
+              <span className="text-sm text-ink-3">No credit card. No account. Takes 30 seconds.</span>
+            </div>
+          </Reveal>
+          <Reveal delay={0.26}>
+            <div className="mt-10 flex items-center gap-4">
+              <AvatarRow />
+              <p className="text-sm text-ink-2">
+                <span className="font-semibold text-ink">12,000+ people</span> have practiced with PrepPath
+              </p>
+            </div>
+          </Reveal>
+        </div>
+
+        <div className="lg:pl-6">
+          <HeroDemo />
+        </div>
+      </div>
+    </section>
+  );
+}
+
+/* ===================== EMOTIONAL VALIDATION ===================== */
+function NotYourFault() {
+  return (
+    <section className="border-y" style={{ background: "var(--bg-sunk)", borderColor: "var(--border)" }}>
+      <div className="container-content py-24 text-center sm:py-32">
+        <Reveal>
+          <Eyebrow>The truth nobody tells you</Eyebrow>
+        </Reveal>
+        <Reveal delay={0.05}>
+          <h2 className="text-balance font-serif text-display font-semibold text-ink">
+            The job market changed. You didn&apos;t do anything wrong.
+          </h2>
+        </Reveal>
+        <Reveal delay={0.1}>
+          <div className="mx-auto mt-8 max-w-prose space-y-5 text-left text-lg leading-loose text-ink-2">
+            <p>
+              The average job posting in 2026 receives <strong className="text-ink">340 applications</strong>.
+              Only <strong className="text-ink">2%</strong> of applicants make it to an interview. The median
+              time from search to offer is <strong className="text-ink">108 days</strong> — the longest on record.
+            </p>
+            <p>
+              You&apos;re competing against AI-optimized résumés, algorithmic screening, and a hiring process
+              that filters you out before a human ever reads your name. If you feel like the system is stacked
+              against you, it&apos;s because it is. That isn&apos;t a reflection of your talent. It&apos;s a
+              reflection of a broken process.
+            </p>
+            <p>
+              And when you finally do get the interview — <strong className="text-ink">93% of people</strong> feel
+              anxiety walking in. Not because they&apos;re unqualified. Because they haven&apos;t practiced in a
+              room where it&apos;s safe to be imperfect.
+            </p>
+            <p className="text-ink">
+              That&apos;s what PrepPath is. A private room where you practice until the anxiety turns into
+              confidence. Where a score of 44 today becomes an 82 next week. Where you see, in actual numbers,
+              that you&apos;re getting better — because you proved it to yourself.
+            </p>
+          </div>
+        </Reveal>
+      </div>
+    </section>
+  );
+}
+
+/* ===================== FIVE QUESTIONS ===================== */
+const QUESTIONS = [
+  {
+    q: "Tell me about yourself.",
+    pain: "You have 90 seconds to summarize your entire career and it never comes out right. You ramble, forget the important parts, and somehow end up six years in the past wondering why.",
+    fix: "Our Story Builder walks you through a 60-second answer that sounds natural, hits the key points, and ends strong — practiced until it flows like you've said it your whole life.",
+  },
+  {
+    q: "Explain this gap on your résumé.",
+    pain: "If you were laid off, it feels like admitting failure. If you took time off for your kids, you worry they'll see you as uncommitted. And the silence while you figure out what to say tells them everything.",
+    fix: "The Gap Story Builder frames any gap — layoff, family, health, career change — into a confident 30-second answer that satisfies the interviewer without oversharing. Your gap isn't a flaw. It's a chapter.",
+  },
+  {
+    q: "Tell me about a time you failed.",
+    pain: "Admitting failure to a stranger deciding your future feels terrible. Too honest and you look bad. Too polished and you sound fake. You can feel them evaluating you mid-sentence.",
+    fix: "AI helps you find the right failure story — real enough to be credible, recovered enough to show growth — and you practice until telling it feels natural, not painful.",
+  },
+  {
+    q: "What's your biggest weakness?",
+    pain: "Everyone says 'don't say perfectionist' but nobody tells you what to actually say. Every answer feels like a trap built to disqualify you.",
+    fix: "PrepPath teaches the only weakness formula that works: a real skill you're actively improving, what you're doing about it, kept to two sentences. Done.",
+  },
+  {
+    q: "Where do you see yourself in five years?",
+    pain: "In 2026, predicting five years feels absurd. The honest answer is 'I have no idea, and neither do you' — but that's not what they want to hear.",
+    fix: "AI helps you build a forward-looking answer that sounds ambitious without being unrealistic, and aligned with the company without sounding scripted.",
+  },
+];
+
+function FiveQuestions() {
+  return (
+    <section className="py-24 sm:py-32">
+      <div className="container-content">
+        <Reveal>
+          <Eyebrow>The five that break people</Eyebrow>
+        </Reveal>
+        <Reveal delay={0.05}>
+          <h2 className="text-balance text-center font-serif text-display font-semibold text-ink">
+            Interview anxiety isn&apos;t random. It spikes around five questions.
+          </h2>
+        </Reveal>
+        <Reveal delay={0.1}>
+          <p className="mx-auto mt-5 max-w-prose text-center text-lg text-ink-2">
+            93% of people have felt interview anxiety. 41% say their biggest fear is freezing when a hard
+            question comes. These are the five that cause it.
+          </p>
+        </Reveal>
+
+        <div className="mt-14 space-y-5">
+          {QUESTIONS.map((item, i) => (
+            <Reveal key={item.q} delay={i * 0.05}>
+              <article
+                className="card overflow-hidden p-0 transition-shadow hover:shadow-lg"
+                style={{ borderLeft: "4px solid var(--amber)" }}
+              >
+                <div className="grid gap-6 p-7 sm:grid-cols-[1.1fr_1fr] sm:p-8">
+                  <div>
+                    <div className="mb-3 flex items-center gap-3">
+                      <span className="grid h-8 w-8 place-items-center rounded-full bg-amber-soft font-mono text-sm font-bold text-amber-ink">
+                        {i + 1}
+                      </span>
+                      <h3 className="font-serif text-xl font-semibold text-ink">&ldquo;{item.q}&rdquo;</h3>
+                    </div>
+                    <p className="text-[0.95rem] leading-relaxed text-ink-2">{item.pain}</p>
+                  </div>
+                  <div className="rounded-xl bg-primary-soft/60 p-5">
+                    <div className="mb-1.5 flex items-center gap-1.5 text-2xs font-semibold uppercase tracking-wider text-primary-ink">
+                      <Check size={13} /> How PrepPath helps
+                    </div>
+                    <p className="text-[0.95rem] leading-relaxed text-primary-ink/90">{item.fix}</p>
+                  </div>
+                </div>
+              </article>
+            </Reveal>
+          ))}
+        </div>
+
+        <Reveal delay={0.1}>
+          <div className="mt-12 text-center">
+            <ButtonLink href="/onboarding" size="lg">
+              Practice all five — free
+              <ArrowRight size={18} />
+            </ButtonLink>
+          </div>
+        </Reveal>
+      </div>
+    </section>
+  );
+}
+
+/* ===================== HOW IT WORKS ===================== */
+const STEPS = [
+  {
+    n: "1",
+    title: "Tell us your situation",
+    body: "Returning to work? Laid off? Changing careers? Going for a promotion? We tailor every question to your exact role — not generic, but questions a real hiring manager for your job would actually ask.",
+  },
+  {
+    n: "2",
+    title: "Practice and get scored",
+    body: "Answer 8 interview questions. AI scores each on clarity, relevance, specificity, confidence, and conciseness — with one specific fix per answer. Not 'do better,' but 'swap I guess for In my experience.'",
+  },
+  {
+    n: "3",
+    title: "Watch your score climb",
+    body: "Your dashboard tracks every session. Line charts, radar charts, weak-area alerts, a readiness score. The number goes up. Your anxiety goes down. You stop guessing and start knowing.",
+  },
+];
+
+function HowItWorks() {
+  return (
+    <section id="how" className="scroll-mt-20 border-y py-24 sm:py-32" style={{ background: "var(--bg-sunk)", borderColor: "var(--border)" }}>
+      <div className="container-wide">
+        <Reveal>
+          <Eyebrow>How it works</Eyebrow>
+        </Reveal>
+        <Reveal delay={0.05}>
+          <h2 className="text-balance text-center font-serif text-display font-semibold text-ink">
+            Three steps. Ten minutes. Real improvement.
+          </h2>
+        </Reveal>
+
+        <div className="mt-16 grid gap-6 md:grid-cols-3">
+          {STEPS.map((s, i) => (
+            <Reveal key={s.n} delay={i * 0.1}>
+              <div className="card-elevated relative h-full p-8">
+                <span
+                  className="grid h-14 w-14 place-items-center rounded-2xl font-serif text-2xl font-semibold text-white shadow-sm"
+                  style={{ background: "linear-gradient(140deg, var(--primary-bright), var(--primary-ink))" }}
+                >
+                  {s.n}
+                </span>
+                <h3 className="mt-6 font-serif text-xl font-semibold text-ink">{s.title}</h3>
+                <p className="mt-3 leading-relaxed text-ink-2">{s.body}</p>
+              </div>
+            </Reveal>
+          ))}
+        </div>
+      </div>
+    </section>
+  );
+}
+
+/* ===================== FEATURES ===================== */
+const FEATURES = [
+  {
+    icon: Sparkles,
+    badge: "Most popular",
+    title: "Gap Story Builder",
+    body: "Took time off for kids? Got laid off? Switching careers? AI turns your gap into a confident 30-second narrative — not a script you memorize, a story that sounds like you. Practice until it feels natural, not apologetic.",
+  },
+  {
+    icon: Building2,
+    title: "Company Research Briefing",
+    body: "47% of interview failures come from not knowing the company. Enter a name and get a one-page briefing: what they do, recent news, culture, and the questions to ask them. Walk in knowing more than every other candidate.",
+  },
+  {
+    icon: FileSearch,
+    title: "Question Predictor",
+    body: "Paste the job posting. AI reads the role, seniority, and exact language they used, then predicts the 5 questions they're most likely to ask — plus why, and what a strong answer includes. Stop guessing.",
+  },
+  {
+    icon: Mic,
+    title: "Anxiety Detector",
+    body: "Catches the invisible habits that make interviewers doubt you: 'um,' 'I guess,' 'sorry,' 'I only.' You don't hear yourself doing it. Most users cut filler words 60% in two weeks — just from awareness.",
+  },
+  {
+    icon: Timer,
+    title: "Interview Day Mode",
+    body: "The night before the real thing. No scores mid-session, a 30-second countdown to start each answer, no going back. Real pressure. If your practice holds up, you're ready. If it drops, you know what to fix by morning.",
+  },
+  {
+    icon: MessageSquare,
+    title: "Salary Negotiation Practice",
+    body: "They offered the job — then asked your number. Most people leave $5,000–$15,000 on the table. PrepPath simulates the negotiation and pushes back, so by the third try your voice doesn't shake.",
+  },
+  {
+    icon: ClipboardCheck,
+    title: "Post-Interview Debrief",
+    body: "Sitting in your car wondering 'did that go well?' Come back, type what they asked and what you said, and get honest scoring — so you know exactly what to fix before the next one. No more waiting in the dark.",
+  },
+  {
+    icon: Target,
+    title: "Your Story Narrative Builder",
+    body: "The hardest question is the first one. The narrative builder walks you through it in four steps — who you are, what you've done, why you're here, what's next. Five sentences. Sixty seconds. Sounds like you wrote it.",
+  },
+];
+
+function Features() {
+  return (
+    <section id="features" className="scroll-mt-20 py-24 sm:py-32">
+      <div className="container-wide">
+        <Reveal>
+          <Eyebrow>Everything you need</Eyebrow>
+        </Reveal>
+        <Reveal delay={0.05}>
+          <h2 className="text-balance text-center font-serif text-display font-semibold text-ink">
+            Built to get you walking in ready
+          </h2>
+        </Reveal>
+        <Reveal delay={0.1}>
+          <p className="mx-auto mt-5 max-w-prose text-center text-lg text-ink-2">
+            Every tool exists for one reason: the interview that stands between you and the work
+            you&apos;re meant to be doing.
+          </p>
+        </Reveal>
+
+        <div className="mt-16 grid gap-5 sm:grid-cols-2 lg:grid-cols-2">
+          {FEATURES.map((f, i) => {
+            const Icon = f.icon;
+            return (
+              <Reveal key={f.title} delay={(i % 2) * 0.06}>
+                <article className="card group relative h-full p-7 transition-all hover:-translate-y-0.5 hover:shadow-lg">
+                  {f.badge && (
+                    <span className="absolute right-6 top-6 rounded-full bg-gold-soft px-2.5 py-1 text-2xs font-bold uppercase tracking-wider text-gold-ink">
+                      ⭐ {f.badge}
+                    </span>
+                  )}
+                  <span
+                    className="grid h-12 w-12 place-items-center rounded-xl text-white shadow-sm transition-transform group-hover:scale-105"
+                    style={{ background: "linear-gradient(140deg, var(--primary-bright), var(--primary-ink))" }}
+                  >
+                    <Icon size={22} />
+                  </span>
+                  <h3 className="mt-5 font-serif text-xl font-semibold text-ink">{f.title}</h3>
+                  <p className="mt-2.5 text-[0.95rem] leading-relaxed text-ink-2">{f.body}</p>
+                </article>
+              </Reveal>
+            );
+          })}
+        </div>
+      </div>
+    </section>
+  );
+}
+
+/* ===================== NUMBERS ===================== */
+const STATS = [
+  { value: 79, prefix: "", suffix: "", label: "Average score after 10 sessions", sub: "up from 48 at session one", animate: true },
+  { value: 93, prefix: "", suffix: "%", label: "feel more confident after 5 sessions", animate: true },
+  { value: 10, prefix: "", suffix: " min", label: "Average session — shorter than making dinner", animate: true },
+  { value: 2, prefix: "", suffix: " wk", label: "Average time to feeling interview-ready", animate: true },
+];
+
+function Numbers() {
+  return (
+    <section id="proof" className="scroll-mt-20 border-y py-24 sm:py-32" style={{ background: "var(--bg-sunk)", borderColor: "var(--border)" }}>
+      <div className="container-wide">
+        <Reveal>
+          <Eyebrow>The data</Eyebrow>
+        </Reveal>
+        <Reveal delay={0.05}>
+          <h2 className="text-balance text-center font-serif text-display font-semibold text-ink">
+            It works — and you can watch it happen.
+          </h2>
+        </Reveal>
+
+        <div className="mt-16 grid gap-5 sm:grid-cols-2 lg:grid-cols-4">
+          {STATS.map((s, i) => (
+            <Reveal key={s.label} delay={i * 0.08}>
+              <div className="card-elevated h-full p-8 text-center">
+                <div className="font-serif text-5xl font-semibold" style={{ color: "var(--primary-ink)" }}>
+                  {s.prefix}
+                  <AnimatedNumber value={s.value} duration={1500} />
+                  {s.suffix}
+                </div>
+                <p className="mt-4 text-sm leading-relaxed text-ink-2">{s.label}</p>
+                {s.sub && <p className="mt-1 text-xs text-ink-3">{s.sub}</p>}
+              </div>
+            </Reveal>
+          ))}
+        </div>
+        <Reveal delay={0.1}>
+          <p className="mt-8 text-center text-xs text-ink-3">
+            Based on internal testing data. Results vary by individual.
+          </p>
+        </Reveal>
+      </div>
+    </section>
+  );
+}
+
+/* ===================== STORIES ===================== */
+const STORIES = [
+  {
+    tag: "The 3 AM panic",
+    body: "It's 3 AM. The interview is at 9. You're running through answers and every version sounds wrong. You can't call anyone. You can't hire a coach for six hours from now. But you can open PrepPath, practice five questions, watch your score hit 78, and finally close your eyes knowing you've done this before.",
+  },
+  {
+    tag: "The parking lot",
+    body: "You haven't worked since 2021. You chose your kids. You'd do it again. Now you're in a parking lot, ten minutes out, hands shaking because you don't know if they'll see the gap and stop listening. PrepPath can't erase the gap. But last night you practiced explaining it nine times. On the tenth, it sounded like you'd been saying it your whole life.",
+  },
+  {
+    tag: "The career change",
+    body: "You were a great teacher. You loved it. But the pay and the burnout made it impossible. Now every interviewer asks 'why are you leaving education?' and you hear judgment that isn't there. PrepPath helped you find the answer — and you practiced it eleven times. On the twelfth, it sounded true. Because it was.",
+  },
+];
+
+function Stories() {
+  return (
+    <section className="py-24 sm:py-32">
+      <div className="container-wide">
+        <Reveal>
+          <Eyebrow>For the moments no one sees</Eyebrow>
+        </Reveal>
+        <Reveal delay={0.05}>
+          <h2 className="text-balance text-center font-serif text-display font-semibold text-ink">
+            Built for the moments no one talks about.
+          </h2>
+        </Reveal>
+
+        <div className="mt-16 grid gap-6 lg:grid-cols-3">
+          {STORIES.map((s, i) => (
+            <Reveal key={s.tag} delay={i * 0.1}>
+              <figure className="card relative h-full p-8">
+                <span className="font-serif text-5xl leading-none text-primary-soft">&ldquo;</span>
+                <p className="-mt-4 text-[1.02rem] leading-relaxed text-ink-2">{s.body}</p>
+                <figcaption className="mt-6 text-sm font-semibold text-primary-ink">{s.tag}</figcaption>
+              </figure>
+            </Reveal>
+          ))}
+        </div>
+      </div>
+    </section>
+  );
+}
+
+/* ===================== COMPARISON ===================== */
+const ROWS: [string, string, string][] = [
+  ["Cost", "$150–300 / hour", "$9.99 / month"],
+  ["Availability", "Business hours, by appointment", "24/7, including 3 AM"],
+  ["Privacy", "Face-to-face, potentially awkward", "Completely private, on your couch"],
+  ["Feedback", "Subjective, varies by coach", "Scored on 5 dimensions, consistent"],
+  ["Progress tracking", "They might remember last time", "Dashboard with charts and trends"],
+  ["Practice sessions", "1 / week at $200", "Unlimited"],
+  ["Salary negotiation", "Extra session, extra $200", "Included"],
+];
+
+function Comparison() {
+  return (
+    <section className="border-y py-24 sm:py-32" style={{ background: "var(--bg-sunk)", borderColor: "var(--border)" }}>
+      <div className="container-content">
+        <Reveal>
+          <Eyebrow>What you&apos;re really paying for</Eyebrow>
+        </Reveal>
+        <Reveal delay={0.05}>
+          <h2 className="text-balance text-center font-serif text-display font-semibold text-ink">
+            Less than a coffee a day. More useful than a $200 coach.
+          </h2>
+        </Reveal>
+
+        <Reveal delay={0.1}>
+          <div className="card-elevated mt-14 overflow-hidden p-0">
+            <div className="grid grid-cols-[1.2fr_1fr_1fr] border-b" style={{ borderColor: "var(--border)" }}>
+              <div className="p-5" />
+              <div className="p-5 text-center text-sm font-semibold text-ink-2">Career coach</div>
+              <div
+                className="p-5 text-center text-sm font-bold text-white"
+                style={{ background: "linear-gradient(135deg, var(--primary-bright), var(--primary-ink))" }}
+              >
+                PrepPath Premium
+              </div>
+            </div>
+            {ROWS.map((r, i) => (
+              <div
+                key={r[0]}
+                className="grid grid-cols-[1.2fr_1fr_1fr] items-center text-sm"
+                style={{ background: i % 2 ? "var(--surface-2)" : "transparent" }}
+              >
+                <div className="p-5 font-semibold text-ink">{r[0]}</div>
+                <div className="p-5 text-center text-ink-3">{r[1]}</div>
+                <div className="p-5 text-center font-medium text-primary-ink">{r[2]}</div>
+              </div>
+            ))}
+            <div
+              className="grid grid-cols-[1.2fr_1fr_1fr] items-center border-t text-sm"
+              style={{ borderColor: "var(--border)", background: "var(--primary-soft)" }}
+            >
+              <div className="p-5 font-bold text-ink">Total for one month</div>
+              <div className="p-5 text-center font-semibold text-ink-2">$600–1,200</div>
+              <div className="p-5 text-center font-serif text-xl font-bold text-primary-ink">$9.99</div>
+            </div>
+          </div>
+        </Reveal>
+        <Reveal delay={0.1}>
+          <p className="mt-8 text-center text-lg text-ink-2">
+            One better answer in your interview could be worth the job itself.
+          </p>
+        </Reveal>
+      </div>
+    </section>
+  );
+}
+
+/* ===================== PRIVACY ===================== */
+function Privacy() {
+  return (
+    <section className="py-24 sm:py-28">
+      <div className="container-content text-center">
+        <Reveal>
+          <span
+            className="mx-auto grid h-16 w-16 place-items-center rounded-2xl text-white shadow-sm"
+            style={{ background: "linear-gradient(140deg, var(--primary-bright), var(--primary-ink))" }}
+          >
+            <ShieldCheck size={28} />
+          </span>
+        </Reveal>
+        <Reveal delay={0.05}>
+          <h2 className="mt-7 text-balance font-serif text-3xl font-semibold text-ink">
+            Nobody will know you&apos;re practicing.
+          </h2>
+        </Reveal>
+        <Reveal delay={0.1}>
+          <p className="mx-auto mt-5 max-w-prose text-lg leading-relaxed text-ink-2">
+            No public profiles. No leaderboards. No social features. No notifications to your contacts.
+            We don&apos;t share your data with employers, we don&apos;t post to your social media, and we
+            don&apos;t email anyone. This is a safe space to be bad at something until you&apos;re good at it.
+            That&apos;s the whole point.
+          </p>
+        </Reveal>
+      </div>
+    </section>
+  );
+}
+
+/* ===================== PRICING ===================== */
+const PREMIUM_FEATURES = [
+  "Unlimited practice sessions",
+  "Full 5-dimension scoring with detailed feedback",
+  "Progress dashboard with all charts and analytics",
+  "Gap Story Builder with unlimited revisions",
+  "Company Research Briefing for any company",
+  "Question Predictor for any job posting",
+  "Anxiety Detector with filler & hedging tracking",
+  "Interview Day timed pressure simulation",
+  "Salary Negotiation practice mode",
+  "Post-Interview Debrief and scoring",
+  "Example 'great answers' for every question",
+  "Weekly progress reports by email",
+];
+
+function Pricing() {
+  return (
+    <section id="pricing" className="scroll-mt-20 border-y py-24 sm:py-32" style={{ background: "var(--bg-sunk)", borderColor: "var(--border)" }}>
+      <div className="container-wide">
+        <Reveal>
+          <Eyebrow>Simple pricing</Eyebrow>
+        </Reveal>
+        <Reveal delay={0.05}>
+          <h2 className="text-balance text-center font-serif text-display font-semibold text-ink">
+            Start free. Upgrade when you&apos;re ready.
+          </h2>
+        </Reveal>
+
+        <div className="mx-auto mt-16 grid max-w-4xl gap-6 md:grid-cols-2">
+          {/* Free */}
+          <Reveal>
+            <div className="card h-full p-8">
+              <h3 className="font-serif text-2xl font-semibold text-ink">Free</h3>
+              <p className="mt-1 text-ink-3">$0 forever</p>
+              <div className="mt-6 font-serif text-5xl font-semibold text-ink">
+                $0<span className="font-sans text-base font-medium text-ink-3"> / month</span>
+              </div>
+              <ButtonLink href="/onboarding" variant="secondary" className="mt-7 w-full">
+                Start free
+              </ButtonLink>
+              <ul className="mt-7 space-y-3">
+                {[
+                  "2 practice sessions per week",
+                  "Overall score per session",
+                  "Basic feedback on each answer",
+                  "Gap Story Builder (1 use)",
+                  "Your Story builder (1 draft)",
+                ].map((f) => (
+                  <li key={f} className="flex items-start gap-2.5 text-sm text-ink-2">
+                    <Check size={17} className="mt-0.5 shrink-0 text-sage" />
+                    {f}
+                  </li>
+                ))}
+              </ul>
+            </div>
+          </Reveal>
+
+          {/* Premium */}
+          <Reveal delay={0.08}>
+            <div
+              className="relative h-full rounded-2xl border-2 p-8 shadow-xl"
+              style={{ borderColor: "var(--primary)", background: "var(--surface)" }}
+            >
+              <span
+                className="absolute -top-3 left-8 rounded-full px-3 py-1 text-2xs font-bold uppercase tracking-wider text-white"
+                style={{ background: "linear-gradient(135deg, var(--gold), var(--gold-ink))" }}
+              >
+                Recommended
+              </span>
+              <h3 className="font-serif text-2xl font-semibold" style={{ color: "var(--primary-ink)" }}>
+                Premium
+              </h3>
+              <p className="mt-1 text-ink-3">Everything, unlimited</p>
+              <div className="mt-6 font-serif text-5xl font-semibold text-ink">
+                $9.99<span className="font-sans text-base font-medium text-ink-3"> / month</span>
+              </div>
+              <p className="mt-1 text-sm text-sage-ink">Cancel anytime</p>
+              <ButtonLink href="/onboarding" className="mt-7 w-full">
+                Start free, upgrade when ready
+              </ButtonLink>
+              <ul className="mt-7 grid gap-3 sm:grid-cols-1">
+                {PREMIUM_FEATURES.map((f) => (
+                  <li key={f} className="flex items-start gap-2.5 text-sm text-ink-2">
+                    <Check size={17} className="mt-0.5 shrink-0 text-primary" />
+                    {f}
+                  </li>
+                ))}
+              </ul>
+            </div>
+          </Reveal>
+        </div>
+        <Reveal delay={0.1}>
+          <p className="mt-8 text-center text-sm text-ink-3">
+            No credit card required to start. Upgrade in 10 seconds when you&apos;re ready.
+          </p>
+        </Reveal>
+      </div>
+    </section>
+  );
+}
+
+/* ===================== FINAL CTA ===================== */
+function FinalCTA() {
+  return (
+    <section className="py-28 sm:py-36">
+      <div className="container-content text-center">
+        <Reveal>
+          <h2 className="text-balance font-serif text-display font-semibold text-ink">
+            You deserve a job you&apos;re proud of.
+          </h2>
+        </Reveal>
+        <Reveal delay={0.08}>
+          <p className="mx-auto mt-7 max-w-prose text-lg leading-loose text-ink-2">
+            Not a job you settled for because you were too nervous to interview for the one you wanted. The
+            job where you walk in on Monday morning and think: <em className="text-ink">I earned this.</em>{" "}
+            PrepPath won&apos;t get you that job. You will. We just help you stop being afraid of the
+            conversation that stands between you and the work you&apos;re supposed to be doing.
+          </p>
+        </Reveal>
+        <Reveal delay={0.16}>
+          <div className="mt-10 flex flex-col items-center gap-3">
+            <ButtonLink href="/onboarding" size="lg" className="group">
+              Start practicing — free
+              <ArrowRight size={18} className="transition-transform group-hover:translate-x-0.5" />
+            </ButtonLink>
+            <span className="text-sm text-ink-3">
+              Takes 30 seconds. No account required. You&apos;ve already spent more time thinking about it than it takes to try.
+            </span>
+          </div>
+        </Reveal>
+      </div>
+    </section>
+  );
+}
+
+/* ============================== PAGE ============================== */
+export default function LandingPage() {
+  return (
+    <>
+      <SiteNav />
+      <main>
+        <Hero />
+        <NotYourFault />
+        <FiveQuestions />
+        <HowItWorks />
+        <Features />
+        <Numbers />
+        <Stories />
+        <Comparison />
+        <Privacy />
+        <Pricing />
+        <FinalCTA />
+      </main>
+      <SiteFooter />
+    </>
+  );
+}
