@@ -66,5 +66,27 @@ The product converts; now feed it people. From the PRD, the wedge is Meta ads to
 - **7-day free trial** framing + **annual plan (save 34%)** for LTV.
 - Retention: streaks, the climbing readiness score, the **interview tracker** (offers, not just scores), per-tool upgrade nudges.
 
+## Measure the funnel (analytics)
+The app fires PostHog-compatible events with zero setup cost (no-op until keyed). Set `NEXT_PUBLIC_POSTHOG_KEY` and you'll see the whole funnel:
+
+`landing_cta_click` → `onboarding_situation` → `onboarding_complete` → `session_complete` → `upgrade_view` → `upgrade_click` → `upgrade_success`, plus `tool_opened`, `interview_tracked`, and `offer_logged`.
+
+Watch two numbers: free-to-first-session (activation) and first-session-to-upgrade (conversion). Those two tell you whether to fix the product or buy more traffic.
+
+## Launch checklist (zero to first dollar)
+1. **Charge for real.** Add Stripe keys (Step 2 above) and the Supabase persistence (Step 3). Until the webhook writes plan state to a DB, Premium is per-browser only.
+2. **Deploy.** Import the repo on Vercel, add every env var from `.env.example`, deploy, point `preppath.ai` at it, and register the Stripe webhook URL.
+3. **Turn on analytics.** Add the PostHog key so you can see where people drop.
+4. **Send 100 visitors.** Run one Meta ad set (below) at $20/day to the landing page.
+5. **Read the funnel after 100 visitors.** Low activation means fix onboarding. Low conversion means fix the paywall moment. High both means raise spend.
+
+## Ad creatives that match the build
+- **"The Gap"** (returning parents): "You took years off for your kids. You'd do it again. But you freeze when they ask about the gap. PrepPath writes three answers and lets you practice out loud. Free." → Gap Story Builder.
+- **"The Filler Words"** (everyone): a typed answer with "um, I guess, I just" highlighted, then a confidence score. "You don't hear it. Interviewers do." → Anxiety Detector.
+- **"The 3 AM Panic"** (everyone): dark screen, phone glow, score climbs to 78, eyes close. "Your interview is in 6 hours. You're ready."
+- **"Paste the posting"** (career changers): the Question Predictor result. "See the 5 questions they'll ask before you walk in. Free."
+
+Target: women 30-50 "return to work"; all 35-55 "recently laid off"; 28-45 "career change". Exclude current tech workers.
+
 ## Honest LTV math
 COGS ~$0.92/user/mo (Claude + Stripe fee). Price $9.99/mo → ~91% gross margin. Annual at $79 front-loads cash and cuts churn. Job seekers churn when they land a job — that's a success, and the share card + tracker turn it into referrals.

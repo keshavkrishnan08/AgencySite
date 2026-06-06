@@ -9,6 +9,7 @@ import { Button } from "@/components/ui/Button";
 import { ROLES } from "@/lib/roles";
 import { SITUATION_META } from "@/lib/utils";
 import { setOnboarding, setProfile } from "@/lib/store";
+import { track } from "@/lib/analytics";
 import type { InterviewGap, Situation } from "@/lib/types";
 
 const SITUATIONS: Situation[] = ["returning", "laid_off", "promotion", "career_change"];
@@ -43,6 +44,7 @@ export default function OnboardingPage() {
     const finalRole = role.trim() || query.trim() || "Office Manager";
     setOnboarding({ situation, targetRole: finalRole, interviewGap: selectedGap });
     setProfile({ situation, targetRole: finalRole, interviewGap: selectedGap });
+    track("onboarding_complete", { situation, role: finalRole, gap: selectedGap });
     router.push("/practice");
   };
 
@@ -174,6 +176,7 @@ export default function OnboardingPage() {
                         whileTap={{ scale: 0.97 }}
                         onClick={() => {
                           setSituation(s);
+                          track("onboarding_situation", { situation: s });
                           setTimeout(() => go(1), 220);
                         }}
                         className="group flex items-center gap-4 rounded-xl border-2 bg-surface p-5 text-left shadow-sm transition-shadow hover:shadow-lg"

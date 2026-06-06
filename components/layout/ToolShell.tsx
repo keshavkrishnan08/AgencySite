@@ -6,6 +6,7 @@ import { ArrowRight, Sparkles } from "lucide-react";
 import { AppNav } from "@/components/layout/AppNav";
 import { ButtonLink } from "@/components/ui/Button";
 import { isPremium } from "@/lib/store";
+import { track } from "@/lib/analytics";
 
 export function ToolShell({
   icon: Icon,
@@ -25,7 +26,8 @@ export function ToolShell({
   useEffect(() => {
     setMounted(true);
     setPremium(isPremium());
-  }, []);
+    track("tool_opened", { tool: title });
+  }, [title]);
 
   return (
     <>
