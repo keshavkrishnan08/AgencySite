@@ -1,4 +1,5 @@
 import { rateLimit } from "@/lib/ratelimit";
+import { recordUsage } from "@/lib/usage";
 import { NextResponse } from "next/server";
 import { exampleAnswer } from "@/lib/examples";
 import { callClaude, FAST_MODEL, hasAI } from "@/lib/ai";
@@ -14,6 +15,7 @@ Your task: write ONE strong example answer to the interview question, in the can
 export async function POST(req: Request) {
   const limited = rateLimit(req);
   if (limited) return limited;
+  recordUsage(req);
   let body: any;
   try {
     body = await req.json();
