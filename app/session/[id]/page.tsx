@@ -14,7 +14,7 @@ import {
   Target as TargetIcon,
   Trophy,
 } from "lucide-react";
-import { AppNav } from "@/components/layout/AppNav";
+import { AppShell } from "@/components/layout/AppShell";
 import { Button, ButtonLink } from "@/components/ui/Button";
 import { AnimatedNumber } from "@/components/ui/AnimatedNumber";
 import { ScoreNumber } from "@/components/ui/Score";
@@ -63,8 +63,7 @@ export default function SessionPage() {
 
   if (!session) {
     return (
-      <>
-        <AppNav />
+      <AppShell>
         <main className="container-content py-24 text-center">
           <h1 className="font-serif text-2xl font-semibold text-ink">Session not found</h1>
           <p className="mt-2 text-ink-2">It may have been cleared. Start a fresh one.</p>
@@ -72,15 +71,14 @@ export default function SessionPage() {
             New session <ArrowRight size={16} />
           </ButtonLink>
         </main>
-      </>
+      </AppShell>
     );
   }
 
   const { strongest, weakest } = bestAndWorst(session);
 
   return (
-    <>
-      <AppNav />
+    <AppShell>
       <main className="container-wide max-w-4xl py-10 sm:py-12">
         {/* Hero score card */}
         <motion.div
@@ -180,7 +178,7 @@ export default function SessionPage() {
           </Link>
         </div>
       </main>
-    </>
+    </AppShell>
   );
 }
 

@@ -29,6 +29,7 @@ export type PPEvent =
   | "session_started"
   | "session_complete"
   | "tool_opened"
+  | "paywall_hit"
   | "voice_used"
   | "upgrade_view"
   | "upgrade_click"
