@@ -380,9 +380,9 @@ function Stories() {
 /* ===================== COMPARISON ===================== */
 const ROWS: [string, string, string][] = [
   ["Cost", "$150-300 / hour", "$9.99 / month"],
-  ["Availability", "Business hours, by appointment", "24/7, including 3 AM"],
-  ["Privacy", "Face-to-face, potentially awkward", "Completely private, on your couch"],
-  ["Feedback", "Subjective, varies by coach", "Scored on 5 dimensions, consistent"],
+  ["Availability", "Business hours only", "Anytime"],
+  ["Privacy", "Face to face", "Completely private"],
+  ["Feedback", "Varies by coach", "Scored on 5 dimensions"],
   ["Progress tracking", "They might remember last time", "Dashboard with charts and trends"],
   ["Practice sessions", "1 / week at $200", "Unlimited"],
   ["Salary negotiation", "Extra session, extra $200", "Included"],
