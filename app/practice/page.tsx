@@ -8,6 +8,7 @@ import { Logo } from "@/components/ui/Logo";
 import { Button, ButtonLink } from "@/components/ui/Button";
 import { AnswerScoreCard } from "@/components/practice/AnswerScoreCard";
 import { VoiceButton } from "@/components/ui/VoiceButton";
+import { InfoTip } from "@/components/ui/Tooltip";
 import { ShowcaseProgress } from "@/components/onboarding/Showcase";
 import { apiFollowUp, apiGenerateExample, apiGenerateQuestions, apiScoreAnswer } from "@/lib/client";
 import { aggregateDimensions, computeOverall } from "@/lib/scoring";
@@ -39,6 +40,7 @@ function PracticeInner() {
   const [questions, setQuestions] = useState<Question[]>([]);
   const [index, setIndex] = useState(0);
   const [answerText, setAnswerText] = useState("");
+  const [interim, setInterim] = useState(""); // live speech-to-text, before it's final
   const [scored, setScored] = useState<ScoredAnswer | null>(null);
   const [answers, setAnswers] = useState<ScoredAnswer[]>([]);
   const [submitting, setSubmitting] = useState(false);
@@ -137,6 +139,7 @@ function PracticeInner() {
   const submit = async () => {
     if (!canSubmit || !current) return;
     setSubmitting(true);
+    setInterim("");
     setFollowUp(null);
     setFollowUpScored(null);
     setFollowUpAnswer("");
@@ -244,6 +247,7 @@ function PracticeInner() {
     setFollowUpScored(null);
     setFollowUpAnswer("");
     setAnswerText("");
+    setInterim("");
     deliveryRef.current = null;
     fuDeliveryRef.current = null;
     setPhase("answer");
@@ -342,15 +346,14 @@ function PracticeInner() {
                     ? "Focus drill"
                     : "Behavioral"}
                 </p>
-                <h1 className="mt-3 font-serif text-2xl font-semibold leading-snug text-ink sm:text-3xl">
-                  {current.text}
+                <h1 className="mt-3 flex items-start gap-2 font-serif text-2xl font-semibold leading-snug text-ink sm:text-3xl">
+                  <span>{current.text}</span>
+                  {current.tip && (
+                    <InfoTip title="How to nail this" iconSize={17} className="mt-1.5 shrink-0">
+                      {current.tip}
+                    </InfoTip>
+                  )}
                 </h1>
-                {current.tip && (
-                  <p className="mt-4 flex items-start gap-2 text-sm italic text-ink-3">
-                    <Sparkles size={15} className="mt-0.5 shrink-0 text-primary" />
-                    {current.tip}
-                  </p>
-                )}
               </div>
 
               <div className="mt-5">
@@ -362,19 +365,31 @@ function PracticeInner() {
                   className="field min-h-[180px] resize-y leading-relaxed"
                   style={{ maxHeight: 420 }}
                 />
+                {interim && (
+                  <p className="mt-2 flex items-start gap-2 px-1 text-sm italic text-ink-3">
+                    <span className="mt-1.5 h-2 w-2 shrink-0 animate-pulse rounded-full bg-coral" />
+                    {interim}…
+                  </p>
+                )}
                 <div className="mt-2 flex items-center justify-between px-1">
                   <span className="text-xs text-ink-3">
                     {wordCount < MIN_WORDS
                       ? `${wordCount} word${wordCount === 1 ? "" : "s"}. A few more to submit (${MIN_WORDS}+)`
                       : `${wordCount} words`}
                   </span>
-                  <span className="text-xs text-ink-3">Tip: 60-150 words is the sweet spot</span>
+                  <span className="flex items-center gap-1 text-xs text-ink-3">
+                    Ideal length
+                    <InfoTip title="How long should it be?">
+                      60 to 150 words is the sweet spot. Long enough to tell a real story, short enough to stay sharp.
+                    </InfoTip>
+                  </span>
                 </div>
               </div>
 
               <div className="mt-6 flex flex-wrap items-center justify-between gap-3">
                 <VoiceButton
-                  onTranscript={(t) => setAnswerText((p) => (p ? p.trim() + " " : "") + t)}
+                  onTranscript={(t) => { setAnswerText((p) => (p ? p.trim() + " " : "") + t); setInterim(""); }}
+                  onInterim={setInterim}
                   onDelivery={(m) => (deliveryRef.current = m)}
                 />
                 <Button onClick={submit} disabled={!canSubmit} size="lg">
