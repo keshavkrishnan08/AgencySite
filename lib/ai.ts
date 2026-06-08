@@ -5,6 +5,9 @@ import Anthropic from "@anthropic-ai/sdk";
    falls back to the local heuristic engine when no key is present. */
 
 const MODEL = process.env.ANTHROPIC_MODEL || "claude-sonnet-4-6";
+// Cheaper, faster model for light extraction/generation (follow-ups, examples,
+// predictions). Cuts token cost where top-tier quality isn't needed.
+export const FAST_MODEL = process.env.ANTHROPIC_MODEL_FAST || "claude-haiku-4-5-20251001";
 
 export function hasAI(): boolean {
   return Boolean(process.env.ANTHROPIC_API_KEY);
@@ -23,6 +26,7 @@ interface CallOpts {
   user: string;
   maxTokens?: number;
   temperature?: number;
+  model?: string;
 }
 
 export async function callClaude({
@@ -30,9 +34,10 @@ export async function callClaude({
   user,
   maxTokens = 1024,
   temperature = 0.4,
+  model = MODEL,
 }: CallOpts): Promise<string> {
   const res = await getClient().messages.create({
-    model: MODEL,
+    model,
     max_tokens: maxTokens,
     temperature,
     // Cache the (stable) system prompt to cut cost on repeated calls.
