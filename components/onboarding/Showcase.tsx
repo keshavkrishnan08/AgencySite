@@ -32,12 +32,12 @@ const SCENES = [
 
 // phase: 0 clear · 1 interviewer typing · 2 interviewer msg · 3 you typing · 4 you msg · 5 score
 const SEQ: [number, number][] = [
-  [1, 900],
-  [2, 1400],
-  [3, 900],
-  [4, 1900],
-  [5, 2600],
-  [0, 500],
+  [1, 1200],
+  [2, 1900],
+  [3, 1200],
+  [4, 2500],
+  [5, 3400],
+  [0, 700],
 ];
 
 function TypingDots() {
@@ -200,14 +200,14 @@ export function ShowcaseQuestions({ role }: { role?: string }) {
     const timers: ReturnType<typeof setTimeout>[] = [];
     const run = () => {
       setCount(0);
-      for (let i = 1; i <= 5; i++) timers.push(setTimeout(() => alive && setCount(i), 360 * i + 400));
+      for (let i = 1; i <= 5; i++) timers.push(setTimeout(() => alive && setCount(i), 620 * i + 600));
       timers.push(
         setTimeout(() => {
           if (!alive) return;
           setRef.current = (setRef.current + 1) % QSETS.length;
           force((n) => n + 1);
           run();
-        }, 360 * 5 + 2800)
+        }, 620 * 5 + 3600)
       );
     };
     run();
@@ -268,7 +268,7 @@ const CLIMB = [44, 57, 66, 74, 82];
 export function ShowcaseProgress() {
   const [cycle, setCycle] = useState(0);
   useEffect(() => {
-    const id = setInterval(() => setCycle((c) => c + 1), 5400);
+    const id = setInterval(() => setCycle((c) => c + 1), 7600);
     return () => clearInterval(id);
   }, []);
 
@@ -278,7 +278,7 @@ export function ShowcaseProgress() {
         <p className="text-2xs font-semibold uppercase tracking-[0.18em] text-white/60">Interview readiness</p>
         <div className="mt-2 flex items-end gap-2">
           <span className="font-serif text-6xl font-semibold leading-none text-white">
-            <AnimatedNumber value={CLIMB[CLIMB.length - 1]} duration={2200} startOnView={false} />
+            <AnimatedNumber value={CLIMB[CLIMB.length - 1]} duration={3200} startOnView={false} />
             <span className="text-2xl text-white/55">%</span>
           </span>
           <span className="mb-2 flex items-center gap-1 rounded-full bg-emerald-300/20 px-2 py-0.5 text-xs font-bold text-emerald-200">
@@ -295,7 +295,7 @@ export function ShowcaseProgress() {
                 style={{ background: "linear-gradient(to top, rgba(255,255,255,0.35), #d7fbff)" }}
                 initial={{ height: 0 }}
                 animate={{ height: `${v}%` }}
-                transition={{ delay: 0.3 + i * 0.22, duration: 0.6, ease: [0.22, 1, 0.36, 1] }}
+                transition={{ delay: 0.4 + i * 0.36, duration: 0.95, ease: [0.22, 1, 0.36, 1] }}
               />
               <span className="text-2xs text-white/50">S{i + 1}</span>
             </div>
