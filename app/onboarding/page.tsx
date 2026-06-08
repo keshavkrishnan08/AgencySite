@@ -303,9 +303,14 @@ export default function OnboardingPage() {
                         )}
                       </div>
                     ))}
-                    <div className="flex items-center gap-3 pt-1">
-                      {screen > 0 && <Button variant="ghost" size="sm" onClick={() => go(screen - 1)}><ArrowLeft size={15} /> Back</Button>}
-                      <Button size="sm" onClick={() => go(screen + 1)} disabled={!screenReady(cur)}>Continue <ArrowRight size={15} /></Button>
+                    <div className="flex flex-col gap-2 pt-1">
+                      <div className="flex items-center gap-3">
+                        {screen > 0 && <Button variant="ghost" size="sm" onClick={() => go(screen - 1)}><ArrowLeft size={15} /> Back</Button>}
+                        <Button size="sm" onClick={() => go(screen + 1)} disabled={!screenReady(cur)}>Continue <ArrowRight size={15} /></Button>
+                      </div>
+                      {!screenReady(cur) && cur.fields.length > 1 && (
+                        <p className="text-xs text-ink-3">Answer each question to continue.</p>
+                      )}
                     </div>
                   </div>
                 )}
