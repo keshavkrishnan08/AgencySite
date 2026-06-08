@@ -16,11 +16,14 @@ import {
   Star,
   CalendarDays,
   Crown,
+  LogOut,
   type LucideIcon,
 } from "lucide-react";
+import { useRouter } from "next/navigation";
 import { LogoMark } from "@/components/ui/Logo";
 import { cn } from "@/lib/utils";
 import { getProfile, isPremium, onStoreChange } from "@/lib/store";
+import { useAuth } from "@/lib/auth";
 
 interface Item {
   href: string;
@@ -49,6 +52,8 @@ const TOOLS: Item[] = [
    reveal labels. Desktop only (lg+); the top bar carries mobile. */
 export function AppSidebar() {
   const pathname = usePathname();
+  const router = useRouter();
+  const { configured, user, signOut } = useAuth();
   const [premium, setPremium] = useState(false);
   const [name, setName] = useState("");
 
@@ -149,6 +154,18 @@ export function AppSidebar() {
             Settings
           </span>
         </Link>
+        {configured && user && (
+          <button
+            onClick={async () => { await signOut(); router.push("/"); }}
+            title="Sign out"
+            className="flex items-center gap-3 rounded-xl px-3 py-2.5 text-ink-2 transition-colors hover:bg-bg-tint hover:text-ink"
+          >
+            <LogOut size={20} className="shrink-0" />
+            <span className="whitespace-nowrap text-sm font-medium opacity-0 transition-opacity duration-200 group-hover:opacity-100">
+              Sign out
+            </span>
+          </button>
+        )}
       </div>
     </aside>
   );
