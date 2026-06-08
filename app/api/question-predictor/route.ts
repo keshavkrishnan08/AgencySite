@@ -1,6 +1,6 @@
 import { rateLimit } from "@/lib/ratelimit";
 import { NextResponse } from "next/server";
-import { callClaude, extractJson, hasAI } from "@/lib/ai";
+import { callClaude, FAST_MODEL, extractJson, hasAI } from "@/lib/ai";
 import { COACH_PERSONA } from "@/lib/prompt";
 import type { PredictedQuestion } from "@/lib/types";
 
@@ -104,7 +104,7 @@ export async function POST(req: Request) {
   if (hasAI()) {
     try {
       const user = `Target role: ${role || "inferred from posting"}\n\nJob posting:\n"""${posting.slice(0, 6000)}"""`;
-      const text = await callClaude({ system: SYSTEM, user, maxTokens: 1100, temperature: 0.5 });
+      const text = await callClaude({ model: FAST_MODEL, system: SYSTEM, user, maxTokens: 1100, temperature: 0.5 });
       const parsed = extractJson<{ questions: PredictedQuestion[] }>(text);
       if (parsed?.questions?.length) {
         return NextResponse.json({ questions: parsed.questions.slice(0, 5), source: "ai" });
