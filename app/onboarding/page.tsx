@@ -7,7 +7,7 @@ import { AnimatePresence, motion } from "framer-motion";
 import { ArrowLeft, ArrowRight, Check, Search, Star, ShieldCheck } from "lucide-react";
 import { Logo } from "@/components/ui/Logo";
 import { Button } from "@/components/ui/Button";
-import { Avatar } from "@/components/ui/Avatar";
+import { OnboardingShowcase } from "@/components/onboarding/Showcase";
 import { ROLES } from "@/lib/roles";
 import { SITUATION_META } from "@/lib/utils";
 import { setOnboarding, setProfile } from "@/lib/store";
@@ -228,40 +228,16 @@ function ConversionPanel({ situation, role }: { situation: Situation | null; rol
             <span className="ml-2 text-sm font-medium text-white/85">Loved by 12,000+ job seekers</span>
           </div>
 
-          <h2 className="mt-7 max-w-md font-serif text-4xl font-semibold leading-tight">
-            {role ? <>Your <span className="text-amber-soft">{role}</span> interview, rehearsed until it&apos;s easy.</> : <>You&apos;re closer than you think.</>}
+          <h2 className="mt-6 max-w-md font-serif text-[2.1rem] font-semibold leading-tight">
+            {role ? <>Your <span className="text-amber-soft">{role}</span> interview, rehearsed until it&apos;s easy.</> : <>This is what your practice looks like.</>}
           </h2>
 
-          <ul className="mt-8 space-y-4">
-            {[
-              "Questions tailored to your exact role and story",
-              "Answer out loud, scored on five dimensions",
-              "One clear fix after every single answer",
-            ].map((b) => (
-              <li key={b} className="flex items-start gap-3 text-white/90">
-                <span className="mt-0.5 grid h-6 w-6 shrink-0 place-items-center rounded-full bg-white/15">
-                  <Check size={14} />
-                </span>
-                <span className="text-[1.05rem]">{b}</span>
-              </li>
-            ))}
-          </ul>
+          {/* live, looping demo */}
+          <div className="mt-10">
+            <OnboardingShowcase />
+          </div>
 
-          {/* testimonial */}
-          <figure className="mt-10 max-w-md rounded-2xl border border-white/20 bg-white/10 p-6 backdrop-blur-md">
-            <p className="text-[1.05rem] leading-relaxed text-white">
-              &ldquo;I hadn&apos;t interviewed in six years. My score went from 44 to 81. I got the job.&rdquo;
-            </p>
-            <figcaption className="mt-4 flex items-center gap-3">
-              <Avatar src="https://randomuser.me/api/portraits/women/68.jpg" name="Rachel M." size={40} className="ring-2 ring-white/40" />
-              <div>
-                <div className="text-sm font-semibold text-white">Rachel M.</div>
-                <div className="text-xs text-white/70">Office Manager</div>
-              </div>
-            </figcaption>
-          </figure>
-
-          <p className="mt-8 flex items-center gap-2 text-sm text-white/75">
+          <p className="mt-12 flex items-center gap-2 text-sm text-white/75">
             <ShieldCheck size={16} /> Private by design. No card to start.
           </p>
         </motion.div>
