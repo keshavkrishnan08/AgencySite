@@ -6,7 +6,7 @@ import { Loader2 } from "lucide-react";
 import { AppNav } from "./AppNav";
 import { AppSidebar } from "./AppSidebar";
 import { useAuth } from "@/lib/auth";
-import { isPremium, onStoreChange } from "@/lib/store";
+import { getProfile, isPremium, onStoreChange, setProfile, upgradeToPremium } from "@/lib/store";
 
 /* Authed app chrome + access gate.
 
@@ -33,6 +33,26 @@ export function AppShell({ children, requirePremium = true }: { children: ReactN
     sync();
     return onStoreChange(sync);
   }, []);
+
+  // Reconcile access against the authoritative subscription. Keeps premium while
+  // inside the paid period; drops it once the sub has ended. "none" means no
+  // subscription row (e.g. just paid, webhook not in yet) so we leave it alone.
+  useEffect(() => {
+    if (!configured || loading || !user) return;
+    const email = getProfile().email;
+    if (!email) return;
+    fetch("/api/subscription-status", { method: "POST", headers: { "Content-Type": "application/json", "x-user-id": email } })
+      .then((r) => r.json())
+      .then((s: { premium: boolean; status: string }) => {
+        if (!s || s.status === "none") return;
+        if (s.premium) {
+          if (!isPremium()) upgradeToPremium();
+        } else if (isPremium()) {
+          setProfile({ plan: "free" });
+        }
+      })
+      .catch(() => {});
+  }, [configured, loading, user]);
 
   // /upgrade so they can pay; /settings so they can always manage/sign out.
   const exemptFromPay = !requirePremium || pathname === "/upgrade" || pathname === "/settings";
