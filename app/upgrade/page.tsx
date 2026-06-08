@@ -4,7 +4,7 @@ import { useEffect, useState } from "react";
 import { useRouter } from "next/navigation";
 import { motion } from "framer-motion";
 import { Check, Lock, ShieldCheck, Loader2, PartyPopper } from "lucide-react";
-import { AppNav } from "@/components/layout/AppNav";
+import { AppShell } from "@/components/layout/AppShell";
 import { Button, ButtonLink } from "@/components/ui/Button";
 import { PremiumBadge } from "@/components/ui/PremiumBadge";
 import { getProfile, upgradeToPremium } from "@/lib/store";
@@ -66,8 +66,7 @@ export default function UpgradePage() {
   const sub = interval === "annual" ? "Just $6.58/mo, billed yearly. Save 34%" : "Billed monthly · cancel anytime";
 
   return (
-    <>
-      <AppNav />
+    <AppShell>
       <main className="container-wide max-w-5xl py-12">
         <div className="text-center">
           <PremiumBadge label="Axon Careers Premium" className="mx-auto" />
@@ -171,7 +170,7 @@ export default function UpgradePage() {
           </div>
         </div>
       </main>
-    </>
+    </AppShell>
   );
 }
 

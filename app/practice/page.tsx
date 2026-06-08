@@ -3,7 +3,7 @@
 import { Suspense, useCallback, useEffect, useRef, useState } from "react";
 import { useRouter, useSearchParams } from "next/navigation";
 import { motion, AnimatePresence } from "framer-motion";
-import { ArrowRight, Sparkles, X, Loader2, Lock, Building2, ChevronDown } from "lucide-react";
+import { ArrowRight, Sparkles, X, Loader2, Lock, Building2, ChevronDown, Check } from "lucide-react";
 import { Logo } from "@/components/ui/Logo";
 import { Button, ButtonLink } from "@/components/ui/Button";
 import { AnswerScoreCard } from "@/components/practice/AnswerScoreCard";
@@ -11,20 +11,18 @@ import { VoiceButton } from "@/components/ui/VoiceButton";
 import { apiFollowUp, apiGenerateExample, apiGenerateQuestions, apiScoreAnswer } from "@/lib/client";
 import { aggregateDimensions, computeOverall } from "@/lib/scoring";
 import {
-  canStartSession,
   getOnboarding,
   getProfile,
   getSessions,
   saveSession,
-  sessionsThisWeek,
-  FREE_WEEKLY_LIMIT,
   isPremium,
 } from "@/lib/store";
 import { average, cn, uid } from "@/lib/utils";
 import { track } from "@/lib/analytics";
 import type { Dimension, DeliveryMetrics, Question, ScoredAnswer, Session, Situation } from "@/lib/types";
 
-type Phase = "setup" | "loading" | "answer" | "score" | "blocked";
+// After the first answer, free users hit a hard paywall (analyzing -> paywall).
+type Phase = "setup" | "loading" | "answer" | "score" | "analyzing" | "paywall";
 
 function PracticeInner() {
   const router = useRouter();
@@ -58,10 +56,6 @@ function PracticeInner() {
 
   const start = useCallback(
     async (r: string, s: Situation | null) => {
-      if (!canStartSession()) {
-        setPhase("blocked");
-        return;
-      }
       setPhase("loading");
       setRole(r);
       setSituation(s);
@@ -115,15 +109,23 @@ function PracticeInner() {
     const s = profile.situation || ob?.situation || null;
     setRole(r);
     setSituation(s);
-    if (!canStartSession()) {
-      setPhase("blocked");
-    } else if (autostart || focusDim) {
+    if (autostart || focusDim) {
       start(r || "Office Manager", s);
     } else {
       setPhase("setup");
     }
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
+
+  // After the first answer, free users get a brief analysis, then the paywall.
+  useEffect(() => {
+    if (phase !== "analyzing") return;
+    const id = setTimeout(() => {
+      setPhase("paywall");
+      window.scrollTo({ top: 0, behavior: "smooth" });
+    }, 2400);
+    return () => clearTimeout(id);
+  }, [phase]);
 
   const wordCount = answerText.trim() ? answerText.trim().split(/\s+/).length : 0;
   const canSubmit = wordCount >= 8 && !submitting;
@@ -155,8 +157,18 @@ function PracticeInner() {
     result.delivery = deliveryRef.current ?? undefined;
     setScored(result);
     setSubmitting(false);
-    setPhase("score");
     window.scrollTo({ top: 0, behavior: "smooth" });
+
+    // Hard paywall: free users answer one question, then must upgrade. Their
+    // real score and coaching are computed (so they're real behind the blur)
+    // but locked. Premium users continue the full session.
+    if (index === 0 && !isPremium()) {
+      track("paywall_hit", { role });
+      setPhase("analyzing");
+      return;
+    }
+
+    setPhase("score");
     // Conversational interviewer: probe deeper into what they just said.
     if (current.category !== "closer") {
       apiFollowUp({
@@ -294,8 +306,13 @@ function PracticeInner() {
           />
         )}
 
-        {/* BLOCKED (paywall) */}
-        {phase === "blocked" && <BlockedCard />}
+        {/* ANALYZING (post first answer, before paywall) */}
+        {phase === "analyzing" && <AnalyzingCard />}
+
+        {/* PAYWALL (hard gate after first answer) */}
+        {phase === "paywall" && scored && (
+          <PaywallScore answer={scored} gentle={gentle} role={role} />
+        )}
 
         {/* LOADING */}
         {phase === "loading" && <LoadingCard />}
@@ -471,8 +488,6 @@ function SetupCard({
   setPosting: (v: string) => void;
   onStart: () => void;
 }) {
-  const premium = typeof window !== "undefined" && isPremium();
-  const used = typeof window !== "undefined" ? sessionsThisWeek() : 0;
   const [showContext, setShowContext] = useState(Boolean(company || posting));
   return (
     <div className="mx-auto max-w-xl">
@@ -538,11 +553,6 @@ function SetupCard({
         <Button onClick={onStart} size="lg" className="mt-6 w-full">
           Start session <ArrowRight size={18} />
         </Button>
-        {!premium && (
-          <p className="mt-4 text-center text-xs text-ink-3">
-            Free plan: {Math.max(0, FREE_WEEKLY_LIMIT - used)} of {FREE_WEEKLY_LIMIT} sessions left this week
-          </p>
-        )}
         <div className="text-center">
           <ButtonLink href="/onboarding" variant="ghost" size="sm" className="mt-2">
             Change role or situation
@@ -553,24 +563,112 @@ function SetupCard({
   );
 }
 
-function BlockedCard() {
+/* Beautiful analysis beat between the first answer and the paywall. */
+const ANALYZE_STEPS = [
+  "Reading your answer",
+  "Scoring clarity and structure",
+  "Listening to your delivery",
+  "Writing your personal coaching",
+];
+function AnalyzingCard() {
+  const [step, setStep] = useState(0);
+  useEffect(() => {
+    const id = setInterval(() => setStep((s) => Math.min(s + 1, ANALYZE_STEPS.length - 1)), 600);
+    return () => clearInterval(id);
+  }, []);
   return (
-    <div className="mx-auto max-w-lg text-center">
-      <div className="card-elevated p-9">
-        <span className="mx-auto grid h-14 w-14 place-items-center rounded-2xl bg-gold-soft text-gold-ink">
-          <Lock size={24} />
+    <div className="mx-auto flex max-w-lg flex-col items-center py-20 text-center">
+      <div className="relative grid h-28 w-28 place-items-center">
+        {[0, 1, 2].map((i) => (
+          <motion.span
+            key={i}
+            className="absolute inset-0 rounded-full border"
+            style={{ borderColor: "var(--primary)" }}
+            initial={{ scale: 0.5, opacity: 0.5 }}
+            animate={{ scale: 1.25, opacity: 0 }}
+            transition={{ duration: 1.8, repeat: Infinity, delay: i * 0.6, ease: "easeOut" }}
+          />
+        ))}
+        <span
+          className="grid h-16 w-16 place-items-center rounded-2xl text-white shadow-lg"
+          style={{ background: "linear-gradient(140deg, var(--primary-bright), var(--primary-ink))" }}
+        >
+          <Sparkles size={26} />
         </span>
-        <h1 className="mt-6 font-serif text-3xl font-semibold text-ink">You&apos;ve used this week&apos;s free sessions</h1>
-        <p className="mt-3 text-ink-2">
-          The free plan includes {FREE_WEEKLY_LIMIT} sessions per week. Go Premium for unlimited practice,
-          full scoring, and every tool.
-        </p>
-        <ButtonLink href="/upgrade" variant="gold" size="lg" className="mt-7 w-full">
-          Upgrade to Premium, $9.99/mo
-        </ButtonLink>
-        <ButtonLink href="/dashboard" variant="ghost" size="sm" className="mt-2">
-          Back to dashboard
-        </ButtonLink>
+      </div>
+      <h1 className="mt-8 font-serif text-2xl font-semibold text-ink">Analyzing your answer…</h1>
+      <div className="mt-4 h-6">
+        <AnimatePresence mode="wait">
+          <motion.p
+            key={step}
+            initial={{ opacity: 0, y: 8 }}
+            animate={{ opacity: 1, y: 0 }}
+            exit={{ opacity: 0, y: -8 }}
+            transition={{ duration: 0.3 }}
+            className="text-ink-2"
+          >
+            {ANALYZE_STEPS[step]}
+          </motion.p>
+        </AnimatePresence>
+      </div>
+    </div>
+  );
+}
+
+/* Hard paywall. The real score and coaching render behind a frosted gate so
+   the value is visible but locked. No way forward but Premium. */
+const UNLOCKS = [
+  "Your full score on all five dimensions",
+  "Personal coaching with one clear fix",
+  "The other seven questions in this session",
+  "Every tool: gap stories, salary, research",
+];
+function PaywallScore({ answer, gentle, role }: { answer: ScoredAnswer; gentle: boolean; role: string }) {
+  return (
+    <div className="relative mx-auto max-w-2xl">
+      {/* real, blurred score behind the gate */}
+      <div aria-hidden className="pointer-events-none select-none blur-[7px] saturate-[0.92] opacity-70">
+        <div className="mb-5 rounded-xl border bg-bg-sunk p-5" style={{ borderColor: "var(--border)" }}>
+          <p className="text-2xs font-semibold uppercase tracking-wider text-ink-3">Your answer</p>
+          <p className="mt-1.5 text-sm leading-relaxed text-ink-2">{answer.answerText}</p>
+        </div>
+        <AnswerScoreCard answer={answer} gentle={gentle} loadExample={async () => ""} />
+      </div>
+
+      {/* gate overlay */}
+      <div className="absolute inset-0 flex items-start justify-center p-4 pt-10 sm:pt-16">
+        <motion.div
+          initial={{ opacity: 0, y: 18, scale: 0.98 }}
+          animate={{ opacity: 1, y: 0, scale: 1 }}
+          transition={{ duration: 0.5, ease: [0.22, 1, 0.36, 1] }}
+          className="w-full max-w-md overflow-hidden rounded-2xl border bg-surface/95 p-8 text-center shadow-xl backdrop-blur-xl"
+          style={{ borderColor: "var(--border-strong)" }}
+        >
+          <span className="premium-badge mx-auto"> <Lock size={12} /> Locked</span>
+          <h1 className="mt-5 font-serif text-3xl font-semibold leading-tight text-ink">
+            Your score is ready.
+          </h1>
+          <p className="mt-3 text-ink-2">
+            We scored your answer for <strong className="text-ink">{role || "your role"}</strong> and wrote
+            your personal coaching. Unlock it to see exactly where you stand, and keep going.
+          </p>
+          <ul className="mx-auto mt-6 max-w-xs space-y-2.5 text-left">
+            {UNLOCKS.map((u) => (
+              <li key={u} className="flex items-start gap-2.5 text-sm font-medium text-ink">
+                <span className="mt-0.5 grid h-5 w-5 shrink-0 place-items-center rounded-full bg-sage-soft">
+                  <Check size={12} className="text-sage-ink" />
+                </span>
+                {u}
+              </li>
+            ))}
+          </ul>
+          <ButtonLink href="/upgrade" variant="gold" size="lg" className="mt-7 w-full">
+            Unlock my score, $9.99/mo
+          </ButtonLink>
+          <ButtonLink href="/dashboard" variant="ghost" size="sm" className="mt-1">
+            Maybe later
+          </ButtonLink>
+        </motion.div>
       </div>
     </div>
   );

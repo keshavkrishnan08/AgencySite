@@ -13,7 +13,7 @@ import {
   TrendingUp,
   ChevronRight,
 } from "lucide-react";
-import { AppNav } from "@/components/layout/AppNav";
+import { AppShell } from "@/components/layout/AppShell";
 import { Button, ButtonLink } from "@/components/ui/Button";
 import { ScoreRing } from "@/components/ui/Score";
 import { InfoTip } from "@/components/ui/Tooltip";
@@ -118,20 +118,18 @@ export default function DashboardPage() {
 
   const tip = DAILY_TIPS[new Date().getDate() % DAILY_TIPS.length];
 
-  if (!mounted) return <main className="min-h-screen"><AppNav /></main>;
+  if (!mounted) return <AppShell><main className="min-h-screen" /></AppShell>;
 
   if (sessions.length === 0) {
     return (
-      <>
-        <AppNav />
+      <AppShell>
         <EmptyState onSeed={() => seedSampleData()} />
-      </>
+      </AppShell>
     );
   }
 
   return (
-    <>
-      <AppNav />
+    <AppShell>
       <main className="container-wide py-8 sm:py-10">
         <header className="mb-8">
           <h1 className="font-serif text-3xl font-semibold text-ink">
@@ -426,7 +424,7 @@ export default function DashboardPage() {
           </div>
         </div>
       </main>
-    </>
+    </AppShell>
   );
 }
 

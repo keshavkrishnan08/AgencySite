@@ -327,19 +327,19 @@ const STORIES = [
     tag: "The 3 AM panic",
     name: "Maria, 38",
     photo: "https://randomuser.me/api/portraits/women/90.jpg",
-    body: "It's 3 AM. Your interview is at 9. Every answer sounds wrong and you can't call anyone. So you open Axon Careers. Five questions. Score hits 78. You close your eyes. You've done this before.",
+    body: "It was 3 AM and my interview was at 9. Every answer in my head sounded wrong and there was no one I could call. I was so stressed out I felt sick. So I opened Axon Careers and ran through five questions. I hit a 78. I finally closed my eyes thinking, okay. I've actually done this before.",
   },
   {
     tag: "The parking lot",
     name: "Rachel, 41",
     photo: "https://randomuser.me/api/portraits/women/33.jpg",
-    body: "You haven't worked since 2021. You chose your kids. Now you're in the parking lot, ten minutes out, hands shaking about the gap. But last night you practiced explaining it nine times. On the tenth, it sounded easy.",
+    body: "I hadn't worked since 2021. I stayed home with my kids, and I'd make that choice again. But there I was in the parking lot, ten minutes out, hands shaking about the gap. The night before, I'd practiced explaining it nine times. On the tenth, it finally came out easy.",
   },
   {
     tag: "The career change",
     name: "James, 45",
     photo: "https://randomuser.me/api/portraits/men/45.jpg",
-    body: "You loved teaching. The burnout didn't. Now everyone asks 'why leave education?' and you hear judgment that isn't there. Axon Careers helped you find the answer. You practiced twelve times. It sounds true, because it is.",
+    body: "I loved teaching. The burnout is what broke me. Everyone kept asking 'why leave education?' and I heard judgment that probably wasn't even there. I practiced my answer twelve times. Now it comes out true, because it is.",
   },
 ];
 

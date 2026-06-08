@@ -1,6 +1,7 @@
 "use client";
 
-import type { ReactNode } from "react";
+import { useEffect, useState, type ReactNode } from "react";
+import { motion } from "framer-motion";
 import { ArrowRight, Check, Mic } from "lucide-react";
 import { Reveal } from "@/components/ui/Reveal";
 import { ButtonLink } from "@/components/ui/Button";
@@ -58,15 +59,15 @@ const PracticeVisual = () => (
       <Label>Question 3 of 8</Label>
       <span className="rounded-full bg-sage-soft px-2.5 py-1 text-xs font-bold text-sage-ink">84 / 100</span>
     </div>
-    <p className="mt-2 font-medium text-ink">Tell me about a tough teammate.</p>
+    <p className="mt-2 font-medium text-ink">Tell me about a difficult coworker.</p>
     <div className="mt-3 flex justify-end">
       <Bubble you>
-        When two people left at once, I cross-trained the team in a week. <Mic size={12} className="ml-0.5 inline" />
+        One teammate pushed back on every change. So I started asking his take before I decided anything. He went from my biggest blocker to my biggest ally. <Mic size={12} className="ml-0.5 inline" />
       </Bubble>
     </div>
     <div className="mt-2.5 flex items-start gap-2">
       <HM />
-      <Bubble>How did they react?</Bubble>
+      <Bubble>Nice. What do you think actually changed for him?</Bubble>
     </div>
     <Divider />
     <div className="flex flex-wrap gap-1.5">
@@ -153,18 +154,83 @@ const ResearchVisual = () => {
   );
 };
 
-// Interview Day (solo, dark)
-const InterviewDayVisual = () => (
-  <Mock dark>
-    <div className="flex items-center justify-between text-xs text-white/55">
-      <span>Question 4 of 8</span>
-      <span className="rounded-full bg-coral/20 px-2.5 py-1 font-mono font-bold text-coral">0:42</span>
-    </div>
-    <p className="mt-4 font-serif text-xl font-semibold text-white">Tell me about a time you failed.</p>
-    <div className="mt-4 h-20 rounded-lg border border-white/10 bg-white/5" />
-    <p className="mt-3 text-xs text-white/45">No scores until the end. No going back.</p>
-  </Mock>
-);
+// Interview Day (solo, dark). Live mic: a volume meter + scrambling transcript,
+// and a corner clock that ticks up to 1:00 then loops back to 0:42.
+const FAIL_TRANSCRIPT =
+  "I missed a deadline that really mattered. I owned it the next morning, and I changed how I plan every project now.";
+
+// Deterministic bar config (no Math.random) so server and client render the
+// same markup. The motion happens after hydration, client-side only.
+const VBARS = Array.from({ length: 16 }, (_, i) => {
+  const seed = (i * 13) % 7;
+  return { peak: 8 + seed * 3, dur: 0.42 + seed * 0.08, delay: (i % 5) * 0.07 };
+});
+
+function InterviewDayVisual() {
+  const [t, setT] = useState(42);
+  const [shown, setShown] = useState("");
+
+  // corner timer: count up, then reset to 0:42 right after it hits 1:00
+  useEffect(() => {
+    const id = setInterval(() => setT((p) => (p >= 60 ? 42 : p + 1)), 1000);
+    return () => clearInterval(id);
+  }, []);
+
+  // live transcription: reveal the answer, scramble the leading edge, loop
+  useEffect(() => {
+    const glyphs = "etaoinshrdlucmfwypvbgkjqxz ";
+    let i = 0;
+    const id = setInterval(() => {
+      i = i > FAIL_TRANSCRIPT.length + 16 ? 0 : i + 1;
+      const clear = Math.min(i, FAIL_TRANSCRIPT.length);
+      let scr = "";
+      if (clear < FAIL_TRANSCRIPT.length) {
+        const n = Math.min(4, FAIL_TRANSCRIPT.length - clear);
+        for (let k = 0; k < n; k++) scr += glyphs[(i * 3 + k * 7) % glyphs.length];
+      }
+      setShown(FAIL_TRANSCRIPT.slice(0, clear) + scr);
+    }, 55);
+    return () => clearInterval(id);
+  }, []);
+
+  const mmss = `${Math.floor(t / 60)}:${String(t % 60).padStart(2, "0")}`;
+
+  return (
+    <Mock dark>
+      <div className="flex items-center justify-between text-xs text-white/55">
+        <span>Question 4 of 8</span>
+        <span className="rounded-full bg-coral/20 px-2.5 py-1 font-mono font-bold tabular-nums text-coral">
+          {mmss}
+        </span>
+      </div>
+      <p className="mt-4 font-serif text-xl font-semibold text-white">Tell me about a time you failed.</p>
+
+      <div className="mt-4 rounded-lg border border-white/10 bg-white/5 p-3">
+        <div className="flex items-center gap-2.5">
+          <span className="flex h-7 items-end gap-[2.5px]">
+            {VBARS.map((b, i) => (
+              <motion.span
+                key={i}
+                className="w-[3px] rounded-full"
+                style={{ background: "linear-gradient(to top, var(--primary-bright), #d7fbff)" }}
+                initial={{ height: 4 }}
+                animate={{ height: [4, b.peak, 6, b.peak * 0.7, 4] }}
+                transition={{ duration: b.dur, delay: b.delay, repeat: Infinity, ease: "easeInOut" }}
+              />
+            ))}
+          </span>
+          <span className="font-mono text-2xs uppercase tracking-wider text-primary-bright">Listening</span>
+        </div>
+        <p className="mt-2 min-h-[2.5rem] text-xs leading-relaxed text-white/70">
+          {shown}
+          <span className="ml-0.5 inline-block animate-pulse text-primary-bright">▌</span>
+        </p>
+      </div>
+
+      <p className="mt-3 text-xs text-white/45">No scores until the end. No going back.</p>
+    </Mock>
+  );
+}
 
 // Salary + Debrief + Tracker
 const AfterVisual = () => (
@@ -172,10 +238,10 @@ const AfterVisual = () => (
     <Label>The pay talk</Label>
     <div className="mt-2.5 flex items-start gap-2">
       <HM />
-      <Bubble>$65,000. Can you do that?</Bubble>
+      <Bubble>We were thinking $65,000 to start. Does that work for you?</Bubble>
     </div>
     <div className="mt-2 flex justify-end">
-      <Bubble you>$72,000, based on market rate.</Bubble>
+      <Bubble you>I&apos;m really excited about this. For this role, and what I&apos;m seeing for similar jobs here, I was hoping for $72,000.</Bubble>
     </div>
     <Divider />
     <div className="flex items-center justify-between">
