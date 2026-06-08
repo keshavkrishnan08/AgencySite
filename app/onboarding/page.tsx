@@ -2,10 +2,12 @@
 
 import { useMemo, useState } from "react";
 import { useRouter } from "next/navigation";
+import Link from "next/link";
 import { AnimatePresence, motion } from "framer-motion";
-import { ArrowLeft, ArrowRight, Check, Lock, Search } from "lucide-react";
+import { ArrowLeft, ArrowRight, Check, Search, Star, ShieldCheck } from "lucide-react";
 import { Logo } from "@/components/ui/Logo";
 import { Button } from "@/components/ui/Button";
+import { Avatar } from "@/components/ui/Avatar";
 import { ROLES } from "@/lib/roles";
 import { SITUATION_META } from "@/lib/utils";
 import { setOnboarding, setProfile } from "@/lib/store";
@@ -45,7 +47,7 @@ export default function OnboardingPage() {
     setOnboarding({ situation, targetRole: finalRole, interviewGap: selectedGap });
     setProfile({ situation, targetRole: finalRole, interviewGap: selectedGap });
     track("onboarding_complete", { situation, role: finalRole, gap: selectedGap });
-    router.push("/practice");
+    router.push("/practice?autostart=1");
   };
 
   const variants = {
@@ -55,279 +57,215 @@ export default function OnboardingPage() {
   };
 
   return (
-    <main className="relative flex min-h-screen flex-col overflow-hidden">
-      {/* animated backdrop */}
-      <div
-        aria-hidden
-        className="pointer-events-none absolute -left-24 top-8 h-72 w-72 animate-float rounded-full opacity-50 blur-3xl"
-        style={{ background: "radial-gradient(circle, rgba(25,169,184,0.22), transparent 70%)" }}
-      />
-      <div
-        aria-hidden
-        className="pointer-events-none absolute -right-24 bottom-10 h-80 w-80 animate-float rounded-full opacity-40 blur-3xl"
-        style={{ background: "radial-gradient(circle, rgba(184,137,59,0.2), transparent 70%)", animationDelay: "1.6s" }}
-      />
-
-      {/* top bar */}
-      <div className="container-wide relative flex items-center justify-between py-6">
-        <Logo />
-        <span className="chip">
-          <Lock size={13} /> No account needed
-        </span>
-      </div>
-
-      {/* progress */}
-      <div className="container-content relative">
-        <div className="mx-auto flex max-w-xs items-center gap-2">
-          {[0, 1, 2].map((i) => (
-            <div
-              key={i}
-              className="h-1.5 flex-1 overflow-hidden rounded-full"
-              style={{ background: "var(--bg-tint)" }}
-            >
-              <motion.div
-                className="h-full rounded-full"
-                initial={false}
-                animate={{ width: i <= step ? "100%" : "0%" }}
-                transition={{ duration: 0.5, ease: [0.22, 1, 0.36, 1] }}
-                style={{ background: "linear-gradient(90deg, var(--primary), var(--primary-bright))" }}
-              />
-            </div>
-          ))}
+    <main className="min-h-screen lg:grid lg:grid-cols-[1fr_minmax(420px,46%)]">
+      {/* ============ LEFT: the questions ============ */}
+      <div className="relative flex min-h-screen flex-col">
+        {/* top bar */}
+        <div className="flex items-center justify-between px-6 py-6 sm:px-10">
+          <Logo />
+          <span className="text-sm text-ink-2">
+            Have an account?{" "}
+            <Link href="/signin?next=/practice" className="font-semibold text-primary-ink hover:underline">
+              Sign in
+            </Link>
+          </span>
         </div>
 
-        {/* live highlight chips of your picks */}
-        <div className="mt-5 flex min-h-[2rem] flex-wrap items-center justify-center gap-2">
-          <AnimatePresence mode="popLayout">
-            {situation && (
-              <motion.span
-                key="c-sit"
-                layout
-                initial={{ opacity: 0, scale: 0.7 }}
-                animate={{ opacity: 1, scale: 1 }}
-                exit={{ opacity: 0, scale: 0.7 }}
-                transition={{ type: "spring", stiffness: 420, damping: 26 }}
-                className="inline-flex items-center gap-1.5 rounded-full bg-primary-soft px-3 py-1 text-sm font-medium text-primary-ink"
-              >
-                {SITUATION_META[situation].emoji} {SITUATION_META[situation].short}
-              </motion.span>
-            )}
-            {(role || query) && (
-              <motion.span
-                key="c-role"
-                layout
-                initial={{ opacity: 0, scale: 0.7 }}
-                animate={{ opacity: 1, scale: 1 }}
-                exit={{ opacity: 0, scale: 0.7 }}
-                transition={{ type: "spring", stiffness: 420, damping: 26 }}
-                className="inline-flex items-center gap-1.5 rounded-full bg-bg-tint px-3 py-1 text-sm font-medium text-ink-2"
-              >
-                Preparing for:&nbsp;<strong className="text-ink">{role || query}</strong>
-              </motion.span>
-            )}
-            {gap && (
-              <motion.span
-                key="c-gap"
-                layout
-                initial={{ opacity: 0, scale: 0.7 }}
-                animate={{ opacity: 1, scale: 1 }}
-                exit={{ opacity: 0, scale: 0.7 }}
-                transition={{ type: "spring", stiffness: 420, damping: 26 }}
-                className="inline-flex items-center gap-1.5 rounded-full bg-bg-tint px-3 py-1 text-sm font-medium text-ink-2"
-              >
-                {GAPS.find((g) => g.value === gap)?.label}
-              </motion.span>
-            )}
-          </AnimatePresence>
+        {/* progress + picks */}
+        <div className="px-6 sm:px-10">
+          <div className="mx-auto flex max-w-md items-center gap-2">
+            {[0, 1, 2].map((i) => (
+              <div key={i} className="h-1.5 flex-1 overflow-hidden rounded-full" style={{ background: "var(--bg-tint)" }}>
+                <motion.div
+                  className="h-full rounded-full"
+                  initial={false}
+                  animate={{ width: i <= step ? "100%" : "0%" }}
+                  transition={{ duration: 0.5, ease: [0.22, 1, 0.36, 1] }}
+                  style={{ background: "linear-gradient(90deg, var(--primary), var(--primary-bright))" }}
+                />
+              </div>
+            ))}
+          </div>
         </div>
-      </div>
 
-      <div className="container-content relative flex flex-1 items-center justify-center py-10">
-        <div className="w-full">
-          <AnimatePresence mode="wait" custom={dir}>
-            {/* STEP 1 */}
-            {step === 0 && (
-              <motion.div
-                key="s1"
-                custom={dir}
-                variants={variants}
-                initial="enter"
-                animate="center"
-                exit="exit"
-                transition={{ duration: 0.32, ease: [0.22, 1, 0.36, 1] }}
-              >
-                <h1 className="text-center font-serif text-3xl font-semibold text-ink sm:text-4xl">
-                  What brings you to Axon Careers?
-                </h1>
-                <p className="mt-3 text-center text-ink-2">
-                  We&apos;ll tailor every question to your exact situation.
-                </p>
-                <div className="mt-9 grid gap-3.5 sm:grid-cols-2">
-                  {SITUATIONS.map((s, i) => {
-                    const meta = SITUATION_META[s];
-                    const active = situation === s;
-                    return (
-                      <motion.button
-                        key={s}
-                        initial={{ opacity: 0, y: 16 }}
-                        animate={{ opacity: 1, y: 0 }}
-                        transition={{ delay: 0.05 + i * 0.07, duration: 0.4, ease: [0.22, 1, 0.36, 1] }}
-                        whileHover={{ y: -4 }}
-                        whileTap={{ scale: 0.97 }}
-                        onClick={() => {
-                          setSituation(s);
-                          track("onboarding_situation", { situation: s });
-                          setTimeout(() => go(1), 220);
-                        }}
-                        className="group flex items-center gap-4 rounded-xl border-2 bg-surface p-5 text-left shadow-sm transition-shadow hover:shadow-lg"
-                        style={{ borderColor: active ? "var(--primary)" : "var(--border)" }}
-                      >
-                        <span
-                          className="grid h-12 w-12 shrink-0 place-items-center rounded-xl text-2xl transition-colors"
-                          style={{ background: active ? "var(--primary-soft)" : "var(--bg-tint)" }}
-                        >
-                          {meta.emoji}
-                        </span>
-                        <span className="font-medium text-ink">{meta.label}</span>
-                        <span className="ml-auto">
-                          {active ? (
-                            <motion.span
-                              initial={{ scale: 0 }}
-                              animate={{ scale: 1 }}
-                              transition={{ type: "spring", stiffness: 500, damping: 22 }}
-                              className="grid h-6 w-6 place-items-center rounded-full bg-primary text-white"
-                            >
-                              <Check size={14} />
-                            </motion.span>
-                          ) : (
-                            <ArrowRight
-                              size={18}
-                              className="text-ink-3 opacity-0 transition-opacity group-hover:opacity-100"
-                            />
-                          )}
-                        </span>
-                      </motion.button>
-                    );
-                  })}
-                </div>
-              </motion.div>
-            )}
-
-            {/* STEP 2 */}
-            {step === 1 && (
-              <motion.div
-                key="s2"
-                custom={dir}
-                variants={variants}
-                initial="enter"
-                animate="center"
-                exit="exit"
-                transition={{ duration: 0.32, ease: [0.22, 1, 0.36, 1] }}
-              >
-                <h1 className="text-center font-serif text-3xl font-semibold text-ink sm:text-4xl">
-                  What job are you preparing for?
-                </h1>
-                <p className="mt-3 text-center text-ink-2">
-                  Type any role. Our AI adapts to anything you enter.
-                </p>
-                <div className="relative mx-auto mt-9 max-w-md">
-                  <div className="relative">
-                    <Search
-                      size={18}
-                      className="pointer-events-none absolute left-4 top-1/2 -translate-y-1/2 text-ink-3"
-                    />
-                    <input
-                      autoFocus
-                      value={query}
-                      onChange={(e) => {
-                        setQuery(e.target.value);
-                        setRole(e.target.value);
-                      }}
-                      onKeyDown={(e) => {
-                        if (e.key === "Enter" && (role.trim() || query.trim())) go(2);
-                      }}
-                      placeholder="e.g., Office Manager, Registered Nurse…"
-                      className="field !pl-11 !py-4 text-lg"
-                    />
-                  </div>
-                  {suggestions.length > 0 && (
-                    <div
-                      className="absolute z-10 mt-2 w-full overflow-hidden rounded-xl border bg-white shadow-lg"
-                      style={{ borderColor: "var(--border)" }}
-                    >
-                      {suggestions.map((s) => (
-                        <button
+        <div className="flex flex-1 items-center justify-center px-6 py-10 sm:px-10">
+          <div className="w-full max-w-md">
+            <AnimatePresence mode="wait" custom={dir}>
+              {/* STEP 1 */}
+              {step === 0 && (
+                <motion.div key="s1" custom={dir} variants={variants} initial="enter" animate="center" exit="exit" transition={{ duration: 0.32, ease: [0.22, 1, 0.36, 1] }}>
+                  <span className="text-2xs font-semibold uppercase tracking-[0.18em] text-primary-ink">Step 1 of 3</span>
+                  <h1 className="mt-3 font-serif text-3xl font-semibold text-ink sm:text-[2.5rem] sm:leading-[1.1]">
+                    What brings you here?
+                  </h1>
+                  <p className="mt-3 text-ink-2">We tailor every question to your exact situation.</p>
+                  <div className="mt-8 grid gap-3">
+                    {SITUATIONS.map((s, i) => {
+                      const meta = SITUATION_META[s];
+                      const active = situation === s;
+                      return (
+                        <motion.button
                           key={s}
+                          initial={{ opacity: 0, y: 16 }}
+                          animate={{ opacity: 1, y: 0 }}
+                          transition={{ delay: 0.05 + i * 0.07, duration: 0.4, ease: [0.22, 1, 0.36, 1] }}
+                          whileHover={{ y: -3 }}
+                          whileTap={{ scale: 0.97 }}
                           onClick={() => {
-                            setRole(s);
-                            setQuery(s);
-                            setTimeout(() => go(2), 120);
+                            setSituation(s);
+                            track("onboarding_situation", { situation: s });
+                            setTimeout(() => go(1), 220);
                           }}
-                          className="block w-full px-4 py-3 text-left text-ink-2 transition-colors hover:bg-bg-tint hover:text-ink"
+                          className="group flex items-center gap-4 rounded-xl border-2 bg-surface p-4 text-left shadow-sm transition-shadow hover:shadow-lg"
+                          style={{ borderColor: active ? "var(--primary)" : "var(--border)" }}
                         >
-                          {s}
-                        </button>
-                      ))}
+                          <span className="grid h-11 w-11 shrink-0 place-items-center rounded-xl text-xl" style={{ background: active ? "var(--primary-soft)" : "var(--bg-tint)" }}>
+                            {meta.emoji}
+                          </span>
+                          <span className="font-medium text-ink">{meta.label}</span>
+                          <span className="ml-auto">
+                            {active ? (
+                              <span className="grid h-6 w-6 place-items-center rounded-full bg-primary text-white"><Check size={14} /></span>
+                            ) : (
+                              <ArrowRight size={18} className="text-ink-3 opacity-0 transition-opacity group-hover:opacity-100" />
+                            )}
+                          </span>
+                        </motion.button>
+                      );
+                    })}
+                  </div>
+                </motion.div>
+              )}
+
+              {/* STEP 2 */}
+              {step === 1 && (
+                <motion.div key="s2" custom={dir} variants={variants} initial="enter" animate="center" exit="exit" transition={{ duration: 0.32, ease: [0.22, 1, 0.36, 1] }}>
+                  <span className="text-2xs font-semibold uppercase tracking-[0.18em] text-primary-ink">Step 2 of 3</span>
+                  <h1 className="mt-3 font-serif text-3xl font-semibold text-ink sm:text-[2.5rem] sm:leading-[1.1]">
+                    What job are you preparing for?
+                  </h1>
+                  <p className="mt-3 text-ink-2">Type any role. The AI adapts to anything you enter.</p>
+                  <div className="relative mt-8">
+                    <div className="relative">
+                      <Search size={18} className="pointer-events-none absolute left-4 top-1/2 -translate-y-1/2 text-ink-3" />
+                      <input
+                        autoFocus
+                        value={query}
+                        onChange={(e) => { setQuery(e.target.value); setRole(e.target.value); }}
+                        onKeyDown={(e) => { if (e.key === "Enter" && (role.trim() || query.trim())) go(2); }}
+                        placeholder="e.g., Office Manager, Registered Nurse…"
+                        className="field !pl-11 !py-4 text-lg"
+                      />
                     </div>
-                  )}
-                  <p className="mt-3 text-center text-sm text-ink-3">
-                    Don&apos;t see your role? Just type it. Our AI adapts to any position.
-                  </p>
-                </div>
+                    {suggestions.length > 0 && (
+                      <div className="absolute z-10 mt-2 w-full overflow-hidden rounded-xl border bg-white shadow-lg" style={{ borderColor: "var(--border)" }}>
+                        {suggestions.map((s) => (
+                          <button key={s} onClick={() => { setRole(s); setQuery(s); setTimeout(() => go(2), 120); }} className="block w-full px-4 py-3 text-left text-ink-2 transition-colors hover:bg-bg-tint hover:text-ink">
+                            {s}
+                          </button>
+                        ))}
+                      </div>
+                    )}
+                  </div>
+                  <div className="mt-8 flex items-center gap-3">
+                    <Button variant="ghost" onClick={() => go(0)}><ArrowLeft size={16} /> Back</Button>
+                    <Button onClick={() => go(2)} disabled={!role.trim() && !query.trim()}>Continue <ArrowRight size={16} /></Button>
+                  </div>
+                </motion.div>
+              )}
 
-                <div className="mt-8 flex items-center justify-center gap-3">
-                  <Button variant="ghost" onClick={() => go(0)}>
-                    <ArrowLeft size={16} /> Back
-                  </Button>
-                  <Button onClick={() => go(2)} disabled={!role.trim() && !query.trim()}>
-                    Continue <ArrowRight size={16} />
-                  </Button>
-                </div>
-              </motion.div>
-            )}
-
-            {/* STEP 3 */}
-            {step === 2 && (
-              <motion.div
-                key="s3"
-                custom={dir}
-                variants={variants}
-                initial="enter"
-                animate="center"
-                exit="exit"
-                transition={{ duration: 0.32, ease: [0.22, 1, 0.36, 1] }}
-              >
-                <h1 className="text-center font-serif text-3xl font-semibold text-ink sm:text-4xl">
-                  When did you last interview?
-                </h1>
-                <p className="mt-3 text-center text-ink-2">
-                  This helps us calibrate how much to ease you in.
-                </p>
-                <div className="mx-auto mt-9 grid max-w-md gap-3">
-                  {GAPS.map((g) => (
-                    <button
-                      key={g.value}
-                      onClick={() => {
-                        setGap(g.value);
-                        finish(g.value);
-                      }}
-                      className="rounded-full border-2 bg-surface px-6 py-4 text-center font-medium text-ink shadow-sm transition-all hover:-translate-y-0.5 hover:border-primary hover:shadow-lg"
-                      style={{ borderColor: gap === g.value ? "var(--primary)" : "var(--border)" }}
-                    >
-                      {g.label}
-                    </button>
-                  ))}
-                </div>
-                <div className="mt-8 flex items-center justify-center">
-                  <Button variant="ghost" onClick={() => go(1)}>
-                    <ArrowLeft size={16} /> Back
-                  </Button>
-                </div>
-              </motion.div>
-            )}
-          </AnimatePresence>
+              {/* STEP 3 */}
+              {step === 2 && (
+                <motion.div key="s3" custom={dir} variants={variants} initial="enter" animate="center" exit="exit" transition={{ duration: 0.32, ease: [0.22, 1, 0.36, 1] }}>
+                  <span className="text-2xs font-semibold uppercase tracking-[0.18em] text-primary-ink">Step 3 of 3</span>
+                  <h1 className="mt-3 font-serif text-3xl font-semibold text-ink sm:text-[2.5rem] sm:leading-[1.1]">
+                    When did you last interview?
+                  </h1>
+                  <p className="mt-3 text-ink-2">This calibrates how gently we ease you in.</p>
+                  <div className="mt-8 grid gap-3">
+                    {GAPS.map((g) => (
+                      <button
+                        key={g.value}
+                        onClick={() => { setGap(g.value); finish(g.value); }}
+                        className="rounded-xl border-2 bg-surface px-6 py-4 text-center font-medium text-ink shadow-sm transition-all hover:-translate-y-0.5 hover:border-primary hover:shadow-lg"
+                        style={{ borderColor: gap === g.value ? "var(--primary)" : "var(--border)" }}
+                      >
+                        {g.label}
+                      </button>
+                    ))}
+                  </div>
+                  <div className="mt-8">
+                    <Button variant="ghost" onClick={() => go(1)}><ArrowLeft size={16} /> Back</Button>
+                  </div>
+                </motion.div>
+              )}
+            </AnimatePresence>
+          </div>
         </div>
       </div>
+
+      {/* ============ RIGHT: conversion panel ============ */}
+      <ConversionPanel situation={situation} role={role || query} />
     </main>
+  );
+}
+
+/* Apollo-style proof column. Sticky, full-bleed gradient, glass cards. Hidden
+   on mobile where the questions take the full screen. */
+function ConversionPanel({ situation, role }: { situation: Situation | null; role: string }) {
+  return (
+    <aside
+      className="relative hidden overflow-hidden lg:block"
+      style={{ background: "linear-gradient(160deg, #19a9b8 0%, #14808e 50%, #0c5660 120%)" }}
+    >
+      <div className="pointer-events-none absolute -right-20 -top-24 h-80 w-80 rounded-full opacity-40 blur-3xl" style={{ background: "radial-gradient(circle, #ffffff66, transparent)" }} />
+      <div className="pointer-events-none absolute -bottom-28 -left-20 h-80 w-80 rounded-full opacity-30 blur-3xl" style={{ background: "radial-gradient(circle, #ffe0a655, transparent)" }} />
+
+      <div className="sticky top-0 flex min-h-screen flex-col justify-center px-12 py-16 text-white xl:px-16">
+        <motion.div initial={{ opacity: 0, y: 18 }} animate={{ opacity: 1, y: 0 }} transition={{ duration: 0.6 }}>
+          <div className="flex items-center gap-1.5">
+            {Array.from({ length: 5 }).map((_, i) => <Star key={i} size={16} className="fill-white text-white" />)}
+            <span className="ml-2 text-sm font-medium text-white/85">Loved by 12,000+ job seekers</span>
+          </div>
+
+          <h2 className="mt-7 max-w-md font-serif text-4xl font-semibold leading-tight">
+            {role ? <>Your <span className="text-amber-soft">{role}</span> interview, rehearsed until it&apos;s easy.</> : <>You&apos;re closer than you think.</>}
+          </h2>
+
+          <ul className="mt-8 space-y-4">
+            {[
+              "Questions tailored to your exact role and story",
+              "Answer out loud, scored on five dimensions",
+              "One clear fix after every single answer",
+            ].map((b) => (
+              <li key={b} className="flex items-start gap-3 text-white/90">
+                <span className="mt-0.5 grid h-6 w-6 shrink-0 place-items-center rounded-full bg-white/15">
+                  <Check size={14} />
+                </span>
+                <span className="text-[1.05rem]">{b}</span>
+              </li>
+            ))}
+          </ul>
+
+          {/* testimonial */}
+          <figure className="mt-10 max-w-md rounded-2xl border border-white/20 bg-white/10 p-6 backdrop-blur-md">
+            <p className="text-[1.05rem] leading-relaxed text-white">
+              &ldquo;I hadn&apos;t interviewed in six years. My score went from 44 to 81. I got the job.&rdquo;
+            </p>
+            <figcaption className="mt-4 flex items-center gap-3">
+              <Avatar src="https://randomuser.me/api/portraits/women/68.jpg" name="Rachel M." size={40} className="ring-2 ring-white/40" />
+              <div>
+                <div className="text-sm font-semibold text-white">Rachel M.</div>
+                <div className="text-xs text-white/70">Office Manager</div>
+              </div>
+            </figcaption>
+          </figure>
+
+          <p className="mt-8 flex items-center gap-2 text-sm text-white/75">
+            <ShieldCheck size={16} /> Private by design. No card to start.
+          </p>
+        </motion.div>
+      </div>
+    </aside>
   );
 }
