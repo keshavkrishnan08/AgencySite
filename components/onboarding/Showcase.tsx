@@ -2,7 +2,7 @@
 
 import { useEffect, useRef, useState } from "react";
 import { AnimatePresence, motion } from "framer-motion";
-import { Sparkles, TrendingUp } from "lucide-react";
+import { Sparkles, TrendingUp, Wand2, Check } from "lucide-react";
 import { AnimatedNumber } from "@/components/ui/AnimatedNumber";
 
 /* A looping, video-like demo for the onboarding side panel: the interviewer
@@ -179,6 +179,130 @@ export function OnboardingShowcase() {
           <span className="font-serif text-xl font-semibold text-sage-ink">2.1</span>
         </div>
       </motion.div>
+    </div>
+  );
+}
+
+/* ---------- Step 2: questions tailoring to the role ---------- */
+const QSETS = [
+  ["Tell me about yourself.", "Why do you want this role?", "Describe a time you led under pressure.", "What's a weakness you're improving?", "What questions do you have for us?"],
+  ["Walk me through your résumé.", "Tell me about a conflict you resolved.", "How do you handle a tight deadline?", "Where do you see yourself in five years?", "Why are you the right fit here?"],
+];
+const QCATS = ["Warm up", "Behavioral", "Behavioral", "Your story", "Closer"];
+
+export function ShowcaseQuestions({ role }: { role?: string }) {
+  const [count, setCount] = useState(0);
+  const setRef = useRef(0);
+  const [, force] = useState(0);
+
+  useEffect(() => {
+    let alive = true;
+    const timers: ReturnType<typeof setTimeout>[] = [];
+    const run = () => {
+      setCount(0);
+      for (let i = 1; i <= 5; i++) timers.push(setTimeout(() => alive && setCount(i), 360 * i + 400));
+      timers.push(
+        setTimeout(() => {
+          if (!alive) return;
+          setRef.current = (setRef.current + 1) % QSETS.length;
+          force((n) => n + 1);
+          run();
+        }, 360 * 5 + 2800)
+      );
+    };
+    run();
+    return () => {
+      alive = false;
+      timers.forEach(clearTimeout);
+    };
+  }, []);
+
+  const qs = QSETS[setRef.current];
+
+  return (
+    <div className="relative mx-auto w-full max-w-sm">
+      <div className="rounded-2xl border border-white/20 bg-white/10 p-5 shadow-2xl backdrop-blur-md">
+        <div className="flex items-center gap-2 text-white">
+          <span className="grid h-8 w-8 place-items-center rounded-lg bg-white/15"><Wand2 size={16} /></span>
+          <div>
+            <p className="text-sm font-semibold leading-tight">Building your interview</p>
+            <p className="text-2xs text-white/65">Tailored for {role || "your role"}</p>
+          </div>
+          {count < 5 && (
+            <motion.span animate={{ opacity: [0.4, 1, 0.4] }} transition={{ duration: 1, repeat: Infinity }} className="ml-auto text-2xs font-medium text-white/70">
+              generating…
+            </motion.span>
+          )}
+        </div>
+
+        <div className="mt-4 min-h-[228px] space-y-2">
+          {qs.map((q, i) => (
+            <AnimatePresence key={`${setRef.current}-${i}`}>
+              {i < count && (
+                <motion.div
+                  initial={{ opacity: 0, x: 14 }}
+                  animate={{ opacity: 1, x: 0 }}
+                  transition={{ type: "spring", stiffness: 320, damping: 26 }}
+                  className="flex items-start gap-2.5 rounded-xl border border-white/15 bg-white/10 p-3"
+                >
+                  <span className="mt-0.5 grid h-5 w-5 shrink-0 place-items-center rounded-full bg-emerald-300/90 text-[10px] font-bold text-ink">
+                    <Check size={12} />
+                  </span>
+                  <div>
+                    <span className="text-2xs font-semibold uppercase tracking-wider text-white/55">{QCATS[i]}</span>
+                    <p className="text-sm leading-snug text-white">{q}</p>
+                  </div>
+                </motion.div>
+              )}
+            </AnimatePresence>
+          ))}
+        </div>
+      </div>
+    </div>
+  );
+}
+
+/* ---------- Step 3: the score climbing every session ---------- */
+const CLIMB = [44, 57, 66, 74, 82];
+
+export function ShowcaseProgress() {
+  const [cycle, setCycle] = useState(0);
+  useEffect(() => {
+    const id = setInterval(() => setCycle((c) => c + 1), 5400);
+    return () => clearInterval(id);
+  }, []);
+
+  return (
+    <div key={cycle} className="relative mx-auto w-full max-w-sm">
+      <div className="rounded-2xl border border-white/20 bg-white/10 p-6 shadow-2xl backdrop-blur-md">
+        <p className="text-2xs font-semibold uppercase tracking-[0.18em] text-white/60">Interview readiness</p>
+        <div className="mt-2 flex items-end gap-2">
+          <span className="font-serif text-6xl font-semibold leading-none text-white">
+            <AnimatedNumber value={CLIMB[CLIMB.length - 1]} duration={2200} startOnView={false} />
+            <span className="text-2xl text-white/55">%</span>
+          </span>
+          <span className="mb-2 flex items-center gap-1 rounded-full bg-emerald-300/20 px-2 py-0.5 text-xs font-bold text-emerald-200">
+            <TrendingUp size={13} /> +38
+          </span>
+        </div>
+
+        {/* rising bars, one per session */}
+        <div className="mt-6 flex h-28 items-end justify-between gap-2.5">
+          {CLIMB.map((v, i) => (
+            <div key={i} className="flex flex-1 flex-col items-center gap-1.5">
+              <motion.div
+                className="w-full rounded-t-md"
+                style={{ background: "linear-gradient(to top, rgba(255,255,255,0.35), #d7fbff)" }}
+                initial={{ height: 0 }}
+                animate={{ height: `${v}%` }}
+                transition={{ delay: 0.3 + i * 0.22, duration: 0.6, ease: [0.22, 1, 0.36, 1] }}
+              />
+              <span className="text-2xs text-white/50">S{i + 1}</span>
+            </div>
+          ))}
+        </div>
+        <p className="mt-4 text-sm text-white/80">A 44 today becomes an 82 next week. You&apos;ll see it climb.</p>
+      </div>
     </div>
   );
 }
