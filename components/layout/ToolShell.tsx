@@ -3,7 +3,7 @@
 import { useEffect, useState } from "react";
 import type { ComponentType } from "react";
 import { ArrowRight, Sparkles } from "lucide-react";
-import { AppNav } from "@/components/layout/AppNav";
+import { AppShell } from "@/components/layout/AppShell";
 import { ButtonLink } from "@/components/ui/Button";
 import { isPremium } from "@/lib/store";
 import { track } from "@/lib/analytics";
@@ -30,15 +30,19 @@ export function ToolShell({
   }, [title]);
 
   return (
-    <>
-      <AppNav />
+    <AppShell>
       <main className="container-content py-10 sm:py-12">
         <div className="mb-8 text-center">
           <span
-            className="mx-auto grid h-14 w-14 place-items-center rounded-2xl text-white shadow-sm"
-            style={{ background: "linear-gradient(140deg, var(--primary-bright), var(--primary-ink))" }}
+            className="relative mx-auto grid h-16 w-16 place-items-center overflow-hidden rounded-[22px] text-white shadow-glow ring-1 ring-white/40"
+            style={{
+              background:
+                "radial-gradient(90% 90% at 24% 16%, rgba(255,255,255,0.42), transparent 44%), linear-gradient(145deg, var(--primary-bright), var(--primary-ink))",
+            }}
           >
-            <Icon size={24} />
+            <span className="absolute -right-3 -top-3 h-9 w-9 rounded-full bg-white/15 blur-sm" aria-hidden />
+            <span className="absolute inset-x-3 top-1.5 h-px bg-white/45" aria-hidden />
+            <Icon size={28} />
           </span>
           {badge && (
             <span className="mt-4 inline-flex items-center gap-1 rounded-full bg-gold-soft px-2.5 py-1 text-2xs font-bold uppercase tracking-wider text-gold-ink">
@@ -65,6 +69,6 @@ export function ToolShell({
 
         {children}
       </main>
-    </>
+    </AppShell>
   );
 }

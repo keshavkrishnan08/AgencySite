@@ -3,7 +3,7 @@
 import { useEffect, useState } from "react";
 import { useRouter } from "next/navigation";
 import { Check, CreditCard, Trash2, User } from "lucide-react";
-import { AppNav } from "@/components/layout/AppNav";
+import { AppShell } from "@/components/layout/AppShell";
 import { Button, ButtonLink } from "@/components/ui/Button";
 import {
   DEFAULT_PROFILE,
@@ -41,13 +41,12 @@ export default function SettingsPage() {
     }
   };
 
-  if (!mounted) return <main className="min-h-screen"><AppNav /></main>;
+  if (!mounted) return <AppShell><main className="min-h-screen" /></AppShell>;
 
   const premium = isPremium();
 
   return (
-    <>
-      <AppNav />
+    <AppShell>
       <main className="container-content py-10">
         <h1 className="font-serif text-3xl font-semibold text-ink">Settings</h1>
         <p className="mt-1 text-ink-2">Manage your account, plan, and preferences.</p>
@@ -155,7 +154,7 @@ export default function SettingsPage() {
           </section>
         </div>
       </main>
-    </>
+    </AppShell>
   );
 }
 

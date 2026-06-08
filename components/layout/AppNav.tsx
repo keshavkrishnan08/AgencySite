@@ -27,7 +27,7 @@ const TOOLS = [
   { href: "/tools/tracker", label: "Interview Tracker", emoji: "📅" },
 ];
 
-export function AppNav() {
+export function AppNav({ minimal = false }: { minimal?: boolean }) {
   const pathname = usePathname();
   const [mounted, setMounted] = useState(false);
   const [premium, setPremium] = useState(false);
@@ -63,8 +63,8 @@ export function AppNav() {
       <div className="glass border-b shadow-sm" style={{ borderColor: "var(--border)" }}>
         <nav className="container-wide flex h-16 items-center justify-between gap-4">
           <div className="flex items-center gap-7">
-            <Logo />
-            <div className="hidden items-center gap-1 lg:flex">
+            <Logo className={cn(minimal && "lg:hidden")} />
+            <div className={cn("hidden items-center gap-1 lg:flex", minimal && "lg:hidden")}>
               {NAV.map((l) => {
                 const active = pathname === l.href || pathname.startsWith(l.href + "/");
                 return (

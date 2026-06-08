@@ -4,7 +4,7 @@ import { useEffect, useState } from "react";
 import Link from "next/link";
 import { motion } from "framer-motion";
 import { ArrowRight, CalendarCheck, Check, Circle, RotateCcw, Sparkles } from "lucide-react";
-import { AppNav } from "@/components/layout/AppNav";
+import { AppShell } from "@/components/layout/AppShell";
 import { Button } from "@/components/ui/Button";
 import { clearPlan, getPlan, getProfile, savePlan, togglePlanTask } from "@/lib/store";
 import { daysUntil, generatePlan } from "@/lib/plan";
@@ -56,12 +56,11 @@ export default function PlanPage() {
     setPlan(null);
   };
 
-  if (!mounted) return <main className="min-h-screen"><AppNav /></main>;
+  if (!mounted) return <AppShell><main className="min-h-screen" /></AppShell>;
 
   if (!plan) {
     return (
-      <>
-        <AppNav />
+      <AppShell>
         <main className="container-content py-12">
           <div className="mb-8 text-center">
             <span
@@ -93,7 +92,7 @@ export default function PlanPage() {
             </Button>
           </div>
         </main>
-      </>
+      </AppShell>
     );
   }
 
@@ -102,8 +101,7 @@ export default function PlanPage() {
   const left = daysUntil(plan.dateISO);
 
   return (
-    <>
-      <AppNav />
+    <AppShell>
       <main className="container-content py-10">
         {/* header */}
         <div
@@ -165,7 +163,7 @@ export default function PlanPage() {
           </button>
         </div>
       </main>
-    </>
+    </AppShell>
   );
 }
 
