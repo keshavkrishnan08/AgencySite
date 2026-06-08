@@ -1,6 +1,6 @@
 import { rateLimit } from "@/lib/ratelimit";
 import { NextResponse } from "next/server";
-import { callClaude, extractJson, hasAI } from "@/lib/ai";
+import { callClaude, FAST_MODEL, extractJson, hasAI } from "@/lib/ai";
 import { COACH_PERSONA } from "@/lib/prompt";
 
 export const runtime = "nodejs";
@@ -61,7 +61,7 @@ export async function POST(req: Request) {
   if (hasAI()) {
     try {
       const user = `Company: ${company}\nRole the candidate is interviewing for: ${role || "unspecified"}`;
-      const text = await callClaude({ system: SYSTEM, user, maxTokens: 900, temperature: 0.5 });
+      const text = await callClaude({ model: FAST_MODEL, system: SYSTEM, user, maxTokens: 900, temperature: 0.5 });
       const parsed = extractJson<any>(text);
       if (parsed?.whatTheyDo) {
         return NextResponse.json({ ...parsed, source: "ai" });
