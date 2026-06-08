@@ -129,7 +129,8 @@ function PracticeInner() {
   }, [phase]);
 
   const wordCount = answerText.trim() ? answerText.trim().split(/\s+/).length : 0;
-  const canSubmit = wordCount >= 8 && !submitting;
+  const MIN_WORDS = 5;
+  const canSubmit = wordCount >= MIN_WORDS && !submitting;
   const total = questions.length;
   const current = questions[index];
 
@@ -363,8 +364,8 @@ function PracticeInner() {
                 />
                 <div className="mt-2 flex items-center justify-between px-1">
                   <span className="text-xs text-ink-3">
-                    {wordCount < 8
-                      ? `${wordCount} words. Aim for at least a few sentences`
+                    {wordCount < MIN_WORDS
+                      ? `${wordCount} word${wordCount === 1 ? "" : "s"}. A few more to submit (${MIN_WORDS}+)`
                       : `${wordCount} words`}
                   </span>
                   <span className="text-xs text-ink-3">Tip: 60-150 words is the sweet spot</span>
