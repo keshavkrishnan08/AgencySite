@@ -10,6 +10,13 @@ import type {
   UserProfile,
 } from "./types";
 import { todayKey } from "./utils";
+import {
+  pushProfile,
+  pushSession,
+  pushInterview,
+  deleteInterviewCloud,
+  pushPlan,
+} from "./cloud";
 
 /* Client-side persistence layer.
  * Uses localStorage so the whole product. Sessions, streaks, dashboard,
@@ -68,6 +75,7 @@ export function setProfile(patch: Partial<UserProfile>): UserProfile {
   const next = { ...getProfile(), ...patch };
   if (!next.createdAt) next.createdAt = new Date().toISOString();
   write(KEYS.profile, next);
+  void pushProfile(next);
   return next;
 }
 
@@ -98,6 +106,7 @@ export function saveSession(session: Session): void {
   else all.push(session);
   write(KEYS.sessions, all);
   touchStreak(session.createdAt);
+  void pushSession(session);
 }
 
 export function deleteSession(id: string): void {
@@ -188,9 +197,11 @@ export function saveInterview(rec: InterviewRecord): void {
   const all = getInterviews().filter((x) => x.id !== rec.id);
   all.push(rec);
   write(KEYS.interviews, all);
+  void pushInterview(rec);
 }
 export function deleteInterview(id: string): void {
   write(KEYS.interviews, getInterviews().filter((x) => x.id !== id));
+  void deleteInterviewCloud(id);
 }
 
 /* ----------------------- Interview prep plan ----------------------- */
@@ -200,6 +211,7 @@ export function getPlan(): InterviewPlan | null {
 }
 export function savePlan(plan: InterviewPlan): void {
   write(KEYS.plan, plan);
+  void pushPlan(plan);
 }
 export function clearPlan(): void {
   if (typeof window !== "undefined") window.localStorage.removeItem(KEYS.plan);
@@ -244,6 +256,27 @@ export function onStoreChange(cb: () => void): () => void {
     window.removeEventListener("pp:change", handler);
     window.removeEventListener("storage", handler);
   };
+}
+
+/** Merge cloud records into local storage on sign-in (cloud wins per id). */
+export function hydrateLocal(data: {
+  profile?: Partial<UserProfile> | null;
+  sessions?: Session[];
+  interviews?: InterviewRecord[];
+  plan?: InterviewPlan | null;
+}): void {
+  if (data.profile) write(KEYS.profile, { ...getProfile(), ...data.profile });
+  if (data.sessions?.length) {
+    const map = new Map(read<Session[]>(KEYS.sessions, []).map((s) => [s.id, s] as const));
+    data.sessions.forEach((s) => map.set(s.id, s));
+    write(KEYS.sessions, Array.from(map.values()));
+  }
+  if (data.interviews?.length) {
+    const map = new Map(read<InterviewRecord[]>(KEYS.interviews, []).map((r) => [r.id, r] as const));
+    data.interviews.forEach((r) => map.set(r.id, r));
+    write(KEYS.interviews, Array.from(map.values()));
+  }
+  if (data.plan && !getPlan()) write(KEYS.plan, data.plan);
 }
 
 export function upgradeToPremium(): void {
