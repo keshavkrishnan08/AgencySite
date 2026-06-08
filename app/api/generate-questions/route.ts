@@ -1,4 +1,5 @@
 import { rateLimit } from "@/lib/ratelimit";
+import { recordUsage } from "@/lib/usage";
 import { NextResponse } from "next/server";
 import { generateQuestions, generateFocusQuestions } from "@/lib/questions";
 import { callClaude, extractJson, hasAI } from "@/lib/ai";
@@ -32,6 +33,7 @@ Return ONLY valid minified JSON, no backticks:
 export async function POST(req: Request) {
   const limited = rateLimit(req);
   if (limited) return limited;
+  recordUsage(req);
   let body: any;
   try {
     body = await req.json();
