@@ -8,7 +8,7 @@ import type {
 import { clamp } from "./utils";
 
 /* ------------------------------------------------------------------ *
- * PrepPath heuristic scoring engine
+ * Axon Careers heuristic scoring engine
  * Pure, deterministic, text-sensitive. Runs anywhere (server/client).
  * Powers the product end-to-end with no external dependency, and acts
  * as the graceful fallback when no Claude API key is configured.

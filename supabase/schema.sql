@@ -1,4 +1,4 @@
--- PrepPath — Supabase schema for real accounts + enforceable Premium.
+-- Axon Careers — Supabase schema for real accounts + enforceable Premium.
 -- Run this in the Supabase SQL editor. See the "Go live" steps in MONETIZATION.md.
 -- The app works on localStorage without this; this is what makes Premium stick
 -- across devices and lets the Stripe webhook record who actually paid.

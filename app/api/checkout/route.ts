@@ -36,7 +36,7 @@ export async function POST(req: Request) {
       subscription_data: TRIAL_DAYS > 0 ? { trial_period_days: TRIAL_DAYS } : undefined,
       success_url: `${origin}/dashboard?upgraded=1&session_id={CHECKOUT_SESSION_ID}`,
       cancel_url: `${origin}/upgrade?canceled=1`,
-      metadata: { product: "preppath_premium", plan },
+      metadata: { product: "axon_premium", plan },
     });
     return NextResponse.json({ configured: true, url: session.url });
   } catch (e: any) {

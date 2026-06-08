@@ -1,6 +1,6 @@
 import type { ReactNode } from "react";
 
-/* PrepPath custom icon set. A cohesive duotone line style (soft fill + crisp
+/* Axon Careers custom icon set. A cohesive duotone line style (soft fill + crisp
    stroke) drawn for the brand, so the product doesn't wear a stock icon pack.
    They use currentColor, so they sit correctly white-on-teal inside the tiles. */
 

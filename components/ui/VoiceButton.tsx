@@ -5,7 +5,7 @@ import { Mic, MicOff } from "lucide-react";
 import { cn } from "@/lib/utils";
 import type { DeliveryMetrics } from "@/lib/types";
 
-/* Browser-native speech-to-text. PrepPath listens; it doesn't speak back.
+/* Browser-native speech-to-text. Axon Careers listens; it doesn't speak back.
    It also measures delivery: how long you spoke, your pace, and your pauses,
    so it can coach the speaking, not just the words. */
 
