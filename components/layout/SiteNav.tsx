@@ -46,7 +46,7 @@ export function SiteNav() {
           </div>
           <div className="flex items-center gap-2">
             <Link
-              href="/dashboard"
+              href="/signin"
               className="hidden text-sm font-medium text-ink-2 transition-colors hover:text-ink sm:inline-flex px-3 py-2"
             >
               Sign in
