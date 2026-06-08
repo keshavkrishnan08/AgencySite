@@ -1,9 +1,19 @@
 "use client";
 
-import { createContext, useCallback, useContext, useEffect, useState, type ReactNode } from "react";
+import { createContext, useCallback, useContext, useEffect, useRef, useState, type ReactNode } from "react";
 import type { Session, User } from "@supabase/supabase-js";
 import { authConfigured, supabaseBrowser } from "./supabase-browser";
-import { setProfile } from "./store";
+import { getInterviews, getPlan, getProfile, getSessions, hydrateLocal, setProfile } from "./store";
+import {
+  pullInterviews,
+  pullPlan,
+  pullProfile,
+  pullSessions,
+  pushInterview,
+  pushPlan,
+  pushProfile,
+  pushSession,
+} from "./cloud";
 
 interface AuthState {
   user: User | null;
@@ -21,6 +31,26 @@ export function AuthProvider({ children }: { children: ReactNode }) {
   const [user, setUser] = useState<User | null>(null);
   const [loading, setLoading] = useState(true);
   const configured = authConfigured();
+  const hydrated = useRef(false);
+
+  // Two-way sync on sign-in: pull cloud records into local, then push any
+  // local-only records (from anon use) up. Idempotent; runs once per session.
+  const hydrate = useCallback(async () => {
+    if (hydrated.current) return;
+    hydrated.current = true;
+    const [profile, sessions, interviews, plan] = await Promise.all([
+      pullProfile(),
+      pullSessions(),
+      pullInterviews(),
+      pullPlan(),
+    ]);
+    hydrateLocal({ profile, sessions, interviews, plan });
+    getSessions().forEach((s) => void pushSession(s));
+    getInterviews().forEach((r) => void pushInterview(r));
+    const pl = getPlan();
+    if (pl) void pushPlan(pl);
+    void pushProfile(getProfile());
+  }, []);
 
   // Mirror the Supabase identity into the local profile so existing
   // email/premium logic keeps working unchanged.
@@ -37,13 +67,17 @@ export function AuthProvider({ children }: { children: ReactNode }) {
       return;
     }
     sb.auth.getSession().then(({ data }: { data: { session: Session | null } }) => {
-      setUser(data.session?.user ?? null);
-      syncProfile(data.session?.user ?? null);
+      const u = data.session?.user ?? null;
+      setUser(u);
+      syncProfile(u);
+      if (u) void hydrate();
       setLoading(false);
     });
     const { data: sub } = sb.auth.onAuthStateChange((_e, session) => {
-      setUser(session?.user ?? null);
-      syncProfile(session?.user ?? null);
+      const u = session?.user ?? null;
+      setUser(u);
+      syncProfile(u);
+      if (u) void hydrate();
     });
     return () => sub.subscription.unsubscribe();
   }, [syncProfile]);
