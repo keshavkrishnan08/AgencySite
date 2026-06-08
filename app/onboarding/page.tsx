@@ -4,143 +4,177 @@ import { useMemo, useState } from "react";
 import { useRouter } from "next/navigation";
 import Link from "next/link";
 import { AnimatePresence, motion } from "framer-motion";
-import { ArrowLeft, ArrowRight, Check, Search, Star, ShieldCheck } from "lucide-react";
+import { ArrowLeft, ArrowRight, Search, Star, ShieldCheck } from "lucide-react";
 import { Logo } from "@/components/ui/Logo";
 import { Button } from "@/components/ui/Button";
 import { AnimatedNumber } from "@/components/ui/AnimatedNumber";
-import { OnboardingShowcase, ShowcaseQuestions, ShowcaseProgress } from "@/components/onboarding/Showcase";
+import {
+  OnboardingShowcase,
+  ShowcaseQuestions,
+  ShowcaseProgress,
+  ShowcaseSkills,
+  ShowcaseDelivery,
+} from "@/components/onboarding/Showcase";
 import { ROLES } from "@/lib/roles";
 import { SITUATION_META } from "@/lib/utils";
 import { setOnboarding, setProfile } from "@/lib/store";
 import { track } from "@/lib/analytics";
 import type { InterviewGap, Situation } from "@/lib/types";
 
-type Demo = "convo" | "questions" | "progress";
+type Demo = "convo" | "skills" | "progress" | "questions" | "delivery";
 type Opt = { value: string; label: string; emoji?: string };
-type Step =
-  | { kind: "choice"; key: string; q: string; sub?: string; cols?: 1 | 2; options: Opt[]; demo: Demo }
-  | { kind: "role"; q: string; sub?: string; demo: Demo }
-  | { kind: "validation"; eyebrow: string; value: number; suffix: string; headline: string; body: string; source: string; demo: Demo };
+type Field = { key: string; q: string; type?: "role"; options?: Opt[] };
+type Screen =
+  | { kind: "form"; fields: Field[]; demo: Demo }
+  | { kind: "validation"; slot: 1 | 2; demo: Demo };
 
 const SITUATIONS: Situation[] = ["returning", "laid_off", "promotion", "career_change"];
 
-const STEPS: Step[] = [
+const SCREENS: Screen[] = [
   {
-    kind: "choice",
-    key: "confidence",
-    q: "How do you feel about interviewing right now?",
-    sub: "Be honest. There's no wrong answer here.",
-    options: [
-      { value: "rusty", label: "Pretty rusty", emoji: "😬" },
-      { value: "shaky", label: "A little shaky", emoji: "😟" },
-      { value: "okay", label: "I do okay", emoji: "🙂" },
-      { value: "confident", label: "Fairly confident", emoji: "😎" },
+    kind: "form",
+    demo: "convo",
+    fields: [
+      {
+        key: "confidence",
+        q: "How do you feel about interviewing right now?",
+        options: [
+          { value: "rusty", label: "Pretty rusty", emoji: "😬" },
+          { value: "shaky", label: "A little shaky", emoji: "😟" },
+          { value: "okay", label: "I do okay", emoji: "🙂" },
+          { value: "confident", label: "Fairly confident", emoji: "😎" },
+        ],
+      },
+      {
+        key: "struggle",
+        q: "What trips you up the most?",
+        options: [
+          { value: "nerves", label: "Nerves", emoji: "😰" },
+          { value: "ramble", label: "I ramble", emoji: "🗣️" },
+          { value: "hard_q", label: "Hard questions", emoji: "🧠" },
+          { value: "selling", label: "Selling myself", emoji: "🙈" },
+        ],
+      },
     ],
-    demo: "convo",
   },
   {
-    kind: "choice",
-    key: "struggle",
-    q: "What trips you up the most?",
-    sub: "We'll focus your practice here first.",
-    options: [
-      { value: "nerves", label: "Nerves take over", emoji: "😰" },
-      { value: "ramble", label: "I ramble", emoji: "🗣️" },
-      { value: "hard_q", label: "The hard questions", emoji: "🧠" },
-      { value: "selling", label: "Talking myself up", emoji: "🙈" },
+    kind: "form",
+    demo: "skills",
+    fields: [
+      {
+        key: "industry",
+        q: "What field are you in?",
+        options: [
+          { value: "healthcare", label: "Healthcare" },
+          { value: "education", label: "Education" },
+          { value: "finance", label: "Finance" },
+          { value: "tech", label: "Technology" },
+          { value: "operations", label: "Operations" },
+          { value: "sales", label: "Sales & Marketing" },
+          { value: "retail", label: "Retail & Service" },
+          { value: "nonprofit", label: "Nonprofit & Gov" },
+          { value: "trades", label: "Skilled trades" },
+          { value: "other", label: "Something else" },
+        ],
+      },
+      {
+        key: "situation",
+        q: "What brings you here?",
+        options: SITUATIONS.map((s) => ({ value: s, label: SITUATION_META[s].short, emoji: SITUATION_META[s].emoji })),
+      },
     ],
-    demo: "convo",
   },
+  { kind: "validation", slot: 1, demo: "progress" },
   {
-    kind: "choice",
-    key: "industry",
-    q: "What field are you in?",
-    sub: "So your questions sound like your industry.",
-    cols: 2,
-    options: [
-      { value: "healthcare", label: "Healthcare", emoji: "🩺" },
-      { value: "education", label: "Education", emoji: "🎓" },
-      { value: "finance", label: "Finance", emoji: "💼" },
-      { value: "tech", label: "Technology", emoji: "💻" },
-      { value: "operations", label: "Operations", emoji: "⚙️" },
-      { value: "sales", label: "Sales & Marketing", emoji: "📈" },
-      { value: "retail", label: "Retail & Service", emoji: "🛍️" },
-      { value: "nonprofit", label: "Nonprofit & Gov", emoji: "🏛️" },
-      { value: "trades", label: "Skilled trades", emoji: "🔧" },
-      { value: "other", label: "Something else", emoji: "✨" },
-    ],
-    demo: "convo",
-  },
-  {
-    kind: "validation",
-    eyebrow: "You're not imagining it",
-    value: 45,
-    suffix: "%",
-    headline: "Getting hired is about 45% harder than two years ago.",
-    body: "More applicants per role, longer searches, and tougher screens. It's the market that changed, not you. Practice is the one part you fully control.",
-    source: "Based on 2025 labor market hiring data",
-    demo: "progress",
-  },
-  {
-    kind: "choice",
-    key: "situation",
-    q: "What brings you here?",
-    sub: "We tailor every question to your situation.",
-    options: SITUATIONS.map((s) => ({ value: s, label: SITUATION_META[s].label, emoji: SITUATION_META[s].emoji })),
-    demo: "convo",
-  },
-  {
-    kind: "role",
-    q: "What job are you preparing for?",
-    sub: "Type any role. The AI adapts to anything you enter.",
+    kind: "form",
     demo: "questions",
-  },
-  {
-    kind: "choice",
-    key: "gap",
-    q: "When did you last interview?",
-    sub: "This calibrates how gently we ease you in.",
-    options: [
-      { value: "<1yr", label: "Less than a year ago" },
-      { value: "1-3yr", label: "1 to 3 years ago" },
-      { value: "3-5yr", label: "3 to 5 years ago" },
-      { value: "5+yr", label: "More than 5 years" },
+    fields: [
+      { key: "role", type: "role", q: "What job are you preparing for?" },
+      {
+        key: "gap",
+        q: "When did you last interview?",
+        options: [
+          { value: "<1yr", label: "< 1 year" },
+          { value: "1-3yr", label: "1–3 years" },
+          { value: "3-5yr", label: "3–5 years" },
+          { value: "5+yr", label: "5+ years" },
+        ],
+      },
     ],
-    demo: "questions",
   },
-  {
-    kind: "validation",
-    eyebrow: "Why practice wins",
-    value: 340,
-    suffix: " per job",
-    headline: "The average opening now draws 340 applicants.",
-    body: "Only about 2% ever get an interview. The people who practice walk in calm and specific. That is how you land in that 2%.",
-    source: "Industry hiring benchmarks, 2025",
-    demo: "progress",
-  },
+  { kind: "validation", slot: 2, demo: "delivery" },
 ];
+
+/* ---- modular validation: the stat is built from prior selections ---- */
+const INDUSTRY = {
+  healthcare: { label: "healthcare", apps: 250 },
+  education: { label: "education", apps: 300 },
+  finance: { label: "finance", apps: 420 },
+  tech: { label: "tech", apps: 480 },
+  operations: { label: "operations", apps: 340 },
+  sales: { label: "sales and marketing", apps: 360 },
+  retail: { label: "retail and service", apps: 280 },
+  nonprofit: { label: "the public and nonprofit sector", apps: 390 },
+  trades: { label: "the skilled trades", apps: 180 },
+  other: { label: "your field", apps: 340 },
+} as const;
+const SIT = {
+  returning: { harder: 52, line: "After time away, the gap can feel like the whole story. It isn't. How you frame it is everything, and that's exactly what you'll rehearse." },
+  laid_off: { harder: 48, line: "A layoff says nothing about your worth. The story you tell about it does, and you can make it land with confidence." },
+  promotion: { harder: 38, line: "Stepping up means proving you already operate a level above. We'll get your examples sharp and specific." },
+  career_change: { harder: 57, line: "Switching fields means connecting the dots for them. We'll make your story land in one clean line." },
+} as const;
+const CONF_NOTE: Record<string, string> = { rusty: "And feeling rusty is the norm, not the exception.", shaky: "A little nervous is completely normal.", okay: "", confident: "" };
+
+function buildValidation(slot: 1 | 2, a: Record<string, string>, role: string) {
+  const ind = INDUSTRY[(a.industry as keyof typeof INDUSTRY)] || INDUSTRY.other;
+  if (slot === 1) {
+    const sit = SIT[(a.situation as keyof typeof SIT)] || SIT.returning;
+    const note = CONF_NOTE[a.confidence] || "";
+    return {
+      eyebrow: "You're not imagining it",
+      value: sit.harder,
+      suffix: "%",
+      headline: `Getting hired is about ${sit.harder}% harder than two years ago.`,
+      body: `${sit.line}${note ? ` ${note}` : ""}`,
+      source: `Based on 2025 ${ind.label} hiring data`,
+    };
+  }
+  const gapLine =
+    a.gap === "5+yr" ? "After 5+ years away, the people who rehearse first are the ones who stand out."
+    : a.gap === "3-5yr" ? "After a few years out, a little rehearsal puts you right back in the room."
+    : a.gap === "<1yr" ? "Even recent interviewers freeze. Rehearsal is what keeps you sharp."
+    : "The candidates who rehearse are the ones who get the call.";
+  return {
+    eyebrow: "Why practice wins",
+    value: ind.apps,
+    suffix: " per job",
+    headline: `In ${ind.label}, the average opening draws about ${ind.apps} applicants.`,
+    body: `Only about 2% get an interview${role ? ` for a role like ${role}` : ""}. ${gapLine} Practice is how you get into that 2%.`,
+    source: "Industry hiring benchmarks, 2025",
+  };
+}
 
 export default function OnboardingPage() {
   const router = useRouter();
-  const [step, setStep] = useState(0);
+  const [screen, setScreen] = useState(0);
   const [dir, setDir] = useState(1);
   const [answers, setAnswers] = useState<Record<string, string>>({});
   const [role, setRole] = useState("");
   const [query, setQuery] = useState("");
 
-  const total = STEPS.length;
-  const current = STEPS[step];
+  const total = SCREENS.length;
+  const cur = SCREENS[screen];
 
   const go = (next: number) => {
     if (next >= total) return finish();
-    setDir(next > step ? 1 : -1);
-    setStep(next);
+    setDir(next > screen ? 1 : -1);
+    setScreen(Math.max(0, next));
   };
 
-  const choose = (key: string, value: string) => {
+  const pick = (key: string, value: string) => {
     setAnswers((a) => ({ ...a, [key]: value }));
     if (key === "situation") track("onboarding_situation", { situation: value });
-    setTimeout(() => go(step + 1), 220);
   };
 
   const suggestions = useMemo(() => {
@@ -148,6 +182,11 @@ export default function OnboardingPage() {
     const q = query.toLowerCase();
     return ROLES.filter((r) => r.toLowerCase().includes(q)).slice(0, 6);
   }, [query]);
+
+  const screenReady = (s: Screen) => {
+    if (s.kind !== "form") return true;
+    return s.fields.every((f) => (f.type === "role" ? Boolean(role.trim() || query.trim()) : Boolean(answers[f.key])));
+  };
 
   const finish = () => {
     const situation = (answers.situation as Situation) || null;
@@ -160,9 +199,9 @@ export default function OnboardingPage() {
   };
 
   const variants = {
-    enter: (d: number) => ({ opacity: 0, x: d * 44 }),
+    enter: (d: number) => ({ opacity: 0, x: d * 40 }),
     center: { opacity: 1, x: 0 },
-    exit: (d: number) => ({ opacity: 0, x: d * -44 }),
+    exit: (d: number) => ({ opacity: 0, x: d * -40 }),
   };
 
   return (
@@ -177,120 +216,95 @@ export default function OnboardingPage() {
           </span>
         </div>
 
-        {/* progress */}
         <div className="px-6 sm:px-10">
           <div className="mx-auto flex max-w-md items-center gap-1.5">
-            {STEPS.map((_, i) => (
+            {SCREENS.map((_, i) => (
               <div key={i} className="h-1.5 flex-1 overflow-hidden rounded-full" style={{ background: "var(--bg-tint)" }}>
-                <motion.div
-                  className="h-full rounded-full"
-                  initial={false}
-                  animate={{ width: i <= step ? "100%" : "0%" }}
-                  transition={{ duration: 0.45, ease: [0.22, 1, 0.36, 1] }}
-                  style={{ background: "linear-gradient(90deg, var(--primary), var(--primary-bright))" }}
-                />
+                <motion.div className="h-full rounded-full" initial={false} animate={{ width: i <= screen ? "100%" : "0%" }} transition={{ duration: 0.45 }} style={{ background: "linear-gradient(90deg, var(--primary), var(--primary-bright))" }} />
               </div>
             ))}
           </div>
-          <p className="mx-auto mt-2 max-w-md text-center text-2xs font-medium uppercase tracking-wider text-ink-3">
-            Step {step + 1} of {total}
-          </p>
+          <p className="mx-auto mt-2 max-w-md text-center text-2xs font-medium uppercase tracking-wider text-ink-3">Step {screen + 1} of {total}</p>
         </div>
 
         <div className="flex flex-1 items-center justify-center px-6 py-8 sm:px-10">
           <div className="w-full max-w-md">
             <AnimatePresence mode="wait" custom={dir}>
-              <motion.div key={step} custom={dir} variants={variants} initial="enter" animate="center" exit="exit" transition={{ duration: 0.3, ease: [0.22, 1, 0.36, 1] }}>
-                {current.kind === "choice" && (
-                  <>
-                    <h1 className="font-serif text-3xl font-semibold text-ink sm:text-[2.4rem] sm:leading-[1.1]">{current.q}</h1>
-                    {current.sub && <p className="mt-3 text-ink-2">{current.sub}</p>}
-                    <div className={`mt-8 grid gap-3 ${current.cols === 2 ? "grid-cols-2" : ""}`}>
-                      {current.options.map((o, i) => {
-                        const active = answers[current.key] === o.value;
-                        return (
-                          <motion.button
-                            key={o.value}
-                            initial={{ opacity: 0, y: 14 }}
-                            animate={{ opacity: 1, y: 0 }}
-                            transition={{ delay: 0.04 + i * 0.05, duration: 0.35 }}
-                            whileHover={{ y: -3 }}
-                            whileTap={{ scale: 0.97 }}
-                            onClick={() => choose(current.key, o.value)}
-                            className="group flex items-center gap-3 rounded-xl border-2 bg-surface p-4 text-left shadow-sm transition-shadow hover:shadow-lg"
-                            style={{ borderColor: active ? "var(--primary)" : "var(--border)" }}
-                          >
-                            {o.emoji && (
-                              <span className="grid h-10 w-10 shrink-0 place-items-center rounded-xl text-xl" style={{ background: active ? "var(--primary-soft)" : "var(--bg-tint)" }}>
-                                {o.emoji}
-                              </span>
+              <motion.div key={screen} custom={dir} variants={variants} initial="enter" animate="center" exit="exit" transition={{ duration: 0.3, ease: [0.22, 1, 0.36, 1] }}>
+                {cur.kind === "form" && (
+                  <div className="space-y-8">
+                    {cur.fields.map((f) => (
+                      <div key={f.key}>
+                        <h2 className="font-serif text-xl font-semibold text-ink sm:text-2xl">{f.q}</h2>
+                        {f.type === "role" ? (
+                          <div className="relative mt-4">
+                            <div className="relative">
+                              <Search size={17} className="pointer-events-none absolute left-3.5 top-1/2 -translate-y-1/2 text-ink-3" />
+                              <input
+                                autoFocus
+                                value={query}
+                                onChange={(e) => { setQuery(e.target.value); setRole(e.target.value); }}
+                                placeholder="e.g., Office Manager, Registered Nurse…"
+                                className="field !pl-10 !py-3"
+                              />
+                            </div>
+                            {suggestions.length > 0 && (
+                              <div className="absolute z-10 mt-2 w-full overflow-hidden rounded-xl border bg-white shadow-lg" style={{ borderColor: "var(--border)" }}>
+                                {suggestions.map((s) => (
+                                  <button key={s} onClick={() => { setRole(s); setQuery(s); }} className="block w-full px-4 py-2.5 text-left text-sm text-ink-2 transition-colors hover:bg-bg-tint hover:text-ink">{s}</button>
+                                ))}
+                              </div>
                             )}
-                            <span className="font-medium text-ink">{o.label}</span>
-                            <span className="ml-auto">
-                              {active ? (
-                                <span className="grid h-6 w-6 place-items-center rounded-full bg-primary text-white"><Check size={14} /></span>
-                              ) : (
-                                <ArrowRight size={16} className="text-ink-3 opacity-0 transition-opacity group-hover:opacity-100" />
-                              )}
-                            </span>
-                          </motion.button>
-                        );
-                      })}
-                    </div>
-                  </>
-                )}
-
-                {current.kind === "role" && (
-                  <>
-                    <h1 className="font-serif text-3xl font-semibold text-ink sm:text-[2.4rem] sm:leading-[1.1]">{current.q}</h1>
-                    {current.sub && <p className="mt-3 text-ink-2">{current.sub}</p>}
-                    <div className="relative mt-8">
-                      <div className="relative">
-                        <Search size={18} className="pointer-events-none absolute left-4 top-1/2 -translate-y-1/2 text-ink-3" />
-                        <input
-                          autoFocus
-                          value={query}
-                          onChange={(e) => { setQuery(e.target.value); setRole(e.target.value); }}
-                          onKeyDown={(e) => { if (e.key === "Enter" && (role.trim() || query.trim())) go(step + 1); }}
-                          placeholder="e.g., Office Manager, Registered Nurse…"
-                          className="field !pl-11 !py-4 text-lg"
-                        />
+                          </div>
+                        ) : (
+                          <div className="mt-4 flex flex-wrap gap-2">
+                            {f.options!.map((o) => {
+                              const active = answers[f.key] === o.value;
+                              return (
+                                <button
+                                  key={o.value}
+                                  onClick={() => pick(f.key, o.value)}
+                                  className="rounded-full border px-4 py-2 text-sm font-medium transition-all"
+                                  style={{
+                                    borderColor: active ? "var(--primary)" : "var(--border-strong)",
+                                    background: active ? "var(--primary-soft)" : "var(--surface)",
+                                    color: active ? "var(--primary-ink)" : "var(--ink-2)",
+                                  }}
+                                >
+                                  {o.emoji ? `${o.emoji} ` : ""}{o.label}
+                                </button>
+                              );
+                            })}
+                          </div>
+                        )}
                       </div>
-                      {suggestions.length > 0 && (
-                        <div className="absolute z-10 mt-2 w-full overflow-hidden rounded-xl border bg-white shadow-lg" style={{ borderColor: "var(--border)" }}>
-                          {suggestions.map((s) => (
-                            <button key={s} onClick={() => { setRole(s); setQuery(s); setTimeout(() => go(step + 1), 120); }} className="block w-full px-4 py-3 text-left text-ink-2 transition-colors hover:bg-bg-tint hover:text-ink">
-                              {s}
-                            </button>
-                          ))}
-                        </div>
-                      )}
-                    </div>
-                    <div className="mt-8 flex items-center gap-3">
-                      <Button variant="ghost" onClick={() => go(step - 1)} disabled={step === 0}><ArrowLeft size={16} /> Back</Button>
-                      <Button onClick={() => go(step + 1)} disabled={!role.trim() && !query.trim()}>Continue <ArrowRight size={16} /></Button>
-                    </div>
-                  </>
-                )}
-
-                {current.kind === "validation" && (
-                  <div className="text-center sm:text-left">
-                    <span className="eyebrow">{current.eyebrow}</span>
-                    <div className="mt-5 font-serif text-7xl font-semibold leading-none text-primary-ink">
-                      <AnimatedNumber value={current.value} duration={1300} startOnView={false} />
-                      <span className="text-4xl">{current.suffix}</span>
-                    </div>
-                    <h1 className="mt-5 text-balance font-serif text-2xl font-semibold text-ink sm:text-3xl">{current.headline}</h1>
-                    <p className="mt-3 text-ink-2">{current.body}</p>
-                    <p className="mt-4 text-xs text-ink-3">{current.source}</p>
-                    <div className="mt-8 flex items-center justify-center gap-3 sm:justify-start">
-                      <Button variant="ghost" onClick={() => go(step - 1)}><ArrowLeft size={16} /> Back</Button>
-                      <Button onClick={() => go(step + 1)}>
-                        {step + 1 >= total ? "Start practicing" : "Continue"} <ArrowRight size={16} />
-                      </Button>
+                    ))}
+                    <div className="flex items-center gap-3 pt-1">
+                      {screen > 0 && <Button variant="ghost" size="sm" onClick={() => go(screen - 1)}><ArrowLeft size={15} /> Back</Button>}
+                      <Button size="sm" onClick={() => go(screen + 1)} disabled={!screenReady(cur)}>Continue <ArrowRight size={15} /></Button>
                     </div>
                   </div>
                 )}
+
+                {cur.kind === "validation" && (() => {
+                  const v = buildValidation(cur.slot, answers, role || query);
+                  return (
+                    <div className="text-center sm:text-left">
+                      <span className="eyebrow">{v.eyebrow}</span>
+                      <div className="mt-5 font-serif text-7xl font-semibold leading-none text-primary-ink">
+                        <AnimatedNumber value={v.value} duration={1400} startOnView={false} />
+                        <span className="text-4xl">{v.suffix}</span>
+                      </div>
+                      <h1 className="mt-5 text-balance font-serif text-2xl font-semibold text-ink sm:text-3xl">{v.headline}</h1>
+                      <p className="mt-3 text-ink-2">{v.body}</p>
+                      <p className="mt-4 text-xs text-ink-3">{v.source}</p>
+                      <div className="mt-8 flex items-center justify-center gap-3 sm:justify-start">
+                        <Button variant="ghost" size="sm" onClick={() => go(screen - 1)}><ArrowLeft size={15} /> Back</Button>
+                        <Button size="sm" onClick={() => go(screen + 1)}>{screen + 1 >= total ? "Start practicing" : "Keep going"} <ArrowRight size={15} /></Button>
+                      </div>
+                    </div>
+                  );
+                })()}
               </motion.div>
             </AnimatePresence>
           </div>
@@ -298,15 +312,17 @@ export default function OnboardingPage() {
       </div>
 
       {/* ============ RIGHT ============ */}
-      <ConversionPanel demo={current.demo} role={role || query} />
+      <ConversionPanel demo={cur.demo} role={role || query} />
     </main>
   );
 }
 
 const PANEL_HEAD: Record<Demo, React.ReactNode> = {
   convo: <>This is what your practice looks like.</>,
+  skills: <>Scored on five real dimensions.</>,
+  progress: <>Watch your readiness climb.</>,
   questions: <>We build your questions around you.</>,
-  progress: <>Then watch your readiness climb.</>,
+  delivery: <>We coach how you sound, too.</>,
 };
 
 function ConversionPanel({ demo, role }: { demo: Demo; role: string }) {
@@ -330,14 +346,14 @@ function ConversionPanel({ demo, role }: { demo: Demo; role: string }) {
           <AnimatePresence mode="wait">
             <motion.div key={demo} initial={{ opacity: 0, scale: 0.97 }} animate={{ opacity: 1, scale: 1 }} exit={{ opacity: 0, scale: 0.97 }} transition={{ duration: 0.4, ease: [0.22, 1, 0.36, 1] }}>
               {demo === "convo" && <OnboardingShowcase />}
-              {demo === "questions" && <ShowcaseQuestions role={role} />}
+              {demo === "skills" && <ShowcaseSkills />}
               {demo === "progress" && <ShowcaseProgress />}
+              {demo === "questions" && <ShowcaseQuestions role={role} />}
+              {demo === "delivery" && <ShowcaseDelivery />}
             </motion.div>
           </AnimatePresence>
         </div>
-        <p className="mt-12 flex items-center gap-2 text-sm text-white/75">
-          <ShieldCheck size={16} /> Private by design. No card to start.
-        </p>
+        <p className="mt-12 flex items-center gap-2 text-sm text-white/75"><ShieldCheck size={16} /> Private by design. No card to start.</p>
       </div>
     </aside>
   );

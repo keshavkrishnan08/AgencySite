@@ -2,7 +2,7 @@
 
 import { useEffect, useRef, useState } from "react";
 import { AnimatePresence, motion } from "framer-motion";
-import { Sparkles, TrendingUp, Wand2, Check } from "lucide-react";
+import { Sparkles, TrendingUp, Wand2, Check, Mic } from "lucide-react";
 import { AnimatedNumber } from "@/components/ui/AnimatedNumber";
 
 /* A looping, video-like demo for the onboarding side panel: the interviewer
@@ -302,6 +302,112 @@ export function ShowcaseProgress() {
           ))}
         </div>
         <p className="mt-4 text-sm text-white/80">A 44 today becomes an 82 next week. You&apos;ll see it climb.</p>
+      </div>
+    </div>
+  );
+}
+
+/* ---------- Skills: five dimensions filling ---------- */
+const SKILLS: [string, number][] = [
+  ["Clarity", 86],
+  ["Relevance", 91],
+  ["Specificity", 74],
+  ["Confidence", 80],
+  ["Conciseness", 88],
+];
+
+export function ShowcaseSkills() {
+  const [cycle, setCycle] = useState(0);
+  useEffect(() => {
+    const id = setInterval(() => setCycle((c) => c + 1), 7200);
+    return () => clearInterval(id);
+  }, []);
+  return (
+    <div key={cycle} className="relative mx-auto w-full max-w-sm">
+      <div className="rounded-2xl border border-white/20 bg-white/10 p-6 shadow-2xl backdrop-blur-md">
+        <div className="flex items-center gap-2 text-white">
+          <span className="grid h-8 w-8 place-items-center rounded-lg bg-white/15"><Sparkles size={16} /></span>
+          <p className="text-sm font-semibold">Scored on five dimensions</p>
+        </div>
+        <div className="mt-5 space-y-3.5">
+          {SKILLS.map(([label, v], i) => (
+            <div key={label}>
+              <div className="mb-1 flex items-center justify-between text-sm">
+                <span className="text-white/85">{label}</span>
+                <span className="font-mono font-semibold text-white">{v}</span>
+              </div>
+              <div className="h-2 overflow-hidden rounded-full bg-white/15">
+                <motion.div
+                  className="h-full rounded-full"
+                  style={{ background: "linear-gradient(to right, #d7fbff, #7fe1ea)" }}
+                  initial={{ width: 0 }}
+                  animate={{ width: `${v}%` }}
+                  transition={{ delay: 0.3 + i * 0.28, duration: 0.9, ease: [0.22, 1, 0.36, 1] }}
+                />
+              </div>
+            </div>
+          ))}
+        </div>
+      </div>
+    </div>
+  );
+}
+
+/* ---------- Delivery: live mic, volume meter + transcript ---------- */
+const DV = Array.from({ length: 18 }, (_, i) => {
+  const s = (i * 13) % 7;
+  return { peak: 10 + s * 4, dur: 0.5 + s * 0.09, delay: (i % 6) * 0.08 };
+});
+const DELIVERY_LINE = "I led the rollout, trained fifteen staff, and cut missed appointments by twenty percent.";
+
+export function ShowcaseDelivery() {
+  const [shown, setShown] = useState("");
+  useEffect(() => {
+    const glyphs = "etaoinshrdlucmfwypvbgkjqxz ";
+    let i = 0;
+    const id = setInterval(() => {
+      i = i > DELIVERY_LINE.length + 18 ? 0 : i + 1;
+      const clear = Math.min(i, DELIVERY_LINE.length);
+      let scr = "";
+      if (clear < DELIVERY_LINE.length) {
+        const n = Math.min(4, DELIVERY_LINE.length - clear);
+        for (let k = 0; k < n; k++) scr += glyphs[(i * 3 + k * 7) % glyphs.length];
+      }
+      setShown(DELIVERY_LINE.slice(0, clear) + scr);
+    }, 70);
+    return () => clearInterval(id);
+  }, []);
+  return (
+    <div className="relative mx-auto w-full max-w-sm">
+      <div className="rounded-2xl border border-white/20 bg-white/10 p-6 shadow-2xl backdrop-blur-md">
+        <div className="flex items-center justify-between text-white">
+          <span className="flex items-center gap-2 text-sm font-semibold"><Mic size={16} /> Listening to your delivery</span>
+          <span className="flex items-center gap-1.5 text-2xs font-semibold text-emerald-200"><span className="h-1.5 w-1.5 rounded-full bg-emerald-300" /> Live</span>
+        </div>
+        <div className="mt-5 flex h-12 items-end justify-center gap-[3px]">
+          {DV.map((b, i) => (
+            <motion.span
+              key={i}
+              className="w-[3px] rounded-full"
+              style={{ background: "linear-gradient(to top, rgba(255,255,255,0.4), #d7fbff)" }}
+              initial={{ height: 4 }}
+              animate={{ height: [4, b.peak, 6, b.peak * 0.7, 4] }}
+              transition={{ duration: b.dur, delay: b.delay, repeat: Infinity, ease: "easeInOut" }}
+            />
+          ))}
+        </div>
+        <p className="mt-4 min-h-[2.5rem] text-sm leading-relaxed text-white/75">
+          {shown}
+          <span className="ml-0.5 inline-block animate-pulse text-white">▌</span>
+        </p>
+        <div className="mt-4 flex gap-2">
+          {[["Pace", "132 wpm"], ["Filler", "low"], ["Pauses", "2"]].map(([k, v]) => (
+            <div key={k} className="flex-1 rounded-lg border border-white/15 bg-white/10 px-3 py-2 text-center">
+              <div className="text-2xs uppercase tracking-wider text-white/55">{k}</div>
+              <div className="text-sm font-semibold text-white">{v}</div>
+            </div>
+          ))}
+        </div>
       </div>
     </div>
   );
