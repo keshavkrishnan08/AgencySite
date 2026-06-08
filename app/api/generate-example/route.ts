@@ -1,3 +1,4 @@
+import { rateLimit } from "@/lib/ratelimit";
 import { NextResponse } from "next/server";
 import { exampleAnswer } from "@/lib/examples";
 import { callClaude, hasAI } from "@/lib/ai";
@@ -11,6 +12,8 @@ const SYSTEM = `${COACH_PERSONA}
 Your task: write ONE strong example answer to the interview question, in the candidate's own likely voice for their exact role and situation. Use STAR where it fits. Natural and spoken, not corporate, 110 to 180 words. Make it realistic for someone in their shoes, not a polished executive. Return only the answer text, no preamble, no quotes, no labels.`;
 
 export async function POST(req: Request) {
+  const limited = rateLimit(req);
+  if (limited) return limited;
   let body: any;
   try {
     body = await req.json();

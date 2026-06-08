@@ -1,3 +1,4 @@
+import { rateLimit } from "@/lib/ratelimit";
 import { NextResponse } from "next/server";
 import { callClaude, extractJson, hasAI } from "@/lib/ai";
 import { COACH_PERSONA } from "@/lib/prompt";
@@ -54,6 +55,8 @@ function fallback(gapType: string, duration: string, activities: string) {
 }
 
 export async function POST(req: Request) {
+  const limited = rateLimit(req);
+  if (limited) return limited;
   let body: any;
   try {
     body = await req.json();
