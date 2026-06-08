@@ -245,7 +245,7 @@ function AccountPrompt({ onDone }: { onDone: () => void }) {
       </div>
       <button
         onClick={() => {
-          setProfile({ email: "you@preppath.ai", name: "You" });
+          setProfile({ email: "you@axoncareers.com", name: "You" });
           onDone();
         }}
         className="mt-3 text-sm text-ink-2 underline-offset-2 hover:underline"
@@ -276,7 +276,7 @@ function ShareCard({ session, sessionsCount }: { session: Session; sessionsCount
     const c = canvasRef.current;
     if (!c) return;
     const link = document.createElement("a");
-    link.download = `preppath-score-${session.overall}.png`;
+    link.download = `axon-careers-score-${session.overall}.png`;
     link.href = c.toDataURL("image/png");
     link.click();
   };

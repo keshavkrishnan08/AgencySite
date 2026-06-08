@@ -2,7 +2,7 @@ import Link from "next/link";
 import { cn } from "@/lib/utils";
 
 /**
- * PrepPath mark. An abstract rising arc to a spark. No box, no tile.
+ * Axon Careers mark. An abstract rising arc to a spark. No box, no tile.
  * Reads as growth + readiness. Teal gradient stroke, stands on its own.
  */
 export function LogoMark({
@@ -71,14 +71,14 @@ export function Logo({
         className="font-serif font-semibold tracking-tight"
         style={{ fontSize: size * 0.52, color: dark ? "#fff" : "var(--ink)" }}
       >
-        Prep
-        <span style={{ color: dark ? "#7fdce6" : "var(--primary-ink)" }}>Path</span>
+        Axon{" "}
+        <span style={{ color: dark ? "#7fdce6" : "var(--primary-ink)" }}>Careers</span>
       </span>
     </span>
   );
   if (!href) return inner;
   return (
-    <Link href={href} aria-label="PrepPath home">
+    <Link href={href} aria-label="Axon Careers home">
       {inner}
     </Link>
   );

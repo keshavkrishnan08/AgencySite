@@ -4,7 +4,7 @@ import { ChevronDown, ChevronRight, Mic, RotateCw, Sparkles, TrendingUp, Trophy,
 import type { LucideIcon } from "lucide-react";
 import { Reveal } from "@/components/ui/Reveal";
 
-/* A beautiful left-to-right flow of the whole PrepPath journey. */
+/* A beautiful left-to-right flow of the whole Axon Careers journey. */
 
 const NODES: { icon: LucideIcon; label: string; sub: string }[] = [
   { icon: UserRound, label: "Your situation", sub: "Role and where you're at" },

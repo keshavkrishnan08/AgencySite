@@ -41,7 +41,7 @@ export function drawShareCard(
   ctx.textAlign = "center";
   ctx.fillStyle = "#0c5660";
   ctx.font = "600 44px Georgia, serif";
-  ctx.fillText("PrepPath", cx, 250);
+  ctx.fillText("Axon Careers", cx, 250);
 
   // label
   ctx.fillStyle = "#989cab";

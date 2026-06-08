@@ -64,7 +64,7 @@ export default function TrackerPage() {
     <ToolShell
       icon={TrackerIcon}
       title="Interview Tracker"
-      description="Practice is the input. Offers are the point. Track every real interview here so you can see what's actually working. And prove PrepPath got you there."
+      description="Practice is the input. Offers are the point. Track every real interview here so you can see what's actually working. And prove Axon Careers got you there."
     >
       {/* stats */}
       {items.length > 0 && (
