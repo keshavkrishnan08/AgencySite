@@ -1,4 +1,5 @@
 import { rateLimit } from "@/lib/ratelimit";
+import { recordUsage } from "@/lib/usage";
 import { NextResponse } from "next/server";
 import { callClaude, FAST_MODEL, extractJson, hasAI } from "@/lib/ai";
 import { COACH_PERSONA } from "@/lib/prompt";
@@ -90,6 +91,7 @@ function fallback(posting: string): PredictedQuestion[] {
 export async function POST(req: Request) {
   const limited = rateLimit(req);
   if (limited) return limited;
+  recordUsage(req);
   let body: any;
   try {
     body = await req.json();
