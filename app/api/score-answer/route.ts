@@ -1,3 +1,4 @@
+import { rateLimit } from "@/lib/ratelimit";
 import { NextResponse } from "next/server";
 import { scoreAnswer } from "@/lib/scoring";
 import { exampleAnswer } from "@/lib/examples";
@@ -36,6 +37,8 @@ Return ONLY valid minified JSON, no backticks, no prose:
 {"scores":{"clarity":N,"relevance":N,"specificity":N,"confidence":N,"conciseness":N,"overall":N},"feedback":{"clarity":"...","relevance":"...","specificity":"...","confidence":"...","conciseness":"..."},"strengthSummary":"...","growthSummary":"..."}`;
 
 export async function POST(req: Request) {
+  const limited = rateLimit(req);
+  if (limited) return limited;
   let body: any;
   try {
     body = await req.json();
