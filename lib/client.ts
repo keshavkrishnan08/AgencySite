@@ -8,6 +8,19 @@ import type { Dimension, Question, ScoredAnswer, Situation } from "./types";
 /* Client helpers that call the API routes, with a local fallback so the
    product keeps working even if the network/route is unavailable. */
 
+/* Identify the account so the server can rate-limit per user (in addition to
+   per IP). Spoofable, which is fine: the IP cap is the real ceiling. */
+function aiHeaders(): Record<string, string> {
+  const h: Record<string, string> = { "Content-Type": "application/json" };
+  try {
+    const email = JSON.parse(localStorage.getItem("pp:profile") || "{}").email;
+    if (email) h["x-user-id"] = String(email);
+  } catch {
+    /* ignore */
+  }
+  return h;
+}
+
 export async function apiGenerateQuestions(args: {
   situation: Situation | null;
   targetRole: string;
@@ -22,7 +35,7 @@ export async function apiGenerateQuestions(args: {
   try {
     const res = await fetch("/api/generate-questions", {
       method: "POST",
-      headers: { "Content-Type": "application/json" },
+      headers: aiHeaders(),
       body: JSON.stringify(args),
     });
     if (res.ok) {
@@ -60,7 +73,7 @@ export async function apiScoreAnswer(
   try {
     const res = await fetch("/api/score-answer", {
       method: "POST",
-      headers: { "Content-Type": "application/json" },
+      headers: aiHeaders(),
       body: JSON.stringify({ ...args, withExample }),
     });
     if (res.ok) {
@@ -88,7 +101,7 @@ export async function apiFollowUp(args: {
   try {
     const res = await fetch("/api/follow-up", {
       method: "POST",
-      headers: { "Content-Type": "application/json" },
+      headers: aiHeaders(),
       body: JSON.stringify(args),
     });
     if (res.ok) {
@@ -109,7 +122,7 @@ export async function apiGenerateExample(
   try {
     const res = await fetch("/api/generate-example", {
       method: "POST",
-      headers: { "Content-Type": "application/json" },
+      headers: aiHeaders(),
       body: JSON.stringify({ question, targetRole, category }),
     });
     if (res.ok) {

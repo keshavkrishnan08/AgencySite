@@ -1,3 +1,4 @@
+import { rateLimit } from "@/lib/ratelimit";
 import { NextResponse } from "next/server";
 import { getStripe, stripeConfigured, PRICES, TRIAL_DAYS } from "@/lib/stripe";
 
@@ -9,6 +10,8 @@ export const dynamic = "force-dynamic";
    the demo upgrade instead. */
 
 export async function POST(req: Request) {
+  const limited = rateLimit(req);
+  if (limited) return limited;
   if (!stripeConfigured()) {
     return NextResponse.json({ configured: false });
   }
