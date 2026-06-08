@@ -1,3 +1,4 @@
+import { rateLimit } from "@/lib/ratelimit";
 import { NextResponse } from "next/server";
 import { generateQuestions, generateFocusQuestions } from "@/lib/questions";
 import { callClaude, extractJson, hasAI } from "@/lib/ai";
@@ -29,6 +30,8 @@ Return ONLY valid minified JSON, no backticks:
 {"questions":[{"number":1,"text":"...","category":"warmup|behavioral|gap|situation|closer","tip":"..."}]}`;
 
 export async function POST(req: Request) {
+  const limited = rateLimit(req);
+  if (limited) return limited;
   let body: any;
   try {
     body = await req.json();

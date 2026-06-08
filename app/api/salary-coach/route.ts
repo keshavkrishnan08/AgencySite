@@ -1,3 +1,4 @@
+import { rateLimit } from "@/lib/ratelimit";
 import { NextResponse } from "next/server";
 import { analyzeAnxiety } from "@/lib/scoring";
 import { callClaude, extractJson, hasAI } from "@/lib/ai";
@@ -52,6 +53,8 @@ function heuristic(round: number, message: string, target: number) {
 }
 
 export async function POST(req: Request) {
+  const limited = rateLimit(req);
+  if (limited) return limited;
   let body: any;
   try {
     body = await req.json();
