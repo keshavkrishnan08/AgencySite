@@ -7,7 +7,7 @@ import { AnimatePresence, motion } from "framer-motion";
 import { ArrowLeft, ArrowRight, Check, Search, Star, ShieldCheck } from "lucide-react";
 import { Logo } from "@/components/ui/Logo";
 import { Button } from "@/components/ui/Button";
-import { OnboardingShowcase } from "@/components/onboarding/Showcase";
+import { OnboardingShowcase, ShowcaseQuestions, ShowcaseProgress } from "@/components/onboarding/Showcase";
 import { ROLES } from "@/lib/roles";
 import { SITUATION_META } from "@/lib/utils";
 import { setOnboarding, setProfile } from "@/lib/store";
@@ -57,7 +57,7 @@ export default function OnboardingPage() {
   };
 
   return (
-    <main className="min-h-screen lg:grid lg:grid-cols-[1fr_minmax(420px,46%)]">
+    <main className="min-h-screen lg:grid lg:grid-cols-2">
       {/* ============ LEFT: the questions ============ */}
       <div className="relative flex min-h-screen flex-col">
         {/* top bar */}
@@ -205,14 +205,21 @@ export default function OnboardingPage() {
       </div>
 
       {/* ============ RIGHT: conversion panel ============ */}
-      <ConversionPanel situation={situation} role={role || query} />
+      <ConversionPanel step={step} role={role || query} />
     </main>
   );
 }
 
-/* Apollo-style proof column. Sticky, full-bleed gradient, glass cards. Hidden
-   on mobile where the questions take the full screen. */
-function ConversionPanel({ situation, role }: { situation: Situation | null; role: string }) {
+/* Proof column with a live, looping demo that changes per step. Sticky,
+   full-bleed gradient, glass cards. Hidden on mobile. */
+const PANEL_COPY = [
+  { h: <>This is what your practice looks like.</>, demo: "convo" },
+  { h: <>We build the questions around you.</>, demo: "questions" },
+  { h: <>Then watch your score climb.</>, demo: "progress" },
+] as const;
+
+function ConversionPanel({ step, role }: { step: number; role: string }) {
+  const copy = PANEL_COPY[Math.min(step, 2)];
   return (
     <aside
       className="relative hidden overflow-hidden lg:block"
@@ -222,25 +229,46 @@ function ConversionPanel({ situation, role }: { situation: Situation | null; rol
       <div className="pointer-events-none absolute -bottom-28 -left-20 h-80 w-80 rounded-full opacity-30 blur-3xl" style={{ background: "radial-gradient(circle, #ffe0a655, transparent)" }} />
 
       <div className="sticky top-0 flex min-h-screen flex-col justify-center px-12 py-16 text-white xl:px-16">
-        <motion.div initial={{ opacity: 0, y: 18 }} animate={{ opacity: 1, y: 0 }} transition={{ duration: 0.6 }}>
-          <div className="flex items-center gap-1.5">
-            {Array.from({ length: 5 }).map((_, i) => <Star key={i} size={16} className="fill-white text-white" />)}
-            <span className="ml-2 text-sm font-medium text-white/85">Loved by 12,000+ job seekers</span>
-          </div>
+        <div className="flex items-center gap-1.5">
+          {Array.from({ length: 5 }).map((_, i) => <Star key={i} size={16} className="fill-white text-white" />)}
+          <span className="ml-2 text-sm font-medium text-white/85">Loved by 12,000+ job seekers</span>
+        </div>
 
-          <h2 className="mt-6 max-w-md font-serif text-[2.1rem] font-semibold leading-tight">
-            {role ? <>Your <span className="text-amber-soft">{role}</span> interview, rehearsed until it&apos;s easy.</> : <>This is what your practice looks like.</>}
-          </h2>
+        <div className="mt-6 min-h-[3.5rem]">
+          <AnimatePresence mode="wait">
+            <motion.h2
+              key={step}
+              initial={{ opacity: 0, y: 10 }}
+              animate={{ opacity: 1, y: 0 }}
+              exit={{ opacity: 0, y: -10 }}
+              transition={{ duration: 0.35 }}
+              className="max-w-md font-serif text-[2.1rem] font-semibold leading-tight"
+            >
+              {step === 1 && role ? <>We build your <span className="text-amber-soft">{role}</span> questions.</> : copy.h}
+            </motion.h2>
+          </AnimatePresence>
+        </div>
 
-          {/* live, looping demo */}
-          <div className="mt-10">
-            <OnboardingShowcase />
-          </div>
+        {/* live demo, swaps per step */}
+        <div className="mt-10">
+          <AnimatePresence mode="wait">
+            <motion.div
+              key={copy.demo}
+              initial={{ opacity: 0, scale: 0.97 }}
+              animate={{ opacity: 1, scale: 1 }}
+              exit={{ opacity: 0, scale: 0.97 }}
+              transition={{ duration: 0.4, ease: [0.22, 1, 0.36, 1] }}
+            >
+              {copy.demo === "convo" && <OnboardingShowcase />}
+              {copy.demo === "questions" && <ShowcaseQuestions role={role} />}
+              {copy.demo === "progress" && <ShowcaseProgress />}
+            </motion.div>
+          </AnimatePresence>
+        </div>
 
-          <p className="mt-12 flex items-center gap-2 text-sm text-white/75">
-            <ShieldCheck size={16} /> Private by design. No card to start.
-          </p>
-        </motion.div>
+        <p className="mt-12 flex items-center gap-2 text-sm text-white/75">
+          <ShieldCheck size={16} /> Private by design. No card to start.
+        </p>
       </div>
     </aside>
   );
