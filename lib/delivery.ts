@@ -1,7 +1,7 @@
 import type { DeliveryMetrics } from "./types";
 
 /* Turns spoken-delivery numbers into plain coaching notes. This is the piece
-   that makes PrepPath a speaking coach, not just a writing coach. */
+   that makes Axon Careers a speaking coach, not just a writing coach. */
 
 export interface DeliveryNote {
   label: string;

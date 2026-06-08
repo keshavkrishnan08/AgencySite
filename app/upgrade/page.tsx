@@ -70,8 +70,8 @@ export default function UpgradePage() {
       <AppNav />
       <main className="container-wide max-w-5xl py-12">
         <div className="text-center">
-          <PremiumBadge label="PrepPath Premium" className="mx-auto" />
-          <span className="sr-only">PrepPath Premium</span>
+          <PremiumBadge label="Axon Careers Premium" className="mx-auto" />
+          <span className="sr-only">Axon Careers Premium</span>
           <h1 className="mt-5 text-balance font-serif text-display font-semibold text-ink">
             Everything you need to walk in ready.
           </h1>
@@ -131,7 +131,7 @@ export default function UpgradePage() {
                   </div>
 
                   <div className="flex items-baseline justify-between">
-                    <h2 className="font-serif text-xl font-semibold text-ink">PrepPath Premium</h2>
+                    <h2 className="font-serif text-xl font-semibold text-ink">Axon Careers Premium</h2>
                     <span className="font-serif text-3xl font-semibold" style={{ color: "var(--primary-ink)" }}>
                       {price}
                     </span>
