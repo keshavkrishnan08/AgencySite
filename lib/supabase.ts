@@ -23,15 +23,33 @@ export function supabaseAdmin(): SupabaseClient | null {
   return client;
 }
 
-/** Look up whether an email currently has an active paid subscription. */
-export async function isEmailPremium(email: string): Promise<boolean> {
+export interface SubStatus {
+  premium: boolean;
+  status: string; // active | trialing | canceled | past_due | none ...
+  until: string | null; // current_period_end ISO
+}
+
+/* Authoritative access for an account, straight from the subscription row.
+   Access if the sub is active/trialing OR still inside the paid period (so a
+   canceled-at-period-end user keeps access until their time runs out, then is
+   kicked). status "none" means no subscription row exists at all. */
+export async function subscriptionStatus(email: string): Promise<SubStatus> {
   const db = supabaseAdmin();
-  if (!db || !email) return false;
+  if (!db || !email) return { premium: false, status: "none", until: null };
   const { data } = await db
     .from("subscriptions")
-    .select("status")
+    .select("status, current_period_end")
     .eq("email", email)
-    .in("status", ["active", "trialing"])
+    .order("updated_at", { ascending: false })
+    .limit(1)
     .maybeSingle();
-  return Boolean(data);
+  if (!data) return { premium: false, status: "none", until: null };
+  const active = data.status === "active" || data.status === "trialing";
+  const withinPeriod = data.current_period_end ? new Date(data.current_period_end) > new Date() : false;
+  return { premium: active || withinPeriod, status: data.status, until: data.current_period_end ?? null };
+}
+
+/** Back-compat: boolean access for an email. */
+export async function isEmailPremium(email: string): Promise<boolean> {
+  return (await subscriptionStatus(email)).premium;
 }
