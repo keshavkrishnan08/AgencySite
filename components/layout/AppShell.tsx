@@ -1,31 +1,60 @@
 "use client";
 
-import { useEffect, type ReactNode } from "react";
+import { useEffect, useState, type ReactNode } from "react";
 import { usePathname, useRouter } from "next/navigation";
 import { Loader2 } from "lucide-react";
 import { AppNav } from "./AppNav";
 import { AppSidebar } from "./AppSidebar";
 import { useAuth } from "@/lib/auth";
+import { isPremium, onStoreChange } from "@/lib/store";
 
-/* Authed app chrome: a hover-expand sidebar on the left (lg+) plus a slim top
-   bar. Content gets a fixed 76px left clearance for the collapsed rail; the
-   rail expands over the page on hover, so content never reflows.
+/* Authed app chrome + access gate.
 
-   When auth is configured and nobody is signed in, this redirects to /signin.
-   Until the Supabase anon key is set, authConfigured() is false and the guard
-   is inert, so the app behaves exactly as before. */
-export function AppShell({ children }: { children: ReactNode }) {
+   The app is for paying customers. Access rules (only when auth is configured):
+     1. not signed in            -> /signin
+     2. signed in, not premium   -> /upgrade   (except on /upgrade itself, so
+                                                 they can actually pay)
+     3. signed in + premium      -> in.
+
+   Premium is read from the local profile, which is hydrated from the DB on
+   sign-in and flipped on a successful checkout. We give hydration a short grace
+   window so a real premium user is never bounced to /upgrade on first paint.
+
+   Until the Supabase anon key is set, authConfigured() is false and the whole
+   gate is inert, so local/dev keeps working. */
+export function AppShell({ children, requirePremium = true }: { children: ReactNode; requirePremium?: boolean }) {
   const { configured, user, loading } = useAuth();
   const router = useRouter();
   const pathname = usePathname();
-
-  const blocked = configured && !loading && !user;
+  const [premium, setPremium] = useState(false);
 
   useEffect(() => {
-    if (blocked) router.replace(`/signin?next=${encodeURIComponent(pathname)}`);
-  }, [blocked, pathname, router]);
+    const sync = () => setPremium(isPremium());
+    sync();
+    return onStoreChange(sync);
+  }, []);
 
-  if (blocked) {
+  // /upgrade so they can pay; /settings so they can always manage/sign out.
+  const exemptFromPay = !requirePremium || pathname === "/upgrade" || pathname === "/settings";
+  const ready = configured && !loading;
+  const needsAuth = ready && !user;
+  const needsPay = ready && !!user && !premium && !exemptFromPay;
+
+  // 1) signed out -> sign in
+  useEffect(() => {
+    if (needsAuth) router.replace(`/signin?next=${encodeURIComponent(pathname)}`);
+  }, [needsAuth, pathname, router]);
+
+  // 2) signed in but not paying -> upgrade (after a grace window for DB hydrate)
+  useEffect(() => {
+    if (!needsPay) return;
+    const t = setTimeout(() => {
+      if (!isPremium()) router.replace("/upgrade");
+    }, 1400);
+    return () => clearTimeout(t);
+  }, [needsPay, router]);
+
+  if (needsAuth || needsPay) {
     return (
       <main className="grid min-h-screen place-items-center">
         <Loader2 size={28} className="animate-spin text-primary" />
