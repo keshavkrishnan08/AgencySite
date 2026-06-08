@@ -46,9 +46,9 @@ export function SiteFooter() {
         <div className="hairline my-10" />
 
         <div className="flex flex-col items-start justify-between gap-4 text-xs text-ink-3 sm:flex-row sm:items-center">
-          <p>© 2026 PrepPath. Built by Keshav Krishnan.</p>
+          <p>© 2026 Axon Careers. Built by Keshav Krishnan.</p>
           <p className="max-w-md sm:text-right">
-            PrepPath is an AI practice tool, not a guarantee of employment. Results vary by individual.
+            Axon Careers is an AI practice tool, not a guarantee of employment. Results vary by individual.
           </p>
         </div>
       </div>

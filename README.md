@@ -1,10 +1,10 @@
-# PrepPath
+# Axon Careers
 
 **An AI mock interview coach for the people the other tools forgot.**
 
-Final Round, Pramp, Interview Kickstart — they all aim at the same person: a 25-year-old software engineer who lives on Reddit. PrepPath is for everyone else. The 38-year-old returning to work after raising kids. The 52-year-old laid off after fifteen years. The teacher switching into corporate training. They're the most anxious job seekers out there, and almost nobody builds for them.
+Final Round, Pramp, Interview Kickstart — they all aim at the same person: a 25-year-old software engineer who lives on Reddit. Axon Careers is for everyone else. The 38-year-old returning to work after raising kids. The 52-year-old laid off after fifteen years. The teacher switching into corporate training. They're the most anxious job seekers out there, and almost nobody builds for them.
 
-PrepPath gives them a private room to practice in. You answer real interview questions, an AI scores you on five dimensions, and you watch the number climb session after session. A score of 44 today becomes an 82 next week — and you proved it to yourself.
+Axon Careers gives them a private room to practice in. You answer real interview questions, an AI scores you on five dimensions, and you watch the number climb session after session. A score of 44 today becomes an 82 next week — and you proved it to yourself.
 
 ---
 
@@ -13,7 +13,7 @@ PrepPath gives them a private room to practice in. You answer real interview que
 The core loop is simple: **Practice → Score → Feedback → Improve → watch your score rise → practice more.**
 
 - **Tailored practice sessions.** Eight questions matched to your role, situation, and the actual company + job posting you paste in, scored on clarity, relevance, specificity, confidence, and conciseness — with one specific fix per answer.
-- **You can speak your answers.** A built-in voice button transcribes speech to text in the browser (no key). PrepPath listens; it doesn't talk back.
+- **You can speak your answers.** A built-in voice button transcribes speech to text in the browser (no key). Axon Careers listens; it doesn't talk back.
 - **A conversational interviewer.** After each answer, Claude asks a real follow-up that probes what you actually said — the way a live interviewer tests whether your story holds up.
 - **A retention-grade dashboard.** Readiness ring, a progress line that climbs toward a "Ready" marker at 80, per-skill sparklines with deltas, streaks, and stats.
 - **An honest Anxiety Detector** baked into every score. It catches the filler words, hedging, apologies, and self-undermining qualifiers you don't hear yourself say.
@@ -35,7 +35,7 @@ And a full toolkit around the interview:
 
 ## It works with zero setup
 
-Here's the important part: **PrepPath runs fully without any API keys.** Every score, every piece of feedback, and the Anxiety Detector are powered by a real heuristic engine (`lib/scoring.ts`) that analyzes your actual words — filler density, STAR structure, concrete numbers, hedging, length. So the product is demonstrable the second you start it.
+Here's the important part: **Axon Careers runs fully without any API keys.** Every score, every piece of feedback, and the Anxiety Detector are powered by a real heuristic engine (`lib/scoring.ts`) that analyzes your actual words — filler density, STAR structure, concrete numbers, hedging, length. So the product is demonstrable the second you start it.
 
 Add an `ANTHROPIC_API_KEY` and the same routes quietly upgrade to live Claude scoring and generation. If a call ever fails, it falls straight back to the local engine. Nothing breaks.
 
@@ -109,4 +109,4 @@ Every screenshot in `/tmp/shots` was generated and checked with Playwright (`scr
 
 ---
 
-Built by Keshav Krishnan. PrepPath is a practice tool, not a guarantee of employment.
+Built by Keshav Krishnan. Axon Careers is a practice tool, not a guarantee of employment.

@@ -157,7 +157,7 @@ export default function OnboardingPage() {
                 transition={{ duration: 0.32, ease: [0.22, 1, 0.36, 1] }}
               >
                 <h1 className="text-center font-serif text-3xl font-semibold text-ink sm:text-4xl">
-                  What brings you to PrepPath?
+                  What brings you to Axon Careers?
                 </h1>
                 <p className="mt-3 text-center text-ink-2">
                   We&apos;ll tailor every question to your exact situation.

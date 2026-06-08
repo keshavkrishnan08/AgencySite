@@ -18,7 +18,7 @@ export async function sendEmail(opts: { to: string; subject: string; html: strin
         "Content-Type": "application/json",
       },
       body: JSON.stringify({
-        from: process.env.EMAIL_FROM || "PrepPath <onboarding@resend.dev>",
+        from: process.env.EMAIL_FROM || "Axon Careers <onboarding@resend.dev>",
         to: opts.to,
         subject: opts.subject,
         html: opts.html,
@@ -32,19 +32,19 @@ export async function sendEmail(opts: { to: string; subject: string; html: strin
 
 const SHELL = (body: string) =>
   `<div style="font-family:system-ui,sans-serif;max-width:520px;margin:0 auto;color:#1b2030;line-height:1.6">
-     <p style="font-size:20px;font-weight:600;color:#0c5660;margin:0 0 16px">PrepPath</p>
+     <p style="font-size:20px;font-weight:600;color:#0c5660;margin:0 0 16px">Axon Careers</p>
      ${body}
-     <p style="color:#989cab;font-size:12px;margin-top:28px">You are getting this because you started practicing on PrepPath. A practice tool, not a guarantee of employment.</p>
+     <p style="color:#989cab;font-size:12px;margin-top:28px">You are getting this because you started practicing on Axon Careers. A practice tool, not a guarantee of employment.</p>
    </div>`;
 
 export function welcomeEmail(name?: string): { subject: string; html: string } {
   return {
-    subject: "Welcome to PrepPath. Here is your first tip.",
+    subject: "Welcome to Axon Careers. Here is your first tip.",
     html: SHELL(
       `<p>${name ? `Hi ${name},` : "Hi,"}</p>
        <p>You took the first step, and that is the hard part. Here is one tip for your next session: end every story with a result, ideally a number. "Cut wait times by 30%" beats "it got better."</p>
        <p>Five minutes a day is all it takes to watch your score climb.</p>
-       <p><a href="https://preppath.ai/practice" style="color:#14808e;font-weight:600">Do a quick session</a></p>`
+       <p><a href="https://axoncareers.com/practice" style="color:#14808e;font-weight:600">Do a quick session</a></p>`
     ),
   };
 }
@@ -55,7 +55,7 @@ export function planEmail(company: string, dateLong: string): { subject: string;
     html: SHELL(
       `<p>Your plan is ready.</p>
        <p>Interview at <strong>${company || "your company"}</strong> on <strong>${dateLong}</strong>. We laid out exactly what to do each day so you are never guessing.</p>
-       <p><a href="https://preppath.ai/plan" style="color:#14808e;font-weight:600">Open your plan</a></p>`
+       <p><a href="https://axoncareers.com/plan" style="color:#14808e;font-weight:600">Open your plan</a></p>`
     ),
   };
 }

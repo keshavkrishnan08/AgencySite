@@ -75,7 +75,7 @@ function Hero() {
             <div className="mt-10 flex items-center gap-4">
               <AvatarRow />
               <p className="text-sm text-ink-2">
-                <span className="font-semibold text-ink">12,000+ people</span> have practiced with PrepPath
+                <span className="font-semibold text-ink">12,000+ people</span> have practiced with Axon Careers
               </p>
             </div>
           </Reveal>
@@ -119,7 +119,7 @@ function NotYourFault() {
               it&apos;s safe to mess up.
             </p>
             <p className="text-ink">
-              That&apos;s PrepPath. A private place to practice until the fear turns into calm. Where a 44 today
+              That&apos;s Axon Careers. A private place to practice until the fear turns into calm. Where a 44 today
               becomes an 82 next week. You&apos;ll see it in real numbers. You&apos;ll prove it to yourself.
             </p>
           </div>
@@ -149,7 +149,7 @@ const QUESTIONS = [
   {
     q: "What's your biggest weakness?",
     pain: "Everyone says 'don't say perfectionist' but nobody tells you what to actually say. Every answer feels like a trap built to disqualify you.",
-    fix: "PrepPath teaches the only weakness formula that works: a real skill you're actively improving, what you're doing about it, kept to two sentences. Done.",
+    fix: "Axon Careers teaches the only weakness formula that works: a real skill you're actively improving, what you're doing about it, kept to two sentences. Done.",
   },
   {
     q: "Where do you see yourself in five years?",
@@ -196,7 +196,7 @@ function FiveQuestions() {
                   </div>
                   <div className="rounded-xl bg-primary-soft/60 p-5">
                     <div className="mb-1.5 flex items-center gap-1.5 text-2xs font-semibold uppercase tracking-wider text-primary-ink">
-                      <Check size={13} /> How PrepPath helps
+                      <Check size={13} /> How Axon Careers helps
                     </div>
                     <p className="text-[0.95rem] leading-relaxed text-primary-ink/90">{item.fix}</p>
                   </div>
@@ -327,7 +327,7 @@ const STORIES = [
     tag: "The 3 AM panic",
     name: "Maria, 38",
     photo: "https://randomuser.me/api/portraits/women/90.jpg",
-    body: "It's 3 AM. Your interview is at 9. Every answer sounds wrong and you can't call anyone. So you open PrepPath. Five questions. Score hits 78. You close your eyes. You've done this before.",
+    body: "It's 3 AM. Your interview is at 9. Every answer sounds wrong and you can't call anyone. So you open Axon Careers. Five questions. Score hits 78. You close your eyes. You've done this before.",
   },
   {
     tag: "The parking lot",
@@ -339,7 +339,7 @@ const STORIES = [
     tag: "The career change",
     name: "James, 45",
     photo: "https://randomuser.me/api/portraits/men/45.jpg",
-    body: "You loved teaching. The burnout didn't. Now everyone asks 'why leave education?' and you hear judgment that isn't there. PrepPath helped you find the answer. You practiced twelve times. It sounds true, because it is.",
+    body: "You loved teaching. The burnout didn't. Now everyone asks 'why leave education?' and you hear judgment that isn't there. Axon Careers helped you find the answer. You practiced twelve times. It sounds true, because it is.",
   },
 ];
 
@@ -410,7 +410,7 @@ function Comparison() {
                 className="p-5 text-center text-sm font-bold text-white"
                 style={{ background: "linear-gradient(135deg, var(--primary-bright), var(--primary-ink))" }}
               >
-                PrepPath Premium
+                Axon Careers Premium
               </div>
             </div>
             {ROWS.map((r, i) => (
@@ -593,7 +593,7 @@ function FinalCTA() {
         <Reveal delay={0.08}>
           <p className="mx-auto mt-7 max-w-prose text-lg leading-loose text-ink-2">
             Not one you settled for because the interview scared you. The job where you walk in Monday and think:{" "}
-            <em className="text-ink">I earned this.</em> PrepPath won&apos;t get it for you. You will. We just
+            <em className="text-ink">I earned this.</em> Axon Careers won&apos;t get it for you. You will. We just
             help you stop fearing the conversation in the way.
           </p>
         </Reveal>
@@ -647,7 +647,7 @@ const FAQS: [string, string][] = [
   ],
   [
     "I haven't interviewed in years. Will this work for me?",
-    "That's exactly who PrepPath is built for. We tailor questions to how long it's been and ease you in. Returning-to-work, recently-laid-off, and career-changers are our core users, not 22-year-old engineers.",
+    "That's exactly who Axon Careers is built for. We tailor questions to how long it's been and ease you in. Returning-to-work, recently-laid-off, and career-changers are our core users, not 22-year-old engineers.",
   ],
   [
     "Is my practice private?",
@@ -663,7 +663,7 @@ const FAQS: [string, string][] = [
   ],
   [
     "What if I want to cancel?",
-    "Two clicks, anytime, from settings. Most people use PrepPath hard for a couple of weeks, land the job, and pause. That's a win in our book.",
+    "Two clicks, anytime, from settings. Most people use Axon Careers hard for a couple of weeks, land the job, and pause. That's a win in our book.",
   ],
 ];
 

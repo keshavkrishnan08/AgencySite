@@ -23,10 +23,10 @@ const jetbrains = JetBrains_Mono({
 });
 
 export const metadata: Metadata = {
-  metadataBase: new URL("https://preppath.ai"),
+  metadataBase: new URL("https://axoncareers.com"),
   title: {
-    default: "PrepPath, You're more ready than you think.",
-    template: "%s · PrepPath",
+    default: "Axon Careers, You're more ready than you think.",
+    template: "%s · Axon Careers",
   },
   description:
     "An AI mock interview coach for career changers, returning professionals, and job seekers. Practice privately, get scored on five dimensions, and watch your confidence climb. For $9.99/month.",
@@ -41,15 +41,15 @@ export const metadata: Metadata = {
   ],
   authors: [{ name: "Keshav Krishnan" }],
   openGraph: {
-    title: "PrepPath, You're more ready than you think.",
+    title: "Axon Careers, You're more ready than you think.",
     description:
       "Practice interviews privately with AI. See exactly where you stand. Walk in knowing your answers are good enough.",
     type: "website",
-    siteName: "PrepPath",
+    siteName: "Axon Careers",
   },
   twitter: {
     card: "summary_large_image",
-    title: "PrepPath, You're more ready than you think.",
+    title: "Axon Careers, You're more ready than you think.",
     description:
       "Practice interviews privately with AI. See exactly where you stand. Walk in ready.",
   },
