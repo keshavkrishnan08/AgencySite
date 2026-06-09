@@ -24,13 +24,13 @@ import { StartSticky } from "@/components/landing/StartSticky";
    everywhere, problem-focused, mobile-first. */
 
 export const metadata: Metadata = {
-  title: "Practice your interview in private, free",
+  title: "Practice your interview in private",
   description:
-    "Haven't interviewed in years? Practice with a private AI coach, five minutes a day, and walk in sure. Free, no card, no account.",
+    "Haven't interviewed in years? Practice with a private AI coach, five minutes a day, and walk in sure. Start a 7-day free trial.",
   openGraph: {
     title: "You're more ready than you think.",
     description:
-      "A private place to practice your interview until the fear turns into calm. Free to start.",
+      "A private place to practice your interview until the fear turns into calm. 7-day free trial.",
   },
   robots: { index: false }, // ad destination, not for organic search
 };
@@ -81,10 +81,10 @@ const STEPS = [
 ];
 
 const ASSURANCES = [
-  { icon: CreditCard, label: "No credit card" },
+  { icon: ShieldCheck, label: "7-day free trial" },
   { icon: Lock, label: "Completely private" },
   { icon: Smartphone, label: "Works on your phone" },
-  { icon: ShieldCheck, label: "Cancel anytime" },
+  { icon: CreditCard, label: "Cancel anytime" },
 ];
 
 function Stars({ className = "" }: { className?: string }) {
@@ -104,7 +104,7 @@ export default function StartPage() {
       <header className="container-wide flex items-center justify-between py-5">
         <Logo href={null} size={30} />
         <span className="chip hidden bg-sage-soft text-sage-ink sm:inline-flex">
-          <Star size={13} className="fill-sage-ink" /> Free to start
+          <Star size={13} className="fill-sage-ink" /> 7-day free trial
         </span>
       </header>
 
@@ -148,10 +148,10 @@ export default function StartPage() {
           <Reveal delay={0.15}>
             <div className="mt-8 flex flex-col items-start gap-3">
               <ButtonLink href={CTA} size="lg" className="w-full sm:w-auto">
-                Start practicing — free <ArrowRight size={18} />
+                Start your free trial <ArrowRight size={18} />
               </ButtonLink>
               <p className="text-sm font-medium text-ink-3">
-                No card. No account. Takes 30 seconds.
+                7 days free, then $9.99/mo. Cancel anytime.
               </p>
             </div>
           </Reveal>
@@ -343,9 +343,9 @@ export default function StartPage() {
                 className="glass inline-flex items-center gap-2 rounded-full px-9 py-4 text-base font-semibold shadow-xl"
                 style={{ color: "var(--primary-ink)" }}
               >
-                Start your first practice — free <ArrowRight size={18} />
+                Start your free trial <ArrowRight size={18} />
               </Link>
-              <p className="text-sm text-white/70">No card. No account. Takes 30 seconds.</p>
+              <p className="text-sm text-white/70">7 days free, then $9.99/mo. Cancel anytime.</p>
             </div>
           </Reveal>
         </div>

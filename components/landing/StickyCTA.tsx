@@ -26,12 +26,12 @@ export function StickyCTA() {
         <div className="glass mx-auto flex max-w-3xl items-center justify-between gap-4 rounded-2xl border px-5 py-3.5 shadow-xl" style={{ borderColor: "var(--border)" }}>
           <div className="hidden sm:block">
             <p className="font-serif text-base font-semibold text-ink">Your next interview is coming.</p>
-            <p className="text-xs text-ink-2">Free to start · no credit card · takes 30 seconds.</p>
+            <p className="text-xs text-ink-2">7-day free trial · cancel anytime.</p>
           </div>
-          <p className="text-sm font-medium text-ink sm:hidden">Practice free. No card</p>
+          <p className="text-sm font-medium text-ink sm:hidden">Start your free trial</p>
           <div className="flex items-center gap-1">
             <ButtonLink href="/onboarding" size="sm" className="group whitespace-nowrap">
-              Start free <ArrowRight size={15} className="transition-transform group-hover:translate-x-0.5" />
+              Start free trial <ArrowRight size={15} className="transition-transform group-hover:translate-x-0.5" />
             </ButtonLink>
             <button
               onClick={() => setDismissed(true)}
