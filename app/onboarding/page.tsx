@@ -288,7 +288,7 @@ export default function OnboardingPage() {
                                 <button
                                   key={o.value}
                                   onClick={() => pick(f.key, o.value)}
-                                  className="rounded-full border px-4 py-2 text-sm font-medium transition-all"
+                                  className="rounded-full border px-3 py-1.5 text-[0.8rem] font-medium transition-all"
                                   style={{
                                     borderColor: active ? "var(--primary)" : "var(--border-strong)",
                                     background: active ? "var(--primary-soft)" : "var(--surface)",
