@@ -30,7 +30,7 @@ export function StartSticky() {
         Start practicing — free <ArrowRight size={18} />
       </Link>
       <p className="mt-1.5 text-center text-2xs font-medium text-ink-3">
-        No card. No account. 30 seconds.
+        7-day free trial. Cancel anytime.
       </p>
     </div>
   );
