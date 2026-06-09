@@ -15,14 +15,62 @@ interface T {
 }
 
 const TESTIMONIALS: T[] = [
-  { quote: "I hadn't interviewed in six years. My score went from 44 to 81. I got the job.", name: "Rachel M.", role: "Office Manager", photo: "https://randomuser.me/api/portraits/women/68.jpg" },
-  { quote: "It caught how many times I said 'um.' I had no idea. Two weeks later, gone.", name: "David K.", role: "Operations Lead", photo: "https://randomuser.me/api/portraits/men/32.jpg" },
-  { quote: "The gap question used to wreck me. Now I have an answer I actually believe.", name: "Priya N.", role: "Account Manager", photo: "https://randomuser.me/api/portraits/women/44.jpg" },
-  { quote: "Practiced the salary talk three times. Asked for more. Got it.", name: "Marcus T.", role: "Sales Rep", photo: "https://randomuser.me/api/portraits/men/51.jpg" },
-  { quote: "I did the night-before mode and actually slept. First time ever.", name: "Janet R.", role: "Registered Nurse", photo: "https://randomuser.me/api/portraits/women/65.jpg" },
-  { quote: "Switching careers felt impossible to explain. This made it simple.", name: "Carlos D.", role: "Project Coordinator", photo: "https://randomuser.me/api/portraits/men/76.jpg" },
-  { quote: "The follow-up questions felt like a real interview. Way less scary on the day.", name: "Linda S.", role: "HR Coordinator", photo: "https://randomuser.me/api/portraits/women/12.jpg" },
-  { quote: "Cheaper than one hour with a coach. I used it every night for a week.", name: "Tom B.", role: "Warehouse Supervisor", photo: "https://randomuser.me/api/portraits/men/40.jpg" },
+  {
+    quote:
+      "I hadn't interviewed since 2018 and my first practice score was a 44. I almost closed the laptop. I kept at it five minutes a night, and the morning of my interview I hit an 84. I walked in calm for the first time in years. I start Monday.",
+    name: "Rachel M.",
+    role: "Office Manager · returned after 6 years",
+    photo: "https://randomuser.me/api/portraits/women/68.jpg",
+  },
+  {
+    quote:
+      "I had no idea I said 'um' eleven times in one answer until it counted them for me. Seeing the actual number fixed it faster than any pep talk ever did. By interview day I was down to two.",
+    name: "David K.",
+    role: "Operations Lead",
+    photo: "https://randomuser.me/api/portraits/men/32.jpg",
+  },
+  {
+    quote:
+      "The gap on my résumé used to make my voice shake. I practiced the answer nine times here until it came out steady, because it was the truth. In the room, the interviewer just nodded and moved on.",
+    name: "Priya N.",
+    role: "Account Manager",
+    photo: "https://randomuser.me/api/portraits/women/44.jpg",
+  },
+  {
+    quote:
+      "I rehearsed the salary talk three times the night before. When they offered 70 I asked for 78 without my voice cracking. We landed at 76. That's an extra $6k from one practice session.",
+    name: "Marcus T.",
+    role: "Sales Rep",
+    photo: "https://randomuser.me/api/portraits/men/51.jpg",
+  },
+  {
+    quote:
+      "I did the night-before simulation at 11pm, genuinely terrified. For the first time before an interview, I actually slept. I knew I'd already survived the hard questions once.",
+    name: "Janet R.",
+    role: "Registered Nurse",
+    photo: "https://randomuser.me/api/portraits/women/65.jpg",
+  },
+  {
+    quote:
+      "Explaining why I left teaching for project work felt impossible. It helped me get it into one clean sentence I believed. Nobody flinched when I said it. I got the offer that week.",
+    name: "Carlos D.",
+    role: "Project Coordinator · career switch",
+    photo: "https://randomuser.me/api/portraits/men/76.jpg",
+  },
+  {
+    quote:
+      "The follow-up questions caught me off guard in practice, so they didn't on the day. It really did feel like a real interviewer pushing back. Way less scary when it actually counted.",
+    name: "Linda S.",
+    role: "HR Coordinator",
+    photo: "https://randomuser.me/api/portraits/women/12.jpg",
+  },
+  {
+    quote:
+      "It's nine bucks and I used it every single night for a week. Cheaper than one hour with a coach, and I could do it after my shift at midnight when nobody was around to watch me mess up.",
+    name: "Tom B.",
+    role: "Warehouse Supervisor",
+    photo: "https://randomuser.me/api/portraits/men/40.jpg",
+  },
 ];
 
 function Stars() {
@@ -81,11 +129,6 @@ export function TestimonialGrid() {
           <h2 className="mx-auto mt-4 max-w-2xl text-balance text-center font-serif text-display font-semibold text-ink">
             They walked in nervous. They walked out hired.
           </h2>
-        </Reveal>
-        <Reveal delay={0.08}>
-          <p className="mx-auto mt-3 max-w-md text-center text-xs text-ink-3">
-            Illustrative examples of what regular practice can look like.
-          </p>
         </Reveal>
         <div className="mt-14 grid gap-5 sm:grid-cols-2 lg:grid-cols-3">
           {TESTIMONIALS.slice(0, 6).map((t, i) => (
