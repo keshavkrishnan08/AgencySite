@@ -33,7 +33,7 @@ function fallback(answer: string): string {
 }
 
 export async function POST(req: Request) {
-  const limited = rateLimit(req);
+  const limited = await rateLimit(req);
   if (limited) return limited;
   recordUsage(req);
   let body: any;

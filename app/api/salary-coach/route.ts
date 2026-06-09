@@ -54,7 +54,7 @@ function heuristic(round: number, message: string, target: number) {
 }
 
 export async function POST(req: Request) {
-  const limited = rateLimit(req);
+  const limited = await rateLimit(req);
   if (limited) return limited;
   recordUsage(req);
   let body: any;
