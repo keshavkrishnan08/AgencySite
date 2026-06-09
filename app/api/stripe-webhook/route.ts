@@ -61,6 +61,9 @@ export async function POST(req: Request) {
       const email = await emailForCustomer(obj.customer);
       const status = event.type === "customer.subscription.deleted" ? "canceled" : obj.status;
       const plan = status === "active" || status === "trialing" ? "premium" : "free";
+      // Stripe's 2026 API moved current_period_end onto the line item; older
+      // versions keep it on the subscription. Read whichever is present.
+      const periodEndUnix = obj.current_period_end ?? obj.items?.data?.[0]?.current_period_end ?? null;
       if (email) {
         await db.from("subscriptions").upsert(
           {
@@ -69,9 +72,7 @@ export async function POST(req: Request) {
             stripe_subscription_id: obj.id ?? null,
             status,
             plan,
-            current_period_end: obj.current_period_end
-              ? new Date(obj.current_period_end * 1000).toISOString()
-              : null,
+            current_period_end: periodEndUnix ? new Date(periodEndUnix * 1000).toISOString() : null,
             updated_at: new Date().toISOString(),
           },
           { onConflict: "stripe_subscription_id" }
