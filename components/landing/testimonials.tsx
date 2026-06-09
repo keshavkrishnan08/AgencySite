@@ -7,14 +7,14 @@ import { Avatar } from "@/components/ui/Avatar";
 /* Real photos pulled from randomuser.me (free, no key, stable CDN).
    Quotes are sample copy. Swap for verified reviews before launch. */
 
-interface T {
+export interface T {
   quote: string;
   name: string;
   role: string;
   photo: string;
 }
 
-const TESTIMONIALS: T[] = [
+export const TESTIMONIALS: T[] = [
   {
     quote:
       "I hadn't interviewed since 2018 and my first practice score was a 44. I almost closed the laptop. I kept at it five minutes a night, and the morning of my interview I hit an 84. I walked in calm for the first time in years. I start Monday.",
