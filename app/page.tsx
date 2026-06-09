@@ -5,7 +5,7 @@ import { HeroDemo } from "@/components/landing/HeroDemo";
 import { Avatar } from "@/components/ui/Avatar";
 import { ProductFeatures } from "@/components/landing/features";
 import { FlowDiagram } from "@/components/landing/FlowDiagram";
-import { TestimonialMarquee, TestimonialGrid } from "@/components/landing/testimonials";
+import { TestimonialGrid } from "@/components/landing/testimonials";
 import { StickyCTA } from "@/components/landing/StickyCTA";
 import { Reveal } from "@/components/ui/Reveal";
 import { ScoreRing } from "@/components/ui/Score";
@@ -89,45 +89,6 @@ function Hero() {
   );
 }
 
-/* ===================== EMOTIONAL VALIDATION ===================== */
-function NotYourFault() {
-  return (
-    <section className="border-y" style={{ background: "var(--bg-sunk)", borderColor: "var(--border)" }}>
-      <div className="container-content py-24 text-center sm:py-32">
-        <Reveal>
-          <Eyebrow>The truth nobody tells you</Eyebrow>
-        </Reveal>
-        <Reveal delay={0.05}>
-          <h2 className="text-balance font-serif text-display font-semibold text-ink">
-            The job market changed. You didn&apos;t do anything wrong.
-          </h2>
-        </Reveal>
-        <Reveal delay={0.1}>
-          <div className="mx-auto mt-8 max-w-prose space-y-5 text-left text-lg leading-loose text-ink-2">
-            <p>
-              Today the average job post gets <strong className="text-ink">340 applicants</strong>. Only{" "}
-              <strong className="text-ink">2%</strong> get an interview. The wait can stretch{" "}
-              <strong className="text-ink">108 days</strong>.
-            </p>
-            <p>
-              You&apos;re up against AI-screened résumés and filters that cut you before a person sees your name.
-              The system is stacked. That&apos;s not about your talent. It&apos;s a broken process.
-            </p>
-            <p>
-              And when you do get the interview, <strong className="text-ink">93% of people</strong> feel
-              anxious. Not because they&apos;re not good enough. Because they&apos;ve never practiced where
-              it&apos;s safe to mess up.
-            </p>
-            <p className="text-ink">
-              That&apos;s Axon Careers. A private place to practice until the fear turns into calm. Where a 44 today
-              becomes an 82 next week. You&apos;ll see it in real numbers. You&apos;ll prove it to yourself.
-            </p>
-          </div>
-        </Reveal>
-      </div>
-    </section>
-  );
-}
 
 /* ===================== FIVE QUESTIONS ===================== */
 const QUESTIONS = [
@@ -701,16 +662,14 @@ export default function LandingPage() {
       <SiteNav />
       <main>
         <Hero />
-        <TestimonialMarquee />
         <TrustStrip />
+        <Stories />
         <HowItWorks />
         <ProductFeatures />
-        <Numbers />
-        <Stories />
-        <NotYourFault />
         <FiveQuestions />
-        <Comparison />
+        <Numbers />
         <TestimonialGrid />
+        <Comparison />
         <Privacy />
         <Pricing />
         <FAQ />
