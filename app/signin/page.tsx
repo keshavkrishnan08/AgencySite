@@ -8,6 +8,7 @@ import { ArrowRight, Loader2, Mail, Lock, User, CheckCircle2 } from "lucide-reac
 import { Logo } from "@/components/ui/Logo";
 import { Button } from "@/components/ui/Button";
 import { useAuth } from "@/lib/auth";
+import { ReviewWall } from "@/components/auth/ReviewWall";
 
 type Mode = "signin" | "signup";
 
@@ -58,7 +59,8 @@ function SignInInner() {
   };
 
   return (
-    <main className="relative flex min-h-screen flex-col items-center justify-center overflow-hidden px-5 py-12">
+    <main className="min-h-screen lg:grid lg:grid-cols-2">
+    <div className="relative flex min-h-screen flex-col items-center justify-center overflow-hidden px-5 py-12">
       {/* ambient glow */}
       <div
         className="pointer-events-none absolute -top-32 left-1/2 h-96 w-[36rem] -translate-x-1/2 rounded-full opacity-50 blur-3xl"
@@ -150,6 +152,8 @@ function SignInInner() {
         Just trying it out?{" "}
         <Link href="/onboarding" className="font-medium text-ink-2 hover:text-ink">Practice free, no account</Link>
       </p>
+    </div>
+      <ReviewWall />
     </main>
   );
 }
