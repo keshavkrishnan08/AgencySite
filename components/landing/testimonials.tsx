@@ -17,56 +17,56 @@ export interface T {
 export const TESTIMONIALS: T[] = [
   {
     quote:
-      "I hadn't interviewed since 2018 and my first practice score was a 44. I almost closed the laptop. I kept at it five minutes a night, and the morning of my interview I hit an 84. I walked in calm for the first time in years. I start Monday.",
+      "I hadn't interviewed since 2018 and my first score was a 44. I almost gave up, honestly! But I kept at it five minutes a night and hit an 84 by interview morning. Walked in actually calm for once. I start Monday!!",
     name: "Rachel M.",
     role: "Office Manager · returned after 6 years",
     photo: "https://randomuser.me/api/portraits/women/68.jpg",
   },
   {
     quote:
-      "I had no idea I said 'um' eleven times in one answer until it counted them for me. Seeing the actual number fixed it faster than any pep talk ever did. By interview day I was down to two.",
+      "I had NO idea I said 'um' eleven times in one answer until it counted them for me. So embarrassing 😅 But by interview day? Down to two. Wild.",
     name: "David K.",
     role: "Operations Lead",
     photo: "https://randomuser.me/api/portraits/men/32.jpg",
   },
   {
     quote:
-      "The gap on my résumé used to make my voice shake. I practiced the answer nine times here until it came out steady, because it was the truth. In the room, the interviewer just nodded and moved on.",
+      "The gap question used to make my voice shake so bad. Practiced it like nine times here til it came out steady. In the actual room, the interviewer just nodded and moved on. That was it!",
     name: "Priya N.",
     role: "Account Manager",
     photo: "https://randomuser.me/api/portraits/women/44.jpg",
   },
   {
     quote:
-      "I rehearsed the salary talk three times the night before. When they offered 70 I asked for 78 without my voice cracking. We landed at 76. That's an extra $6k from one practice session.",
+      "Rehearsed the salary talk three times the night before. They offered 70, I asked for 78 without my voice cracking once, and we landed at 76. That's $6k from one practice session!!",
     name: "Marcus T.",
     role: "Sales Rep",
     photo: "https://randomuser.me/api/portraits/men/51.jpg",
   },
   {
     quote:
-      "I did the night-before simulation at 11pm, genuinely terrified. For the first time before an interview, I actually slept. I knew I'd already survived the hard questions once.",
+      "Did the night-before sim at 11pm, totally terrified. And then... I actually slept?! First time ever before an interview. Game changer.",
     name: "Janet R.",
     role: "Registered Nurse",
     photo: "https://randomuser.me/api/portraits/women/65.jpg",
   },
   {
     quote:
-      "Explaining why I left teaching for project work felt impossible. It helped me get it into one clean sentence I believed. Nobody flinched when I said it. I got the offer that week.",
+      "Explaining why I left teaching felt impossible. This got it down to one clean sentence I actually believed. Nobody flinched when I said it. Got the offer that week!",
     name: "Carlos D.",
     role: "Project Coordinator · career switch",
     photo: "https://randomuser.me/api/portraits/men/76.jpg",
   },
   {
     quote:
-      "The follow-up questions caught me off guard in practice, so they didn't on the day. It really did feel like a real interviewer pushing back. Way less scary when it actually counted.",
+      "The follow-ups caught me SO off guard in practice... which meant they didn't on the day. Felt like a real interviewer pushing back. Way less scary when it actually counted!",
     name: "Linda S.",
     role: "HR Coordinator",
     photo: "https://randomuser.me/api/portraits/women/12.jpg",
   },
   {
     quote:
-      "It's nine bucks and I used it every single night for a week. Cheaper than one hour with a coach, and I could do it after my shift at midnight when nobody was around to watch me mess up.",
+      "Nine bucks and I used it every single night for a week. Cheaper than one hour with a coach, and I could do it after my shift at midnight. No notes!",
     name: "Tom B.",
     role: "Warehouse Supervisor",
     photo: "https://randomuser.me/api/portraits/men/40.jpg",

@@ -75,8 +75,7 @@ function SignInInner() {
         initial={{ opacity: 0, y: 18 }}
         animate={{ opacity: 1, y: 0 }}
         transition={{ duration: 0.5, ease: [0.22, 1, 0.36, 1] }}
-        className="w-full max-w-md rounded-2xl border bg-surface/90 p-8 shadow-xl backdrop-blur-xl sm:p-9"
-        style={{ borderColor: "var(--border-strong)" }}
+        className="w-full max-w-sm"
       >
         <h1 className="text-center font-serif text-3xl font-semibold text-ink">
           {mode === "signup" ? "Create your account" : "Welcome back"}
