@@ -9,7 +9,7 @@ export const dynamic = "force-dynamic";
    this to reconcile access: keep premium while inside the paid period, drop it
    once the subscription has truly ended. Reads the email from x-user-id. */
 export async function POST(req: Request) {
-  const limited = rateLimit(req);
+  const limited = await rateLimit(req);
   if (limited) return limited;
   const email = (req.headers.get("x-user-id") || "").trim().slice(0, 200);
   if (!email) return NextResponse.json({ premium: false, status: "none", until: null });
