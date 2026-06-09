@@ -12,21 +12,30 @@ import { getProfile, isPremium, onStoreChange, setProfile, upgradeToPremium } fr
 
    The app is for paying customers. Access rules (only when auth is configured):
      1. not signed in            -> /signin
-     2. signed in, not premium   -> /upgrade   (except on /upgrade itself, so
-                                                 they can actually pay)
-     3. signed in + premium      -> in.
+     2. signed in, not premium   -> /upgrade   (except on /upgrade and /settings)
+     3. signed in + premium       -> in.
 
-   Premium is read from the local profile, which is hydrated from the DB on
-   sign-in and flipped on a successful checkout. We give hydration a short grace
-   window so a real premium user is never bounced to /upgrade on first paint.
+   Access is authoritative from the subscription. We must NOT decide "not paying"
+   until that check returns, or a returning subscriber signing in fresh (premium
+   only in the DB, not yet local) gets wrongly bounced to /upgrade. So while the
+   subscription check is in flight we show a loader, never a redirect.
 
-   Until the Supabase anon key is set, authConfigured() is false and the whole
-   gate is inert, so local/dev keeps working. */
+   Until the Supabase anon key is set, authConfigured() is false and the gate is
+   inert, so local/dev keeps working. */
+// Remembers which account's subscription we've already verified this session,
+// so navigating between authed pages doesn't re-show the gate loader.
+let checkedFor: string | null = null;
+
 export function AppShell({ children, requirePremium = true }: { children: ReactNode; requirePremium?: boolean }) {
   const { configured, user, loading } = useAuth();
   const router = useRouter();
   const pathname = usePathname();
-  const [premium, setPremium] = useState(false);
+  // Seed from localStorage so a cached nav renders instantly with the right
+  // access state (no loader flash, no one-frame false redirect).
+  const [premium, setPremium] = useState(() => (typeof window !== "undefined" ? isPremium() : false));
+  const [subChecked, setSubChecked] = useState(
+    () => typeof window !== "undefined" && checkedFor !== null && checkedFor === getProfile().email
+  );
 
   useEffect(() => {
     const sync = () => setPremium(isPremium());
@@ -34,47 +43,66 @@ export function AppShell({ children, requirePremium = true }: { children: ReactN
     return onStoreChange(sync);
   }, []);
 
-  // Reconcile access against the authoritative subscription. Keeps premium while
-  // inside the paid period; drops it once the sub has ended. "none" means no
-  // subscription row (e.g. just paid, webhook not in yet) so we leave it alone.
+  // Reconcile access against the authoritative subscription before gating.
   useEffect(() => {
-    if (!configured || loading || !user) return;
+    if (!configured) return; // gate inert
+    if (loading) return; // wait for auth to resolve
+    if (!user) {
+      setSubChecked(true);
+      return;
+    }
     const email = getProfile().email;
-    if (!email) return;
-    fetch("/api/subscription-status", { method: "POST", headers: { "Content-Type": "application/json", "x-user-id": email } })
+    if (!email) {
+      setSubChecked(true);
+      return;
+    }
+    if (checkedFor === email) {
+      // Already verified this account this session; skip the blocking check.
+      setSubChecked(true);
+      return;
+    }
+    let alive = true;
+    fetch("/api/subscription-status", {
+      method: "POST",
+      headers: { "Content-Type": "application/json", "x-user-id": email },
+    })
       .then((r) => r.json())
       .then((s: { premium: boolean; status: string }) => {
-        if (!s || s.status === "none") return;
-        if (s.premium) {
-          if (!isPremium()) upgradeToPremium();
-        } else if (isPremium()) {
-          setProfile({ plan: "free" });
+        if (!alive) return;
+        // "none" = no subscription row (e.g. just paid, webhook not in yet):
+        // leave the local/optimistic flag alone. Otherwise the DB is the truth.
+        if (s && s.status !== "none") {
+          if (s.premium) upgradeToPremium();
+          else if (isPremium()) setProfile({ plan: "free" });
         }
       })
-      .catch(() => {});
+      .catch(() => {})
+      .finally(() => {
+        checkedFor = email;
+        if (alive) setSubChecked(true);
+      });
+    return () => {
+      alive = false;
+    };
   }, [configured, loading, user]);
 
   // /upgrade so they can pay; /settings so they can always manage/sign out.
   const exemptFromPay = !requirePremium || pathname === "/upgrade" || pathname === "/settings";
   const ready = configured && !loading;
   const needsAuth = ready && !user;
-  const needsPay = ready && !!user && !premium && !exemptFromPay;
+  // Don't judge "not paying" until the subscription check has returned.
+  const checkingSub = ready && !!user && !subChecked && !exemptFromPay;
+  const needsPay = ready && !!user && subChecked && !premium && !exemptFromPay;
 
-  // 1) signed out -> sign in
   useEffect(() => {
     if (needsAuth) router.replace(`/signin?next=${encodeURIComponent(pathname)}`);
   }, [needsAuth, pathname, router]);
 
-  // 2) signed in but not paying -> upgrade (after a grace window for DB hydrate)
   useEffect(() => {
-    if (!needsPay) return;
-    const t = setTimeout(() => {
-      if (!isPremium()) router.replace("/upgrade");
-    }, 1400);
-    return () => clearTimeout(t);
+    if (needsPay) router.replace("/upgrade");
   }, [needsPay, router]);
 
-  if (needsAuth || needsPay) {
+  if (needsAuth || needsPay || checkingSub) {
     return (
       <main className="grid min-h-screen place-items-center">
         <Loader2 size={28} className="animate-spin text-primary" />
