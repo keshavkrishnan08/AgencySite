@@ -82,6 +82,11 @@ export function TestimonialGrid() {
             They walked in nervous. They walked out hired.
           </h2>
         </Reveal>
+        <Reveal delay={0.08}>
+          <p className="mx-auto mt-3 max-w-md text-center text-xs text-ink-3">
+            Illustrative examples of what regular practice can look like.
+          </p>
+        </Reveal>
         <div className="mt-14 grid gap-5 sm:grid-cols-2 lg:grid-cols-3">
           {TESTIMONIALS.slice(0, 6).map((t, i) => (
             <Reveal key={t.name} delay={(i % 3) * 0.06}>

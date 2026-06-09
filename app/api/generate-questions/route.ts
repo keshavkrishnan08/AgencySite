@@ -31,7 +31,7 @@ Return ONLY valid minified JSON, no backticks:
 {"questions":[{"number":1,"text":"...","category":"warmup|behavioral|gap|situation|closer","tip":"..."}]}`;
 
 export async function POST(req: Request) {
-  const limited = rateLimit(req);
+  const limited = await rateLimit(req);
   if (limited) return limited;
   recordUsage(req);
   let body: any;

@@ -160,11 +160,8 @@ export default function StartPage() {
             <div className="mt-8 flex items-center gap-3">
               <AvatarRow />
               <div className="text-sm">
-                <div className="flex items-center gap-1.5">
-                  <Stars />
-                  <span className="font-semibold text-ink">4.9</span>
-                </div>
-                <span className="text-ink-3">12,000+ people have practiced here</span>
+                <p className="font-medium text-ink">Practice in private. No account to start.</p>
+                <span className="text-ink-3">Five minutes a day until you feel ready.</span>
               </div>
             </div>
           </Reveal>
