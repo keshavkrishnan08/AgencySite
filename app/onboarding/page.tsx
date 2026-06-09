@@ -4,7 +4,7 @@ import { useMemo, useState } from "react";
 import { useRouter } from "next/navigation";
 import Link from "next/link";
 import { AnimatePresence, motion } from "framer-motion";
-import { ArrowLeft, ArrowRight, Search, ShieldCheck } from "lucide-react";
+import { ArrowLeft, ArrowRight, Search, Star, ShieldCheck } from "lucide-react";
 import { Logo } from "@/components/ui/Logo";
 import { Button } from "@/components/ui/Button";
 import { AnimatedNumber } from "@/components/ui/AnimatedNumber";
@@ -360,9 +360,9 @@ function ConversionPanel({ demo, role }: { demo: Demo; role: string }) {
       <div className="pointer-events-none absolute -right-20 -top-24 h-80 w-80 rounded-full opacity-40 blur-3xl" style={{ background: "radial-gradient(circle, #ffffff66, transparent)" }} />
       <div className="pointer-events-none absolute -bottom-28 -left-20 h-80 w-80 rounded-full opacity-30 blur-3xl" style={{ background: "radial-gradient(circle, #ffe0a655, transparent)" }} />
       <div className="sticky top-0 flex min-h-screen flex-col justify-center px-12 py-16 text-white xl:px-16">
-        <div className="flex items-center gap-2 text-white/85">
-          <ShieldCheck size={16} />
-          <span className="text-sm font-medium">Built for people getting back out there.</span>
+        <div className="flex items-center gap-1.5">
+          {Array.from({ length: 5 }).map((_, i) => <Star key={i} size={16} className="fill-white text-white" />)}
+          <span className="ml-2 text-sm font-medium text-white/85">Loved by 12,000+ job seekers</span>
         </div>
         <div className="mt-6 min-h-[3.5rem]">
           <AnimatePresence mode="wait">
