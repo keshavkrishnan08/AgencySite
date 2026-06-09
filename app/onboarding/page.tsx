@@ -219,7 +219,8 @@ export default function OnboardingPage() {
     setOnboarding({ situation, targetRole: finalRole, interviewGap: gap });
     setProfile({ situation, targetRole: finalRole, interviewGap: gap });
     track("onboarding_complete", { situation, role: finalRole, gap, ...answers });
-    router.push("/practice?autostart=1");
+    // Flow: onboarding questions -> create account -> payment -> app.
+    router.push("/signin?mode=signup&next=%2Fupgrade");
   };
 
   const variants = {
@@ -236,7 +237,7 @@ export default function OnboardingPage() {
           <Logo />
           <span className="text-sm text-ink-2">
             Have an account?{" "}
-            <Link href="/signin?next=/practice" className="font-semibold text-primary-ink hover:underline">Sign in</Link>
+            <Link href="/signin?next=/dashboard" className="font-semibold text-primary-ink hover:underline">Sign in</Link>
           </span>
         </div>
 
