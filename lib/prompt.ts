@@ -13,13 +13,28 @@ How you always work:
 - Plain words a 6th grader can read. Short sentences. Warm, human, direct.
 - Never use em dashes or en dashes. Use a period, comma, or colon.`;
 
-export const SCORING_RUBRIC = `Score each dimension 0 to 100 with these anchors so scores stay consistent:
-- 90 to 100: a hiring manager would be impressed.
-- 70 to 89: solid, would pass.
-- 50 to 69: okay but clearly improvable.
-- 30 to 49: weak, would hurt them.
-- 0 to 29: missing, vague, or off topic.
-If the candidate has a known weak area, judge it honestly and connect your fix to it.`;
+export const SCORING_RUBRIC = `GRADING PROCEDURE. Follow this exact procedure every time so two identical answers always get the same scores. Do not grade on vibes. For each dimension: (1) pick the band the evidence supports, (2) adjust within that band using the listed signals, (3) record the score. Then compute the weighted overall. Be consistent and honest, not generous.
+
+TRANSCRIPTION TOLERANCE (critical): answers are captured by speech-to-text and may be imperfect. IGNORE anything that is clearly a transcription artifact and not something a listener would hear: missing or wrong punctuation, no capitalization, homophones (their/there, to/two/too, your/you're), run-on sentences caused by missing punctuation, dropped short filler words, and stray line breaks. Grade the underlying spoken content and intent. NEVER lower clarity, conciseness, or confidence because of transcription noise. Only penalize problems a human listener would actually notice in the room.
+
+BANDS (apply to every dimension, 0-100):
+- 90-100 Excellent: a hiring manager would be impressed and remember it.
+- 75-89 Strong: clearly passes; only minor polish left.
+- 60-74 Okay: gets the point across but has one real, fixable weakness.
+- 40-59 Weak: would hurt them; a core element is missing or muddled.
+- 20-39 Poor: largely fails this dimension.
+- 0-19 Absent or off-topic.
+
+DIMENSION SIGNALS (what raises or lowers each):
+1) CLARITY (structure, easy to follow). Up: leads with the point, logical order (situation then action then result), one idea per sentence. Down: buries the point, jumps around, listener must re-track. (Punctuation from STT does not count.)
+2) RELEVANCE (answers THIS question for THIS role). Up: first sentence answers exactly what was asked; the example fits the question type and the target role. Down: answers an adjacent question, drifts, or tells a generic story that ignores the prompt.
+3) SPECIFICITY (concrete, measurable, real). Up: a real situation, concrete actions, and a result, ideally with a number, timeframe, or named outcome. Down: vague claims with no example, number, or outcome. This is the most common failure. Be strict: no number or concrete result caps this at 65.
+4) CONFIDENCE (language projects steadiness). Up: declarative ownership ("I led," "I decided," "I cut"). Down: audible hedging and self-undermining: "just," "I think," "kind of," "maybe," "I'm not sure," "probably," apologizing, "does that make sense?". Count them; each cluster lowers the score. (Judge spoken hedging, not written artifacts.)
+5) CONCISENESS (right length, no rambling). Up: roughly 60-150 spoken words for a behavioral answer; tight, lands, and stops. Down: under ~25 words (too thin to judge) or rambling/repeating past the point. Judge by spoken length and repetition, not punctuation.
+
+OVERALL = round(clarity*0.20 + relevance*0.20 + specificity*0.25 + confidence*0.20 + conciseness*0.15).
+
+If the candidate has a known weak area, grade it strictly and tie the one fix to it. In every feedback line, quote the candidate's own words as the evidence for the score.`;
 
 const SITUATION_LABEL: Record<string, string> = {
   returning: "returning to work after time away",
