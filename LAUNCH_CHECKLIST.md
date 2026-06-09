@@ -10,9 +10,9 @@ Last verified: against Supabase project `iszclgghrubxmshllwwc` and Stripe test m
 
 These block real users from paying or getting in. Do all of them.
 
-- [ ] **Turn off (or handle) Supabase email confirmation.**
-  Dashboard → Authentication → Providers → Email → toggle **Confirm email** off, OR keep it on and tell users to check their inbox.
-  Why it matters: with it on, a new password signup can't log in until they click the email link, so they never reach checkout. Right now this is the single biggest blocker to the signup → pay flow.
+- [x] **Supabase email confirmation — DONE (off).** Verified: a client signup
+  returns a session immediately, so onboarding → create account → payment runs
+  with no email step in the way.
 
 - [ ] **Set the Stripe webhook + secret in production.**
   After you deploy, Stripe Dashboard → Developers → Webhooks → Add endpoint → `https://YOUR_DOMAIN/api/stripe-webhook`.
