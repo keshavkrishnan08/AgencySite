@@ -4,7 +4,7 @@ import { useEffect, useRef, useState } from "react";
 import { Mic, MicOff, Loader2 } from "lucide-react";
 import { cn } from "@/lib/utils";
 import type { DeliveryMetrics } from "@/lib/types";
-import { whisperSupported, blobToPcm16k, transcribePcm } from "@/lib/whisper";
+import { whisperSupported, blobToPcm16k, transcribePcm, preloadWhisper } from "@/lib/whisper";
 
 /* Voice input. Primary engine is on-device Whisper (transformers.js): the audio
    never leaves the browser and there is no API key. We record with the mic,
@@ -246,6 +246,15 @@ export function VoiceButton({
 
   /* ---------------- shared ---------------- */
 
+  // Warm the model when the user shows intent (hover/focus), so the first
+  // transcription isn't a cold download. Runs once, only for the Whisper engine.
+  const preloadedRef = useRef(false);
+  const warm = () => {
+    if (preloadedRef.current || engine !== "whisper") return;
+    preloadedRef.current = true;
+    preloadWhisper().catch(() => {});
+  };
+
   const onClick = () => {
     if (phase === "transcribing") return;
     if (phase === "rec") {
@@ -286,6 +295,8 @@ export function VoiceButton({
     <button
       type="button"
       onClick={onClick}
+      onMouseEnter={warm}
+      onFocus={warm}
       aria-pressed={phase === "rec"}
       aria-label={phase === "rec" ? "Stop recording" : "Speak your answer"}
       disabled={phase === "transcribing"}
