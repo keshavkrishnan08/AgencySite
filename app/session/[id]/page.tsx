@@ -221,8 +221,8 @@ function AccountPrompt({ onDone }: { onDone: () => void }) {
         <h2 className="font-serif text-xl font-semibold">Save your progress</h2>
       </div>
       <p className="mt-2 max-w-lg text-ink-2">
-        Create a free account to track your scores, see your improvement over time, and pick up where you
-        left off. No credit card.
+        Create an account to track your scores, see your improvement over time, and pick up where you
+        left off.
       </p>
       <div className="mt-5 flex flex-col gap-3 sm:flex-row">
         <input
