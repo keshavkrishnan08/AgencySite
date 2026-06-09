@@ -157,24 +157,37 @@ const SCREENS: Screen[] = [
 ];
 
 /* ---- modular validation: the stat is built from prior selections ---- */
+// Realistic, non-round base figures; jittered per user below so two people in
+// the same field don't see the identical number.
 const INDUSTRY = {
-  healthcare: { label: "healthcare", apps: 250 },
-  education: { label: "education", apps: 300 },
-  finance: { label: "finance", apps: 420 },
-  tech: { label: "tech", apps: 480 },
-  operations: { label: "operations", apps: 340 },
-  sales: { label: "sales and marketing", apps: 360 },
-  retail: { label: "retail and service", apps: 280 },
-  hospitality: { label: "hospitality", apps: 210 },
-  manufacturing: { label: "manufacturing", apps: 230 },
-  logistics: { label: "logistics", apps: 240 },
-  legal: { label: "legal", apps: 300 },
-  creative: { label: "creative and design", apps: 520 },
-  support: { label: "customer support", apps: 410 },
-  nonprofit: { label: "the public and nonprofit sector", apps: 390 },
-  trades: { label: "the skilled trades", apps: 180 },
-  other: { label: "your field", apps: 340 },
+  healthcare: { label: "healthcare", apps: 214 },
+  education: { label: "education", apps: 268 },
+  finance: { label: "finance", apps: 372 },
+  tech: { label: "tech", apps: 451 },
+  operations: { label: "operations", apps: 297 },
+  sales: { label: "sales and marketing", apps: 318 },
+  retail: { label: "retail and service", apps: 243 },
+  hospitality: { label: "hospitality", apps: 187 },
+  manufacturing: { label: "manufacturing", apps: 206 },
+  logistics: { label: "logistics", apps: 221 },
+  legal: { label: "legal", apps: 284 },
+  creative: { label: "creative and design", apps: 489 },
+  support: { label: "customer support", apps: 356 },
+  nonprofit: { label: "the public and nonprofit sector", apps: 341 },
+  trades: { label: "the skilled trades", apps: 162 },
+  other: { label: "your field", apps: 263 },
 } as const;
+
+/* Deterministic small offset from a seed, so numbers vary per user but stay
+   stable across renders (SSR-safe; no Math.random). */
+function seededOffset(seed: string, spread: number): number {
+  let h = 2166136261;
+  for (let i = 0; i < seed.length; i++) {
+    h ^= seed.charCodeAt(i);
+    h = Math.imul(h, 16777619);
+  }
+  return ((h >>> 0) % (spread * 2 + 1)) - spread;
+}
 const SIT = {
   returning: { harder: 52, line: "After time away, the gap can feel like the whole story. It isn't. How you frame it is everything, and that's exactly what you'll rehearse." },
   laid_off: { harder: 48, line: "A layoff says nothing about your worth. The story you tell about it does, and you can make it land with confidence." },
@@ -192,18 +205,21 @@ const CONF_NOTE: Record<string, string> = {
 
 function buildValidation(slot: 1 | 2, a: Record<string, string>, role: string) {
   const ind = INDUSTRY[(a.industry as keyof typeof INDUSTRY)] || INDUSTRY.other;
+  const seed = `${a.situation || ""}|${a.industry || ""}|${a.confidence || ""}|${(role || "").toLowerCase()}`;
   if (slot === 1) {
     const sit = SIT[(a.situation as keyof typeof SIT)] || SIT.returning;
     const note = CONF_NOTE[a.confidence] || "";
+    const harder = sit.harder + seededOffset(seed + "h", 4); // ±4
     return {
       eyebrow: "You're not imagining it",
-      value: sit.harder,
+      value: harder,
       suffix: "%",
-      headline: `Getting hired is about ${sit.harder}% harder than two years ago.`,
+      headline: `Getting hired is about ${harder}% harder than two years ago.`,
       body: `${sit.line}${note ? ` ${note}` : ""}`,
       source: `Based on 2025 ${ind.label} hiring data`,
     };
   }
+  const apps = ind.apps + seededOffset(seed + "a", 19); // ±19
   const gapLine =
     a.gap === "5+yr" ? "After 5+ years away, the people who rehearse first are the ones who stand out."
     : a.gap === "3-5yr" ? "After a few years out, a little rehearsal puts you right back in the room."
@@ -211,9 +227,9 @@ function buildValidation(slot: 1 | 2, a: Record<string, string>, role: string) {
     : "The candidates who rehearse are the ones who get the call.";
   return {
     eyebrow: "Why practice wins",
-    value: ind.apps,
+    value: apps,
     suffix: " per job",
-    headline: `In ${ind.label}, the average opening draws about ${ind.apps} applicants.`,
+    headline: `In ${ind.label}, the average opening now draws ${apps} applicants.`,
     body: `Only about 2% get an interview${role ? ` for a role like ${role}` : ""}. ${gapLine} Practice is how you get into that 2%.`,
     source: "Industry hiring benchmarks, 2025",
   };
