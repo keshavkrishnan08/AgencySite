@@ -330,7 +330,7 @@ function FeatureRow({ f, i }: { f: Feat; i: number }) {
           </ul>
           {f.href && (
             <ButtonLink href={f.href} variant="secondary" size="sm" className="group mt-7">
-              Try it free <ArrowRight size={15} className="transition-transform group-hover:translate-x-0.5" />
+              Try it <ArrowRight size={15} className="transition-transform group-hover:translate-x-0.5" />
             </ButtonLink>
           )}
         </div>

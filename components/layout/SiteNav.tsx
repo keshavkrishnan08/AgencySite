@@ -52,7 +52,7 @@ export function SiteNav() {
               Sign in
             </Link>
             <ButtonLink href="/onboarding" size="sm">
-              Start free
+              Start free trial
             </ButtonLink>
           </div>
         </nav>

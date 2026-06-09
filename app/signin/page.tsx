@@ -89,7 +89,7 @@ function SignInInner() {
         {!configured && (
           <div className="mt-5 rounded-xl border bg-amber-soft p-4 text-center text-sm text-amber-ink" style={{ borderColor: "var(--amber)" }}>
             Accounts come online the moment the Supabase key is set. For now you can{" "}
-            <Link href="/onboarding" className="font-semibold underline">start practicing free</Link>.
+            <Link href="/onboarding" className="font-semibold underline">start the questions</Link>.
           </div>
         )}
 
@@ -148,8 +148,8 @@ function SignInInner() {
       </motion.div>
 
       <p className="mt-6 text-center text-xs text-ink-3">
-        Just trying it out?{" "}
-        <Link href="/onboarding" className="font-medium text-ink-2 hover:text-ink">Practice free, no account</Link>
+        New here?{" "}
+        <Link href="/onboarding" className="font-medium text-ink-2 hover:text-ink">See how it works</Link>
       </p>
     </div>
       <ReviewWall />
