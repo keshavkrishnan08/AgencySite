@@ -24,9 +24,10 @@ import type { InterviewGap, Situation } from "@/lib/types";
 type Demo = "convo" | "skills" | "progress" | "questions" | "delivery";
 type Opt = { value: string; label: string; emoji?: string };
 type Field = { key: string; q: string; type?: "role"; options?: Opt[] };
+type Cond = (a: Record<string, string>) => boolean;
 type Screen =
-  | { kind: "form"; fields: Field[]; demo: Demo }
-  | { kind: "validation"; slot: 1 | 2; demo: Demo };
+  | { kind: "form"; fields: Field[]; demo: Demo; when?: Cond }
+  | { kind: "validation"; slot: 1 | 2; demo: Demo; when?: Cond };
 
 const SITUATIONS: Situation[] = ["returning", "laid_off", "promotion", "career_change"];
 
@@ -96,6 +97,45 @@ const SCREENS: Screen[] = [
     ],
   },
   { kind: "validation", slot: 1, demo: "progress" },
+  {
+    // Only for career changers: where they're coming from, to frame the pivot.
+    kind: "form",
+    demo: "skills",
+    when: (a) => a.situation === "career_change",
+    fields: [
+      {
+        key: "fromField",
+        q: "What field are you coming from?",
+        options: [
+          { value: "education", label: "Education", emoji: "🎓" },
+          { value: "healthcare", label: "Healthcare", emoji: "🩺" },
+          { value: "corporate", label: "Corporate", emoji: "💼" },
+          { value: "service", label: "Service & retail", emoji: "🛍️" },
+          { value: "trades", label: "Trades", emoji: "🔧" },
+          { value: "military", label: "Military", emoji: "🎖️" },
+          { value: "other", label: "Something else", emoji: "✨" },
+        ],
+      },
+    ],
+  },
+  {
+    // Only for the less-confident: name the fear so we can target it.
+    kind: "form",
+    demo: "convo",
+    when: (a) => ["terrified", "rusty", "shaky"].includes(a.confidence),
+    fields: [
+      {
+        key: "dread",
+        q: "What's the part you dread most?",
+        options: [
+          { value: "first", label: "The first question", emoji: "🥶" },
+          { value: "curveball", label: "A curveball", emoji: "🌀" },
+          { value: "blank", label: "Going blank", emoji: "🫥" },
+          { value: "judged", label: "Being judged", emoji: "👀" },
+        ],
+      },
+    ],
+  },
   {
     kind: "form",
     demo: "questions",
@@ -187,8 +227,11 @@ export default function OnboardingPage() {
   const [role, setRole] = useState("");
   const [query, setQuery] = useState("");
 
-  const total = SCREENS.length;
-  const cur = SCREENS[screen];
+  // Active screens depend on the answers, so the total step count is dynamic
+  // (e.g. career changers and less-confident users get an extra tailored step).
+  const active = useMemo(() => SCREENS.filter((s) => !s.when || s.when(answers)), [answers]);
+  const total = active.length;
+  const cur = active[Math.min(screen, total - 1)];
 
   const go = (next: number) => {
     if (next >= total) return finish();
@@ -243,7 +286,7 @@ export default function OnboardingPage() {
 
         <div className="px-6 sm:px-10">
           <div className="mx-auto flex max-w-md items-center gap-1.5">
-            {SCREENS.map((_, i) => (
+            {active.map((_, i) => (
               <div key={i} className="h-1.5 flex-1 overflow-hidden rounded-full" style={{ background: "var(--bg-tint)" }}>
                 <motion.div className="h-full rounded-full" initial={false} animate={{ width: i <= screen ? "100%" : "0%" }} transition={{ duration: 0.45 }} style={{ background: "linear-gradient(90deg, var(--primary), var(--primary-bright))" }} />
               </div>
