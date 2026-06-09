@@ -75,7 +75,7 @@ function Hero() {
             <div className="mt-10 flex items-center gap-4">
               <AvatarRow />
               <p className="text-sm text-ink-2">
-                <span className="font-semibold text-ink">12,000+ people</span> have practiced with Axon Careers
+                A private place to practice until you walk in ready.
               </p>
             </div>
           </Reveal>
