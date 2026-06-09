@@ -76,7 +76,8 @@ export async function POST(req: Request) {
     try {
       const ctx = candidateBlock({ name, situation, targetRole, company, interviewGap, weakestDimension, recentAverage });
       const user = `${ctx}\n\nQuestion (${category}): ${question}\n\nTheir answer:\n"""${answer.slice(0, 4000)}"""`;
-      const text = await callClaude({ system: SYSTEM, user, maxTokens: 700, temperature: 0.3 });
+      // temperature 0 so the same answer grades the same way every session.
+      const text = await callClaude({ system: SYSTEM, user, maxTokens: 900, temperature: 0 });
       const parsed = extractJson<AiScore>(text);
       if (parsed?.scores && parsed.feedback) {
         return NextResponse.json({
