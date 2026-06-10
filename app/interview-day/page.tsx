@@ -4,7 +4,7 @@ import { useCallback, useEffect, useRef, useState } from "react";
 import Link from "next/link";
 import { motion } from "framer-motion";
 import { ArrowRight, Clock, Lock, Loader2, ShieldAlert, Timer } from "lucide-react";
-import { Logo } from "@/components/ui/Logo";
+import { AppShell } from "@/components/layout/AppShell";
 import { Button, ButtonLink } from "@/components/ui/Button";
 import { AnimatedNumber } from "@/components/ui/AnimatedNumber";
 import { VoiceButton } from "@/components/ui/VoiceButton";
@@ -276,17 +276,20 @@ export default function InterviewDayPage() {
   );
 }
 
+/* Inside the app shell (persistent sidebar + nav), but the simulation area stays
+   dark and immersive. */
 function DarkShell({ children }: { children: React.ReactNode }) {
   return (
-    <main
-      className="relative flex min-h-screen flex-col"
-      style={{ background: "radial-gradient(120% 80% at 50% -10%, #1b2740, #10141f 60%)" }}
-    >
-      <div className="container-wide flex items-center justify-between py-6">
-        <Logo href="/dashboard" dark size={32} />
-        <span className="chip border-white/15 bg-white/10 text-white/70">Interview Day Mode</span>
-      </div>
-      <div className="container-content flex flex-1 items-center justify-center py-10">{children}</div>
-    </main>
+    <AppShell>
+      <main
+        className="relative flex min-h-[calc(100vh-4rem)] flex-col"
+        style={{ background: "radial-gradient(120% 80% at 50% -10%, #1b2740, #10141f 60%)" }}
+      >
+        <div className="container-wide flex items-center justify-end py-5">
+          <span className="chip border-white/15 bg-white/10 text-white/70">Interview Day Mode</span>
+        </div>
+        <div className="container-content flex flex-1 items-center justify-center py-10">{children}</div>
+      </main>
+    </AppShell>
   );
 }
