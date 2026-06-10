@@ -32,9 +32,37 @@ DIMENSION SIGNALS (what raises or lowers each):
 4) CONFIDENCE (language projects steadiness). Up: declarative ownership ("I led," "I decided," "I cut"). Down: audible hedging and self-undermining: "just," "I think," "kind of," "maybe," "I'm not sure," "probably," apologizing, "does that make sense?". Count them; each cluster lowers the score. (Judge spoken hedging, not written artifacts.)
 5) CONCISENESS (right length, no rambling). Up: roughly 60-150 spoken words for a behavioral answer; tight, lands, and stops. Down: under ~25 words (too thin to judge) or rambling/repeating past the point. Judge by spoken length and repetition, not punctuation.
 
+BEHAVIORAL RED FLAGS (what real hiring managers penalize — apply across dimensions):
+- "We" with no "I": if the story is all "we did / the team did" with no clear personal action, the candidate hasn't shown ownership. Cap confidence and specificity until they say what THEY did. This is one of the most common reasons a good story scores low.
+- Hypothetical instead of real: "I would..." / "I usually..." instead of a specific time it happened. A real, dated example beats a hypothetical every time; penalize relevance and specificity.
+- Blame-shifting: blaming a coworker, boss, or company ("they were incompetent") instead of showing how THEY handled it. Lower confidence and relevance; the answer should center their response, not others' faults.
+- No measurable result: a story with no outcome, number, timeframe, or named result is incomplete. This caps specificity (no number/result = 65 max) and weakens clarity.
+- Excessive setup: burning the answer on background before the point. Hurts clarity and conciseness.
+- Inflated role: claiming credit that doesn't fit the story. Erodes credibility; do not reward it.
+- Strong signals to reward: leads with the point, a clear Situation/Task/Action/Result, "I" ownership, a quantified outcome, and a story that would hold up under a follow-up question.
+
 OVERALL = round(clarity*0.20 + relevance*0.20 + specificity*0.25 + confidence*0.20 + conciseness*0.15).
 
 If the candidate has a known weak area, grade it strictly and tie the one fix to it. In every feedback line, quote the candidate's own words as the evidence for the score.`;
+
+/* How real interviewers behave — used to make the role-play and follow-ups feel
+   like an actual hiring manager, not a script. */
+export const EMPLOYER_REALISM = `Behave like a real hiring manager, not a quiz bot. A candidate's first answer is usually only about 75% of the story, so your job is to dig for the rest. Probe the way real interviewers do: "What specifically was YOUR role in that?", "What was the actual outcome?", "What would you do differently?". If they spoke in "we" the whole time, redirect: "I get what the team did. Walk me through what YOU did." Reference a concrete detail they actually said. Sound like a person: warm but evaluating, plain-spoken, never robotic or generic.`;
+
+/* Expert salary-negotiation strategy, from negotiation research (Harvard PON,
+   recruiters). Drives both the employer's pushback and the coach's grading. */
+export const NEGOTIATION_STRATEGY = `Salary-negotiation principles to enforce (this is what good negotiators actually do):
+- Don't name the first number. Whoever anchors first usually loses leverage. Early on, the right move is to deflect: "I'm focused on whether this is the right fit; what range have you budgeted for the role?"
+- If forced to give a range, it should START at the target (ranges anchor to the bottom).
+- Counter with a SPECIFIC number, not a range — a specific number anchors to the middle; a range invites the lowest end.
+- Defuse a low anchor before countering: name it as below market with a reason ("based on market data for this role and my experience..."), THEN state the number.
+- Counter ~10-15% above the real target to leave room.
+- Don't accept or counter on the spot; it's fine to take time to consider.
+- Negotiate total compensation (base, bonus, equity, benefits, start date), not just base.
+- Strongest leverage is after a written offer, not during early interviews.`;
+
+/* Anti-canned, anti-hallucination directive for every chat/generation. */
+export const ANTI_CANNED = `Reason from exactly what the person said — never fall back on a generic, one-size-fits-all line. If their message is empty, off-topic, or you genuinely can't tell what they mean, say so plainly and ask a specific clarifying question. It is better to admit you're not sure than to fake a confident answer.`;
 
 const SITUATION_LABEL: Record<string, string> = {
   returning: "returning to work after time away",

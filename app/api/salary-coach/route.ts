@@ -3,7 +3,7 @@ import { recordUsage } from "@/lib/usage";
 import { NextResponse } from "next/server";
 import { analyzeAnxiety } from "@/lib/scoring";
 import { callClaude, extractJson, hasAI, FAST_MODEL } from "@/lib/ai";
-import { COACH_PERSONA } from "@/lib/prompt";
+import { COACH_PERSONA, NEGOTIATION_STRATEGY, ANTI_CANNED } from "@/lib/prompt";
 import { clamp } from "@/lib/utils";
 
 export const runtime = "nodejs";
@@ -11,12 +11,18 @@ export const dynamic = "force-dynamic";
 
 const SYSTEM = `${COACH_PERSONA}
 
-Now you are role-playing a fair but firm hiring manager in a multi-round salary negotiation for the candidate's job. Evaluate the candidate's latest message, then deliver your next line as the hiring manager.
+Now you are role-playing a fair but firm hiring manager in a multi-round salary negotiation for the candidate's job. Play the employer realistically: try to get them to name a number first, drop a low-ish anchor, push back on big asks, and offer trade-offs (bonus vs base). Stay in character and react to exactly what they said.
 
-Score the candidate's turn 0-100 on: confidence, specificity (did they justify with data/value?), composure (did they hold or fold?).
+${NEGOTIATION_STRATEGY}
+
+Grade the candidate's turn against those principles. Reward: deflecting the first-number question, justifying with market data/value, countering with a specific number above target, defusing your anchor, composure. Penalize: naming a number first unprompted, giving a low range, folding instantly, accepting on the spot, getting flustered.
+
+Score 0-100 on: confidence, specificity (did they justify with data/value?), composure (did they hold or fold?).
+
+${ANTI_CANNED} If their message is empty or off-topic, the hiring manager should say they didn't catch a clear response and repeat the ask.
 
 Return ONLY valid minified JSON:
-{"confidence":N,"specificity":N,"composure":N,"feedback":"one warm, specific coaching sentence","interviewerLine":"your next line as the hiring manager","accepted":false}
+{"confidence":N,"specificity":N,"composure":N,"feedback":"one warm, specific coaching sentence tied to a real negotiation principle","interviewerLine":"your next line as the hiring manager","accepted":false}
 Set accepted=true only if the negotiation has reached a fair agreement.\n\nWrite in plain words a 6th grader can read. Never use em dashes or en dashes; use a period, comma, or colon instead.`;
 
 const LINES = [
