@@ -51,7 +51,15 @@ The funnel is instrumented; it no-ops until you set the keys.
 
 ---
 
-## 📈 What the campaign model says (run `node scripts/campaign-abm.mjs`)
+## 📈 Comprehensive multi-campaign model (run `node scripts/campaign-model.mjs`)
+
+The deepest model: 3 live campaigns (Prospecting / Lookalike / Retargeting) over 12 months, persona agents with multi-touch + think-and-return, the shipped funnel (auto-advance, validations removed, annual-default), churn, AI cost, and a retargeting pool fed by drop-offs. At **$30/day**:
+- **459 paid subs / 12 mo, blended CAC ~$24, ROAS ~2.6×, ~$12.8k profit** on $10.8k spend.
+- **Retargeting is the cheapest channel (CAC ~$16)**, then Lookalike (~$23), then Prospecting (~$27) — fund all three; retargeting compounds as the drop-off pool grows.
+- Annual-default lifts annual share to ~60%, which front-loads cash (break-even month 0).
+- Tunable via env: `MONTHS, RUNS, DAILY, CHURN, PAYWARM, GROWTH`.
+
+## 📈 Earlier single-campaign model (run `node scripts/campaign-abm.mjs`)
 
 At **$5/creative × 6 = $30/day**, the deep agent-based sim (averaged over 25 runs) shows:
 - No free trial: people pay $9.99 immediately at the paywall (`scripts/campaign-abm-notrial.mjs`).
