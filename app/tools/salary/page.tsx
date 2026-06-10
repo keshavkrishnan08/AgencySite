@@ -8,6 +8,7 @@ import { SalaryIcon } from "@/components/icons";
 import { Button } from "@/components/ui/Button";
 import { ScoreNumber } from "@/components/ui/Score";
 import { getProfile } from "@/lib/store";
+import { suggestSalaryRange } from "@/lib/salary";
 import { average, scoreColor } from "@/lib/utils";
 
 type Turn =
@@ -20,9 +21,9 @@ const MAX_ROUNDS = 4;
 export default function SalaryPage() {
   const [phase, setPhase] = useState<"setup" | "chat" | "done">("setup");
   const [role, setRole] = useState("");
-  const [range, setRange] = useState("$55,000-$70,000");
-  const [target, setTarget] = useState("70000");
-  const [walkaway, setWalkaway] = useState("60000");
+  const [range, setRange] = useState("");
+  const [target, setTarget] = useState("");
+  const [walkaway, setWalkaway] = useState("");
   const [thread, setThread] = useState<Turn[]>([]);
   const [input, setInput] = useState("");
   const [round, setRound] = useState(0);
@@ -30,7 +31,15 @@ export default function SalaryPage() {
   const [overalls, setOveralls] = useState<number[]>([]);
   const bottomRef = useRef<HTMLDivElement>(null);
 
-  useEffect(() => setRole(getProfile().targetRole || "this role"), []);
+  // Prefill a role-aware estimate so the practice is custom to their job.
+  useEffect(() => {
+    const r = getProfile().targetRole || "this role";
+    setRole(r);
+    const est = suggestSalaryRange(r);
+    setRange(est.range);
+    setTarget(String(est.target));
+    setWalkaway(String(est.walkaway));
+  }, []);
   useEffect(() => bottomRef.current?.scrollIntoView({ behavior: "smooth" }), [thread, phase]);
 
   const start = async () => {
