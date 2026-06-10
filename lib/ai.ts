@@ -4,13 +4,18 @@ import Anthropic from "@anthropic-ai/sdk";
 /* Server-side Claude wrapper. The app works fully without this. Every route
    falls back to the local heuristic engine when no key is present. */
 
-const MODEL = process.env.ANTHROPIC_MODEL || "claude-sonnet-4-6";
-// Cheaper, faster model for light extraction/generation (follow-ups, examples,
-// predictions). Cuts token cost where top-tier quality isn't needed.
-export const FAST_MODEL = process.env.ANTHROPIC_MODEL_FAST || "claude-haiku-4-5-20251001";
-// Scoring is the product's credibility. Defaults to Haiku (cheap) but can be
-// pinned to Sonnet for maximum rigor with one env var, no code change.
-export const SCORE_MODEL = process.env.ANTHROPIC_MODEL_SCORING || FAST_MODEL;
+// Policy: always use the minimum capable model (Haiku). NEVER large/expensive
+// models — Opus is hard-blocked even if mis-set via env, and every default is
+// Haiku. Env overrides are honored only when they aren't Opus.
+const DEFAULT_MODEL = "claude-haiku-4-5-20251001";
+const minModel = (m?: string | null): string => (!m || /opus/i.test(m) ? DEFAULT_MODEL : m);
+
+// Every route uses this. Default Haiku; an explicit non-Opus override is allowed.
+export const FAST_MODEL = minModel(process.env.ANTHROPIC_MODEL_FAST);
+const MODEL = minModel(process.env.ANTHROPIC_MODEL);
+// Scoring also defaults to Haiku (minimum but strong). Override via env if ever
+// needed, but never Opus.
+export const SCORE_MODEL = minModel(process.env.ANTHROPIC_MODEL_SCORING);
 
 export function hasAI(): boolean {
   return Boolean(process.env.ANTHROPIC_API_KEY);
@@ -40,7 +45,7 @@ export async function callClaude({
   model = MODEL,
 }: CallOpts): Promise<string> {
   const res = await getClient().messages.create({
-    model,
+    model: minModel(model), // never Opus, always at least Haiku
     max_tokens: maxTokens,
     temperature,
     // Cache the (stable) system prompt to cut cost on repeated calls.
