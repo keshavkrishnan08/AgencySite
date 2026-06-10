@@ -12,7 +12,7 @@ import {
   TrendingUp,
 } from "lucide-react";
 import { ScoreNumber, DimensionBars } from "@/components/ui/Score";
-import { RichText } from "@/components/ui/RichText";
+import { RichText, Inline } from "@/components/ui/RichText";
 import { InfoTip } from "@/components/ui/Tooltip";
 import { deliveryNotes } from "@/lib/delivery";
 import { DIMENSIONS, DIMENSION_HELP, scoreLabel, scoreColor, cn } from "@/lib/utils";
@@ -63,7 +63,7 @@ function FeedbackRow({ dim, score, text }: { dim: Dimension; score: number; text
         <InfoTip title={`${label}: ${help.what}`} className="mx-1">
           {help.tip}
         </InfoTip>
-        : {text}
+        : <Inline text={text} />
       </p>
     </div>
   );
@@ -159,7 +159,7 @@ export function AnswerScoreCard({
         <CheckCircle2 size={18} className="mt-0.5 shrink-0 text-sage-ink" />
         <p className="text-[0.95rem] text-ink">
           <span className="font-semibold">What went right: </span>
-          {answer.strengthSummary}
+          <Inline text={answer.strengthSummary} />
         </p>
       </div>
 
@@ -171,7 +171,7 @@ export function AnswerScoreCard({
             <p className="text-2xs font-semibold uppercase tracking-wider text-amber-ink">Work on this next</p>
             <ul className="mt-1.5 space-y-1">
               {answer.improve.map((tip, i) => (
-                <li key={i} className="text-[0.95rem] leading-relaxed text-ink">{tip}</li>
+                <li key={i} className="text-[0.95rem] leading-relaxed text-ink"><Inline text={tip} /></li>
               ))}
             </ul>
           </div>
