@@ -13,7 +13,14 @@ import {
   setProfile,
 } from "@/lib/store";
 import { SITUATION_META } from "@/lib/utils";
-import type { Situation, UserProfile } from "@/lib/types";
+import type { InterviewGap, Situation, UserProfile } from "@/lib/types";
+
+const GAP_OPTS: [InterviewGap, string][] = [
+  ["<1yr", "Less than a year ago"],
+  ["1-3yr", "1–3 years ago"],
+  ["3-5yr", "3–5 years ago"],
+  ["5+yr", "5+ years ago"],
+];
 
 export default function SettingsPage() {
   const router = useRouter();
@@ -74,6 +81,9 @@ export default function SettingsPage() {
               <Field label="Target role">
                 <input className="field" value={profile.targetRole} onChange={(e) => update({ targetRole: e.target.value })} placeholder="e.g., Office Manager" />
               </Field>
+              <Field label="Company">
+                <input className="field" value={profile.company ?? ""} onChange={(e) => update({ company: e.target.value })} placeholder="e.g., Mercy Hospital" />
+              </Field>
               <Field label="Situation">
                 <select
                   className="field"
@@ -83,6 +93,18 @@ export default function SettingsPage() {
                   <option value="">Not set</option>
                   {(Object.keys(SITUATION_META) as Situation[]).map((s) => (
                     <option key={s} value={s}>{SITUATION_META[s].label}</option>
+                  ))}
+                </select>
+              </Field>
+              <Field label="Last interviewed">
+                <select
+                  className="field"
+                  value={profile.interviewGap ?? ""}
+                  onChange={(e) => update({ interviewGap: (e.target.value || null) as InterviewGap | null })}
+                >
+                  <option value="">Not set</option>
+                  {GAP_OPTS.map(([v, label]) => (
+                    <option key={v} value={v}>{label}</option>
                   ))}
                 </select>
               </Field>
