@@ -27,6 +27,7 @@ export interface SubStatus {
   premium: boolean;
   status: string; // active | trialing | canceled | past_due | none ...
   until: string | null; // current_period_end ISO
+  interval: string | null; // 'monthly' | 'annual' | null
 }
 
 /* Authoritative access for an account, straight from the subscription row.
@@ -35,18 +36,23 @@ export interface SubStatus {
    kicked). status "none" means no subscription row exists at all. */
 export async function subscriptionStatus(email: string): Promise<SubStatus> {
   const db = supabaseAdmin();
-  if (!db || !email) return { premium: false, status: "none", until: null };
+  if (!db || !email) return { premium: false, status: "none", until: null, interval: null };
   const { data } = await db
     .from("subscriptions")
-    .select("status, current_period_end")
+    .select("status, current_period_end, interval")
     .eq("email", email)
     .order("updated_at", { ascending: false })
     .limit(1)
     .maybeSingle();
-  if (!data) return { premium: false, status: "none", until: null };
+  if (!data) return { premium: false, status: "none", until: null, interval: null };
   const active = data.status === "active" || data.status === "trialing";
   const withinPeriod = data.current_period_end ? new Date(data.current_period_end) > new Date() : false;
-  return { premium: active || withinPeriod, status: data.status, until: data.current_period_end ?? null };
+  return {
+    premium: active || withinPeriod,
+    status: data.status,
+    until: data.current_period_end ?? null,
+    interval: data.interval ?? null,
+  };
 }
 
 /** Back-compat: boolean access for an email. */
