@@ -38,7 +38,7 @@ function getClient(): Anthropic {
   return client;
 }
 
-async function callOpenAI(system: string, user: string, maxTokens: number, temperature: number): Promise<string> {
+async function callOpenAI(system: string, user: string, maxTokens: number, temperature: number, seed?: number): Promise<string> {
   const res = await fetch("https://api.openai.com/v1/chat/completions", {
     method: "POST",
     headers: {
@@ -49,7 +49,9 @@ async function callOpenAI(system: string, user: string, maxTokens: number, tempe
       model: OPENAI_MODEL,
       max_tokens: maxTokens,
       temperature,
-      // OpenAI auto-caches long stable prefixes, so the system prompt is cheap on repeat.
+      // A fixed seed makes the same prompt reproducible (used for scoring, so the
+      // same answer grades the same way). OpenAI auto-caches stable prefixes too.
+      ...(seed != null ? { seed } : {}),
       messages: [
         { role: "system", content: system },
         { role: "user", content: user },
@@ -70,6 +72,7 @@ interface CallOpts {
   maxTokens?: number;
   temperature?: number;
   model?: string;
+  seed?: number; // set for reproducible output (e.g. deterministic scoring)
 }
 
 // Provider-agnostic call. Prefers OpenAI (gpt-4o-mini) when its key is set,
@@ -80,9 +83,10 @@ export async function callClaude({
   maxTokens = 1024,
   temperature = 0.4,
   model = MODEL,
+  seed,
 }: CallOpts): Promise<string> {
   if (useOpenAI()) {
-    return callOpenAI(system, user, maxTokens, temperature);
+    return callOpenAI(system, user, maxTokens, temperature, seed);
   }
   const res = await getClient().messages.create({
     model: minModel(model), // never Opus, always at least Haiku
