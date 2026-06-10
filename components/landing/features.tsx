@@ -311,7 +311,7 @@ export function ProductFeatures() {
         </Reveal>
         <Reveal delay={0.05}>
           <h2 className="mx-auto mt-4 max-w-2xl text-balance font-serif text-display font-semibold text-ink">
-            One app. Everything that wins the interview.
+            One app.
           </h2>
         </Reveal>
       </div>
