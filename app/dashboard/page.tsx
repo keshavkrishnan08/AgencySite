@@ -27,7 +27,6 @@ import {
   getStreak,
   isPremium,
   onStoreChange,
-  upgradeToPremium,
 } from "@/lib/store";
 import { daysUntil } from "@/lib/plan";
 import type { InterviewPlan, InterviewRecord } from "@/lib/types";
@@ -64,11 +63,8 @@ export default function DashboardPage() {
 
   useEffect(() => {
     setMounted(true);
-    // Stripe success redirect (or demo): activate premium, then clean the URL.
-    if (typeof window !== "undefined" && new URLSearchParams(window.location.search).get("upgraded") === "1") {
-      upgradeToPremium();
-      window.history.replaceState({}, "", "/dashboard");
-    }
+    // Note: the Stripe checkout return (?upgraded=1) is verified and granted by
+    // AppShell before this page renders, so there's nothing to handle here.
     const sync = () => {
       setSessions(getSessions());
       const s = getStreak();
