@@ -2,7 +2,7 @@ import { rateLimit } from "@/lib/ratelimit";
 import { recordUsage } from "@/lib/usage";
 import { NextResponse } from "next/server";
 import { analyzeAnxiety } from "@/lib/scoring";
-import { callClaude, extractJson, hasAI } from "@/lib/ai";
+import { callClaude, extractJson, hasAI, FAST_MODEL } from "@/lib/ai";
 import { COACH_PERSONA } from "@/lib/prompt";
 import { clamp } from "@/lib/utils";
 
@@ -73,7 +73,7 @@ export async function POST(req: Request) {
   if (hasAI() && message.trim()) {
     try {
       const user = `Round: ${round + 1} of 4\nRole: ${role}\nMarket range: ${range}\nCandidate target: ${target}\nCandidate walkaway: ${walkaway}\n\nCandidate's latest message: "${message.slice(0, 1500)}"`;
-      const text = await callClaude({ system: SYSTEM, user, maxTokens: 400, temperature: 0.5 });
+      const text = await callClaude({ model: FAST_MODEL, system: SYSTEM, user, maxTokens: 400, temperature: 0.5 });
       const parsed = extractJson<any>(text);
       if (parsed && typeof parsed.confidence === "number") {
         return NextResponse.json({ ...parsed, source: "ai" });

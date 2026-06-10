@@ -1,7 +1,7 @@
 import { rateLimit } from "@/lib/ratelimit";
 import { recordUsage } from "@/lib/usage";
 import { NextResponse } from "next/server";
-import { callClaude, extractJson, hasAI } from "@/lib/ai";
+import { callClaude, extractJson, hasAI, FAST_MODEL } from "@/lib/ai";
 import { COACH_PERSONA } from "@/lib/prompt";
 
 export const runtime = "nodejs";
@@ -70,7 +70,7 @@ export async function POST(req: Request) {
   if (hasAI()) {
     try {
       const user = `Gap type: ${GAP_LABELS[gapType] || gapType}\nDuration: ${duration}\nWhat they did during the gap: ${activities || "not specified"}\nTarget role: ${role || "unspecified"}`;
-      const text = await callClaude({ system: SYSTEM, user, maxTokens: 700, temperature: 0.6 });
+      const text = await callClaude({ model: FAST_MODEL, system: SYSTEM, user, maxTokens: 700, temperature: 0.6 });
       const parsed = extractJson<{ versions: { label: string; text: string }[] }>(text);
       if (parsed?.versions?.length) {
         return NextResponse.json({ versions: parsed.versions.slice(0, 3), source: "ai" });
