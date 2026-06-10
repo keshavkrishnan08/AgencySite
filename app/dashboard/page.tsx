@@ -14,6 +14,7 @@ import {
   ChevronRight,
 } from "lucide-react";
 import { AppShell } from "@/components/layout/AppShell";
+import { GoalCard } from "@/components/dashboard/GoalCard";
 import { Button, ButtonLink } from "@/components/ui/Button";
 import { ScoreRing } from "@/components/ui/Score";
 import { InfoTip } from "@/components/ui/Tooltip";
@@ -161,6 +162,13 @@ export default function DashboardPage() {
               </Link>
             );
           })()}
+
+        {/* Lightweight interview countdown for anyone without a full plan. */}
+        {!plan && (
+          <div className="mb-6">
+            <GoalCard sessionsDone={sessions.length} />
+          </div>
+        )}
 
         <div className="grid gap-6 lg:grid-cols-[1.8fr_1fr]">
           {/* LEFT */}
