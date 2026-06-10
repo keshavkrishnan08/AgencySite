@@ -63,7 +63,10 @@ export async function POST(req: Request) {
       const plan = status === "active" || status === "trialing" ? "premium" : "free";
       // Stripe's 2026 API moved current_period_end onto the line item; older
       // versions keep it on the subscription. Read whichever is present.
-      const periodEndUnix = obj.current_period_end ?? obj.items?.data?.[0]?.current_period_end ?? null;
+      const item = obj.items?.data?.[0];
+      const periodEndUnix = obj.current_period_end ?? item?.current_period_end ?? null;
+      // Billing interval from the price: 'year' -> annual, else monthly.
+      const interval = item?.price?.recurring?.interval === "year" ? "annual" : "monthly";
       if (email) {
         await db.from("subscriptions").upsert(
           {
@@ -72,6 +75,7 @@ export async function POST(req: Request) {
             stripe_subscription_id: obj.id ?? null,
             status,
             plan,
+            interval,
             current_period_end: periodEndUnix ? new Date(periodEndUnix * 1000).toISOString() : null,
             updated_at: new Date().toISOString(),
           },
