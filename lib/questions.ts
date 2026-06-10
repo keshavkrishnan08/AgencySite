@@ -4,10 +4,14 @@ import type { Dimension, Question, Situation } from "./types";
    to the candidate's situation and target role. Claude replaces this when a key
    is present, but these are written to be realistic for non-tech roles. */
 
+// Grammatical role helpers so an empty/unknown role still reads cleanly.
+const mod = (role: string) => (role.trim() ? `${role.trim()} ` : ""); // "Office Manager " or ""
+const noun = (role: string) => role.trim() || "this role";
+
 const WARMUP = (role: string): string[] => [
-  `Tell me about yourself and what brought you to apply for this ${role} position.`,
-  `Walk me through your background. What should I know about your experience as it relates to ${role}?`,
-  `What got you interested in this ${role} role specifically?`,
+  `Tell me about yourself and what brought you to apply for this ${mod(role)}position.`,
+  `Walk me through your background. What should I know about your experience as it relates to ${noun(role)}?`,
+  `What got you interested in this ${mod(role)}role specifically?`,
 ];
 
 const BEHAVIORAL = (role: string): string[] => [
@@ -23,28 +27,28 @@ const BEHAVIORAL = (role: string): string[] => [
 const SITUATION_QS: Record<Situation, (role: string) => string[]> = {
   returning: (role) => [
     `I see a gap in your work history. Can you tell me about that time and what you've been doing?`,
-    `How have you kept your skills current for a ${role} role during your time away from the workforce?`,
-    `What makes you confident you can step back into a fast-paced ${role} role right now?`,
+    `How have you kept your skills current for this ${mod(role)}role during your time away from the workforce?`,
+    `What makes you confident you can step back into a fast-paced ${mod(role)}role right now?`,
   ],
   laid_off: (role) => [
     `Why did you leave your last position?`,
-    `You were at your last company a long time. How will you adapt to a new environment as a ${role}?`,
+    `You were at your last company a long time. How will you adapt to a new environment in this ${mod(role)}role?`,
     `What are you looking for in your next role that you didn't have in your last one?`,
   ],
   promotion: (role) => [
-    `What makes you ready to take on a ${role} role with more responsibility?`,
+    `What makes you ready to take on this ${mod(role)}role with more responsibility?`,
     `Tell me about a time you led without having the formal title to do it.`,
     `How do you handle being responsible for outcomes that depend on other people?`,
   ],
   career_change: (role) => [
-    `Your background isn't a traditional path into ${role}. Why are you making this change?`,
-    `What skills from your previous career transfer to this ${role} role?`,
+    `Your background isn't a traditional path into this ${mod(role)}role. Why are you making this change?`,
+    `What skills from your previous career transfer to this ${mod(role)}role?`,
     `How will you get up to speed in an industry that's new to you?`,
   ],
 };
 
 const CLOSER = (role: string): string[] => [
-  `What questions do you have for us about the ${role} role or the team?`,
+  `What questions do you have for us about the ${mod(role)}role or the team?`,
   `Is there anything we haven't covered that you'd like us to know?`,
 ];
 
@@ -99,7 +103,7 @@ export function generateQuestions(
   seed = 0,
   context?: JobContext
 ): Question[] {
-  const r = role.trim() || "the";
+  const r = role.trim(); // may be empty; templates default gracefully via mod()/noun()
   const company = context?.company?.trim();
   const posting = context?.posting?.trim() || "";
 
@@ -110,10 +114,10 @@ export function generateQuestions(
   const close = rotate(CLOSER(r), seed);
 
   const opener = company
-    ? `Tell me about yourself and why you applied to ${company} for this ${r} role.`
+    ? `Tell me about yourself and why you applied to ${company} for this ${mod(r)}role.`
     : warm[0];
   const closer = company
-    ? `What questions do you have for us about the ${r} role at ${company}?`
+    ? `What questions do you have for us about the ${mod(r)}role at ${company}?`
     : close[0];
   const signal = postingSignalQuestion(posting);
 
