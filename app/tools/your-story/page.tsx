@@ -4,6 +4,7 @@ import { useEffect, useMemo, useState } from "react";
 import { motion } from "framer-motion";
 import { BookOpen, Copy, Check, Loader2, Sparkles } from "lucide-react";
 import { ToolShell } from "@/components/layout/ToolShell";
+import { RichText } from "@/components/ui/RichText";
 import { StoryIcon } from "@/components/icons";
 import { Button } from "@/components/ui/Button";
 import { AnswerScoreCard } from "@/components/practice/AnswerScoreCard";
@@ -95,7 +96,7 @@ export default function YourStoryPage() {
               <span className="text-xs text-ink-3">{wordCount} words · ~{Math.max(1, Math.round(wordCount / 2.5))}s</span>
             </div>
             {story ? (
-              <p className="text-[1.05rem] leading-loose text-ink">{story}</p>
+              <RichText text={story} className="text-[1.05rem] leading-loose text-ink" />
             ) : (
               <p className="leading-loose text-ink-3">Your answer will assemble here as you fill in the four steps…</p>
             )}

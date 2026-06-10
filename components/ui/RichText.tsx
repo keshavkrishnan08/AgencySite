@@ -29,6 +29,13 @@ function renderInline(text: string, keyBase: string): ReactNode[] {
   return out;
 }
 
+/* Inline-only: renders **bold**, *italic*, `code` inside an existing line/bubble
+   without imposing block layout. For short single-line AI strings. */
+export function Inline({ text, className }: { text: string; className?: string }) {
+  if (!text) return null;
+  return <span className={className}>{renderInline(text, "inl")}</span>;
+}
+
 export function RichText({ text, className }: { text: string; className?: string }) {
   if (!text) return null;
   const blocks = text.replace(/\r\n/g, "\n").split(/\n{2,}/).map((b) => b.trim()).filter(Boolean);
