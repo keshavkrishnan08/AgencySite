@@ -23,7 +23,7 @@ import type { InterviewGap, Situation } from "@/lib/types";
 
 type Demo = "convo" | "skills" | "progress" | "questions" | "delivery";
 type Opt = { value: string; label: string; emoji?: string };
-type Field = { key: string; q: string; type?: "role"; options?: Opt[] };
+type Field = { key: string; q: string; type?: "role" | "text"; optional?: boolean; options?: Opt[] };
 type Cond = (a: Record<string, string>) => boolean;
 type Screen =
   | { kind: "form"; fields: Field[]; demo: Demo; when?: Cond }
@@ -141,6 +141,7 @@ const SCREENS: Screen[] = [
     demo: "questions",
     fields: [
       { key: "role", type: "role", q: "What job are you preparing for?" },
+      { key: "company", type: "text", optional: true, q: "Any company in mind? (optional)" },
       {
         key: "gap",
         q: "When did you last interview?",
@@ -268,15 +269,18 @@ export default function OnboardingPage() {
 
   const screenReady = (s: Screen) => {
     if (s.kind !== "form") return true;
-    return s.fields.every((f) => (f.type === "role" ? Boolean(role.trim() || query.trim()) : Boolean(answers[f.key])));
+    return s.fields.every((f) =>
+      f.optional ? true : f.type === "role" ? Boolean(role.trim() || query.trim()) : Boolean(answers[f.key])
+    );
   };
 
   const finish = () => {
     const situation = (answers.situation as Situation) || null;
     const gap = (answers.gap as InterviewGap) || "1-3yr";
     const finalRole = role.trim() || query.trim() || "Office Manager";
-    setOnboarding({ situation, targetRole: finalRole, interviewGap: gap });
-    setProfile({ situation, targetRole: finalRole, interviewGap: gap });
+    const company = (answers.company || "").trim();
+    setOnboarding({ situation, targetRole: finalRole, company, interviewGap: gap });
+    setProfile({ situation, targetRole: finalRole, company, interviewGap: gap });
     track("onboarding_complete", { situation, role: finalRole, gap, ...answers });
     // Flow: onboarding questions -> create account -> payment -> app.
     router.push("/signin?mode=signup&next=%2Fupgrade");
@@ -340,6 +344,13 @@ export default function OnboardingPage() {
                               </div>
                             )}
                           </div>
+                        ) : f.type === "text" ? (
+                          <input
+                            value={answers[f.key] || ""}
+                            onChange={(e) => pick(f.key, e.target.value)}
+                            placeholder="e.g., Mercy Hospital"
+                            className="field mt-4 !py-3"
+                          />
                         ) : (
                           <div className="mt-4 flex flex-wrap gap-2">
                             {f.options!.map((o) => {
