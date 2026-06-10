@@ -17,8 +17,17 @@ const MODEL = minModel(process.env.ANTHROPIC_MODEL);
 // needed, but never Opus.
 export const SCORE_MODEL = minModel(process.env.ANTHROPIC_MODEL_SCORING);
 
+// OpenAI: cheapest capable tier only. Anything that isn't a mini/nano model is
+// downgraded to gpt-4o-mini, so we never run a big/expensive OpenAI model either.
+const DEFAULT_OPENAI = "gpt-4o-mini";
+const minOpenAI = (m?: string | null): string => (!m || !/mini|nano/i.test(m) ? DEFAULT_OPENAI : m);
+const OPENAI_MODEL = minOpenAI(process.env.OPENAI_MODEL);
+
+const useOpenAI = () => Boolean(process.env.OPENAI_API_KEY);
+
 export function hasAI(): boolean {
-  return Boolean(process.env.ANTHROPIC_API_KEY);
+  // Either provider works; OpenAI is preferred when present.
+  return Boolean(process.env.OPENAI_API_KEY || process.env.ANTHROPIC_API_KEY);
 }
 
 let client: Anthropic | null = null;
@@ -29,6 +38,32 @@ function getClient(): Anthropic {
   return client;
 }
 
+async function callOpenAI(system: string, user: string, maxTokens: number, temperature: number): Promise<string> {
+  const res = await fetch("https://api.openai.com/v1/chat/completions", {
+    method: "POST",
+    headers: {
+      Authorization: `Bearer ${process.env.OPENAI_API_KEY}`,
+      "Content-Type": "application/json",
+    },
+    body: JSON.stringify({
+      model: OPENAI_MODEL,
+      max_tokens: maxTokens,
+      temperature,
+      // OpenAI auto-caches long stable prefixes, so the system prompt is cheap on repeat.
+      messages: [
+        { role: "system", content: system },
+        { role: "user", content: user },
+      ],
+    }),
+  });
+  if (!res.ok) {
+    const t = await res.text().catch(() => "");
+    throw new Error(`openai ${res.status}: ${t.slice(0, 160)}`);
+  }
+  const data = await res.json();
+  return data?.choices?.[0]?.message?.content ?? "";
+}
+
 interface CallOpts {
   system: string;
   user: string;
@@ -37,6 +72,8 @@ interface CallOpts {
   model?: string;
 }
 
+// Provider-agnostic call. Prefers OpenAI (gpt-4o-mini) when its key is set,
+// else Anthropic (Haiku). Same minimal-model, low-cost policy on both sides.
 export async function callClaude({
   system,
   user,
@@ -44,6 +81,9 @@ export async function callClaude({
   temperature = 0.4,
   model = MODEL,
 }: CallOpts): Promise<string> {
+  if (useOpenAI()) {
+    return callOpenAI(system, user, maxTokens, temperature);
+  }
   const res = await getClient().messages.create({
     model: minModel(model), // never Opus, always at least Haiku
     max_tokens: maxTokens,
