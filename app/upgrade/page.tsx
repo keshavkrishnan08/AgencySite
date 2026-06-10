@@ -117,7 +117,7 @@ export default function UpgradePage() {
               ) : (
                 <>
                   {/* billing interval toggle */}
-                  <div className="mb-5 flex rounded-full bg-bg-tint p-1">
+                  <div className="mb-2 flex rounded-full bg-bg-tint p-1">
                     {(["monthly", "annual"] as const).map((opt) => (
                       <button
                         key={opt}
@@ -131,6 +131,10 @@ export default function UpgradePage() {
                       </button>
                     ))}
                   </div>
+                  {/* social proof: nudge toward annual */}
+                  <p className="mb-5 text-center text-2xs font-medium text-ink-3">
+                    🔥 Most people choose yearly
+                  </p>
 
                   <div className="mb-2 flex justify-end">
                     <span className="inline-flex items-center gap-1.5 rounded-full bg-coral-soft px-2.5 py-1 text-2xs font-bold uppercase tracking-wider text-coral-ink">
