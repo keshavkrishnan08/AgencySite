@@ -2,6 +2,7 @@ import type { Metadata, Viewport } from "next";
 import { Fraunces, Hanken_Grotesk, JetBrains_Mono } from "next/font/google";
 import "./globals.css";
 import { AuthProvider } from "@/lib/auth";
+import { MetaPixel } from "@/components/MetaPixel";
 
 const fraunces = Fraunces({
   subsets: ["latin"],
@@ -73,6 +74,7 @@ export default function RootLayout({
       className={`${fraunces.variable} ${hanken.variable} ${jetbrains.variable}`}
     >
       <body>
+        <MetaPixel />
         <AuthProvider>{children}</AuthProvider>
       </body>
     </html>
