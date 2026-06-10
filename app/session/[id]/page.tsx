@@ -106,7 +106,8 @@ export default function SessionPage() {
             <span className="mb-2 text-2xl text-white/70">/100</span>
           </div>
           <p className="mt-3 text-white/85">
-            You answered {session.answers.length} questions in {formatDuration(session.durationSeconds)} ·
+            You answered {session.answers.length} questions in {formatDuration(session.durationSeconds)}
+            {session.avgSecondsPerQuestion ? ` · ~${session.avgSecondsPerQuestion}s per question` : ""} ·
             preparing for {session.targetRole}
             {session.company ? ` at ${session.company}` : ""}
           </p>

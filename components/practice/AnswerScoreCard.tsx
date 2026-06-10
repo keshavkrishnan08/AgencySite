@@ -5,6 +5,7 @@ import {
   AlertCircle,
   CheckCircle2,
   ChevronDown,
+  Clock,
   Heart,
   Lightbulb,
   Mic,
@@ -15,6 +16,8 @@ import { InfoTip } from "@/components/ui/Tooltip";
 import { deliveryNotes } from "@/lib/delivery";
 import { DIMENSIONS, DIMENSION_HELP, scoreLabel, scoreColor, cn } from "@/lib/utils";
 import type { Dimension, ScoredAnswer } from "@/lib/types";
+
+const fmtSecs = (s: number) => (s < 60 ? `${s}s` : `${Math.floor(s / 60)}m ${s % 60}s`);
 
 function DeliveryPanel({ answer }: { answer: ScoredAnswer }) {
   if (!answer.delivery) return null;
@@ -182,6 +185,11 @@ export function AnswerScoreCard({
             {scoreLabel(s)}
           </p>
           <p className="mt-0.5 text-2xs uppercase tracking-wider text-ink-3">out of 100</p>
+          {answer.secondsOnQuestion != null && (
+            <p className="mt-2 inline-flex items-center gap-1 text-2xs font-medium text-ink-3">
+              <Clock size={12} /> {fmtSecs(answer.secondsOnQuestion)} on this question
+            </p>
+          )}
         </div>
         <DimensionBars dimensions={answer.scores} />
       </div>
