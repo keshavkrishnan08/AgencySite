@@ -115,11 +115,13 @@ export function AnswerScoreCard({
   animate = true,
   gentle = false,
   loadExample,
+  recentAverage = 0,
 }: {
   answer: ScoredAnswer;
   animate?: boolean;
   gentle?: boolean;
   loadExample?: (a: ScoredAnswer) => Promise<string>;
+  recentAverage?: number;
 }) {
   const [open, setOpen] = useState(false);
   const [example, setExample] = useState(answer.exampleAnswer || "");
@@ -186,6 +188,15 @@ export function AnswerScoreCard({
             {scoreLabel(s)}
           </p>
           <p className="mt-0.5 text-2xs uppercase tracking-wider text-ink-3">out of 100</p>
+          {recentAverage > 0 && (() => {
+            const delta = s - Math.round(recentAverage);
+            const up = delta >= 0;
+            return (
+              <p className="mt-2 inline-flex items-center gap-1 text-2xs font-semibold" style={{ color: up ? "var(--sage-ink)" : "var(--amber-ink)" }}>
+                {delta === 0 ? "= your recent average" : `${up ? "↑ +" : "↓ "}${Math.abs(delta)} vs your recent average (${Math.round(recentAverage)})`}
+              </p>
+            );
+          })()}
           {answer.secondsOnQuestion != null && (
             <p className="mt-2 inline-flex items-center gap-1 text-2xs font-medium text-ink-3">
               <Clock size={12} /> {fmtSecs(answer.secondsOnQuestion)} on this question

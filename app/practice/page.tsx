@@ -446,6 +446,7 @@ function PracticeInner() {
             <AnswerScoreCard
               answer={scored}
               gentle={gentle}
+              recentAverage={perso.current.recentAverage}
               loadExample={(a) => apiGenerateExample(a.questionText, role, a.category)}
             />
 
