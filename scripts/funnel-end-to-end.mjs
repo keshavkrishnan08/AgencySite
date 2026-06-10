@@ -5,18 +5,19 @@
 
 const SPEND = 900; // $30/day x 30
 
-// ---- 1. ACQUISITION (per month, from the ABM) ----
+// ---- 1. ACQUISITION (per month, from the ABM — current shipped funnel:
+//        auto-advance + validations-removed onboarding, annual-default) ----
 const ACQ = [
-  ["Ad click", 735.6],
-  ["/start landing viewed", 636.9],
-  ["Started onboarding", 405.4],
-  ["Finished the questions", 231.8],
-  ["Created account", 147.1],
-  ["Reached paywall (/upgrade)", 136.4],
-  ["Subscribed (paid $9.99)", 23.7],
+  ["Ad click", 730.2],
+  ["/start landing viewed", 615.6],
+  ["Started onboarding", 390.9],
+  ["Finished the questions", 277.8],
+  ["Created account", 223.2],
+  ["Reached paywall (/upgrade)", 216.3],
+  ["Subscribed (paid $9.99)", 25.4],
 ];
-const LANDING = 636.9; // base for "from landing" %
-const PAID = 23.7;
+const LANDING = 615.6; // base for "from landing" %
+const PAID = 25.4;
 
 // ---- 2. IN-APP ACTIVATION (% of paid; modeled benchmarks) ----
 const ACT = [
@@ -29,8 +30,8 @@ const ACT = [
   ["Formed a habit (3+ sessions)", 0.41],
 ];
 
-// ---- 3. RETENTION / CHURN (blended, from ABM cashflow: annual locked + 12% monthly churn) ----
-const ACTIVE = [23.7, 22.3, 21.0, 19.8, 18.9, 18.0, 17.2, 16.5, 15.9, 15.4, 14.9, 14.5];
+// ---- 3. RETENTION / CHURN (blended, from ABM cashflow: annual locked + monthly churn) ----
+const ACTIVE = [25.4, 23.9, 22.5, 21.2, 20.3, 19.3, 18.4, 17.7, 17.0, 16.5, 16.0, 15.5];
 
 const f = (n, d = 0) => Number(n).toFixed(d);
 const pc = (n, den) => (den ? (n / den * 100).toFixed(1) + "%" : "—");
