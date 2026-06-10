@@ -466,8 +466,31 @@ function Pricing() {
         </Reveal>
 
         <div className="mx-auto mt-16 grid max-w-3xl gap-6 sm:grid-cols-2">
-          {/* Monthly */}
+          {/* Yearly — highlighted, led with (best value) */}
           <Reveal delay={0.08}>
+            <div className="relative flex h-full flex-col rounded-2xl border-2 p-8 shadow-xl" style={{ borderColor: "var(--primary)", background: "var(--surface)" }}>
+              <span className="absolute -top-3 left-8 rounded-full px-3 py-1 text-2xs font-bold uppercase tracking-wider text-white" style={{ background: "linear-gradient(135deg, var(--gold), var(--gold-ink))" }}>
+                Best value · save 34%
+              </span>
+              <h3 className="font-serif text-xl font-semibold" style={{ color: "var(--primary-ink)" }}>Yearly</h3>
+              <span className="mt-3 inline-flex w-fit items-center gap-1.5 rounded-full bg-coral-soft px-3 py-1 text-2xs font-bold uppercase tracking-wider text-coral-ink">
+                23% off · through next week
+              </span>
+              <div className="mt-3 flex items-baseline gap-2.5">
+                <span className="font-serif text-xl font-semibold text-ink-3 line-through">$103</span>
+                <span className="font-serif text-5xl font-semibold text-ink">
+                  $6.58<span className="font-sans text-base font-medium text-ink-3"> / mo</span>
+                </span>
+              </div>
+              <p className="mt-1 text-sm text-sage-ink">Billed yearly at $79 · cancel anytime</p>
+              <ButtonLink href="/onboarding" className="mt-7 w-full">
+                Get started
+              </ButtonLink>
+            </div>
+          </Reveal>
+
+          {/* Monthly */}
+          <Reveal delay={0.14}>
             <div className="relative flex h-full flex-col rounded-2xl border-2 p-8 shadow-lg" style={{ borderColor: "var(--border)", background: "var(--surface)" }}>
               <h3 className="font-serif text-xl font-semibold text-ink">Monthly</h3>
               <span className="mt-3 inline-flex w-fit items-center gap-1.5 rounded-full bg-coral-soft px-3 py-1 text-2xs font-bold uppercase tracking-wider text-coral-ink">
@@ -481,29 +504,6 @@ function Pricing() {
               </div>
               <p className="mt-1 text-sm text-ink-3">Billed monthly · cancel anytime</p>
               <ButtonLink href="/onboarding" variant="secondary" className="mt-7 w-full">
-                Get started
-              </ButtonLink>
-            </div>
-          </Reveal>
-
-          {/* Yearly — highlighted */}
-          <Reveal delay={0.14}>
-            <div className="relative flex h-full flex-col rounded-2xl border-2 p-8 shadow-xl" style={{ borderColor: "var(--primary)", background: "var(--surface)" }}>
-              <span className="absolute -top-3 left-8 rounded-full px-3 py-1 text-2xs font-bold uppercase tracking-wider text-white" style={{ background: "linear-gradient(135deg, var(--gold), var(--gold-ink))" }}>
-                Best value · save 34%
-              </span>
-              <h3 className="font-serif text-xl font-semibold" style={{ color: "var(--primary-ink)" }}>Yearly</h3>
-              <span className="mt-3 inline-flex w-fit items-center gap-1.5 rounded-full bg-coral-soft px-3 py-1 text-2xs font-bold uppercase tracking-wider text-coral-ink">
-                23% off · through next week
-              </span>
-              <div className="mt-3 flex items-baseline gap-2.5">
-                <span className="font-serif text-xl font-semibold text-ink-3 line-through">$103</span>
-                <span className="font-serif text-5xl font-semibold text-ink">
-                  $79<span className="font-sans text-base font-medium text-ink-3"> / yr</span>
-                </span>
-              </div>
-              <p className="mt-1 text-sm text-sage-ink">Just $6.58/mo, billed yearly · cancel anytime</p>
-              <ButtonLink href="/onboarding" className="mt-7 w-full">
                 Get started
               </ButtonLink>
             </div>
