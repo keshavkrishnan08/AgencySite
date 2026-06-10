@@ -6,14 +6,14 @@
 
    The whole question: is opCash/spend > 1 (snowball grows) or < 1 (snowball melts)? */
 
-// Overridable: node reinvest-scaling.mjs [CAC] [monthlyShare] [churn]
+// Overridable: node reinvest-scaling.mjs [CAC] [monthlyShare] [churn] [months]
 const SEED = 900;          // month-0 ad budget ($30/day x 30)
 const CAC = Number(process.argv[2] ?? 37.97);   // constant cost per paying sub
 const CHURN = Number(process.argv[4] ?? 0.30);  // monthly churn on monthly subs
 const PM = 9.99, PA = 79;  // monthly / annual price
 const AI = 1.44;           // Anthropic cost / active user / month (optimized)
 const fee = (g, n) => g * 0.029 + n * 0.30; // Stripe: % + per-transaction
-const MONTHS = 12;
+const MONTHS = Number(process.argv[5] ?? 12);
 
 const f = (n, d = 0) => Number(n).toFixed(d);
 
@@ -62,8 +62,8 @@ function run(monthlyShare, { verbose = false } = {}) {
   return { rows, totalAcquired, totalOpCash, lastOpCash, monthlySubs, activeAnnualEnd, runRateNet };
 }
 
-console.log("===== RECURSIVE REINVESTMENT — 1 YEAR — churn %s%%, CAC $%s, seed $%s =====",
-  CHURN * 100, f(CAC, 2), SEED);
+console.log("===== RECURSIVE REINVESTMENT — %s MONTHS — churn %s%%, CAC $%s, seed $%s =====",
+  MONTHS, CHURN * 100, f(CAC, 2), SEED);
 console.log("  Assumes constant CAC (no scaling friction) and reinvests 100%% of cash.\n");
 
 console.log("  UNIT ECONOMICS (the verdict before we even simulate):");
@@ -89,9 +89,9 @@ for (const r of base.rows) {
     ("$" + f(r.opCash)).padStart(7),
     (f(r.g, 2) + "x").padStart(6));
 }
-console.log("\n  After 12 months of reinvesting everything:");
+console.log("\n  After %s months of reinvesting everything:", MONTHS);
 console.log("    Total subs acquired:        %s", f(base.totalAcquired));
-console.log("    Active base at month 12:    %s monthly + %s annual", f(base.monthlySubs, 1), f(base.activeAnnualEnd, 1));
+console.log("    Active base at the end:     %s monthly + %s annual", f(base.monthlySubs, 1), f(base.activeAnnualEnd, 1));
 console.log("    Ad budget now (was $900):   $%s/mo", f(base.lastOpCash));
 console.log("    Forward net run-rate:       $%s/mo", f(base.runRateNet));
 console.log("    Total operating cash cycled:$%s on a $%s seed (%sx)",
