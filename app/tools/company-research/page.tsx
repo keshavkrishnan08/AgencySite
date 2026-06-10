@@ -4,6 +4,7 @@ import { useEffect, useState } from "react";
 import { motion } from "framer-motion";
 import { Building2, Loader2, MessageCircleQuestion, Newspaper, Heart, Target, Sparkles } from "lucide-react";
 import { ToolShell } from "@/components/layout/ToolShell";
+import { RichText } from "@/components/ui/RichText";
 import { CompanyIcon } from "@/components/icons";
 import { Button } from "@/components/ui/Button";
 import { getBriefings, getProfile, saveBriefing } from "@/lib/store";
@@ -86,7 +87,7 @@ export default function CompanyResearchPage() {
           <h2 className="font-serif text-2xl font-semibold text-ink">{briefing.company}</h2>
 
           <Card icon={Building2} title="What they do">
-            <p className="leading-relaxed text-ink-2">{briefing.whatTheyDo}</p>
+            <RichText text={briefing.whatTheyDo} />
           </Card>
           <Card icon={Newspaper} title="Recent news to look for">
             <BulletList items={briefing.recentNews} />
