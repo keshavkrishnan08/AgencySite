@@ -32,20 +32,15 @@ export function AppShell({ children, requirePremium = true }: { children: ReactN
   const pathname = usePathname();
   // Seed from localStorage so a cached nav renders instantly with the right
   // access state (no loader flash, no one-frame false redirect).
-  const [premium, setPremium] = useState(() => {
-    if (typeof window === "undefined") return false;
-    // Returning from Stripe Checkout: trust the success redirect optimistically so
-    // the paywall clears immediately, and force a fresh subscription re-check (the
-    // webhook confirms it moments later). Without this the cached gate bounces a
-    // just-paid user back to /upgrade.
-    if (new URLSearchParams(window.location.search).get("upgraded") === "1") {
-      upgradeToPremium();
-      checkedFor = null;
-    }
-    return isPremium();
-  });
+  const [premium, setPremium] = useState(() => (typeof window !== "undefined" ? isPremium() : false));
   const [subChecked, setSubChecked] = useState(
     () => typeof window !== "undefined" && checkedFor !== null && checkedFor === getProfile().email
+  );
+  // Returning from Stripe Checkout (?upgraded=1): hold a loader and VERIFY the
+  // session was actually paid before granting access. A user who cancels (or
+  // anyone typing the URL) is never let in.
+  const [verifying, setVerifying] = useState(
+    () => typeof window !== "undefined" && new URLSearchParams(window.location.search).get("upgraded") === "1"
   );
 
   useEffect(() => {
@@ -53,6 +48,36 @@ export function AppShell({ children, requirePremium = true }: { children: ReactN
     sync();
     return onStoreChange(sync);
   }, []);
+
+  useEffect(() => {
+    if (!verifying) return;
+    const sessionId = new URLSearchParams(window.location.search).get("session_id") || "";
+    let alive = true;
+    (async () => {
+      let paid = false;
+      try {
+        const r = await fetch("/api/verify-checkout", {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({ sessionId }),
+        });
+        paid = !!(await r.json())?.paid;
+      } catch {
+        /* treat as unpaid */
+      }
+      if (!alive) return;
+      if (paid) {
+        upgradeToPremium();
+        checkedFor = null; // re-confirm against the DB on next gate
+        setPremium(true);
+      }
+      window.history.replaceState({}, "", pathname); // strip the query either way
+      setVerifying(false);
+    })();
+    return () => {
+      alive = false;
+    };
+  }, [verifying, pathname]);
 
   // Reconcile access against the authoritative subscription before gating.
   useEffect(() => {
@@ -103,7 +128,8 @@ export function AppShell({ children, requirePremium = true }: { children: ReactN
   const needsAuth = ready && !user;
   // Don't judge "not paying" until the subscription check has returned.
   const checkingSub = ready && !!user && !subChecked && !exemptFromPay;
-  const needsPay = ready && !!user && subChecked && !premium && !exemptFromPay;
+  // Never judge "not paying" while a checkout return is still being verified.
+  const needsPay = ready && !!user && subChecked && !premium && !exemptFromPay && !verifying;
 
   useEffect(() => {
     if (needsAuth) router.replace(`/signin?next=${encodeURIComponent(pathname)}`);
@@ -113,10 +139,11 @@ export function AppShell({ children, requirePremium = true }: { children: ReactN
     if (needsPay) router.replace("/upgrade");
   }, [needsPay, router]);
 
-  if (needsAuth || needsPay || checkingSub) {
+  if (needsAuth || needsPay || checkingSub || verifying) {
     return (
-      <main className="grid min-h-screen place-items-center">
+      <main className="grid min-h-screen place-items-center gap-3 text-center">
         <Loader2 size={28} className="animate-spin text-primary" />
+        {verifying && <p className="text-sm text-ink-3">Confirming your payment…</p>}
       </main>
     );
   }
