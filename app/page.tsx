@@ -1,4 +1,4 @@
-import { ArrowRight, Check, CreditCard, Lock, RefreshCw, ShieldCheck, Briefcase, Sparkles } from "lucide-react";
+import { ArrowRight, Check, CreditCard, RefreshCw, ShieldCheck, Sparkles } from "lucide-react";
 import { SiteNav } from "@/components/layout/SiteNav";
 import { SiteFooter } from "@/components/layout/SiteFooter";
 import { HeroDemo } from "@/components/landing/HeroDemo";
@@ -569,32 +569,6 @@ function FinalCTA() {
   );
 }
 
-/* ===================== TRUST STRIP ===================== */
-const TRUST = [
-  { icon: CreditCard, label: "$9.99/month" },
-  { icon: Lock, label: "Completely private" },
-  { icon: RefreshCw, label: "Cancel anytime" },
-  { icon: Briefcase, label: "Works for any role" },
-];
-
-function TrustStrip() {
-  return (
-    <div className="border-y" style={{ borderColor: "var(--border)", background: "var(--surface)" }}>
-      <div className="container-wide grid grid-cols-2 gap-4 py-6 sm:grid-cols-4">
-        {TRUST.map((t) => {
-          const Icon = t.icon;
-          return (
-            <div key={t.label} className="flex items-center justify-center gap-2.5 text-sm font-medium text-ink-2">
-              <Icon size={18} className="text-primary" />
-              {t.label}
-            </div>
-          );
-        })}
-      </div>
-    </div>
-  );
-}
-
 /* ===================== FAQ ===================== */
 const FAQS: [string, string][] = [
   [
@@ -660,7 +634,6 @@ export default function LandingPage() {
         <Hero />
         <TestimonialCarousel />
         <DemoSection />
-        <TrustStrip />
         <Stories />
         <HowItWorks />
         <ProductFeatures />
