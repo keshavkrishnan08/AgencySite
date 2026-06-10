@@ -28,7 +28,9 @@ const INCLUDED = [
 export default function UpgradePage() {
   const router = useRouter();
   const [state, setState] = useState<"idle" | "processing" | "done">("idle");
-  const [interval, setIntervalPlan] = useState<"monthly" | "annual">("monthly");
+  // Default to annual: it's the highest-LTV plan (churn-immune + prepaid), and the
+  // pre-selected option is the single biggest lever on plan mix.
+  const [interval, setIntervalPlan] = useState<"monthly" | "annual">("annual");
 
   useEffect(() => {
     track("upgrade_view");
@@ -153,6 +155,20 @@ export default function UpgradePage() {
                     <Row label="23% off this week" value={`-${interval === "annual" ? "$24" : "$3"}`} />
                     <Row label="Due today" value={price} bold />
                   </div>
+
+                  {/* Nudge monthly pickers toward the higher-LTV annual plan */}
+                  {interval === "monthly" && (
+                    <button
+                      onClick={() => setIntervalPlan("annual")}
+                      className="mt-4 flex w-full items-center justify-between gap-2 rounded-xl border-2 border-dashed px-4 py-3 text-left text-sm transition-colors hover:bg-sage-soft/40"
+                      style={{ borderColor: "var(--sage)" }}
+                    >
+                      <span className="text-ink-2">
+                        💡 Pay yearly and <span className="font-semibold text-sage-ink">save $41</span> (just $6.58/mo)
+                      </span>
+                      <span className="shrink-0 font-semibold text-sage-ink">Switch →</span>
+                    </button>
+                  )}
 
                   <Button onClick={subscribe} disabled={state === "processing"} size="lg" className="mt-6 w-full">
                     {state === "processing" ? (
