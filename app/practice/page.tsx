@@ -83,16 +83,22 @@ function PracticeInner() {
       perso.current = { weakestDimension, recentAverage, name: profile.name, interviewGap: profile.interviewGap || "" };
       setGentle(hist.length === 0);
 
+      // Recent questions to steer the generator away from repeats across sessions.
+      const recentQuestions = Array.from(
+        new Set(hist.flatMap((x) => (x.answers || []).map((a) => a.questionText)).filter(Boolean))
+      ).slice(-16);
       const { questions } = await apiGenerateQuestions({
         situation: s,
         targetRole: r,
         interviewGap: profile.interviewGap,
-        seed: Math.floor(Date.now() / 1000) % 7,
+        seed: (hist.length * 101 + Math.floor(Date.now() / 1000)) % 9973,
         focusDimension: focusDim,
         company: company.trim(),
         posting: posting.trim(),
         name: profile.name,
         weakestDimension,
+        sessionCount: hist.length,
+        avoid: recentQuestions,
       });
       setQuestions(questions);
       setIndex(0);
