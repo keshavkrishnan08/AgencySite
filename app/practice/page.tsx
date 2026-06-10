@@ -50,6 +50,7 @@ function PracticeInner() {
   const [followUpScored, setFollowUpScored] = useState<ScoredAnswer | null>(null);
   const [submittingFollowUp, setSubmittingFollowUp] = useState(false);
   const sessionStart = useRef<number>(0);
+  const questionStart = useRef<number>(0); // wall-clock start of the current question
   const [gentle, setGentle] = useState(false);
   // Per-user personalization computed from history, fed into every AI call.
   const perso = useRef({ weakestDimension: "", recentAverage: 0, name: "", interviewGap: "" });
@@ -141,6 +142,12 @@ function PracticeInner() {
     return () => clearTimeout(id);
   }, [phase]);
 
+  // Stamp the clock each time a fresh question is presented, so we can measure
+  // how long the candidate spends per question.
+  useEffect(() => {
+    if (phase === "answer") questionStart.current = Date.now();
+  }, [phase, index]);
+
   const wordCount = answerText.trim() ? answerText.trim().split(/\s+/).length : 0;
   const MIN_WORDS = 5;
   const canSubmit = wordCount >= MIN_WORDS && !submitting;
@@ -171,6 +178,9 @@ function PracticeInner() {
       false
     );
     result.delivery = deliveryRef.current ?? undefined;
+    result.secondsOnQuestion = questionStart.current
+      ? Math.round((Date.now() - questionStart.current) / 1000)
+      : undefined;
     setScored(result);
     setSubmitting(false);
     window.scrollTo({ top: 0, behavior: "smooth" });
@@ -223,6 +233,10 @@ function PracticeInner() {
 
   const finishSession = (finalAnswers: ScoredAnswer[]) => {
     const dimensions = aggregateDimensions(finalAnswers);
+    const perQ = finalAnswers.map((a) => a.secondsOnQuestion || 0).filter((n) => n > 0);
+    const avgSecondsPerQuestion = perQ.length
+      ? Math.round(perQ.reduce((s, n) => s + n, 0) / perQ.length)
+      : undefined;
     const session: Session = {
       id: uid("s"),
       createdAt: new Date().toISOString(),
@@ -233,6 +247,7 @@ function PracticeInner() {
       overall: computeOverall(dimensions),
       dimensions,
       durationSeconds: Math.round((Date.now() - sessionStart.current) / 1000),
+      avgSecondsPerQuestion,
       answers: finalAnswers,
       focusDimension: focusDim,
     };
