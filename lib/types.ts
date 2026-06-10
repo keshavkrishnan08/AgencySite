@@ -50,6 +50,7 @@ export interface ScoredAnswer {
   exampleAnswer: string;
   wordCount: number;
   durationSeconds?: number;
+  secondsOnQuestion?: number; // wall-clock time from seeing the question to submitting
   delivery?: DeliveryMetrics;
   source: "ai" | "heuristic";
 }
@@ -71,6 +72,7 @@ export interface Session {
   overall: number;
   dimensions: DimensionScores;
   durationSeconds: number;
+  avgSecondsPerQuestion?: number;
   answers: ScoredAnswer[];
   focusDimension?: Dimension;
 }
