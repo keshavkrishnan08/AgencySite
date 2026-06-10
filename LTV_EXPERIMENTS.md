@@ -25,7 +25,7 @@ The two levers that move LTV are **plan mix** (more annual = churn-immune + prep
 | B1 | **Activation:** route straight to first question, celebrate first score | partial (empty-state CTA) |
 | B2 | ~~Weekly progress email~~ | dropped (no email) |
 | B3 | **Streaks** + daily nudge | ✅ already in product (dashboard) |
-| B4 | **Interview-date goal + countdown** for urgency/return | ✅ shipped (GoalCard) |
+| B4 | **Interview scheduling**: multiple interviews, linear countdown to the soonest, selector to prep any one out of order; feeds practice role/company | ✅ shipped (InterviewSchedule) |
 | B5 | **Save-on-cancel**: offer pause or 1-month discount | todo |
 | B6 | ~~Re-engagement email~~ | dropped (no email) |
 | B7 | **Visible progress data** ("you cut 'um' 60% in 2 weeks") | todo |
