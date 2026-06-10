@@ -112,6 +112,7 @@ function PracticeInner() {
     const s = profile.situation || ob?.situation || null;
     setRole(r);
     setSituation(s);
+    setCompany(profile.company || ob?.company || "");
     if (autostart || focusDim) {
       start(r || "Office Manager", s);
     } else {

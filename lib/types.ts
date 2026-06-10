@@ -80,6 +80,7 @@ export interface UserProfile {
   email: string;
   situation: Situation | null;
   targetRole: string;
+  company?: string;
   interviewGap: InterviewGap | null;
   plan: Plan;
   createdAt: string;
