@@ -36,7 +36,9 @@ function campaign() {
   const make=()=>{ if(reached>=AUD)return null; const m=newMind();
     const a={m,persona:({"Pragmatic switcher":"career_change","Skeptical veteran":"laid_off","Eager climber":"promotion"})[m.id]||"returning",
       dev:chance(.75)?"mobile":"desktop", intent:tr(m.intent,.12), pat:tr(m.pat,.12), trust:tr(m.trust,.12),
-      price:tr(m.price,.12), tech:tr(m.tech,.12), aiMo: clamp(gauss(24,13),4,75)*0.16, seen:0, paid:false, plan:null, sess:0, consid:false};
+      // $/mo Anthropic cost = sessions/mo * $/session. After moving scoring +
+      // question-gen to Haiku with a minimal output contract, $/session ~ $0.06.
+      price:tr(m.price,.12), tech:tr(m.tech,.12), aiMo: clamp(gauss(24,13),4,75)*0.06, seen:0, paid:false, plan:null, sess:0, consid:false};
     agents.push(a); reached++; return a; };
   const nScreens=(a)=> 5 + (a.persona==="career_change"?1:0) + ((a.m.intent<.75&&a.m.trust<.6)?1:0);
 

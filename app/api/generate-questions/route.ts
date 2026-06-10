@@ -2,7 +2,7 @@ import { rateLimit } from "@/lib/ratelimit";
 import { recordUsage } from "@/lib/usage";
 import { NextResponse } from "next/server";
 import { generateQuestions, generateFocusQuestions } from "@/lib/questions";
-import { callClaude, extractJson, hasAI } from "@/lib/ai";
+import { callClaude, extractJson, hasAI, FAST_MODEL } from "@/lib/ai";
 import { COACH_PERSONA, candidateBlock } from "@/lib/prompt";
 import type { Question } from "@/lib/types";
 
@@ -62,7 +62,7 @@ export async function POST(req: Request) {
   if (hasAI()) {
     try {
       const user = `${candidateBlock({ name, situation: situation || "", targetRole, company, interviewGap, posting, weakestDimension })}\n\nWrite their 8 questions now.`;
-      const text = await callClaude({ system: SYSTEM, user, maxTokens: 1100, temperature: 0.6 });
+      const text = await callClaude({ model: FAST_MODEL, system: SYSTEM, user, maxTokens: 1100, temperature: 0.6 });
       const parsed = extractJson<{ questions: Question[] }>(text);
       if (parsed?.questions?.length) {
         const questions = parsed.questions.slice(0, 8).map((q, i) => ({
