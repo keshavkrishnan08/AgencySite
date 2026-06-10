@@ -32,6 +32,7 @@ const KEYS = {
   onboarding: "pp:onboarding",
   interviews: "pp:interviews",
   plan: "pp:plan",
+  goal: "pp:goal",
 } as const;
 
 function read<T>(key: string, fallback: T): T {
@@ -238,6 +239,17 @@ export interface OnboardingDraft {
   company?: string;
   interviewGap: UserProfile["interviewGap"];
 }
+/* ----------------------- Goal (interview countdown) ----------------------- */
+export interface Goal {
+  interviewDate: string | null; // ISO date (YYYY-MM-DD)
+}
+export function getGoal(): Goal {
+  return read<Goal>(KEYS.goal, { interviewDate: null });
+}
+export function setGoal(g: Goal): void {
+  write(KEYS.goal, g);
+}
+
 export function getOnboarding(): OnboardingDraft | null {
   return read<OnboardingDraft | null>(KEYS.onboarding, null);
 }
