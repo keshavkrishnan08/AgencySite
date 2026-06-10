@@ -33,11 +33,32 @@ Not blockers, but you want these.
 
 - [ ] **Add `ANTHROPIC_API_KEY`** to turn on real AI scoring/coaching. Without it the app runs on the built-in local engine (works, but less sharp). This is the only key needed to upgrade the whole app to Claude.
 - [ ] **Persist gap-story answers and company briefings to the DB.** Today they save to `localStorage` only. Sessions, interviews, plans, profile, usage, and premium status already persist per account.
-- [ ] **Move rate limiting to Upstash/Redis** if you deploy on more than one instance. The current limiter is in-memory (correct for a single instance; resets per instance otherwise). Same interface, swap the store.
+- [x] **Rate limiting is serverless-safe** — backed by an atomic Supabase counter (works across Vercel instances), with an in-memory fallback. Upstash/Redis only needed at very high scale.
 - [ ] **Set a real domain** and update `NEXT_PUBLIC_APP_URL` + the `metadataBase` / email links (currently `axoncareers.com` placeholder).
-- [ ] **Swap sample testimonials/stats for real ones** before making claims publicly (the "12,000+", names, and quotes are placeholders).
+- [ ] **Substantiate or soften the "12,000+ / 4.9" claims.** You chose to keep them; make sure you can back them up, or treat as illustrative, to avoid a false-advertising issue.
 - [ ] **Add `RESEND_API_KEY`** if you want the welcome/plan emails to actually send.
-- [ ] **Configure PostHog** (`NEXT_PUBLIC_POSTHOG_KEY`) if you want product analytics.
+
+---
+
+## 📊 Analytics (wired — just add the keys)
+
+The funnel is instrumented; it no-ops until you set the keys.
+
+- [ ] **Meta Pixel** — set `NEXT_PUBLIC_META_PIXEL_ID`. The Pixel is wired (`components/MetaPixel.tsx`) and fires standard events so the ad campaign can optimize and attribute: `PageView` (all pages), **Lead** (onboarding complete), **ViewContent** (paywall view), **InitiateCheckout** (clicked subscribe), **Subscribe** (paid, with $9.99 value). Verify with the Meta Pixel Helper extension.
+- [ ] **PostHog** — set `NEXT_PUBLIC_POSTHOG_KEY` (and `NEXT_PUBLIC_POSTHOG_HOST`). Captures the full funnel (`landing_cta_click`, `onboarding_complete`, `paywall_hit`, `upgrade_click`, `upgrade_success`, etc.) for product analytics. Verify in PostHog Live Events.
+- [ ] **Meta Conversions API (recommended).** Client Pixel events get blocked by ad-blockers/iOS. Fire **Subscribe** server-side from the Stripe webhook (you already get the event there) for accurate, durable attribution. This noticeably improves Meta's optimization on small budgets.
+- [ ] **Add UTM tracking** on ad links (`?utm_source=meta&utm_campaign=…&utm_content={{creative}}`) so you can attribute paid subs back to the winning creative.
+
+---
+
+## 📈 What the campaign model says (run `node scripts/campaign-abm.mjs`)
+
+At **$5/creative × 6 = $30/day**, the deep agent-based sim (averaged over 25 runs) shows:
+- ~33k people reached/mo, ~960 clicks (1.6% CTR), ~58 trials, **~13 paying subs**, **CAC ~$72**.
+- **Biggest leak is the paywall:** ~74% of people who reach `/upgrade` don't start a trial (mostly "not ready," then mobile-card-averse, then price). The onboarding mid-screens are the second leak.
+- **Most pick monthly** (~99%); with 12% churn that's **~0.82× ROAS / slightly unprofitable over 12 months** at these assumptions.
+- **You're underwater month 1** (~$118 first-month revenue vs $900 spend) → budget ~4–5 months of runway before payback.
+- Levers that flip it positive: lower churn (≤8%), push the annual plan, reduce paywall friction, kill weak creatives faster. Re-run the script after changing assumptions.
 
 ---
 
@@ -76,11 +97,15 @@ ANTHROPIC_API_KEY=sk-ant-...                          # server only
 # ANTHROPIC_MODEL=claude-sonnet-4-6                   # optional override
 # ANTHROPIC_MODEL_FAST=claude-haiku-4-5-20251001      # optional override
 
+# Analytics (client-safe; wired, no-op until set)
+NEXT_PUBLIC_META_PIXEL_ID=...                         # Meta Pixel for ad optimization
+NEXT_PUBLIC_POSTHOG_KEY=...                           # product funnel analytics
+NEXT_PUBLIC_POSTHOG_HOST=https://us.i.posthog.com     # optional override
+
 # Optional
 NEXT_PUBLIC_APP_URL=https://yourdomain.com
 RESEND_API_KEY=...
 EMAIL_FROM=Axon Careers <hello@yourdomain.com>
-NEXT_PUBLIC_POSTHOG_KEY=...
 ```
 
 **Security rule:** only values prefixed `NEXT_PUBLIC_` reach the browser, and those are all meant to be public (Supabase anon, Stripe publishable, PostHog). Every secret (service role, Stripe secret, Anthropic, Resend, webhook secret) has no `NEXT_PUBLIC_` prefix and stays on the server.

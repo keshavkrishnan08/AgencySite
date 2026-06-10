@@ -37,9 +37,36 @@ export type PPEvent =
   | "interview_tracked"
   | "offer_logged";
 
+/* Map our funnel events to Meta's standard events so the ad campaign can
+   optimize for and attribute conversions. */
+const META_EVENT: Partial<Record<PPEvent, string>> = {
+  onboarding_complete: "Lead",
+  upgrade_view: "ViewContent",
+  upgrade_click: "InitiateCheckout",
+  upgrade_success: "Subscribe",
+};
+
+declare global {
+  interface Window {
+    fbq?: (...args: unknown[]) => void;
+  }
+}
+
 export function track(event: PPEvent, properties: Record<string, unknown> = {}): void {
   if (typeof window === "undefined") return;
-  if (!KEY) return; // no-op until configured
+
+  // Meta Pixel standard event (fires only when the Pixel is loaded).
+  const metaEvent = META_EVENT[event];
+  if (metaEvent && typeof window.fbq === "function") {
+    try {
+      const payload = event === "upgrade_success" ? { currency: "USD", value: 9.99 } : {};
+      window.fbq("track", metaEvent, payload);
+    } catch {
+      /* never break the app */
+    }
+  }
+
+  if (!KEY) return; // PostHog no-op until configured
   try {
     void fetch(`${HOST}/capture/`, {
       method: "POST",
