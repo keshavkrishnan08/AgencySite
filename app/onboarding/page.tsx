@@ -442,7 +442,7 @@ function ConversionPanel({ demo, role }: { demo: Demo; role: string }) {
             </motion.div>
           </AnimatePresence>
         </div>
-        <p className="mt-12 flex items-center gap-2 text-sm text-white/75"><ShieldCheck size={16} /> Private by design. 7-day free trial.</p>
+        <p className="mt-12 flex items-center gap-2 text-sm text-white/75"><ShieldCheck size={16} /> Private by design. Cancel anytime.</p>
       </div>
     </aside>
   );

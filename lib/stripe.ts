@@ -26,4 +26,6 @@ export const PRICES = {
   annual: () => process.env.STRIPE_PRICE_ID_ANNUAL || process.env.STRIPE_PRICE_ID || "",
 };
 
-export const TRIAL_DAYS = Number(process.env.STRIPE_TRIAL_DAYS || "7");
+// No free trial: charge immediately on subscribe. Set STRIPE_TRIAL_DAYS to
+// re-enable one later. checkout/route.ts only adds a trial when this is > 0.
+export const TRIAL_DAYS = Number(process.env.STRIPE_TRIAL_DAYS || "0");

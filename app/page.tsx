@@ -65,10 +65,10 @@ function Hero() {
           <Reveal delay={0.18}>
             <div className="mt-9 flex flex-col items-start gap-3 sm:flex-row sm:items-center">
               <ButtonLink href="/onboarding" size="lg" className="group">
-                Start your free trial
+                Get started
                 <ArrowRight size={18} className="transition-transform group-hover:translate-x-0.5" />
               </ButtonLink>
-              <span className="text-sm text-ink-3">7 days free, then $9.99/mo. Cancel anytime.</span>
+              <span className="text-sm text-ink-3">$9.99/mo. Cancel anytime.</span>
             </div>
           </Reveal>
           <Reveal delay={0.26}>
@@ -465,7 +465,7 @@ function Pricing() {
         </Reveal>
 
         <div className="mx-auto mt-16 max-w-md">
-          {/* Premium — the only plan, with a 7-day free trial */}
+          {/* Premium — the only plan */}
           <Reveal delay={0.08}>
             <div
               className="relative h-full rounded-2xl border-2 p-8 shadow-xl"
@@ -475,7 +475,7 @@ function Pricing() {
                 className="absolute -top-3 left-8 rounded-full px-3 py-1 text-2xs font-bold uppercase tracking-wider text-white"
                 style={{ background: "linear-gradient(135deg, var(--gold), var(--gold-ink))" }}
               >
-                7-day free trial
+                Most popular
               </span>
               <h3 className="font-serif text-2xl font-semibold" style={{ color: "var(--primary-ink)" }}>
                 Axon Careers Premium
@@ -491,10 +491,10 @@ function Pricing() {
                 </span>
               </div>
               <p className="mt-1 text-sm text-sage-ink">
-                Free for 7 days, then $9.99/mo. Or <span className="text-ink-3 line-through">$103</span> $79/year (save 34%) · cancel anytime
+                Billed monthly. Or <span className="text-ink-3 line-through">$103</span> $79/year (save 34%) · cancel anytime
               </p>
               <ButtonLink href="/onboarding" className="mt-7 w-full">
-                Start your free trial
+                Get started
               </ButtonLink>
               <ul className="mt-7 grid gap-3 sm:grid-cols-1">
                 {PREMIUM_FEATURES.map((f) => (
@@ -509,7 +509,7 @@ function Pricing() {
         </div>
         <Reveal delay={0.1}>
           <p className="mt-8 flex flex-wrap items-center justify-center gap-x-6 gap-y-2 text-center text-sm text-ink-2">
-            <span className="inline-flex items-center gap-1.5"><ShieldCheck size={15} className="text-sage" /> 7-day free trial</span>
+            <span className="inline-flex items-center gap-1.5"><ShieldCheck size={15} className="text-sage" /> Private & secure</span>
             <span className="inline-flex items-center gap-1.5"><CreditCard size={15} className="text-sage" /> Secure checkout via Stripe</span>
             <span className="inline-flex items-center gap-1.5"><RefreshCw size={15} className="text-sage" /> Cancel in two clicks</span>
           </p>
@@ -539,11 +539,11 @@ function FinalCTA() {
         <Reveal delay={0.16}>
           <div className="mt-10 flex flex-col items-center gap-3">
             <ButtonLink href="/onboarding" size="lg" className="group">
-              Start your free trial
+              Get started
               <ArrowRight size={18} className="transition-transform group-hover:translate-x-0.5" />
             </ButtonLink>
             <span className="text-sm text-ink-3">
-              7 days free, then $9.99/mo. Cancel anytime. You&apos;ve already spent more time thinking about it than it takes to try.
+              $9.99/mo. Cancel anytime. You&apos;ve already spent more time thinking about it than it takes to try.
             </span>
           </div>
         </Reveal>
@@ -554,7 +554,7 @@ function FinalCTA() {
 
 /* ===================== TRUST STRIP ===================== */
 const TRUST = [
-  { icon: CreditCard, label: "7-day free trial" },
+  { icon: CreditCard, label: "$9.99/month" },
   { icon: Lock, label: "Completely private" },
   { icon: RefreshCw, label: "Cancel anytime" },
   { icon: Briefcase, label: "Works for any role" },
@@ -581,8 +581,8 @@ function TrustStrip() {
 /* ===================== FAQ ===================== */
 const FAQS: [string, string][] = [
   [
-    "How does the free trial work?",
-    "You answer a few quick questions, create an account, and start a 7-day free trial. You won't be charged during the trial, and you can cancel anytime in two clicks. After 7 days it's $9.99/month (or $79/year).",
+    "How does billing work?",
+    "You answer a few quick questions, create an account, and subscribe for $9.99/month (or $79/year). You're charged right away, you get everything immediately, and you can cancel anytime in two clicks.",
   ],
   [
     "I haven't interviewed in years. Will this work for me?",

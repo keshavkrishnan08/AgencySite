@@ -26,11 +26,11 @@ import { StartSticky } from "@/components/landing/StartSticky";
 export const metadata: Metadata = {
   title: "Practice your interview in private",
   description:
-    "Haven't interviewed in years? Practice with a private AI coach, five minutes a day, and walk in sure. Start a 7-day free trial.",
+    "Haven't interviewed in years? Practice with a private AI coach, five minutes a day, and walk in sure. Just $9.99/month.",
   openGraph: {
     title: "You're more ready than you think.",
     description:
-      "A private place to practice your interview until the fear turns into calm. 7-day free trial.",
+      "A private place to practice your interview until the fear turns into calm. Just $9.99/month.",
   },
   robots: { index: false }, // ad destination, not for organic search
 };
@@ -81,7 +81,7 @@ const STEPS = [
 ];
 
 const ASSURANCES = [
-  { icon: ShieldCheck, label: "7-day free trial" },
+  { icon: ShieldCheck, label: "Cancel anytime" },
   { icon: Lock, label: "Completely private" },
   { icon: Smartphone, label: "Works on your phone" },
   { icon: CreditCard, label: "Cancel anytime" },
@@ -104,7 +104,7 @@ export default function StartPage() {
       <header className="container-wide flex items-center justify-between py-5">
         <Logo href={null} size={30} />
         <span className="chip hidden bg-sage-soft text-sage-ink sm:inline-flex">
-          <Star size={13} className="fill-sage-ink" /> 7-day free trial
+          <Star size={13} className="fill-sage-ink" /> $9.99/month
         </span>
       </header>
 
@@ -148,10 +148,10 @@ export default function StartPage() {
           <Reveal delay={0.15}>
             <div className="mt-8 flex flex-col items-start gap-3">
               <ButtonLink href={CTA} size="lg" className="w-full sm:w-auto">
-                Start your free trial <ArrowRight size={18} />
+                Get started <ArrowRight size={18} />
               </ButtonLink>
               <p className="text-sm font-medium text-ink-3">
-                7 days free, then $9.99/mo. Cancel anytime.
+                $9.99/mo. Cancel anytime.
               </p>
             </div>
           </Reveal>
@@ -343,9 +343,9 @@ export default function StartPage() {
                 className="glass inline-flex items-center gap-2 rounded-full px-9 py-4 text-base font-semibold shadow-xl"
                 style={{ color: "var(--primary-ink)" }}
               >
-                Start your free trial <ArrowRight size={18} />
+                Get started <ArrowRight size={18} />
               </Link>
-              <p className="text-sm text-white/70">7 days free, then $9.99/mo. Cancel anytime.</p>
+              <p className="text-sm text-white/70">$9.99/mo. Cancel anytime.</p>
             </div>
           </Reveal>
         </div>

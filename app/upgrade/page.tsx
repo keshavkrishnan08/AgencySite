@@ -149,9 +149,9 @@ export default function UpgradePage() {
                   <div className="my-6 hairline" />
 
                   <div className="space-y-2 text-sm">
-                    <Row label="7-day free trial" value="$0.00" />
-                    <Row label={interval === "annual" ? "Then per year (23% off)" : "Then per month (23% off)"} value={price} />
-                    <Row label="Due today" value="$0.00" bold />
+                    <Row label={interval === "annual" ? "Was (per year)" : "Was (per month)"} value={wasPrice} />
+                    <Row label="23% off this week" value={`-${interval === "annual" ? "$24" : "$3"}`} />
+                    <Row label="Due today" value={price} bold />
                   </div>
 
                   <Button onClick={subscribe} disabled={state === "processing"} size="lg" className="mt-6 w-full">
@@ -161,7 +161,7 @@ export default function UpgradePage() {
                       </>
                     ) : (
                       <>
-                        <Lock size={16} /> Start 7-day free trial
+                        <Lock size={16} /> Subscribe — {price}/{interval === "annual" ? "yr" : "mo"}
                       </>
                     )}
                   </Button>
