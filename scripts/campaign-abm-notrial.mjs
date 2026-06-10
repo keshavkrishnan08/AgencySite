@@ -14,6 +14,14 @@ const tr = (m, sd) => clamp(gauss(m, sd));
 
 const PER = 5, NC = 6, DAILY = PER * NC, DAYS = 30;
 const CPM = 14, LEARN = 7, LMULT = 1.35, AUD = 45000, CAP = 7;
+// Onboarding knobs (override via env to model UX changes):
+//   ONB_SCREENS base step count, ONB_BASE per-screen continue, ONB_PEN patience penalty
+const ONB_SCREENS = Number(process.env.ONB_SCREENS || 5);
+const ONB_BASE = Number(process.env.ONB_BASE || 0.965);
+const ONB_PEN = Number(process.env.ONB_PEN || 0.14);
+// Optional paywall pay-rate multiplier (validation screens build desire; removing
+// them can trim conversion — model that with PAY_MULT < 1).
+const PAY_MULT = Number(process.env.PAY_MULT || 1);
 const EXP = { 1: 1, 2: 1.3, 3: 1.2, 4: 0.85, 5: 0.55, 6: 0.35 };
 const CREA = [1.5, 1.1, 1.0, 0.9, 0.8, 0.55];
 const MINDS = [
@@ -40,7 +48,7 @@ function campaign() {
       // question-gen to Haiku with a minimal output contract, $/session ~ $0.06.
       price:tr(m.price,.12), tech:tr(m.tech,.12), aiMo: clamp(gauss(24,13),4,75)*0.06, seen:0, paid:false, plan:null, sess:0, consid:false};
     agents.push(a); reached++; return a; };
-  const nScreens=(a)=> 5 + (a.persona==="career_change"?1:0) + ((a.m.intent<.75&&a.m.trust<.6)?1:0);
+  const nScreens=(a)=> ONB_SCREENS + (a.persona==="career_change"?1:0) + ((a.m.intent<.75&&a.m.trust<.6)?1:0);
 
   function session(a){
     F.click++; const mob=a.dev==="mobile";
@@ -48,15 +56,19 @@ function campaign() {
     F.lp++;
     if(!chance(clamp(.50*(.4+a.intent))))return;
     F.onb_start++;
-    const ns=nScreens(a), per=clamp(.965-(1-a.m.pat)*.14);
-    for(let s=1;s<=ns;s++) if(!chance(per)){onb[s]=(onb[s]||0)+1; return;}
+    // Single completion draw (one RNG draw regardless of screen count) so that
+    // changing the number of onboarding screens does NOT desync the downstream
+    // random stream — keeps scenarios comparable. Per-screen drop is recorded
+    // separately below without consuming the shared stream.
+    const ns=nScreens(a), per=clamp(ONB_BASE-(1-a.m.pat)*ONB_PEN);
+    if(!chance(Math.pow(per, ns))){ const s=1+Math.floor(((a.seen*7+a.sess*3)%ns)); onb[s]=(onb[s]||0)+1; return; }
     F.onb_done++;
     if(!chance(clamp(.55+a.trust*.4)))return;
     F.acct++;
     if(!chance(.97))return;
     F.paywall++;
     // NO TRIAL: pay $9.99 right now. A bigger ask than a free trial, so lower.
-    const pPay=clamp(.20*(.4+a.trust*.6)*(1-a.price*.55)*(mob?(.7+a.tech*.3):1)*(1+a.intent*.2-.1));
+    const pPay=clamp(PAY_MULT*.20*(.4+a.trust*.6)*(1-a.price*.55)*(mob?(.7+a.tech*.3):1)*(1+a.intent*.2-.1));
     if(!chance(pPay)){ pwReason[a.price>.7?"price":a.trust<.45?"trust":(mob&&a.tech<.55)?"mobileCard":"hesitate"]++;
       pwDev[a.dev]++; pwMind[a.m.id]=(pwMind[a.m.id]||0)+1; a.consid=true; return; }
     F.paid++; a.paid=true; mindStat[a.m.id].paid++;
