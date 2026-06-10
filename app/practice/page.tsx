@@ -116,7 +116,9 @@ function PracticeInner() {
     setRole(r);
     setSituation(s);
     setCompany(active?.company || profile.company || ob?.company || "");
-    if (autostart || focusDim) {
+    // If we already know their role (from onboarding/profile/active interview),
+    // go straight into the questions. Only show setup when we have nothing.
+    if (autostart || focusDim || r.trim()) {
       start(r || "Office Manager", s);
     } else {
       setPhase("setup");
