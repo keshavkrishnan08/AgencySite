@@ -15,7 +15,6 @@ The code paths are wired. You're flipping switches, not building.
 
 ## Step 1 — Turn on real AI (5 min)
 ```bash
-echo 'ANTHROPIC_API_KEY=sk-ant-...' >> .env.local
 ```
 Every `/api/*` route already prefers Claude and falls back to the heuristic engine. Nothing else to change.
 
