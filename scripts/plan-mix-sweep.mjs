@@ -7,7 +7,7 @@
 const PAID = 23.7;        // avg paying subs / month from the ABM
 const SPEND = 900;        // $30/day x 30
 const PM = 9.99, PA = 79; // monthly / annual price
-const CH = 0.12;          // monthly churn
+const CH = 0.50;          // monthly churn
 const AIP = 1.44;         // Anthropic cost / active user / month (24 sess x $0.06)
 const fee = (g) => g * 0.029 + 0.30; // Stripe
 const CAC = SPEND / PAID;
@@ -62,6 +62,9 @@ for (const s of SHARES) {
     r.monthRows.map(v => f(v).padStart(5)).join(""));
 }
 
+const monthlyOnly = model(1.0);
 console.log("\n  Read: higher annual share = more month-0 cash and earlier break-even");
-console.log("  (annual is paid up front and locked for the year). A 100%%-monthly book");
-console.log("  still turns a 12-month profit now because AI cost dropped to $%s/user.", AIP);
+console.log("  (annual is paid up front and locked for the year).");
+console.log("  At %s%% churn, a 100%%-monthly book is %s ($%s over 12 mo); annual's",
+  CH * 100, monthlyOnly.profit >= 0 ? "profitable" : "a LOSS", f(monthlyOnly.profit));
+console.log("  locked-in year is what keeps the high-annual rows above water.");
