@@ -49,6 +49,14 @@ const clampScore = (n: unknown): number => {
   return Number.isFinite(v) ? Math.min(100, Math.max(0, v)) : 0;
 };
 
+/* Content-addressed cache: identical scoring inputs return the identical result,
+   so the same answer ALWAYS grades the same way (LLMs aren't bit-deterministic
+   even at temp 0). Also saves cost on repeats. Module-level, capped. */
+interface AiScored { scores: DimensionScores & { overall: number }; strengthSummary: string; growthSummary: string; improve: string[] }
+const scoreCache = new Map<string, AiScored>();
+const SCORE_CACHE_MAX = 1000;
+const hashKey = (s: string): string => { let h = 5381; for (let i = 0; i < s.length; i++) h = (h * 33 + s.charCodeAt(i)) >>> 0; return String(h); };
+
 export async function POST(req: Request) {
   const limited = await rateLimit(req);
   if (limited) return limited;
@@ -84,6 +92,17 @@ export async function POST(req: Request) {
   const heuristic = scoreAnswer({ question, answer, targetRole, category, questionNumber });
   const example = withExample ? exampleAnswer(question, targetRole, category) : "";
 
+  // Same inputs -> same grade (deterministic), straight from cache.
+  const cacheKey = hashKey([question, answer, targetRole, situation, category, name, company, interviewGap, weakestDimension, recentAverage].join("||"));
+  const cached = scoreCache.get(cacheKey);
+  if (cached) {
+    return NextResponse.json({
+      ...heuristic, scores: cached.scores, feedback: heuristic.feedback,
+      strengthSummary: cached.strengthSummary, growthSummary: cached.growthSummary,
+      improve: cached.improve, anxiety: heuristic.anxiety, exampleAnswer: example, source: "ai",
+    });
+  }
+
   if (hasAI()) {
     try {
       const ctx = candidateBlock({ name, situation, targetRole, company, interviewGap, weakestDimension, recentAverage });
@@ -91,7 +110,8 @@ export async function POST(req: Request) {
       // Haiku + temperature 0: cheap, and the strict rubric (not the model tier)
       // is what makes the same answer grade the same way every session.
       // maxTokens kept low because the contract is just scores + brief fixes.
-      const text = await callClaude({ model: SCORE_MODEL, system: SYSTEM, user, maxTokens: 320, temperature: 0 });
+      // temperature 0 + fixed seed => the same answer grades the same way every time.
+      const text = await callClaude({ model: SCORE_MODEL, system: SYSTEM, user, maxTokens: 320, temperature: 0, seed: 7 });
       const parsed = extractJson<AiScore>(text);
       if (parsed && parsed.clarity != null) {
         // Numbers: clamped to ints and overall recomputed server-side so the
@@ -108,14 +128,19 @@ export async function POST(req: Request) {
           .filter((s) => typeof s === "string" && s.trim())
           .map((s) => s.trim())
           .slice(0, 2);
-        return NextResponse.json({
-          ...heuristic,
+        const aiResult: AiScored = {
           scores: { ...dims, overall: computeOverall(dims) },
-          // per-dimension notes come from the free deterministic engine
-          feedback: heuristic.feedback,
           strengthSummary: (parsed.strength || "").trim() || heuristic.strengthSummary,
           growthSummary: improve.join(" ") || heuristic.growthSummary,
-          improve, // brief, structured list of fixes for the UI / future graphs
+          improve,
+        };
+        // store for deterministic repeats (evict oldest if full)
+        if (scoreCache.size >= SCORE_CACHE_MAX) scoreCache.delete(scoreCache.keys().next().value as string);
+        scoreCache.set(cacheKey, aiResult);
+        return NextResponse.json({
+          ...heuristic,
+          ...aiResult,
+          feedback: heuristic.feedback, // per-dimension notes from the deterministic engine
           anxiety: heuristic.anxiety,
           exampleAnswer: example,
           source: "ai",
