@@ -62,6 +62,7 @@ export default function UpgradePage() {
   };
 
   const price = interval === "annual" ? "$79" : "$9.99";
+  const wasPrice = interval === "annual" ? "$103" : "$12.99"; // pre-discount, struck through
   const cadence = interval === "annual" ? "per year" : "per month";
   const sub = interval === "annual" ? "Just $6.58/mo, billed yearly. Save 34%" : "Billed monthly · cancel anytime";
 
@@ -129,10 +130,18 @@ export default function UpgradePage() {
                     ))}
                   </div>
 
+                  <div className="mb-2 flex justify-end">
+                    <span className="inline-flex items-center gap-1.5 rounded-full bg-coral-soft px-2.5 py-1 text-2xs font-bold uppercase tracking-wider text-coral-ink">
+                      23% off · through next week
+                    </span>
+                  </div>
                   <div className="flex items-baseline justify-between">
                     <h2 className="font-serif text-xl font-semibold text-ink">Axon Careers Premium</h2>
-                    <span className="font-serif text-3xl font-semibold" style={{ color: "var(--primary-ink)" }}>
-                      {price}
+                    <span className="flex items-baseline gap-2">
+                      <span className="font-serif text-xl font-semibold text-ink-3 line-through">{wasPrice}</span>
+                      <span className="font-serif text-3xl font-semibold" style={{ color: "var(--primary-ink)" }}>
+                        {price}
+                      </span>
                     </span>
                   </div>
                   <p className="text-sm text-ink-3">{cadence} · {sub}</p>
@@ -141,7 +150,7 @@ export default function UpgradePage() {
 
                   <div className="space-y-2 text-sm">
                     <Row label="7-day free trial" value="$0.00" />
-                    <Row label={interval === "annual" ? "Then per year" : "Then per month"} value={price} />
+                    <Row label={interval === "annual" ? "Then per year (23% off)" : "Then per month (23% off)"} value={price} />
                     <Row label="Due today" value="$0.00" bold />
                   </div>
 
