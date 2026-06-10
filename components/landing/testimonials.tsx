@@ -1,6 +1,5 @@
 "use client";
 
-import { useEffect, useRef } from "react";
 import { Star } from "lucide-react";
 import { Reveal } from "@/components/ui/Reveal";
 import { Avatar } from "@/components/ui/Avatar";
@@ -100,41 +99,34 @@ function Card({ t, className }: { t: T; className?: string }) {
   );
 }
 
-/* Auto-advancing carousel. One short row (much less tall than the grid), scrolls
-   through every review and snaps; users can also swipe/drag it themselves. */
-export function TestimonialCarousel() {
-  const ref = useRef<HTMLDivElement>(null);
-
-  useEffect(() => {
-    const el = ref.current;
-    if (!el) return;
-    if (window.matchMedia("(prefers-reduced-motion: reduce)").matches) return;
-    let idx = 0;
-    const id = setInterval(() => {
-      const cards = el.children;
-      if (!cards.length) return;
-      idx = (idx + 1) % cards.length;
-      const card = cards[idx] as HTMLElement;
-      el.scrollTo({ left: card.offsetLeft - el.offsetLeft, behavior: "smooth" });
-    }, 3500);
-    return () => clearInterval(id);
-  }, []);
-
+/* Compact, continuously-scrolling review ticker. Constant motion (no snapping),
+   and a much shorter row than the full cards. */
+function CompactCard({ t }: { t: T }) {
   return (
-    <section className="border-y py-12" style={{ background: "var(--bg-sunk)", borderColor: "var(--border)" }}>
-      <div className="container-wide mb-6 flex flex-wrap items-center justify-center gap-2 text-sm text-ink-2">
-        <Stars />
-        <span className="font-medium text-ink">4.9 from 12,000+ job seekers</span>
+    <figure
+      className="flex w-[300px] shrink-0 items-center gap-3 rounded-full border bg-surface px-4 py-2"
+      style={{ borderColor: "var(--border)" }}
+    >
+      <Avatar src={t.photo} name={t.name} size={32} className="ring-2 ring-white" />
+      <div className="min-w-0">
+        <div className="flex items-center gap-1.5">
+          <span className="truncate text-xs font-semibold text-ink">{t.name}</span>
+          <Stars />
+        </div>
+        <p className="truncate text-xs text-ink-2" title={t.quote}>&ldquo;{t.quote}&rdquo;</p>
       </div>
-      <div className="marquee-mask">
-        <div
-          ref={ref}
-          className="no-scrollbar flex snap-x snap-mandatory gap-5 overflow-x-auto px-[max(1.5rem,calc((100vw-72rem)/2))] pb-2"
-        >
-          {TESTIMONIALS.map((t, i) => (
-            <div key={i} className="snap-start">
-              <Card t={t} />
-            </div>
+    </figure>
+  );
+}
+
+export function TestimonialCarousel() {
+  const row = [...TESTIMONIALS, ...TESTIMONIALS];
+  return (
+    <section className="border-y py-3" style={{ background: "var(--bg-sunk)", borderColor: "var(--border)" }}>
+      <div className="marquee-mask overflow-hidden">
+        <div className="marquee-track flex w-max gap-5">
+          {row.map((t, i) => (
+            <CompactCard key={i} t={t} />
           ))}
         </div>
       </div>
