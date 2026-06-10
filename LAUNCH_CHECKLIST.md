@@ -54,8 +54,10 @@ The funnel is instrumented; it no-ops until you set the keys.
 ## 📈 What the campaign model says (run `node scripts/campaign-abm.mjs`)
 
 At **$5/creative × 6 = $30/day**, the deep agent-based sim (averaged over 25 runs) shows:
-- ~33k people reached/mo, ~960 clicks (1.6% CTR), ~58 trials, **~13 paying subs**, **CAC ~$72**.
-- **Biggest leak is the paywall:** ~74% of people who reach `/upgrade` don't start a trial (mostly "not ready," then mobile-card-averse, then price). The onboarding mid-screens are the second leak.
+- No free trial: people pay $9.99 immediately at the paywall (`scripts/campaign-abm-notrial.mjs`).
+- ~34k people reached/mo, ~1k clicks (1.6% CTR), **~24 paying subs**, **CAC ~$38**.
+- **Biggest leak is the paywall:** ~83% of people who reach `/upgrade` don't buy (mostly "not ready," then price, then mobile-card-averse). Onboarding mid-screens are the second leak.
+- **Heavy AI usage matters:** at ~$3.8/paying-user/month in Anthropic tokens, net margin is ~$5.6/mo (not $9.40), and the 12-month cohort is roughly **break-even (≈0.96× ROAS)**. Watch token cost per active user closely.
 - **Most pick monthly** (~99%); with 12% churn that's **~0.82× ROAS / slightly unprofitable over 12 months** at these assumptions.
 - **You're underwater month 1** (~$118 first-month revenue vs $900 spend) → budget ~4–5 months of runway before payback.
 - Levers that flip it positive: lower churn (≤8%), push the annual plan, reduce paywall friction, kill weak creatives faster. Re-run the script after changing assumptions.
