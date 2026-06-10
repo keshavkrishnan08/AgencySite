@@ -7,6 +7,7 @@ import { Avatar } from "@/components/ui/Avatar";
 import { ProductFeatures } from "@/components/landing/features";
 import { FlowDiagram } from "@/components/landing/FlowDiagram";
 import { TestimonialCarousel } from "@/components/landing/testimonials";
+import { FAQAccordion } from "@/components/landing/FAQAccordion";
 import { StickyCTA } from "@/components/landing/StickyCTA";
 import { Reveal } from "@/components/ui/Reveal";
 import { ScoreRing } from "@/components/ui/Score";
@@ -434,35 +435,6 @@ function Comparison() {
   );
 }
 
-/* ===================== PRIVACY ===================== */
-function Privacy() {
-  return (
-    <section className="py-24 sm:py-28">
-      <div className="container-content text-center">
-        <Reveal>
-          <span
-            className="mx-auto grid h-16 w-16 place-items-center rounded-2xl text-white shadow-sm"
-            style={{ background: "linear-gradient(140deg, var(--primary-bright), var(--primary-ink))" }}
-          >
-            <ShieldCheck size={28} />
-          </span>
-        </Reveal>
-        <Reveal delay={0.05}>
-          <h2 className="mt-7 text-balance font-serif text-3xl font-semibold text-ink">
-            Nobody will know you&apos;re practicing.
-          </h2>
-        </Reveal>
-        <Reveal delay={0.1}>
-          <p className="mx-auto mt-5 max-w-prose text-lg leading-relaxed text-ink-2">
-            No profiles. No leaderboards. No posts to your contacts. We don&apos;t share your data, and we
-            don&apos;t email anyone. It&apos;s just you and your screen. A safe place to be bad at this until
-            you&apos;re good. That&apos;s the whole point.
-          </p>
-        </Reveal>
-      </div>
-    </section>
-  );
-}
 
 /* ===================== PRICING ===================== */
 const PREMIUM_FEATURES = [
@@ -489,53 +461,69 @@ function Pricing() {
         </Reveal>
         <Reveal delay={0.05}>
           <h2 className="text-balance text-center font-serif text-display font-semibold text-ink">
-            One plan. Everything you need.
+            One membership. Pick your billing.
           </h2>
         </Reveal>
 
-        <div className="mx-auto mt-16 max-w-md">
-          {/* Premium — the only plan */}
+        <div className="mx-auto mt-16 grid max-w-3xl gap-6 sm:grid-cols-2">
+          {/* Monthly */}
           <Reveal delay={0.08}>
-            <div
-              className="relative h-full rounded-2xl border-2 p-8 shadow-xl"
-              style={{ borderColor: "var(--primary)", background: "var(--surface)" }}
-            >
-              <span
-                className="absolute -top-3 left-8 rounded-full px-3 py-1 text-2xs font-bold uppercase tracking-wider text-white"
-                style={{ background: "linear-gradient(135deg, var(--gold), var(--gold-ink))" }}
-              >
-                Most popular
-              </span>
-              <h3 className="font-serif text-2xl font-semibold" style={{ color: "var(--primary-ink)" }}>
-                Axon Careers Premium
-              </h3>
-              <p className="mt-1 text-ink-3">Everything, unlimited</p>
-              <span className="mt-3 inline-flex items-center gap-1.5 rounded-full bg-coral-soft px-3 py-1 text-2xs font-bold uppercase tracking-wider text-coral-ink">
+            <div className="relative flex h-full flex-col rounded-2xl border-2 p-8 shadow-lg" style={{ borderColor: "var(--border)", background: "var(--surface)" }}>
+              <h3 className="font-serif text-xl font-semibold text-ink">Monthly</h3>
+              <span className="mt-3 inline-flex w-fit items-center gap-1.5 rounded-full bg-coral-soft px-3 py-1 text-2xs font-bold uppercase tracking-wider text-coral-ink">
                 23% off · through next week
               </span>
-              <div className="mt-3 flex items-baseline gap-3">
-                <span className="font-serif text-2xl font-semibold text-ink-3 line-through">$12.99</span>
+              <div className="mt-3 flex items-baseline gap-2.5">
+                <span className="font-serif text-xl font-semibold text-ink-3 line-through">$12.99</span>
                 <span className="font-serif text-5xl font-semibold text-ink">
-                  $9.99<span className="font-sans text-base font-medium text-ink-3"> / month</span>
+                  $9.99<span className="font-sans text-base font-medium text-ink-3"> / mo</span>
                 </span>
               </div>
-              <p className="mt-1 text-sm text-sage-ink">
-                Billed monthly. Or <span className="text-ink-3 line-through">$103</span> $79/year (save 34%) · cancel anytime
-              </p>
+              <p className="mt-1 text-sm text-ink-3">Billed monthly · cancel anytime</p>
+              <ButtonLink href="/onboarding" variant="secondary" className="mt-7 w-full">
+                Get started
+              </ButtonLink>
+            </div>
+          </Reveal>
+
+          {/* Yearly — highlighted */}
+          <Reveal delay={0.14}>
+            <div className="relative flex h-full flex-col rounded-2xl border-2 p-8 shadow-xl" style={{ borderColor: "var(--primary)", background: "var(--surface)" }}>
+              <span className="absolute -top-3 left-8 rounded-full px-3 py-1 text-2xs font-bold uppercase tracking-wider text-white" style={{ background: "linear-gradient(135deg, var(--gold), var(--gold-ink))" }}>
+                Best value · save 34%
+              </span>
+              <h3 className="font-serif text-xl font-semibold" style={{ color: "var(--primary-ink)" }}>Yearly</h3>
+              <span className="mt-3 inline-flex w-fit items-center gap-1.5 rounded-full bg-coral-soft px-3 py-1 text-2xs font-bold uppercase tracking-wider text-coral-ink">
+                23% off · through next week
+              </span>
+              <div className="mt-3 flex items-baseline gap-2.5">
+                <span className="font-serif text-xl font-semibold text-ink-3 line-through">$103</span>
+                <span className="font-serif text-5xl font-semibold text-ink">
+                  $79<span className="font-sans text-base font-medium text-ink-3"> / yr</span>
+                </span>
+              </div>
+              <p className="mt-1 text-sm text-sage-ink">Just $6.58/mo, billed yearly · cancel anytime</p>
               <ButtonLink href="/onboarding" className="mt-7 w-full">
                 Get started
               </ButtonLink>
-              <ul className="mt-7 grid gap-3 sm:grid-cols-1">
-                {PREMIUM_FEATURES.map((f) => (
-                  <li key={f} className="flex items-start gap-2.5 text-sm text-ink-2">
-                    <Check size={17} className="mt-0.5 shrink-0 text-primary" />
-                    {f}
-                  </li>
-                ))}
-              </ul>
             </div>
           </Reveal>
         </div>
+
+        {/* Everything included, on both plans */}
+        <Reveal delay={0.1}>
+          <div className="mx-auto mt-10 max-w-3xl rounded-2xl border p-7" style={{ borderColor: "var(--border)", background: "var(--surface)" }}>
+            <p className="text-center text-sm font-semibold text-ink">Everything included, on both plans</p>
+            <ul className="mt-5 grid gap-3 sm:grid-cols-2">
+              {PREMIUM_FEATURES.map((f) => (
+                <li key={f} className="flex items-start gap-2.5 text-sm text-ink-2">
+                  <Check size={17} className="mt-0.5 shrink-0 text-primary" />
+                  {f}
+                </li>
+              ))}
+            </ul>
+          </div>
+        </Reveal>
         <Reveal delay={0.1}>
           <p className="mt-8 flex flex-wrap items-center justify-center gap-x-6 gap-y-2 text-center text-sm text-ink-2">
             <span className="inline-flex items-center gap-1.5"><ShieldCheck size={15} className="text-sage" /> Private & secure</span>
@@ -610,28 +598,36 @@ function TrustStrip() {
 /* ===================== FAQ ===================== */
 const FAQS: [string, string][] = [
   [
-    "How does billing work?",
-    "You answer a few quick questions, create an account, and subscribe for $9.99/month (or $79/year). You're charged right away, you get everything immediately, and you can cancel anytime in two clicks.",
+    "Can AI really tell if my answer is good?",
+    "Yes, at the things that actually sink interviews. It scores the five a hiring manager weighs: clarity, relevance, specificity, confidence, and conciseness. It catches vagueness, rambling, hedging, and missing results, and explains exactly why, quoting your own words. It's not a substitute for human chemistry in the room, but it's a sharp, honest read on the substance of what you said.",
+  ],
+  [
+    "Is the scoring consistent, or does it change every time?",
+    "Consistent. The rubric and settings are fixed, so the same answer gets the same score every session. Retake a question and the number only moves when your answer actually changes, which is how you can see real progress instead of noise.",
+  ],
+  [
+    "What if it mishears me when I speak?",
+    "It grades what you said, not how the transcript looks. Missing punctuation, capitalization, and homophones like 'their' and 'there' are ignored. You're never penalized for a speech-to-text slip, only for things a listener would actually notice.",
+  ],
+  [
+    "Is this just generic interview advice?",
+    "No. Every question and every fix is tailored to your exact role, company, situation, and the gap on your résumé. A generic, could-be-anyone answer is treated as a miss, because in a real interview it is one.",
+  ],
+  [
+    "Does practicing here actually help in the real room?",
+    "It builds the muscle that holds up under pressure: leading with your point, backing it with specifics, and cutting the filler and 'I just' that leak confidence. You can speak your answers out loud, and Interview Day mode rehearses you under a real clock with no do-overs.",
   ],
   [
     "I haven't interviewed in years. Will this work for me?",
-    "That's exactly who Axon Careers is built for. We tailor questions to how long it's been and ease you in. Returning-to-work, recently-laid-off, and career-changers are our core users, not 22-year-old engineers.",
+    "That's exactly who it's built for. Questions adjust to how long it's been and ease you in. Returning-to-work, recently-laid-off, and career-changers are the core users here, not 22-year-old engineers.",
   ],
   [
-    "Is my practice private?",
-    "Completely. No public profiles, no leaderboards, no posting to your social media, no emailing your contacts. It's between you and your screen. A safe place to be bad at something until you're good.",
+    "How does billing work?",
+    "Answer a few quick questions, create an account, and subscribe for $9.99/month or $79/year. You're charged right away, everything unlocks immediately, and you can cancel anytime in two clicks.",
   ],
   [
-    "I'm not techy. Is it complicated?",
-    "No. Two actions per screen, plain language, nothing to install. If you can type or talk, you can use it. You can even speak your answers out loud and we'll transcribe them.",
-  ],
-  [
-    "Does practicing typed answers actually help out loud?",
-    "It builds the muscle: structure, specifics, and cutting the filler words and 'I just' that leak confidence. You can also speak your answers in the app, and the Interview Day mode rehearses you under real time pressure.",
-  ],
-  [
-    "What if I want to cancel?",
-    "Two clicks, anytime, from settings. Most people use Axon Careers hard for a couple of weeks, land the job, and pause. That's a win in our book.",
+    "Is my practice private, and can I cancel easily?",
+    "Completely private: no profiles, no leaderboards, no posts, no emailing your contacts. It's just you and your screen. And cancelling is two clicks from settings, anytime.",
   ],
 ];
 
@@ -647,16 +643,9 @@ function FAQ() {
             Everything you might be wondering.
           </h2>
         </Reveal>
-        <div className="mt-12 grid gap-x-8 gap-y-8 sm:grid-cols-2">
-          {FAQS.map(([q, a], i) => (
-            <Reveal key={q} delay={(i % 2) * 0.06}>
-              <div>
-                <h3 className="font-serif text-lg font-semibold text-ink">{q}</h3>
-                <p className="mt-2 leading-relaxed text-ink-2">{a}</p>
-              </div>
-            </Reveal>
-          ))}
-        </div>
+        <Reveal delay={0.1}>
+          <FAQAccordion items={FAQS} />
+        </Reveal>
       </div>
     </section>
   );
@@ -669,6 +658,7 @@ export default function LandingPage() {
       <SiteNav />
       <main>
         <Hero />
+        <TestimonialCarousel />
         <DemoSection />
         <TrustStrip />
         <Stories />
@@ -676,9 +666,7 @@ export default function LandingPage() {
         <ProductFeatures />
         <FiveQuestions />
         <Numbers />
-        <TestimonialCarousel />
         <Comparison />
-        <Privacy />
         <Pricing />
         <FAQ />
         <FinalCTA />
