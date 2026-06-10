@@ -2,6 +2,7 @@
 
 import { supabaseBrowser } from "./supabase-browser";
 import type { InterviewPlan, InterviewRecord, Session, UserProfile } from "./types";
+import type { ScheduledInterview } from "./store";
 
 /* Additive cloud sync. Every function is fire-and-forget and null-guarded: if
    auth isn't configured or nobody is signed in, it no-ops and the app keeps
@@ -31,6 +32,7 @@ export async function pushProfile(p: UserProfile): Promise<void> {
       name: p.name || null,
       situation: p.situation,
       target_role: p.targetRole || null,
+      company: p.company || null,
       interview_gap: p.interviewGap,
       plan: p.plan,
     }).eq("id", id);
@@ -52,6 +54,7 @@ export async function pullProfile(): Promise<Partial<UserProfile> | null> {
       email: data.email || "",
       situation: data.situation ?? null,
       targetRole: data.target_role || "",
+      company: data.company || "",
       interviewGap: data.interview_gap ?? null,
       plan: (data.plan as UserProfile["plan"]) || "free",
     };
@@ -196,5 +199,55 @@ export async function pullPlan(): Promise<InterviewPlan | null> {
     return (data?.data as InterviewPlan) ?? null;
   } catch {
     return null;
+  }
+}
+
+/* ---------------- schedule (upcoming interviews) ---------------- */
+
+export async function pushScheduled(item: ScheduledInterview): Promise<void> {
+  const sb = supabaseBrowser();
+  if (!sb) return;
+  const id = await currentUserId();
+  if (!id) return;
+  try {
+    await sb.from("schedule").upsert(
+      {
+        user_id: id,
+        client_id: item.id,
+        company: item.company || null,
+        role: item.role || null,
+        interview_date: item.dateISO || null,
+        created_at: item.createdAt,
+        data: item,
+      },
+      { onConflict: "user_id,client_id" }
+    );
+  } catch {
+    /* ignore */
+  }
+}
+
+export async function deleteScheduledCloud(clientId: string): Promise<void> {
+  const sb = supabaseBrowser();
+  if (!sb) return;
+  const id = await currentUserId();
+  if (!id) return;
+  try {
+    await sb.from("schedule").delete().eq("user_id", id).eq("client_id", clientId);
+  } catch {
+    /* ignore */
+  }
+}
+
+export async function pullSchedule(): Promise<ScheduledInterview[]> {
+  const sb = supabaseBrowser();
+  if (!sb) return [];
+  const id = await currentUserId();
+  if (!id) return [];
+  try {
+    const { data } = await sb.from("schedule").select("data").eq("user_id", id);
+    return (data ?? []).map((r) => r.data as ScheduledInterview).filter(Boolean);
+  } catch {
+    return [];
   }
 }
