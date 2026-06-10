@@ -483,7 +483,8 @@ function Pricing() {
                 </span>
               </div>
               <p className="mt-1 text-sm text-sage-ink">Billed yearly at $79 · cancel anytime</p>
-              <ButtonLink href="/onboarding" className="mt-7 w-full">
+              <p className="mt-2 text-xs font-medium text-ink-3">🔥 Most people choose yearly</p>
+              <ButtonLink href="/onboarding" className="mt-5 w-full">
                 Get started
               </ButtonLink>
             </div>
