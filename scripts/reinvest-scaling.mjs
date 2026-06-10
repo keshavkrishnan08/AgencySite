@@ -6,9 +6,10 @@
 
    The whole question: is opCash/spend > 1 (snowball grows) or < 1 (snowball melts)? */
 
+// Overridable: node reinvest-scaling.mjs [CAC] [monthlyShare] [churn]
 const SEED = 900;          // month-0 ad budget ($30/day x 30)
-const CAC = 37.97;         // constant cost per paying sub (from the $30/day ABM)
-const CHURN = 0.30;        // monthly churn on monthly subs
+const CAC = Number(process.argv[2] ?? 37.97);   // constant cost per paying sub
+const CHURN = Number(process.argv[4] ?? 0.30);  // monthly churn on monthly subs
 const PM = 9.99, PA = 79;  // monthly / annual price
 const AI = 1.44;           // Anthropic cost / active user / month (optimized)
 const fee = (g, n) => g * 0.029 + n * 0.30; // Stripe: % + per-transaction
@@ -71,7 +72,7 @@ console.log("    Monthly LTV $%s  vs CAC $%s  -> %s", f(ltvMonthly, 2), f(CAC, 2
 console.log("    Annual  LTV $%s  vs CAC $%s  -> %s", f(ltvAnnual, 2), f(CAC, 2),
   ltvAnnual >= CAC ? "OK (+$" + f(ltvAnnual - CAC, 2) + ")" : "LOSES");
 
-const MIX = 0.75; // base case: 75% monthly / 25% annual
+const MIX = Number(process.argv[3] ?? 0.75); // monthly share
 console.log("\n===== MONTH-BY-MONTH @ %s%% monthly / %s%% annual =====", MIX * 100, (1 - MIX) * 100);
 console.log("  Blended LTV $%s vs CAC $%s -> reinvestment compounds %s\n",
   f(blendedLtv(MIX), 2), f(CAC, 2), blendedLtv(MIX) >= CAC ? "UP" : "DOWN");
