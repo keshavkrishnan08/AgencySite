@@ -18,6 +18,7 @@ import {
   getSessions,
   saveSession,
   isPremium,
+  getActiveInterview,
 } from "@/lib/store";
 import { average, cn, uid } from "@/lib/utils";
 import { track } from "@/lib/analytics";
@@ -108,11 +109,13 @@ function PracticeInner() {
   useEffect(() => {
     const profile = getProfile();
     const ob = getOnboarding();
-    const r = profile.targetRole || ob?.targetRole || "";
+    // Prefer the interview you're actively prepping for (from the schedule).
+    const active = getActiveInterview();
+    const r = active?.role || profile.targetRole || ob?.targetRole || "";
     const s = profile.situation || ob?.situation || null;
     setRole(r);
     setSituation(s);
-    setCompany(profile.company || ob?.company || "");
+    setCompany(active?.company || profile.company || ob?.company || "");
     if (autostart || focusDim) {
       start(r || "Office Manager", s);
     } else {
