@@ -481,11 +481,17 @@ function Pricing() {
                 Axon Careers Premium
               </h3>
               <p className="mt-1 text-ink-3">Everything, unlimited</p>
-              <div className="mt-6 font-serif text-5xl font-semibold text-ink">
-                $9.99<span className="font-sans text-base font-medium text-ink-3"> / month</span>
+              <span className="mt-3 inline-flex items-center gap-1.5 rounded-full bg-coral-soft px-3 py-1 text-2xs font-bold uppercase tracking-wider text-coral-ink">
+                23% off · through next week
+              </span>
+              <div className="mt-3 flex items-baseline gap-3">
+                <span className="font-serif text-2xl font-semibold text-ink-3 line-through">$12.99</span>
+                <span className="font-serif text-5xl font-semibold text-ink">
+                  $9.99<span className="font-sans text-base font-medium text-ink-3"> / month</span>
+                </span>
               </div>
               <p className="mt-1 text-sm text-sage-ink">
-                Free for 7 days, then $9.99/mo · or $79/year (save 34%) · cancel anytime
+                Free for 7 days, then $9.99/mo. Or <span className="text-ink-3 line-through">$103</span> $79/year (save 34%) · cancel anytime
               </p>
               <ButtonLink href="/onboarding" className="mt-7 w-full">
                 Start your free trial
