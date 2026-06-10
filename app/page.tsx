@@ -2,10 +2,11 @@ import { ArrowRight, Check, CreditCard, Lock, RefreshCw, ShieldCheck, Briefcase,
 import { SiteNav } from "@/components/layout/SiteNav";
 import { SiteFooter } from "@/components/layout/SiteFooter";
 import { HeroDemo } from "@/components/landing/HeroDemo";
+import { ProductDemo } from "@/components/landing/ProductDemo";
 import { Avatar } from "@/components/ui/Avatar";
 import { ProductFeatures } from "@/components/landing/features";
 import { FlowDiagram } from "@/components/landing/FlowDiagram";
-import { TestimonialGrid } from "@/components/landing/testimonials";
+import { TestimonialCarousel } from "@/components/landing/testimonials";
 import { StickyCTA } from "@/components/landing/StickyCTA";
 import { Reveal } from "@/components/ui/Reveal";
 import { ScoreRing } from "@/components/ui/Score";
@@ -89,6 +90,34 @@ function Hero() {
   );
 }
 
+
+/* ===================== PRODUCT DEMO ===================== */
+function DemoSection() {
+  return (
+    <section className="border-y py-20 sm:py-24" style={{ background: "var(--bg-sunk)", borderColor: "var(--border)" }}>
+      <div className="container-wide mb-12 text-center">
+        <Reveal>
+          <Eyebrow>See it work</Eyebrow>
+        </Reveal>
+        <Reveal delay={0.05}>
+          <h2 className="text-balance text-center font-serif text-display font-semibold text-ink">
+            Answer a question. Watch it get scored.
+          </h2>
+        </Reveal>
+        <Reveal delay={0.1}>
+          <p className="mx-auto mt-5 max-w-prose text-center text-lg text-ink-2">
+            This is the actual app. Speak or type your answer, and get a score with one clear fix in seconds.
+          </p>
+        </Reveal>
+      </div>
+      <div className="container-wide">
+        <Reveal delay={0.12}>
+          <ProductDemo />
+        </Reveal>
+      </div>
+    </section>
+  );
+}
 
 /* ===================== FIVE QUESTIONS ===================== */
 const QUESTIONS = [
@@ -371,7 +400,7 @@ function Comparison() {
                 className="p-5 text-center text-sm font-bold text-white"
                 style={{ background: "linear-gradient(135deg, var(--primary-bright), var(--primary-ink))" }}
               >
-                Axon Careers Premium
+                Axon Careers
               </div>
             </div>
             {ROWS.map((r, i) => (
@@ -640,13 +669,14 @@ export default function LandingPage() {
       <SiteNav />
       <main>
         <Hero />
+        <DemoSection />
         <TrustStrip />
         <Stories />
         <HowItWorks />
         <ProductFeatures />
         <FiveQuestions />
         <Numbers />
-        <TestimonialGrid />
+        <TestimonialCarousel />
         <Comparison />
         <Privacy />
         <Pricing />
