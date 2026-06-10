@@ -22,13 +22,15 @@ The two levers that move LTV are **plan mix** (more annual = churn-immune + prep
 ### B — make customers stay longer
 | # | Idea | Status |
 |---|------|--------|
-| B1 | **Activation:** route straight to first question, celebrate first score | todo |
-| B2 | **Weekly progress email** (RESEND wired; needs send) | todo |
-| B3 | **Streaks** + daily question nudge | todo |
-| B4 | **Interview-date goal + countdown** for urgency/return | todo |
+| B1 | **Activation:** route straight to first question, celebrate first score | partial (empty-state CTA) |
+| B2 | ~~Weekly progress email~~ | dropped (no email) |
+| B3 | **Streaks** + daily nudge | ✅ already in product (dashboard) |
+| B4 | **Interview-date goal + countdown** for urgency/return | ✅ shipped (GoalCard) |
 | B5 | **Save-on-cancel**: offer pause or 1-month discount | todo |
-| B6 | **Re-engagement email** at 7 days inactive | todo |
+| B6 | ~~Re-engagement email~~ | dropped (no email) |
 | B7 | **Visible progress data** ("you cut 'um' 60% in 2 weeks") | todo |
+
+Retention strategy is **in-product, no email** — natural urgency (countdown), habit (streaks), and visible progress, surfaced where the user already is.
 
 ## Results log
 | Date | Experiment | Metric | Before | After | Keep? |
