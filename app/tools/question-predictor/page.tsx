@@ -65,7 +65,7 @@ export default function QuestionPredictorPage() {
 
       {questions.length > 0 && (
         <motion.div initial={{ opacity: 0, y: 16 }} animate={{ opacity: 1, y: 0 }} className="mt-6 space-y-4">
-          <h2 className="font-serif text-xl font-semibold text-ink">Most likely, in order of probability</h2>
+          <h2 className="font-serif text-xl font-semibold text-ink">Most likely questions</h2>
           {questions.map((q, i) => (
             <article key={i} className="card p-6">
               <div className="flex items-start gap-4">
