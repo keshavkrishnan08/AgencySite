@@ -5,6 +5,7 @@ import Link from "next/link";
 import { motion } from "framer-motion";
 import { ArrowRight, Clock, Lock, Loader2, ShieldAlert, Timer } from "lucide-react";
 import { AppShell } from "@/components/layout/AppShell";
+import { Inline } from "@/components/ui/RichText";
 import { Button, ButtonLink } from "@/components/ui/Button";
 import { AnimatedNumber } from "@/components/ui/AnimatedNumber";
 import { VoiceButton } from "@/components/ui/VoiceButton";
@@ -252,7 +253,7 @@ export default function InterviewDayPage() {
             animate={{ opacity: 1, y: 0 }}
             className="font-serif text-3xl font-semibold leading-snug text-white"
           >
-            {q.text}
+            <Inline text={q.text} />
           </motion.h1>
         )}
 

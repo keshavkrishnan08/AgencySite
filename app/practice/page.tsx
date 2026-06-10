@@ -375,7 +375,7 @@ function PracticeInner() {
                     : "Behavioral"}
                 </p>
                 <h1 className="mt-3 flex items-start gap-2 font-serif text-2xl font-semibold leading-snug text-ink sm:text-3xl">
-                  <span>{current.text}</span>
+                  <span><Inline text={current.text} /></span>
                   {current.tip && (
                     <InfoTip title="How to nail this" iconSize={17} className="mt-1.5 shrink-0">
                       {current.tip}
