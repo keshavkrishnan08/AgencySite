@@ -27,10 +27,10 @@ export function StartSticky() {
         className="glass flex items-center justify-center gap-2 rounded-full px-6 py-3.5 text-base font-semibold shadow-xl"
         style={{ color: "var(--primary-ink)" }}
       >
-        Start practicing — free <ArrowRight size={18} />
+        Get started <ArrowRight size={18} />
       </Link>
       <p className="mt-1.5 text-center text-2xs font-medium text-ink-3">
-        7-day free trial. Cancel anytime.
+        $9.99/mo. Cancel anytime.
       </p>
     </div>
   );
