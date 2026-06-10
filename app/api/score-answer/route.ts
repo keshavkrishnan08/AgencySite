@@ -41,7 +41,9 @@ Return ONLY this minified JSON, nothing else:
 
 - The five scores are integers 0-100 from the rubric. Do NOT output an overall; it is computed for you.
 - strength: ONE short sentence naming their strongest dimension, quoting their words when it helps.
-- improve: 1 to 2 short, specific fixes, most valuable first, each under 18 words, tied to their role and weak area. No fluff, no preamble.`;
+- improve: 1 to 2 short, specific fixes, most valuable first, each under 18 words, tied to their role and weak area. No fluff, no preamble.
+
+CRITICAL FOR CONSISTENCY: grade the answer purely on its own merits against the rubric. The candidate's recent average, weak area, and session count are context for tailoring your feedback ONLY — never raise or lower the scores because of them. The same answer must always earn the same scores.`;
 
 // Coerce whatever the model emits into a graph-safe integer in [0,100].
 const clampScore = (n: unknown): number => {
@@ -92,8 +94,11 @@ export async function POST(req: Request) {
   const heuristic = scoreAnswer({ question, answer, targetRole, category, questionNumber });
   const example = withExample ? exampleAnswer(question, targetRole, category) : "";
 
-  // Same inputs -> same grade (deterministic), straight from cache.
-  const cacheKey = hashKey([question, answer, targetRole, situation, category, name, company, interviewGap, weakestDimension, recentAverage].join("||"));
+  // Key ONLY on the answer's own merits (question + answer + role + situation +
+  // category) — NOT on the candidate's history. So the same answer earns the same
+  // grade in every session, regardless of their averages. Comparison to past
+  // performance is layered on separately (deterministically) by the UI.
+  const cacheKey = hashKey([question, answer, targetRole, situation, category].join("||"));
   const cached = scoreCache.get(cacheKey);
   if (cached) {
     return NextResponse.json({
