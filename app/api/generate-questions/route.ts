@@ -50,6 +50,8 @@ export async function POST(req: Request) {
     posting = "",
     name = "",
     weakestDimension = "",
+    sessionCount = 0,
+    avoid = [],
   } = body ?? {};
 
   if (focusDimension) {
@@ -61,8 +63,13 @@ export async function POST(req: Request) {
 
   if (hasAI()) {
     try {
-      const user = `${candidateBlock({ name, situation: situation || "", targetRole, company, interviewGap, posting, weakestDimension })}\n\nWrite their 8 questions now.`;
-      const text = await callClaude({ model: FAST_MODEL, system: SYSTEM, user, maxTokens: 1100, temperature: 0.6 });
+      const avoidList: string[] = Array.isArray(avoid) ? avoid.filter((s: unknown) => typeof s === "string" && s).slice(0, 12) : [];
+      const variety =
+        `\n\nThis is practice session #${(Number(sessionCount) || 0) + 1}. Make this set FRESH: vary the wording, scenarios, and angles so it does not feel like a repeat of earlier sessions.` +
+        (avoidList.length ? `\nDo NOT reuse or lightly reword any of these already-asked questions:\n- ${avoidList.join("\n- ")}` : "");
+      const user = `${candidateBlock({ name, situation: situation || "", targetRole, company, interviewGap, posting, weakestDimension })}${variety}\n\nWrite their 8 questions now.`;
+      // Higher temperature than scoring: for questions, variety matters more than determinism.
+      const text = await callClaude({ model: FAST_MODEL, system: SYSTEM, user, maxTokens: 1100, temperature: 0.85 });
       const parsed = extractJson<{ questions: Question[] }>(text);
       if (parsed?.questions?.length) {
         const questions = parsed.questions.slice(0, 8).map((q, i) => ({
