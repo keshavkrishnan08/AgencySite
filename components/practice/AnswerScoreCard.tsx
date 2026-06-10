@@ -159,6 +159,21 @@ export function AnswerScoreCard({
         </p>
       </div>
 
+      {/* Brief, specific fixes — the minimal coach output */}
+      {answer.improve && answer.improve.length > 0 && (
+        <div className="flex gap-2.5 rounded-xl border bg-amber-soft/40 p-4" style={{ borderColor: "var(--border)" }}>
+          <TrendingUp size={18} className="mt-0.5 shrink-0 text-amber-ink" />
+          <div>
+            <p className="text-2xs font-semibold uppercase tracking-wider text-amber-ink">Work on this next</p>
+            <ul className="mt-1.5 space-y-1">
+              {answer.improve.map((tip, i) => (
+                <li key={i} className="text-[0.95rem] leading-relaxed text-ink">{tip}</li>
+              ))}
+            </ul>
+          </div>
+        </div>
+      )}
+
       {/* Overall + dimensions */}
       <div className="card-elevated grid items-center gap-8 p-7 sm:grid-cols-[auto_1fr] sm:p-8">
         <div className="text-center sm:border-r sm:pr-8" style={{ borderColor: "var(--border)" }}>

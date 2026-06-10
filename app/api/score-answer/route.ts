@@ -1,25 +1,33 @@
 import { rateLimit } from "@/lib/ratelimit";
 import { recordUsage } from "@/lib/usage";
 import { NextResponse } from "next/server";
-import { scoreAnswer } from "@/lib/scoring";
+import { scoreAnswer, computeOverall } from "@/lib/scoring";
 import { exampleAnswer } from "@/lib/examples";
-import { callClaude, extractJson, hasAI } from "@/lib/ai";
+import { callClaude, extractJson, hasAI, FAST_MODEL } from "@/lib/ai";
 import { COACH_PERSONA, SCORING_RUBRIC, candidateBlock } from "@/lib/prompt";
-import type { AnswerScores, Dimension } from "@/lib/types";
+import type { DimensionScores } from "@/lib/types";
 
 export const runtime = "nodejs";
 export const dynamic = "force-dynamic";
 
+/* Minimal model contract: just the five scores plus the brief things to fix.
+   No per-dimension paragraphs and no overall (we recompute it deterministically),
+   so output stays tiny and cheap. The detailed per-dimension notes come from the
+   local engine for free. */
 interface AiScore {
-  scores: AnswerScores;
-  feedback: Record<Dimension, string>;
-  strengthSummary: string;
-  growthSummary: string;
+  clarity: number;
+  relevance: number;
+  specificity: number;
+  confidence: number;
+  conciseness: number;
+  strength?: string;
+  improve?: string[];
 }
 
 const SYSTEM = `${COACH_PERSONA}
 
-Your task: score ONE interview answer on five dimensions, each 0 to 100.
+Score ONE interview answer on five dimensions, each an INTEGER 0 to 100, using the procedure below. Your output is read by software, so be terse: no paragraphs, no markdown, no extra keys.
+
 1. clarity: easy to follow and well structured.
 2. relevance: actually answers the question asked.
 3. specificity: concrete examples, numbers, outcomes, not vague.
@@ -28,14 +36,18 @@ Your task: score ONE interview answer on five dimensions, each 0 to 100.
 
 ${SCORING_RUBRIC}
 
-For each dimension write ONE sentence of feedback. Start with what they did right, then give ONE specific fix, and quote their own words when it helps. Tie the feedback to their role, situation, and weak area.
+Return ONLY this minified JSON, nothing else:
+{"clarity":N,"relevance":N,"specificity":N,"confidence":N,"conciseness":N,"strength":"...","improve":["...","..."]}
 
-Compute overall as a weighted average: clarity 20%, relevance 20%, specificity 25%, confidence 20%, conciseness 15%, rounded to an integer.
+- The five scores are integers 0-100 from the rubric. Do NOT output an overall; it is computed for you.
+- strength: ONE short sentence naming their strongest dimension, quoting their words when it helps.
+- improve: 1 to 2 short, specific fixes, most valuable first, each under 18 words, tied to their role and weak area. No fluff, no preamble.`;
 
-Also write strengthSummary (their best dimension, one sentence) and growthSummary (their weakest dimension plus the single most valuable fix, one sentence).
-
-Return ONLY valid minified JSON, no backticks, no prose:
-{"scores":{"clarity":N,"relevance":N,"specificity":N,"confidence":N,"conciseness":N,"overall":N},"feedback":{"clarity":"...","relevance":"...","specificity":"...","confidence":"...","conciseness":"..."},"strengthSummary":"...","growthSummary":"..."}`;
+// Coerce whatever the model emits into a graph-safe integer in [0,100].
+const clampScore = (n: unknown): number => {
+  const v = Math.round(Number(n));
+  return Number.isFinite(v) ? Math.min(100, Math.max(0, v)) : 0;
+};
 
 export async function POST(req: Request) {
   const limited = await rateLimit(req);
@@ -76,16 +88,34 @@ export async function POST(req: Request) {
     try {
       const ctx = candidateBlock({ name, situation, targetRole, company, interviewGap, weakestDimension, recentAverage });
       const user = `${ctx}\n\nQuestion (${category}): ${question}\n\nTheir answer:\n"""${answer.slice(0, 4000)}"""`;
-      // temperature 0 so the same answer grades the same way every session.
-      const text = await callClaude({ system: SYSTEM, user, maxTokens: 900, temperature: 0 });
+      // Haiku + temperature 0: cheap, and the strict rubric (not the model tier)
+      // is what makes the same answer grade the same way every session.
+      // maxTokens kept low because the contract is just scores + brief fixes.
+      const text = await callClaude({ model: FAST_MODEL, system: SYSTEM, user, maxTokens: 320, temperature: 0 });
       const parsed = extractJson<AiScore>(text);
-      if (parsed?.scores && parsed.feedback) {
+      if (parsed && parsed.clarity != null) {
+        // Numbers: clamped to ints and overall recomputed server-side so the
+        // graphs always get a clean, internally-consistent set.
+        const dims: DimensionScores = {
+          clarity: clampScore(parsed.clarity),
+          relevance: clampScore(parsed.relevance),
+          specificity: clampScore(parsed.specificity),
+          confidence: clampScore(parsed.confidence),
+          conciseness: clampScore(parsed.conciseness),
+        };
+        // Message: the brief fixes, normalized to clean strings.
+        const improve = (Array.isArray(parsed.improve) ? parsed.improve : [])
+          .filter((s) => typeof s === "string" && s.trim())
+          .map((s) => s.trim())
+          .slice(0, 2);
         return NextResponse.json({
           ...heuristic,
-          scores: parsed.scores,
-          feedback: parsed.feedback,
-          strengthSummary: parsed.strengthSummary || heuristic.strengthSummary,
-          growthSummary: parsed.growthSummary || heuristic.growthSummary,
+          scores: { ...dims, overall: computeOverall(dims) },
+          // per-dimension notes come from the free deterministic engine
+          feedback: heuristic.feedback,
+          strengthSummary: (parsed.strength || "").trim() || heuristic.strengthSummary,
+          growthSummary: improve.join(" ") || heuristic.growthSummary,
+          improve, // brief, structured list of fixes for the UI / future graphs
           anxiety: heuristic.anxiety,
           exampleAnswer: example,
           source: "ai",
