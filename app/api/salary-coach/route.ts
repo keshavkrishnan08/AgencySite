@@ -3,7 +3,7 @@ import { recordUsage } from "@/lib/usage";
 import { NextResponse } from "next/server";
 import { analyzeAnxiety } from "@/lib/scoring";
 import { callClaude, extractJson, hasAI, FAST_MODEL } from "@/lib/ai";
-import { COACH_PERSONA, NEGOTIATION_STRATEGY, ANTI_CANNED } from "@/lib/prompt";
+import { COACH_PERSONA, NEGOTIATION_STRATEGY, EMPLOYER_VOICE, ANTI_CANNED } from "@/lib/prompt";
 import { clamp } from "@/lib/utils";
 
 export const runtime = "nodejs";
@@ -14,6 +14,10 @@ const SYSTEM = `${COACH_PERSONA}
 Now you are role-playing a fair but firm hiring manager in a multi-round salary negotiation for the candidate's job. Play the employer realistically: try to get them to name a number first, drop a low-ish anchor, push back on big asks, and offer trade-offs (bonus vs base). Stay in character and react to exactly what they said.
 
 ${NEGOTIATION_STRATEGY}
+
+${EMPLOYER_VOICE}
+
+Your interviewerLine should read like real negotiation dialogue: acknowledge their move, react to it, and advance the conversation a beat (open with the ask, then push back, then trade off, then move toward a close as rounds progress). Not a clipped one-liner.
 
 Grade the candidate's turn against those principles. Reward: deflecting the first-number question, justifying with market data/value, countering with a specific number above target, defusing your anchor, composure. Penalize: naming a number first unprompted, giving a low range, folding instantly, accepting on the spot, getting flustered.
 
@@ -26,10 +30,10 @@ Return ONLY valid minified JSON:
 Set accepted=true only if the negotiation has reached a fair agreement.\n\nWrite in plain words a 6th grader can read. Never use em dashes or en dashes; use a period, comma, or colon instead.`;
 
 const LINES = [
-  "What are your salary expectations for this role?",
-  "That's a bit above the range we had budgeted. We were thinking closer to the lower end. Could that work?",
-  "We might be able to get there with a signing bonus instead of base. How does that sound?",
-  "Okay. Here's our best and final: let's meet in the middle on base plus the bonus. Do we have a deal?",
+  "So before we go further, let me ask: what are your salary expectations for this role? I want to make sure we're in the same ballpark.",
+  "Okay, I appreciate you putting that out there. To be straight with you, that's sitting a little above what we'd budgeted for the role. We were thinking closer to the lower end of our band. Help me understand the number.",
+  "Here's the thing, I hear you on the base. I'm not sure I can get all the way there on salary alone, but I might have room on a signing bonus. Would a stronger bonus help bridge the gap?",
+  "Alright, let me see what I can do. Here's where I can land: we meet partway on base and I add the bonus on top. I think that's a fair package. Do we have a deal?",
 ];
 
 function heuristic(round: number, message: string, target: number) {
@@ -79,7 +83,7 @@ export async function POST(req: Request) {
   if (hasAI() && message.trim()) {
     try {
       const user = `Round: ${round + 1} of 4\nRole: ${role}\nMarket range: ${range}\nCandidate target: ${target}\nCandidate walkaway: ${walkaway}\n\nCandidate's latest message: "${message.slice(0, 1500)}"`;
-      const text = await callClaude({ model: FAST_MODEL, system: SYSTEM, user, maxTokens: 400, temperature: 0.5 });
+      const text = await callClaude({ model: FAST_MODEL, system: SYSTEM, user, maxTokens: 520, temperature: 0.6 });
       const parsed = extractJson<any>(text);
       if (parsed && typeof parsed.confidence === "number") {
         return NextResponse.json({ ...parsed, source: "ai" });
