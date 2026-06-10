@@ -3,15 +3,17 @@
 import { createContext, useCallback, useContext, useEffect, useRef, useState, type ReactNode } from "react";
 import type { Session, User } from "@supabase/supabase-js";
 import { authConfigured, supabaseBrowser } from "./supabase-browser";
-import { getInterviews, getPlan, getProfile, getSessions, hydrateLocal, setProfile } from "./store";
+import { getInterviews, getPlan, getProfile, getSchedule, getSessions, hydrateLocal, setProfile } from "./store";
 import {
   pullInterviews,
   pullPlan,
   pullProfile,
+  pullSchedule,
   pullSessions,
   pushInterview,
   pushPlan,
   pushProfile,
+  pushScheduled,
   pushSession,
 } from "./cloud";
 
@@ -38,15 +40,17 @@ export function AuthProvider({ children }: { children: ReactNode }) {
   const hydrate = useCallback(async () => {
     if (hydrated.current) return;
     hydrated.current = true;
-    const [profile, sessions, interviews, plan] = await Promise.all([
+    const [profile, sessions, interviews, plan, schedule] = await Promise.all([
       pullProfile(),
       pullSessions(),
       pullInterviews(),
       pullPlan(),
+      pullSchedule(),
     ]);
-    hydrateLocal({ profile, sessions, interviews, plan });
+    hydrateLocal({ profile, sessions, interviews, plan, schedule });
     getSessions().forEach((s) => void pushSession(s));
     getInterviews().forEach((r) => void pushInterview(r));
+    getSchedule().forEach((i) => void pushScheduled(i));
     const pl = getPlan();
     if (pl) void pushPlan(pl);
     void pushProfile(getProfile());

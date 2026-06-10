@@ -16,6 +16,8 @@ import {
   pushInterview,
   deleteInterviewCloud,
   pushPlan,
+  pushScheduled,
+  deleteScheduledCloud,
 } from "./cloud";
 
 /* Client-side persistence layer.
@@ -275,16 +277,21 @@ export function addScheduled(rec: Omit<ScheduledInterview, "id" | "createdAt">):
   const item: ScheduledInterview = { ...rec, id: uid(), createdAt: new Date().toISOString() };
   const items = [...s.items, item];
   write(KEYS.schedule, { items, activeId: s.activeId ?? item.id });
+  void pushScheduled(item);
   return item;
 }
 export function updateScheduled(id: string, patch: Partial<ScheduledInterview>): void {
   const s = readSchedule();
-  write(KEYS.schedule, { ...s, items: s.items.map((i) => (i.id === id ? { ...i, ...patch } : i)) });
+  const items = s.items.map((i) => (i.id === id ? { ...i, ...patch } : i));
+  write(KEYS.schedule, { ...s, items });
+  const updated = items.find((i) => i.id === id);
+  if (updated) void pushScheduled(updated);
 }
 export function removeScheduled(id: string): void {
   const s = readSchedule();
   const items = s.items.filter((i) => i.id !== id);
   write(KEYS.schedule, { items, activeId: s.activeId === id ? null : s.activeId });
+  void deleteScheduledCloud(id);
 }
 export function setActiveInterview(id: string): void {
   write(KEYS.schedule, { ...readSchedule(), activeId: id });
@@ -327,8 +334,15 @@ export function hydrateLocal(data: {
   sessions?: Session[];
   interviews?: InterviewRecord[];
   plan?: InterviewPlan | null;
+  schedule?: ScheduledInterview[];
 }): void {
   if (data.profile) write(KEYS.profile, { ...getProfile(), ...data.profile });
+  if (data.schedule?.length) {
+    const cur = readSchedule();
+    const map = new Map(cur.items.map((i) => [i.id, i] as const));
+    data.schedule.forEach((i) => map.set(i.id, i));
+    write(KEYS.schedule, { items: Array.from(map.values()), activeId: cur.activeId });
+  }
   if (data.sessions?.length) {
     const map = new Map(read<Session[]>(KEYS.sessions, []).map((s) => [s.id, s] as const));
     data.sessions.forEach((s) => map.set(s.id, s));
