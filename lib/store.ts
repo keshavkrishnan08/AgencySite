@@ -9,7 +9,7 @@ import type {
   Streak,
   UserProfile,
 } from "./types";
-import { todayKey } from "./utils";
+import { todayKey, uid } from "./utils";
 import {
   pushProfile,
   pushSession,
@@ -33,6 +33,7 @@ const KEYS = {
   interviews: "pp:interviews",
   plan: "pp:plan",
   goal: "pp:goal",
+  schedule: "pp:schedule",
 } as const;
 
 function read<T>(key: string, fallback: T): T {
@@ -248,6 +249,55 @@ export function getGoal(): Goal {
 }
 export function setGoal(g: Goal): void {
   write(KEYS.goal, g);
+}
+
+/* ----------------------- Interview schedule ----------------------- */
+export interface ScheduledInterview {
+  id: string;
+  company: string;
+  role: string;
+  dateISO: string; // YYYY-MM-DD
+  createdAt: string;
+}
+interface ScheduleState {
+  items: ScheduledInterview[];
+  activeId: string | null;
+}
+function readSchedule(): ScheduleState {
+  return read<ScheduleState>(KEYS.schedule, { items: [], activeId: null });
+}
+/** All upcoming interviews, soonest first (linear prep order). */
+export function getSchedule(): ScheduledInterview[] {
+  return readSchedule().items.slice().sort((a, b) => a.dateISO.localeCompare(b.dateISO));
+}
+export function addScheduled(rec: Omit<ScheduledInterview, "id" | "createdAt">): ScheduledInterview {
+  const s = readSchedule();
+  const item: ScheduledInterview = { ...rec, id: uid(), createdAt: new Date().toISOString() };
+  const items = [...s.items, item];
+  write(KEYS.schedule, { items, activeId: s.activeId ?? item.id });
+  return item;
+}
+export function updateScheduled(id: string, patch: Partial<ScheduledInterview>): void {
+  const s = readSchedule();
+  write(KEYS.schedule, { ...s, items: s.items.map((i) => (i.id === id ? { ...i, ...patch } : i)) });
+}
+export function removeScheduled(id: string): void {
+  const s = readSchedule();
+  const items = s.items.filter((i) => i.id !== id);
+  write(KEYS.schedule, { items, activeId: s.activeId === id ? null : s.activeId });
+}
+export function setActiveInterview(id: string): void {
+  write(KEYS.schedule, { ...readSchedule(), activeId: id });
+}
+/** The interview you're currently prepping for: the chosen one, else the soonest upcoming. */
+export function getActiveInterview(): ScheduledInterview | null {
+  const s = readSchedule();
+  const items = getSchedule();
+  if (!items.length) return null;
+  const chosen = items.find((i) => i.id === s.activeId);
+  if (chosen) return chosen;
+  const today = new Date().toISOString().slice(0, 10);
+  return items.find((i) => i.dateISO >= today) || items[0];
 }
 
 export function getOnboarding(): OnboardingDraft | null {
