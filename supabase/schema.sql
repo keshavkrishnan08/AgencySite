@@ -14,6 +14,7 @@ create table if not exists public.profiles (
   name text,
   situation text,
   target_role text,
+  company text,
   interview_gap text,
   plan text not null default 'free',            -- 'free' | 'premium'
   stripe_customer_id text,
@@ -57,6 +58,19 @@ create table if not exists public.plans (
 );
 create index if not exists plans_user_idx on public.plans (user_id);
 
+create table if not exists public.schedule (
+  id uuid primary key default gen_random_uuid(),
+  user_id uuid not null references public.profiles(id) on delete cascade,
+  client_id text,
+  company text,
+  role text,
+  interview_date date,
+  data jsonb,                                    -- full ScheduledInterview record
+  created_at timestamptz not null default now()
+);
+create index if not exists schedule_user_idx on public.schedule (user_id, interview_date);
+create unique index if not exists schedule_user_client_idx on public.schedule (user_id, client_id);
+
 create table if not exists public.subscriptions (
   id uuid primary key default gen_random_uuid(),
   email text not null,
@@ -79,6 +93,7 @@ alter table public.profiles      enable row level security;
 alter table public.sessions      enable row level security;
 alter table public.interviews    enable row level security;
 alter table public.plans         enable row level security;
+alter table public.schedule      enable row level security;
 alter table public.subscriptions enable row level security;
 
 drop policy if exists "own profile" on public.profiles;
@@ -95,6 +110,10 @@ create policy "own interviews" on public.interviews
 
 drop policy if exists "own plans" on public.plans;
 create policy "own plans" on public.plans
+  for all using (auth.uid() = user_id) with check (auth.uid() = user_id);
+
+drop policy if exists "own schedule" on public.schedule;
+create policy "own schedule" on public.schedule
   for all using (auth.uid() = user_id) with check (auth.uid() = user_id);
 
 -- ---------------------------------------------------------------------------
