@@ -5,6 +5,7 @@ import { useRouter, useSearchParams } from "next/navigation";
 import { motion, AnimatePresence } from "framer-motion";
 import { ArrowRight, Sparkles, X, Loader2, Lock, Building2, ChevronDown, Check } from "lucide-react";
 import { AppShell } from "@/components/layout/AppShell";
+import { Inline } from "@/components/ui/RichText";
 import { Button, ButtonLink } from "@/components/ui/Button";
 import { AnswerScoreCard } from "@/components/practice/AnswerScoreCard";
 import { VoiceButton } from "@/components/ui/VoiceButton";
@@ -460,7 +461,7 @@ function PracticeInner() {
                   <span className="grid h-6 w-6 place-items-center rounded-full bg-ink text-[10px] font-bold text-white">HM</span>
                   The interviewer follows up
                 </div>
-                <p className="font-serif text-lg font-semibold text-ink">&ldquo;{followUp}&rdquo;</p>
+                <p className="font-serif text-lg font-semibold text-ink">&ldquo;<Inline text={followUp} />&rdquo;</p>
 
                 {!followUpScored ? (
                   <>
