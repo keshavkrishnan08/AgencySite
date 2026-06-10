@@ -65,6 +65,7 @@ export const DEFAULT_PROFILE: UserProfile = {
   email: "",
   situation: null,
   targetRole: "",
+  company: "",
   interviewGap: null,
   plan: "free",
   createdAt: "",
