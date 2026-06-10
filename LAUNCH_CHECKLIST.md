@@ -104,9 +104,10 @@ STRIPE_PRICE_ID_ANNUAL=price_...                      # annual (live mode)
 
 # AI (optional but recommended)
 ANTHROPIC_API_KEY=sk-ant-...                          # server only
-# ANTHROPIC_MODEL=claude-sonnet-4-6                   # optional override
-# ANTHROPIC_MODEL_FAST=claude-haiku-4-5-20251001      # optional override (all routes default here)
-# ANTHROPIC_MODEL_SCORING=claude-sonnet-4-6           # pin scoring to Sonnet for max rigor (defaults to Haiku)
+# Model policy: every route uses Haiku (minimum-but-strong). Opus is hard-blocked
+# in code; do not switch to large/expensive models. Overrides below are optional
+# and default to Haiku — leave them unset to keep cost minimal.
+# ANTHROPIC_MODEL_FAST=claude-haiku-4-5-20251001      # default for all routes
 
 # Analytics (client-safe; wired, no-op until set)
 NEXT_PUBLIC_META_PIXEL_ID=...                         # Meta Pixel for ad optimization
