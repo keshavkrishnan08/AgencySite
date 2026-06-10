@@ -84,7 +84,7 @@ const ASSURANCES = [
   { icon: ShieldCheck, label: "Cancel anytime" },
   { icon: Lock, label: "Completely private" },
   { icon: Smartphone, label: "Works on your phone" },
-  { icon: CreditCard, label: "Cancel anytime" },
+  { icon: CreditCard, label: "$9.99/month" },
 ];
 
 function Stars({ className = "" }: { className?: string }) {
