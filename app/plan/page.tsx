@@ -6,11 +6,11 @@ import { motion } from "framer-motion";
 import { ArrowRight, CalendarCheck, Check, Circle, RotateCcw, Sparkles } from "lucide-react";
 import { AppShell } from "@/components/layout/AppShell";
 import { Button } from "@/components/ui/Button";
-import { clearPlan, getPlan, getProfile, savePlan, togglePlanTask } from "@/lib/store";
+import { clearPlan, getPlan, getProfile, getSessions, savePlan, togglePlanTask } from "@/lib/store";
 import { daysUntil, generatePlan } from "@/lib/plan";
 import { track } from "@/lib/analytics";
-import { cn, formatDateLong, todayKey } from "@/lib/utils";
-import type { InterviewPlan } from "@/lib/types";
+import { average, cn, formatDateLong, todayKey } from "@/lib/utils";
+import type { Dimension, InterviewPlan } from "@/lib/types";
 
 export default function PlanPage() {
   const [mounted, setMounted] = useState(false);
@@ -32,7 +32,19 @@ export default function PlanPage() {
 
   const create = () => {
     if (!company.trim() || !date) return;
-    const p = generatePlan({ company, role, dateISO: date });
+    // Personalize the plan from the customer's situation + weakest dimension.
+    const profile = getProfile();
+    const recent = getSessions().slice(-5);
+    let weakestDimension = "";
+    if (recent.length) {
+      const dims: Dimension[] = ["clarity", "relevance", "specificity", "confidence", "conciseness"];
+      let lowest = 101;
+      for (const k of dims) {
+        const avg = average(recent.map((x) => x.dimensions[k] || 0));
+        if (avg < lowest) { lowest = avg; weakestDimension = k; }
+      }
+    }
+    const p = generatePlan({ company, role, dateISO: date, situation: profile.situation, weakestDimension });
     savePlan(p);
     setPlan(p);
     track("interview_tracked", { source: "plan" });

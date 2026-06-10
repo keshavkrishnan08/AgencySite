@@ -106,11 +106,19 @@ export default function InterviewDayPage() {
 
   const begin = async () => {
     setPhase("scoring");
+    const profile = getProfile();
+    const hist = getSessions();
+    const avoid = Array.from(
+      new Set(hist.flatMap((x) => (x.answers || []).map((a) => a.questionText)).filter(Boolean))
+    ).slice(-16);
     const { questions } = await apiGenerateQuestions({
-      situation: getProfile().situation,
+      situation: profile.situation,
       targetRole: role.current,
-      interviewGap: getProfile().interviewGap,
-      seed: Math.floor(Date.now() / 1000) % 7,
+      company: profile.company || "",
+      interviewGap: profile.interviewGap,
+      seed: (hist.length * 101 + Math.floor(Date.now() / 1000)) % 9973,
+      sessionCount: hist.length,
+      avoid,
     });
     setQuestions(questions);
     setIndex(0);
