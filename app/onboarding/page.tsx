@@ -96,7 +96,6 @@ const SCREENS: Screen[] = [
       },
     ],
   },
-  { kind: "validation", slot: 1, demo: "progress" },
   {
     // Only for career changers: where they're coming from, to frame the pivot.
     kind: "form",
@@ -154,7 +153,6 @@ const SCREENS: Screen[] = [
       },
     ],
   },
-  { kind: "validation", slot: 2, demo: "delivery" },
 ];
 
 /* ---- modular validation: the stat is built from prior selections ---- */
