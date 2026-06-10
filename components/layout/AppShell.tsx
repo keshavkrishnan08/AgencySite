@@ -32,7 +32,18 @@ export function AppShell({ children, requirePremium = true }: { children: ReactN
   const pathname = usePathname();
   // Seed from localStorage so a cached nav renders instantly with the right
   // access state (no loader flash, no one-frame false redirect).
-  const [premium, setPremium] = useState(() => (typeof window !== "undefined" ? isPremium() : false));
+  const [premium, setPremium] = useState(() => {
+    if (typeof window === "undefined") return false;
+    // Returning from Stripe Checkout: trust the success redirect optimistically so
+    // the paywall clears immediately, and force a fresh subscription re-check (the
+    // webhook confirms it moments later). Without this the cached gate bounces a
+    // just-paid user back to /upgrade.
+    if (new URLSearchParams(window.location.search).get("upgraded") === "1") {
+      upgradeToPremium();
+      checkedFor = null;
+    }
+    return isPremium();
+  });
   const [subChecked, setSubChecked] = useState(
     () => typeof window !== "undefined" && checkedFor !== null && checkedFor === getProfile().email
   );
