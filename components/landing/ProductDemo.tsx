@@ -171,7 +171,7 @@ export function ProductDemo() {
             <span className="h-3 w-3 rounded-full" style={{ background: "#28c840" }} />
           </div>
           <div className="mx-auto flex min-w-[220px] max-w-[60%] items-center justify-center gap-1.5 rounded-md px-3 py-1 text-xs text-ink-3 shadow-inner" style={{ background: "var(--surface)" }}>
-            <Lock size={11} /> axoncareers.com/practice
+            <Lock size={11} /> axonservices.dev/practice
           </div>
           <div className="w-8" />
         </div>
