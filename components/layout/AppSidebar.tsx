@@ -93,7 +93,7 @@ export function AppSidebar() {
   };
 
   return (
-    <aside className="group fixed inset-y-0 left-0 z-50 hidden w-[76px] flex-col overflow-hidden border-r bg-surface/85 backdrop-blur-xl transition-[width] duration-200 ease-out hover:w-60 hover:shadow-xl lg:flex"
+    <aside className="group fixed inset-y-0 left-0 z-50 hidden w-[76px] flex-col overflow-hidden border-r bg-surface transition-[width] duration-200 ease-out hover:w-60 hover:shadow-2xl lg:flex"
       style={{ borderColor: "var(--border)" }}
     >
       {/* brand */}
