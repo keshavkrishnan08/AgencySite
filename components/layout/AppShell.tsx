@@ -38,10 +38,9 @@ export function AppShell({ children, requirePremium = true }: { children: ReactN
   );
   // Returning from Stripe Checkout (?upgraded=1): hold a loader and VERIFY the
   // session was actually paid before granting access. A user who cancels (or
-  // anyone typing the URL) is never let in.
-  const [verifying, setVerifying] = useState(
-    () => typeof window !== "undefined" && new URLSearchParams(window.location.search).get("upgraded") === "1"
-  );
+  // anyone typing the URL) is never let in. Seeded false (matches SSR — no
+  // hydration mismatch) and flipped on in the client-only effect below.
+  const [verifying, setVerifying] = useState(false);
 
   useEffect(() => {
     const sync = () => setPremium(isPremium());
@@ -50,8 +49,12 @@ export function AppShell({ children, requirePremium = true }: { children: ReactN
   }, []);
 
   useEffect(() => {
-    if (!verifying) return;
-    const sessionId = new URLSearchParams(window.location.search).get("session_id") || "";
+    // Client-only: detect the Stripe return here (not in initial state) so SSR
+    // and first client render agree (no hydration mismatch).
+    const params = new URLSearchParams(window.location.search);
+    if (params.get("upgraded") !== "1") return;
+    setVerifying(true);
+    const sessionId = params.get("session_id") || "";
     let alive = true;
     (async () => {
       let paid = false;
@@ -77,7 +80,7 @@ export function AppShell({ children, requirePremium = true }: { children: ReactN
     return () => {
       alive = false;
     };
-  }, [verifying, pathname]);
+  }, [pathname]);
 
   // Reconcile access against the authoritative subscription before gating.
   useEffect(() => {
