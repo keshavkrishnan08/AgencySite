@@ -4,6 +4,7 @@ import { useEffect, useState } from "react";
 import { motion } from "framer-motion";
 import { Check, Copy, Loader2, Save, Sparkles, Trash2 } from "lucide-react";
 import { ToolShell } from "@/components/layout/ToolShell";
+import { RichText } from "@/components/ui/RichText";
 import { GapStoryIcon } from "@/components/icons";
 import { Button } from "@/components/ui/Button";
 import { cn } from "@/lib/utils";
@@ -143,7 +144,7 @@ export default function GapStoryPage() {
                 <span className="text-sm font-semibold text-primary-ink">{v.label}</span>
                 {selected === i && <Check size={18} className="text-primary" />}
               </div>
-              <p className="leading-relaxed text-ink-2">{v.text}</p>
+              <RichText text={v.text} />
             </button>
           ))}
 
@@ -177,7 +178,7 @@ export default function GapStoryPage() {
                   <p className="text-2xs font-semibold uppercase tracking-wider text-ink-3">
                     {s.gapType} · {s.duration} · {s.versionLabel}
                   </p>
-                  <p className="mt-1.5 text-sm leading-relaxed text-ink-2">{s.text}</p>
+                  <RichText text={s.text} className="mt-1.5 text-sm" />
                 </div>
                 <button
                   onClick={() => {

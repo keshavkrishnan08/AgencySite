@@ -12,6 +12,7 @@ import {
   TrendingUp,
 } from "lucide-react";
 import { ScoreNumber, DimensionBars } from "@/components/ui/Score";
+import { RichText } from "@/components/ui/RichText";
 import { InfoTip } from "@/components/ui/Tooltip";
 import { deliveryNotes } from "@/lib/delivery";
 import { DIMENSIONS, DIMENSION_HELP, scoreLabel, scoreColor, cn } from "@/lib/utils";
@@ -229,7 +230,7 @@ export function AnswerScoreCard({
             {loading ? (
               <p className="text-ink-3">Writing an example…</p>
             ) : (
-              <p className="leading-relaxed text-ink-2">{example}</p>
+              <RichText text={example} />
             )}
           </div>
         )}

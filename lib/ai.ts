@@ -8,6 +8,9 @@ const MODEL = process.env.ANTHROPIC_MODEL || "claude-sonnet-4-6";
 // Cheaper, faster model for light extraction/generation (follow-ups, examples,
 // predictions). Cuts token cost where top-tier quality isn't needed.
 export const FAST_MODEL = process.env.ANTHROPIC_MODEL_FAST || "claude-haiku-4-5-20251001";
+// Scoring is the product's credibility. Defaults to Haiku (cheap) but can be
+// pinned to Sonnet for maximum rigor with one env var, no code change.
+export const SCORE_MODEL = process.env.ANTHROPIC_MODEL_SCORING || FAST_MODEL;
 
 export function hasAI(): boolean {
   return Boolean(process.env.ANTHROPIC_API_KEY);
