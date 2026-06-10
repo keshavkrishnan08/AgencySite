@@ -99,21 +99,31 @@ function Card({ t, className }: { t: T; className?: string }) {
   );
 }
 
-/* Compact, continuously-scrolling review ticker. Constant motion (no snapping),
-   and a much shorter row than the full cards. */
+/* Compact, continuously-scrolling review strip — the look most SaaS sites use:
+   clean rounded cards, soft shadow, avatar + name + stars + a two-line quote,
+   with the row constantly drifting and the edges faded out. */
+const clamp2: React.CSSProperties = {
+  display: "-webkit-box",
+  WebkitLineClamp: 2,
+  WebkitBoxOrient: "vertical",
+  overflow: "hidden",
+};
+
 function CompactCard({ t }: { t: T }) {
   return (
     <figure
-      className="flex w-[300px] shrink-0 items-center gap-3 rounded-full border bg-surface px-4 py-2"
+      className="flex w-[360px] shrink-0 items-start gap-3 rounded-2xl border bg-surface px-5 py-3.5 shadow-sm transition-shadow hover:shadow-md"
       style={{ borderColor: "var(--border)" }}
     >
-      <Avatar src={t.photo} name={t.name} size={32} className="ring-2 ring-white" />
+      <Avatar src={t.photo} name={t.name} size={40} className="shrink-0 ring-2 ring-white" />
       <div className="min-w-0">
-        <div className="flex items-center gap-1.5">
-          <span className="truncate text-xs font-semibold text-ink">{t.name}</span>
+        <div className="flex items-center justify-between gap-2">
+          <span className="truncate text-sm font-semibold text-ink">{t.name}</span>
           <Stars />
         </div>
-        <p className="truncate text-xs text-ink-2" title={t.quote}>&ldquo;{t.quote}&rdquo;</p>
+        <p className="mt-1 text-xs leading-snug text-ink-2" style={clamp2}>
+          &ldquo;{t.quote}&rdquo;
+        </p>
       </div>
     </figure>
   );
@@ -122,9 +132,9 @@ function CompactCard({ t }: { t: T }) {
 export function TestimonialCarousel() {
   const row = [...TESTIMONIALS, ...TESTIMONIALS];
   return (
-    <section className="border-y py-3" style={{ background: "var(--bg-sunk)", borderColor: "var(--border)" }}>
+    <section className="border-y py-6" style={{ background: "var(--bg-sunk)", borderColor: "var(--border)" }}>
       <div className="marquee-mask overflow-hidden">
-        <div className="marquee-track flex w-max gap-5">
+        <div className="marquee-track flex w-max gap-4">
           {row.map((t, i) => (
             <CompactCard key={i} t={t} />
           ))}
