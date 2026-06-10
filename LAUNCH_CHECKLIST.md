@@ -81,7 +81,7 @@ At **$5/creative × 6 = $30/day**, the deep agent-based sim (averaged over 25 ru
 - **Per-account usage counts** stored in the DB (`usage` table, atomic increment, service-role writes).
 - **Security:** AI/Anthropic key is server-only (`import "server-only"`, no `NEXT_PUBLIC`), never reaches the client. RLS on every table — the public key reads nothing; each user sees only their own rows.
 - **Rate limiting:** per IP (30/min, 300/day) + per account, on every AI route + checkout. Load-tested (35 calls → 429).
-- **Token cost:** prompt caching on the stable system prompt; Haiku for light calls, Sonnet for scoring.
+- **Token cost (minimized):** every AI route runs on **Haiku** (scoring, questions, follow-ups, examples, gap story, company brief, predictor, salary coach) with the stable system prompt **prompt-cached** and **minimal output contracts** (scoring returns scores + brief fixes only). The new personalization (salary range, day-by-day plan) is computed **locally — zero tokens**. ~$1.4/active user/mo modeled.
 - **Every AI endpoint** returns valid structured output; the app works fully on the local engine with no API key.
 - **Dashboard graphs** are fully dynamic from session data.
 
