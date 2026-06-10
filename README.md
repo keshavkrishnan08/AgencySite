@@ -110,3 +110,4 @@ Every screenshot in `/tmp/shots` was generated and checked with Playwright (`scr
 ---
 
 Built by Keshav Krishnan. Axon Careers is a practice tool, not a guarantee of employment.
+ 
