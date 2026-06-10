@@ -4,6 +4,7 @@ import { useEffect, useState } from "react";
 import { motion } from "framer-motion";
 import { FileSearch, Loader2, Sparkles, Check } from "lucide-react";
 import { ToolShell } from "@/components/layout/ToolShell";
+import { Inline } from "@/components/ui/RichText";
 import { PredictorIcon } from "@/components/icons";
 import { Button, ButtonLink } from "@/components/ui/Button";
 import { getProfile } from "@/lib/store";
@@ -80,14 +81,14 @@ export default function QuestionPredictorPage() {
                     </span>
                   </div>
                   <p className="mt-2 text-sm leading-relaxed text-ink-2">
-                    <strong className="text-ink">Why they ask it:</strong> {q.why}
+                    <strong className="text-ink">Why they ask it:</strong> <Inline text={q.why} />
                   </p>
                   <div className="mt-3 rounded-lg bg-bg-sunk p-4">
                     <p className="mb-2 text-2xs font-semibold uppercase tracking-wider text-primary-ink">A strong answer includes</p>
                     <ul className="space-y-1.5">
                       {q.strongAnswer.map((s, j) => (
                         <li key={j} className="flex gap-2 text-sm text-ink-2">
-                          <Check size={15} className="mt-0.5 shrink-0 text-sage" /> {s}
+                          <Check size={15} className="mt-0.5 shrink-0 text-sage" /> <Inline text={s} />
                         </li>
                       ))}
                     </ul>

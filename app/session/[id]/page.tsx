@@ -15,6 +15,7 @@ import {
   Trophy,
 } from "lucide-react";
 import { AppShell } from "@/components/layout/AppShell";
+import { Inline } from "@/components/ui/RichText";
 import { Button, ButtonLink } from "@/components/ui/Button";
 import { AnimatedNumber } from "@/components/ui/AnimatedNumber";
 import { ScoreNumber } from "@/components/ui/Score";
@@ -149,7 +150,7 @@ export default function SessionPage() {
             <div className="mb-1.5 flex items-center gap-2 text-2xs font-semibold uppercase tracking-wider text-amber-ink">
               <TargetIcon size={14} /> Focus area
             </div>
-            <p className="text-ink-2">{session.answers[0]?.growthSummary ?? growthOf(weakest)}</p>
+            <p className="text-ink-2"><Inline text={session.answers[0]?.growthSummary ?? growthOf(weakest)} /></p>
           </div>
         </div>
 

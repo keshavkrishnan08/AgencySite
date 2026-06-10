@@ -9,6 +9,7 @@ import { Button } from "@/components/ui/Button";
 import { ScoreNumber } from "@/components/ui/Score";
 import { getProfile } from "@/lib/store";
 import { suggestSalaryRange } from "@/lib/salary";
+import { Inline } from "@/components/ui/RichText";
 import { average, scoreColor } from "@/lib/utils";
 
 type Turn =
@@ -199,7 +200,7 @@ function TurnBubble({ turn }: { turn: Turn }) {
       <motion.div initial={{ opacity: 0, y: 10 }} animate={{ opacity: 1, y: 0 }} className="flex items-start gap-3">
         <span className="grid h-9 w-9 shrink-0 place-items-center rounded-full bg-ink text-2xs font-bold text-white">HM</span>
         <div className="max-w-[80%] rounded-2xl rounded-tl-sm border bg-surface px-4 py-3 text-ink shadow-sm" style={{ borderColor: "var(--border)" }}>
-          {turn.text}
+          <Inline text={turn.text} />
         </div>
       </motion.div>
     );
@@ -218,7 +219,7 @@ function TurnBubble({ turn }: { turn: Turn }) {
       <div className="mb-2 flex items-center gap-2 text-2xs font-semibold uppercase tracking-wider text-amber-ink">
         <Sparkles size={13} /> Coach
       </div>
-      <p className="text-sm leading-relaxed text-ink-2">{turn.text}</p>
+      <p className="text-sm leading-relaxed text-ink-2"><Inline text={turn.text} /></p>
       <div className="mt-3 flex flex-wrap gap-2">
         {(["confidence", "specificity", "composure"] as const).map((k) => (
           <span key={k} className="inline-flex items-center gap-1.5 rounded-full bg-white px-2.5 py-1 text-xs font-medium text-ink-2 shadow-xs">
