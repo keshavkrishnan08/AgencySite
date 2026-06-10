@@ -30,7 +30,6 @@ import {
 } from "@/lib/store";
 import { daysUntil } from "@/lib/plan";
 import type { InterviewPlan, InterviewRecord } from "@/lib/types";
-import { seedSampleData } from "@/lib/seed";
 import {
   DIMENSIONS,
   average,
@@ -120,7 +119,7 @@ export default function DashboardPage() {
   if (sessions.length === 0) {
     return (
       <AppShell>
-        <EmptyState onSeed={() => seedSampleData()} />
+        <EmptyState />
       </AppShell>
     );
   }
@@ -449,7 +448,7 @@ function Stat({
   );
 }
 
-function EmptyState({ onSeed }: { onSeed: () => void }) {
+function EmptyState() {
   return (
     <main className="container-content py-20 text-center">
       <span
@@ -460,16 +459,12 @@ function EmptyState({ onSeed }: { onSeed: () => void }) {
       </span>
       <h1 className="mt-6 font-serif text-3xl font-semibold text-ink">Your dashboard is ready</h1>
       <p className="mx-auto mt-3 max-w-md text-ink-2">
-        Complete your first practice session and your scores, charts, and streak will appear here. Want to
-        see what it looks like first?
+        Run your first practice session and your scores, charts, and streak will appear here.
       </p>
-      <div className="mt-8 flex flex-col items-center justify-center gap-3 sm:flex-row">
+      <div className="mt-8 flex justify-center">
         <ButtonLink href="/practice" size="lg">
           Start a session <ArrowRight size={18} />
         </ButtonLink>
-        <Button variant="secondary" size="lg" onClick={onSeed}>
-          <Sparkles size={16} /> Load sample progress
-        </Button>
       </div>
     </main>
   );
