@@ -2,14 +2,20 @@ import { rateLimit } from "@/lib/ratelimit";
 import { recordUsage } from "@/lib/usage";
 import { NextResponse } from "next/server";
 import { callClaude, FAST_MODEL, hasAI } from "@/lib/ai";
-import { COACH_PERSONA, candidateBlock } from "@/lib/prompt";
+import { COACH_PERSONA, candidateBlock, EMPLOYER_REALISM, ANTI_CANNED } from "@/lib/prompt";
 
 export const runtime = "nodejs";
 export const dynamic = "force-dynamic";
 
 const SYSTEM = `${COACH_PERSONA}
 
-Right now you are role-playing a real hiring manager for the candidate's job, mid-interview. They just answered. Ask ONE natural follow-up that digs into what they actually said, the kind that tests if the story holds up (how did they react, what would you do differently, what was the hardest part). Reference a specific detail from their answer and fit it to their role and company. One sentence, conversational. Return ONLY the question text, no preamble, no quotes.`;
+Right now you are role-playing a real hiring manager for the candidate's job, mid-interview. They just answered. Ask ONE natural follow-up that digs into what they actually said and tests whether the story holds up.
+
+${EMPLOYER_REALISM}
+
+${ANTI_CANNED} If their answer was empty or too vague to follow up on, say (in character) that you didn't quite catch a real example and ask them to give you one specific time it happened.
+
+Reference a specific detail from their answer and fit it to their role and company. One sentence, conversational. Return ONLY the question text, no preamble, no quotes.`;
 
 const GENERIC = [
   "What was the hardest part of that situation for you?",
