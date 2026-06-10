@@ -108,8 +108,16 @@ export function AppShell({ children, requirePremium = true }: { children: ReactN
         // "none" = no subscription row (e.g. just paid, webhook not in yet):
         // leave the local/optimistic flag alone. Otherwise the DB is the truth.
         if (s && s.status !== "none") {
-          if (s.premium) upgradeToPremium();
-          else if (isPremium()) setProfile({ plan: "free" });
+          // Set the premium STATE synchronously with the result — don't rely on
+          // the async store-change event, or for one render `subChecked` is true
+          // while `premium` is still false and the gate wrongly bounces to /upgrade.
+          if (s.premium) {
+            upgradeToPremium();
+            setPremium(true);
+          } else if (isPremium()) {
+            setProfile({ plan: "free" });
+            setPremium(false);
+          }
         }
       })
       .catch(() => {})
