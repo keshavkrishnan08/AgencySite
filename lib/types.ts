@@ -45,6 +45,7 @@ export interface ScoredAnswer {
   feedback: Record<Dimension, string>;
   strengthSummary: string;
   growthSummary: string;
+  improve?: string[];
   anxiety: AnxietyFlags;
   exampleAnswer: string;
   wordCount: number;
