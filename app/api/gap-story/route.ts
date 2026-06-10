@@ -14,7 +14,7 @@ const GAP_LABELS: Record<string, string> = {
   education: "going back to school or certification",
   health: "a health situation",
   personal: "personal reasons",
-  other: "time away",
+  other: "personal reasons",
 };
 
 const SYSTEM = `${COACH_PERSONA}
@@ -32,7 +32,7 @@ Return ONLY valid minified JSON:
 {"versions":[{"label":"The Confident Pivot","text":"..."},{"label":"The Honest & Brief","text":"..."},{"label":"The Growth Story","text":"..."}]}\n\nWrite in plain words a 6th grader can read. Never use em dashes or en dashes; use a period, comma, or colon instead.`;
 
 function fallback(gapType: string, duration: string, activities: string) {
-  const reason = GAP_LABELS[gapType] || "time away";
+  const reason = GAP_LABELS[gapType] || "personal reasons";
   const did = activities.trim()
     ? ` During that time I ${activities.trim().replace(/\.$/, "")}, so I stayed sharp and engaged.`
     : "";
@@ -48,7 +48,7 @@ function fallback(gapType: string, duration: string, activities: string) {
       },
       {
         label: "The Growth Story",
-        text: `My ${duration} away was for ${reason}, and it taught me a lot about staying organized and resourceful under real pressure.${did} I'm bringing all of that with me, and I'm genuinely excited to get back to work I care about.`,
+        text: `That time away was for ${reason}, and it taught me a lot about staying organized and resourceful under real pressure.${did} I'm bringing all of that with me, and I'm genuinely excited to get back to work I care about.`,
       },
     ],
     source: "heuristic" as const,
