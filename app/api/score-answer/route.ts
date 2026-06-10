@@ -3,7 +3,7 @@ import { recordUsage } from "@/lib/usage";
 import { NextResponse } from "next/server";
 import { scoreAnswer, computeOverall } from "@/lib/scoring";
 import { exampleAnswer } from "@/lib/examples";
-import { callClaude, extractJson, hasAI, FAST_MODEL } from "@/lib/ai";
+import { callClaude, extractJson, hasAI, SCORE_MODEL } from "@/lib/ai";
 import { COACH_PERSONA, SCORING_RUBRIC, candidateBlock } from "@/lib/prompt";
 import type { DimensionScores } from "@/lib/types";
 
@@ -91,7 +91,7 @@ export async function POST(req: Request) {
       // Haiku + temperature 0: cheap, and the strict rubric (not the model tier)
       // is what makes the same answer grade the same way every session.
       // maxTokens kept low because the contract is just scores + brief fixes.
-      const text = await callClaude({ model: FAST_MODEL, system: SYSTEM, user, maxTokens: 320, temperature: 0 });
+      const text = await callClaude({ model: SCORE_MODEL, system: SYSTEM, user, maxTokens: 320, temperature: 0 });
       const parsed = extractJson<AiScore>(text);
       if (parsed && parsed.clarity != null) {
         // Numbers: clamped to ints and overall recomputed server-side so the
