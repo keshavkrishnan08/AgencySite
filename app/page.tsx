@@ -102,7 +102,7 @@ function DemoSection() {
         </Reveal>
         <Reveal delay={0.05}>
           <h2 className="text-balance text-center font-serif text-display font-semibold text-ink">
-            Answer a question. Watch it get scored.
+            Instant feedback.
           </h2>
         </Reveal>
         <Reveal delay={0.1}>
@@ -158,7 +158,7 @@ function FiveQuestions() {
         </Reveal>
         <Reveal delay={0.05}>
           <h2 className="text-balance text-center font-serif text-display font-semibold text-ink">
-            Interview anxiety isn&apos;t random. It spikes around five questions.
+            The hard five.
           </h2>
         </Reveal>
         <Reveal delay={0.1}>
@@ -220,7 +220,7 @@ function HowItWorks() {
         </Reveal>
         <Reveal delay={0.05}>
           <h2 className="mx-auto max-w-2xl text-balance font-serif text-display font-semibold text-ink">
-            From nervous to hired, one simple path.
+            Three steps.
           </h2>
         </Reveal>
         <Reveal delay={0.1}>
@@ -259,7 +259,7 @@ function Numbers() {
         </Reveal>
         <Reveal delay={0.05}>
           <h2 className="text-balance text-center font-serif text-display font-semibold text-ink">
-            It works, and you can watch it happen.
+            It works.
           </h2>
         </Reveal>
 
@@ -343,7 +343,7 @@ function Stories() {
         </Reveal>
         <Reveal delay={0.05}>
           <h2 className="text-balance text-center font-serif text-display font-semibold text-ink">
-            For the moments no one talks about.
+            Real moments.
           </h2>
         </Reveal>
 
@@ -388,7 +388,7 @@ function Comparison() {
         </Reveal>
         <Reveal delay={0.05}>
           <h2 className="text-balance text-center font-serif text-display font-semibold text-ink">
-            Less than a coffee a day. More useful than a $200 coach.
+            Beats a coach.
           </h2>
         </Reveal>
 
@@ -461,7 +461,7 @@ function Pricing() {
         </Reveal>
         <Reveal delay={0.05}>
           <h2 className="text-balance text-center font-serif text-display font-semibold text-ink">
-            One membership. Pick your billing.
+            Pick your plan.
           </h2>
         </Reveal>
 
@@ -543,7 +543,7 @@ function FinalCTA() {
       <div className="container-content text-center">
         <Reveal>
           <h2 className="text-balance font-serif text-display font-semibold text-ink">
-            You deserve a job you&apos;re proud of.
+            Walk in ready.
           </h2>
         </Reveal>
         <Reveal delay={0.08}>
@@ -614,7 +614,7 @@ function FAQ() {
         </Reveal>
         <Reveal delay={0.05}>
           <h2 className="text-balance text-center font-serif text-display font-semibold text-ink">
-            Everything you might be wondering.
+            Got questions?
           </h2>
         </Reveal>
         <Reveal delay={0.1}>
