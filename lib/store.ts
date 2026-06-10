@@ -235,6 +235,7 @@ export function togglePlanTask(taskId: string): void {
 export interface OnboardingDraft {
   situation: UserProfile["situation"];
   targetRole: string;
+  company?: string;
   interviewGap: UserProfile["interviewGap"];
 }
 export function getOnboarding(): OnboardingDraft | null {
