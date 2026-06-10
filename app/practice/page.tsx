@@ -4,12 +4,11 @@ import { Suspense, useCallback, useEffect, useRef, useState } from "react";
 import { useRouter, useSearchParams } from "next/navigation";
 import { motion, AnimatePresence } from "framer-motion";
 import { ArrowRight, Sparkles, X, Loader2, Lock, Building2, ChevronDown, Check } from "lucide-react";
-import { Logo } from "@/components/ui/Logo";
+import { AppShell } from "@/components/layout/AppShell";
 import { Button, ButtonLink } from "@/components/ui/Button";
 import { AnswerScoreCard } from "@/components/practice/AnswerScoreCard";
 import { VoiceButton } from "@/components/ui/VoiceButton";
 import { InfoTip } from "@/components/ui/Tooltip";
-import { ShowcaseProgress } from "@/components/onboarding/Showcase";
 import { apiFollowUp, apiGenerateExample, apiGenerateQuestions, apiScoreAnswer } from "@/lib/client";
 import { aggregateDimensions, computeOverall } from "@/lib/scoring";
 import {
@@ -269,13 +268,12 @@ function PracticeInner() {
   /* ---------------- Render ---------------- */
 
   return (
-    <div className="lg:grid lg:grid-cols-2">
-      <main className="min-h-screen pb-24">
-      {/* Header */}
-      <div className="sticky top-0 z-40 glass border-b" style={{ borderColor: "var(--border)" }}>
-        <div className="container-content flex h-16 items-center justify-between gap-4">
-          <Logo href="/dashboard" />
-          {(phase === "answer" || phase === "score") && (
+    <AppShell>
+      <main className="pb-24">
+      {/* In-session bar (progress + end), sits under the app nav */}
+      <div className="sticky top-16 z-30 glass border-b" style={{ borderColor: "var(--border)" }}>
+        <div className="container-content flex h-14 items-center justify-between gap-4">
+          {(phase === "answer" || phase === "score") ? (
             <div className="flex flex-1 items-center justify-center gap-3">
               <span className="hidden text-sm font-medium text-ink-2 sm:inline">
                 Question {index + 1} of {total}
@@ -290,6 +288,8 @@ function PracticeInner() {
                 />
               </div>
             </div>
+          ) : (
+            <span />
           )}
           <button onClick={endEarly} className="btn-ghost text-sm">
             <X size={16} /> End
@@ -492,31 +492,7 @@ function PracticeInner() {
         )}
       </div>
       </main>
-      <PracticeAside />
-    </div>
-  );
-}
-
-/* Right half: a motivating, animated panel mirroring the onboarding split. */
-function PracticeAside() {
-  return (
-    <aside
-      className="relative hidden overflow-hidden lg:block"
-      style={{ background: "linear-gradient(160deg, #19a9b8 0%, #14808e 50%, #0c5660 120%)" }}
-    >
-      <div className="pointer-events-none absolute -right-20 -top-24 h-80 w-80 rounded-full opacity-40 blur-3xl" style={{ background: "radial-gradient(circle, #ffffff66, transparent)" }} />
-      <div className="pointer-events-none absolute -bottom-28 -left-20 h-80 w-80 rounded-full opacity-30 blur-3xl" style={{ background: "radial-gradient(circle, #ffe0a655, transparent)" }} />
-      <div className="sticky top-0 flex min-h-screen flex-col justify-center px-12 py-16 text-white xl:px-16">
-        <span className="text-2xs font-semibold uppercase tracking-[0.18em] text-white/70">Every answer counts</span>
-        <h2 className="mt-4 max-w-md font-serif text-[2.1rem] font-semibold leading-tight">
-          You&apos;re building real readiness.
-        </h2>
-        <div className="mt-10">
-          <ShowcaseProgress />
-        </div>
-        <p className="mt-12 text-sm text-white/75">Say it out loud. That&apos;s how it sticks.</p>
-      </div>
-    </aside>
+    </AppShell>
   );
 }
 
