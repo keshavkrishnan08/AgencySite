@@ -261,6 +261,22 @@ export default function OnboardingPage() {
     if (key === "situation") track("onboarding_situation", { situation: value });
   };
 
+  // A screen auto-advances once every field is a chip-select (no typing) and
+  // all are answered — so a tap moves you forward, no hunting for "Continue".
+  // Fewer taps + less perceived length lifts completion.
+  const selectOption = (key: string, value: string) => {
+    const na = { ...answers, [key]: value };
+    setAnswers(na);
+    if (key === "situation") track("onboarding_situation", { situation: value });
+    if (
+      cur.kind === "form" &&
+      cur.fields.every((f) => f.options && !f.optional) &&
+      cur.fields.every((f) => Boolean(na[f.key]))
+    ) {
+      window.setTimeout(() => go(screen + 1), 380);
+    }
+  };
+
   const suggestions = useMemo(() => {
     if (query.trim().length < 2) return [];
     const q = query.toLowerCase();
@@ -358,7 +374,7 @@ export default function OnboardingPage() {
                               return (
                                 <button
                                   key={o.value}
-                                  onClick={() => pick(f.key, o.value)}
+                                  onClick={() => selectOption(f.key, o.value)}
                                   className="rounded-full border px-3 py-1.5 text-[0.8rem] font-medium transition-all"
                                   style={{
                                     borderColor: active ? "var(--primary)" : "var(--border-strong)",
