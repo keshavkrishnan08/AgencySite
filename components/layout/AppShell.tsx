@@ -1,6 +1,6 @@
 "use client";
 
-import { useEffect, useState, type ReactNode } from "react";
+import { useEffect, useRef, useState, type ReactNode } from "react";
 import { usePathname, useRouter } from "next/navigation";
 import { Loader2 } from "lucide-react";
 import { AppNav } from "./AppNav";
@@ -41,9 +41,14 @@ export function AppShell({ children, requirePremium = true }: { children: ReactN
   // anyone typing the URL) is never let in. Seeded false (matches SSR — no
   // hydration mismatch) and flipped on in the client-only effect below.
   const [verifying, setVerifying] = useState(false);
+  // The authoritative subscription decision (null = not yet checked). Once the
+  // sub-status check has decided, it WINS over the local profile.plan flag — so a
+  // "canceled but still within the paid period" user (whose profile.plan is
+  // 'free') keeps access, and store writes can't clobber the grant.
+  const subDecision = useRef<boolean | null>(null);
 
   useEffect(() => {
-    const sync = () => setPremium(isPremium());
+    const sync = () => setPremium(subDecision.current !== null ? subDecision.current : isPremium());
     sync();
     return onStoreChange(sync);
   }, []);
@@ -71,6 +76,7 @@ export function AppShell({ children, requirePremium = true }: { children: ReactN
       if (!alive) return;
       if (paid) {
         upgradeToPremium();
+        subDecision.current = true;
         checkedFor = null; // re-confirm against the DB on next gate
         setPremium(true);
       }
@@ -90,7 +96,9 @@ export function AppShell({ children, requirePremium = true }: { children: ReactN
       setSubChecked(true);
       return;
     }
-    const email = getProfile().email;
+    // Key on the AUTHENTICATED identity, not localStorage (which lags the session
+    // right after sign-in and would send an empty email -> "none" -> wrong bounce).
+    const email = user.email || getProfile().email;
     if (!email) {
       setSubChecked(true);
       return;
@@ -106,19 +114,23 @@ export function AppShell({ children, requirePremium = true }: { children: ReactN
       headers: { "Content-Type": "application/json", "x-user-id": email },
     })
       .then((r) => r.json())
-      .then((s: { premium: boolean; status: string }) => {
+      .then((s: { premium?: boolean; status?: string; rateLimited?: boolean; error?: string }) => {
         if (!alive) return;
         // "none" = no subscription row (e.g. just paid, webhook not in yet):
         // leave the local/optimistic flag alone. Otherwise the DB is the truth.
-        if (s && s.status !== "none") {
-          // Set the premium STATE synchronously with the result — don't rely on
-          // the async store-change event, or for one render `subChecked` is true
-          // while `premium` is still false and the gate wrongly bounces to /upgrade.
+        // Only a DEFINITIVE status counts. A rate-limit/error response (no boolean
+        // premium, or rateLimited) is inconclusive — leave the current state
+        // alone; never revoke a paying user over a transient 429 or network blip.
+        const definitive = s && typeof s.premium === "boolean" && !s.rateLimited && !s.error;
+        if (definitive && s.status !== "none") {
+          // Authoritative: record the decision so onStoreChange/hydrate can't
+          // override it, and set the premium state synchronously with the result.
+          subDecision.current = !!s.premium;
           if (s.premium) {
             upgradeToPremium();
             setPremium(true);
-          } else if (isPremium()) {
-            setProfile({ plan: "free" });
+          } else {
+            if (isPremium()) setProfile({ plan: "free" });
             setPremium(false);
           }
         }
