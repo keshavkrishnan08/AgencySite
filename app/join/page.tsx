@@ -133,86 +133,58 @@ function DemoSection() {
   );
 }
 
-/* ===================== FIVE QUESTIONS ===================== */
-const QUESTIONS = [
-  {
-    q: "Tell me about yourself.",
-    pain: "You have 90 seconds to summarize your entire career and it never comes out right. You ramble, forget the important parts, and somehow end up six years in the past wondering why.",
-    fix: "It's the first question of every session, so you rehearse it more than any other. You get scored on structure and length until a 60-second version comes out clean, then you watch that score climb week over week.",
-  },
-  {
-    q: "Explain this gap on your résumé.",
-    pain: "If you were laid off, it feels like admitting failure. If you took time off for your kids, you worry they'll see you as uncommitted. And the silence while you figure out what to say tells them everything.",
-    fix: "The Gap Story Builder frames any gap (layoff, family, health, career change) into a confident 30-second answer that satisfies the interviewer without oversharing. Your gap isn't a flaw. It's a chapter.",
-  },
-  {
-    q: "Tell me about a time you failed.",
-    pain: "Admitting failure to a stranger deciding your future feels terrible. Too honest and you look bad. Too polished and you sound fake. You can feel them evaluating you mid-sentence.",
-    fix: "AI helps you find the right failure story: real enough to be credible, recovered enough to show growth. You practice until telling it feels natural, not painful.",
-  },
-  {
-    q: "What's your biggest weakness?",
-    pain: "Everyone says 'don't say perfectionist' but nobody tells you what to actually say. Every answer feels like a trap built to disqualify you.",
-    fix: "Axon Careers teaches the only weakness formula that works: a real skill you're actively improving, what you're doing about it, kept to two sentences. Done.",
-  },
-  {
-    q: "Where do you see yourself in five years?",
-    pain: "In 2026, predicting five years feels absurd. The honest answer is 'I have no idea, and neither do you,' but that's not what they want to hear.",
-    fix: "AI helps you build a forward-looking answer that sounds ambitious without being unrealistic, and aligned with the company without sounding scripted.",
-  },
+/* ===================== THE HARD FIVE ===================== */
+/* Just the questions. The long pain/fix treatment for each made this section
+   taller than the rest of the page combined, and people scrolled past it. The
+   questions alone land the point faster. */
+const HARD_QUESTIONS = [
+  "Tell me about yourself.",
+  "Explain this gap on your résumé.",
+  "Tell me about a time you failed.",
+  "What's your biggest weakness?",
+  "Where do you see yourself in five years?",
 ];
 
 function FiveQuestions() {
   return (
-    <section className="py-24 sm:py-32">
+    <section className="py-28 sm:py-40">
       <div className="container-content">
         <Reveal>
-          <Eyebrow>The five that break people</Eyebrow>
+          <Eyebrow>The hard five</Eyebrow>
         </Reveal>
         <Reveal delay={0.05}>
           <h2 className="text-balance text-center font-serif text-display font-semibold text-ink">
-            The hard five.
+            Prepare for the ones
+            <br />
+            that break people.
           </h2>
         </Reveal>
         <Reveal delay={0.1}>
           <p className="mx-auto mt-5 max-w-prose text-center text-lg text-ink-2">
-            93% of people have felt interview anxiety. 41% say their biggest fear is freezing when a hard
-            question comes. These are the five that cause it.
+            93% of people have felt interview anxiety. 41% say their biggest fear is freezing on a hard
+            question. These are the five that cause it, and you&apos;ll rehearse every one.
           </p>
         </Reveal>
 
-        <div className="mt-14 space-y-5">
-          {QUESTIONS.map((item, i) => (
-            <Reveal key={item.q} delay={i * 0.05}>
-              <article
-                className="card overflow-hidden p-0 transition-shadow hover:shadow-lg"
-                style={{ borderLeft: "4px solid var(--amber)" }}
+        <div className="mt-12 grid gap-3 sm:grid-cols-2">
+          {HARD_QUESTIONS.map((q, i) => (
+            <Reveal key={q} delay={i * 0.04}>
+              <div
+                className="flex h-full items-center gap-3.5 rounded-xl border p-4 transition-shadow hover:shadow-sm"
+                style={{ borderColor: "var(--border)", background: "var(--surface)" }}
               >
-                <div className="grid gap-6 p-7 sm:grid-cols-[1.1fr_1fr] sm:p-8">
-                  <div>
-                    <div className="mb-3 flex items-center gap-3">
-                      <span className="grid h-8 w-8 place-items-center rounded-full bg-amber-soft font-mono text-sm font-bold text-amber-ink">
-                        {i + 1}
-                      </span>
-                      <h3 className="font-serif text-xl font-semibold text-ink">&ldquo;{item.q}&rdquo;</h3>
-                    </div>
-                    <p className="text-[0.95rem] leading-relaxed text-ink-2">{item.pain}</p>
-                  </div>
-                  <div className="rounded-xl bg-primary-soft/60 p-5">
-                    <div className="mb-1.5 flex items-center gap-1.5 text-2xs font-semibold uppercase tracking-wider text-primary-ink">
-                      <Check size={13} /> How Axon Careers helps
-                    </div>
-                    <p className="text-[0.95rem] leading-relaxed text-primary-ink/90">{item.fix}</p>
-                  </div>
-                </div>
-              </article>
+                <span className="grid h-7 w-7 shrink-0 place-items-center rounded-full bg-amber-soft font-mono text-xs font-bold text-amber-ink">
+                  {i + 1}
+                </span>
+                <p className="font-medium text-ink">&ldquo;{q}&rdquo;</p>
+              </div>
             </Reveal>
           ))}
         </div>
 
         <Reveal delay={0.1}>
-          <div className="mx-auto mt-12 max-w-md">
-            <PresaleForm source="five_questions" cta="Practice all five" />
+          <div className="mx-auto mt-10 max-w-md">
+            <PresaleForm source="hard_five" />
           </div>
         </Reveal>
       </div>
@@ -346,7 +318,7 @@ const STORIES = [
 
 function Stories() {
   return (
-    <section className="py-24 sm:py-32">
+    <section className="py-28 sm:py-40">
       <div className="container-wide">
         <Reveal>
           <Eyebrow>For the moments no one sees</Eyebrow>
@@ -557,7 +529,7 @@ function Pricing() {
 /* ===================== FINAL CTA ===================== */
 function FinalCTA() {
   return (
-    <section className="py-28 sm:py-36">
+    <section className="py-32 sm:py-44">
       <div className="container-content text-center">
         <Reveal>
           <h2 className="text-balance font-serif text-display font-semibold text-ink">
