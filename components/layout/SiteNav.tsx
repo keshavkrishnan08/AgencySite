@@ -1,9 +1,8 @@
 "use client";
 
 import { useEffect, useState } from "react";
-import Link from "next/link";
 import { Logo } from "@/components/ui/Logo";
-import { ButtonLink } from "@/components/ui/Button";
+import { StartFreeButton } from "@/components/ui/StartFreeButton";
 import { cn } from "@/lib/utils";
 
 const LINKS = [
@@ -44,16 +43,11 @@ export function SiteNav() {
               </a>
             ))}
           </div>
+          {/* One action, no "Sign in". Returning customers are routed straight
+              into the app by StartFreeButton, so a second link would only be a
+              fork in the road nobody needs. */}
           <div className="flex items-center gap-2">
-            <Link
-              href="/signin"
-              className="hidden text-sm font-medium text-ink-2 transition-colors hover:text-ink sm:inline-flex px-3 py-2"
-            >
-              Sign in
-            </Link>
-            <ButtonLink href="/onboarding" size="sm">
-              Start free
-            </ButtonLink>
+            <StartFreeButton size="sm" source="nav" showArrow={false} />
           </div>
         </nav>
       </div>
