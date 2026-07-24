@@ -33,6 +33,9 @@ export async function apiGenerateQuestions(args: {
   weakestDimension?: string;
   sessionCount?: number;
   avoid?: string[];
+  focusTypes?: string[];
+  difficulty?: string;
+  count?: number;
 }): Promise<{ questions: Question[]; source: string }> {
   try {
     const res = await fetch("/api/generate-questions", {

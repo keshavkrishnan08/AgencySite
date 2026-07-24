@@ -52,7 +52,34 @@ export async function POST(req: Request) {
     weakestDimension = "",
     sessionCount = 0,
     avoid = [],
+    focusTypes = [],
+    difficulty = "standard",
+    count = 8,
   } = body ?? {};
+
+  // Clamp the requested question count to a sane range.
+  const n = Math.max(4, Math.min(12, Number(count) || 8));
+  // Human labels for the requested categories, fed into the prompt.
+  const TYPE_LABEL: Record<string, string> = {
+    warmup: "warm-up / 'tell me about yourself'",
+    behavioral: "behavioral 'tell me about a time' questions",
+    situation: "situational / hypothetical scenarios",
+    gap: "questions about their résumé gap or career change",
+    closer: "closing questions and 'do you have questions for us'",
+    leadership: "leadership and conflict questions",
+  };
+  const wantedTypes: string[] = Array.isArray(focusTypes)
+    ? focusTypes.filter((t: unknown) => typeof t === "string" && TYPE_LABEL[t as string])
+    : [];
+  const diffLine =
+    difficulty === "easy"
+      ? "\nKeep the difficulty gentle and encouraging — this person is easing back in."
+      : difficulty === "hard"
+      ? "\nMake these HARD: pointed follow-up-style questions, curveballs, and pressure that a tough panel would use."
+      : "";
+  const typeLine = wantedTypes.length
+    ? `\nEmphasise these question types: ${wantedTypes.map((t) => TYPE_LABEL[t]).join("; ")}. Weight the set toward them.`
+    : "";
 
   if (focusDimension) {
     return NextResponse.json({
@@ -67,12 +94,12 @@ export async function POST(req: Request) {
       const variety =
         `\n\nThis is practice session #${(Number(sessionCount) || 0) + 1}. Make this set FRESH: vary the wording, scenarios, and angles so it does not feel like a repeat of earlier sessions.` +
         (avoidList.length ? `\nDo NOT reuse or lightly reword any of these already-asked questions:\n- ${avoidList.join("\n- ")}` : "");
-      const user = `${candidateBlock({ name, situation: situation || "", targetRole, company, interviewGap, posting, weakestDimension })}${variety}\n\nWrite their 8 questions now.`;
+      const user = `${candidateBlock({ name, situation: situation || "", targetRole, company, interviewGap, posting, weakestDimension })}${variety}${typeLine}${diffLine}\n\nWrite their ${n} questions now.`;
       // Higher temperature than scoring: for questions, variety matters more than determinism.
       const text = await callClaude({ model: FAST_MODEL, system: SYSTEM, user, maxTokens: 1100, temperature: 0.85 });
       const parsed = extractJson<{ questions: Question[] }>(text);
       if (parsed?.questions?.length) {
-        const questions = parsed.questions.slice(0, 8).map((q, i) => ({
+        const questions = parsed.questions.slice(0, n).map((q, i) => ({
           number: i + 1,
           text: q.text,
           category: q.category || "behavioral",
@@ -85,8 +112,15 @@ export async function POST(req: Request) {
     }
   }
 
-  return NextResponse.json({
-    questions: generateQuestions(situation, targetRole, seed, { company, posting }),
-    source: "heuristic",
-  });
+  // Heuristic fallback: honour the requested count and type emphasis as best a
+  // static bank can. Filter to wanted categories first, then top up to n.
+  let hq = generateQuestions(situation, targetRole, seed, { company, posting });
+  if (wantedTypes.length) {
+    const wanted = new Set(wantedTypes);
+    const matched = hq.filter((q) => wanted.has(q.category));
+    const rest = hq.filter((q) => !wanted.has(q.category));
+    hq = [...matched, ...rest];
+  }
+  hq = hq.slice(0, n).map((q, i) => ({ ...q, number: i + 1 }));
+  return NextResponse.json({ questions: hq, source: "heuristic" });
 }
