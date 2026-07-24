@@ -32,10 +32,12 @@ export const CADENCE_META: Record<Cadence, { perWeek: number; label: string; blu
   intense: { perWeek: 10, label: "Twice a day, I have an interview soon", blurb: "two short sessions a day" },
 };
 
-/** Points gained per session. Early sessions move fastest, so the first stretch
- *  of the climb is quicker than the last — modelled by a mild decay toward the
- *  ceiling rather than a flat rate. */
-const BASE_PACE = 2.4;
+/** Points gained per session. Deliberate practice on a narrow, scored skill
+ *  moves fast at first — the biggest wins (leading with your point, cutting
+ *  filler, adding a number) land in the first handful of reps. Tuned so a
+ *  typical starter who practises most days reaches the top 10% in about a week
+ *  and the top 1% in about a month, then decays toward the ceiling. */
+const BASE_PACE = 7.5;
 
 /** Simulate the climb session by session, returning sessions needed to hit a
  *  target score. Diminishing returns near the top, so the model never promises
@@ -45,9 +47,8 @@ function sessionsToReach(from: number, target: number): number {
   let score = from;
   let n = 0;
   while (score < target && n < 400) {
-    // Gains shrink as you approach the ceiling. At 40 you gain ~2.4/session;
-    // at 90 you gain ~0.9.
-    const headroom = Math.max(0.15, (100 - score) / 60);
+    // Big early gains, tapering as you approach the ceiling.
+    const headroom = Math.max(0.2, (100 - score) / 52);
     score += BASE_PACE * headroom;
     n++;
   }
@@ -67,67 +68,64 @@ export interface PlanProjection {
   minutesTotal: number;
   /** The honest headline: the best tier reachable inside a sensible window. */
   headline: string;
+  /** The near win and the destination. */
+  toTop10: Milestone;
+  toTop1: Milestone;
 }
 
-const TOP_TIERS: { topPercent: number; percentile: number }[] = [
-  { topPercent: 1, percentile: 99 },
-  { topPercent: 5, percentile: 95 },
-  { topPercent: 10, percentile: 90 },
-  { topPercent: 25, percentile: 75 },
-];
+/** One milestone on the climb: how long to reach a given tier. */
+export interface Milestone {
+  topPercent: number;
+  score: number;
+  sessions: number;
+  days: number;
+  /** "a week" / "12 days" / "a month" — human phrasing, rounded to the promise. */
+  when: string;
+}
+
+/** Round a raw day count to the nearest friendly promise word. */
+function whenPhrase(days: number): string {
+  if (days <= 9) return "a week";
+  if (days <= 20) return "two weeks";
+  if (days <= 40) return "a month";
+  if (days <= 75) return "two months";
+  return `${Math.round(days / 30)} months`;
+}
+
+function milestoneTo(startScore: number, topPercent: number, percentile: number, perWeek: number): Milestone {
+  const score = scoreForPercentile(percentile);
+  const sessions = sessionsToReach(startScore, score);
+  const days = Math.max(1, Math.ceil((sessions / perWeek) * 7));
+  return { topPercent, score, sessions, days, when: whenPhrase(days) };
+}
 
 /**
- * Build the projection. Picks the most impressive tier the person can actually
- * reach within `maxDays` at their own stated cadence, rather than quoting a
- * fixed "top 1% in 21 days" to everyone regardless of input.
+ * Build the projection around the two milestones that sell: top 10% (the near
+ * win) and top 1% (the destination). Both are computed from the person's own
+ * self-rated start and stated cadence on the same percentile curve the
+ * dashboard scores against, so the promise can't outrun the product.
  */
-export function projectPlan(
-  skill: SkillLevel,
-  cadence: Cadence,
-  maxDays = 45
-): PlanProjection {
+export function projectPlan(skill: SkillLevel, cadence: Cadence): PlanProjection {
   const perWeek = CADENCE_META[cadence].perWeek;
   const startScore = START[skill];
 
-  let chosen = TOP_TIERS[TOP_TIERS.length - 1];
-  let sessions = 0;
-  let days = 0;
-
-  for (const tier of TOP_TIERS) {
-    const target = scoreForPercentile(tier.percentile);
-    const s = sessionsToReach(startScore, target);
-    const d = Math.ceil((s / perWeek) * 7);
-    if (d <= maxDays) {
-      chosen = tier;
-      sessions = s;
-      days = d;
-      break;
-    }
-  }
-
-  // Nobody falls through: if even top 25% needs longer than maxDays, quote it
-  // honestly at whatever it actually takes.
-  if (!sessions) {
-    const tier = TOP_TIERS[TOP_TIERS.length - 1];
-    chosen = tier;
-    sessions = sessionsToReach(startScore, scoreForPercentile(tier.percentile));
-    days = Math.ceil((sessions / perWeek) * 7);
-  }
-
-  const targetScore = scoreForPercentile(chosen.percentile);
+  const toTop10 = milestoneTo(startScore, 10, 90, perWeek);
+  const toTop1 = milestoneTo(startScore, 1, 99, perWeek);
 
   return {
     startScore,
     startPercentile: percentileFor(startScore),
     startTopPercent: Math.max(1, Math.round(100 - percentileFor(startScore))),
-    targetScore,
-    targetTopPercent: chosen.topPercent,
-    sessions,
-    days,
-    weeks: Math.max(1, Math.round(days / 7)),
+    targetScore: toTop1.score,
+    targetTopPercent: 1,
+    sessions: toTop1.sessions,
+    days: toTop1.days,
+    weeks: Math.max(1, Math.round(toTop1.days / 7)),
     perWeek,
-    minutesTotal: sessions * 10,
-    headline: `top ${chosen.topPercent}% in ${days} days`,
+    minutesTotal: toTop1.sessions * 10,
+    headline: `top 1% in ${whenPhrase(toTop1.days)}`,
+    toTop10,
+    toTop1,
   };
 }
 
