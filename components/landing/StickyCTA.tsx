@@ -28,10 +28,10 @@ export function StickyCTA() {
             <p className="font-serif text-base font-semibold text-ink">Your next interview is coming.</p>
             <p className="text-xs text-ink-2">From $6.66/mo · cancel anytime.</p>
           </div>
-          <p className="text-sm font-medium text-ink sm:hidden">Get started</p>
+          <p className="text-sm font-medium text-ink sm:hidden">Start free</p>
           <div className="flex items-center gap-1">
             <ButtonLink href="/onboarding" size="sm" className="group whitespace-nowrap">
-              Get started <ArrowRight size={15} className="transition-transform group-hover:translate-x-0.5" />
+              Start free <ArrowRight size={15} className="transition-transform group-hover:translate-x-0.5" />
             </ButtonLink>
             <button
               onClick={() => setDismissed(true)}

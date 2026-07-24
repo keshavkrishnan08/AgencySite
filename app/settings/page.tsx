@@ -5,6 +5,7 @@ import { useRouter } from "next/navigation";
 import { Check, CreditCard, Trash2, User } from "lucide-react";
 import { AppShell } from "@/components/layout/AppShell";
 import { Button, ButtonLink } from "@/components/ui/Button";
+import { ExitSurvey } from "@/components/feedback/ExitSurvey";
 import {
   DEFAULT_PROFILE,
   getProfile,
@@ -27,6 +28,7 @@ export default function SettingsPage() {
   const [profile, setLocalProfile] = useState<UserProfile>(DEFAULT_PROFILE);
   const [saved, setSaved] = useState(false);
   const [mounted, setMounted] = useState(false);
+  const [exitOpen, setExitOpen] = useState(false);
 
   useEffect(() => {
     setMounted(true);
@@ -147,7 +149,7 @@ export default function SettingsPage() {
                 </p>
               </div>
               {premium ? (
-                <Button variant="secondary" onClick={() => setProfile({ plan: "free" })}>
+                <Button variant="secondary" onClick={() => setExitOpen(true)}>
                   Manage billing
                 </Button>
               ) : (
@@ -176,6 +178,18 @@ export default function SettingsPage() {
           </section>
         </div>
       </main>
+
+      {/* Cancelling routes through the outcome survey. "I got the job" is the
+          first option, and it's the statistic nothing else here can observe. */}
+      {exitOpen && (
+        <ExitSurvey
+          onClose={() => setExitOpen(false)}
+          onConfirm={() => {
+            setProfile({ plan: "free" });
+            setExitOpen(false);
+          }}
+        />
+      )}
     </AppShell>
   );
 }

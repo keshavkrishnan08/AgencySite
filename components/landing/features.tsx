@@ -243,7 +243,7 @@ const FEATURES: Feat[] = [
   },
 ];
 
-function FeatureRow({ f, i }: { f: Feat; i: number }) {
+function FeatureRow({ f, i, presale }: { f: Feat; i: number; presale?: boolean }) {
   const reverse = i % 2 === 1;
   return (
     <Reveal>
@@ -264,7 +264,7 @@ function FeatureRow({ f, i }: { f: Feat; i: number }) {
               </li>
             ))}
           </ul>
-          {f.href && (
+          {f.href && !presale && (
             <ButtonLink href={f.href} variant="secondary" size="sm" className="group mt-7">
               Try it <ArrowRight size={15} className="transition-transform group-hover:translate-x-0.5" />
             </ButtonLink>
@@ -276,7 +276,9 @@ function FeatureRow({ f, i }: { f: Feat; i: number }) {
   );
 }
 
-export function ProductFeatures() {
+/** `presale` drops the per-feature "Try it" links. The ad landing page has no
+    way into the app, so those would be dead ends out of a paid funnel. */
+export function ProductFeatures({ presale = false }: { presale?: boolean }) {
   return (
     <section id="features" className="scroll-mt-20 py-10">
       <div className="container-wide text-center">
@@ -291,7 +293,7 @@ export function ProductFeatures() {
       </div>
       <div className="mt-4 divide-y" style={{ borderColor: "var(--border)" }}>
         {FEATURES.map((f, i) => (
-          <FeatureRow key={f.title} f={f} i={i} />
+          <FeatureRow key={f.title} f={f} i={i} presale={presale} />
         ))}
       </div>
     </section>
