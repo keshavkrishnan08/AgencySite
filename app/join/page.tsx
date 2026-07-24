@@ -1,6 +1,6 @@
 import { ArrowRight, Check, CreditCard, RefreshCw, ShieldCheck, Sparkles } from "lucide-react";
-import { SiteNav } from "@/components/layout/SiteNav";
-import { SiteFooter } from "@/components/layout/SiteFooter";
+import { PresaleNav } from "@/components/landing/PresaleNav";
+import { PresaleFooter } from "@/components/landing/PresaleFooter";
 import { HeroDemo } from "@/components/landing/HeroDemo";
 import { ProductDemo } from "@/components/landing/ProductDemo";
 import { Avatar } from "@/components/ui/Avatar";
@@ -8,13 +8,29 @@ import { ProductFeatures } from "@/components/landing/features";
 import { FlowDiagram } from "@/components/landing/FlowDiagram";
 import { TestimonialCarousel } from "@/components/landing/testimonials";
 import { FAQAccordion } from "@/components/landing/FAQAccordion";
-import { StickyCTA } from "@/components/landing/StickyCTA";
+import { PresaleSticky } from "@/components/landing/PresaleSticky";
+import { PresaleForm } from "@/components/landing/PresaleForm";
 import { Reveal } from "@/components/ui/Reveal";
 import { ScoreRing } from "@/components/ui/Score";
 import { ProgressLineChart, MiniBars } from "@/components/charts/Charts";
 import { AvatarRow } from "@/components/ui/AvatarRow";
 import { ButtonLink } from "@/components/ui/Button";
 import { PLANS } from "@/lib/pricing";
+
+import type { Metadata } from "next";
+
+/* Paid-traffic landing page. A 1:1 copy of the marketing site, with every
+   outbound CTA replaced by the presale email form — no sign-in, no onboarding,
+   no way to reach the app. While payments are off, the email IS the conversion.
+
+   noindex so it never competes with / in search or splits the ad campaign's
+   attribution across two ranking pages. */
+export const metadata: Metadata = {
+  title: "Practice your interview in private — early access",
+  description:
+    "Haven't interviewed in years? An AI coach that scores you, shows you exactly where you stand, and tells you when you're ready. Join the early list.",
+  robots: { index: false, follow: false },
+};
 
 /* ------------------------------------------------------------------ */
 
@@ -66,12 +82,8 @@ function Hero() {
             </p>
           </Reveal>
           <Reveal delay={0.18}>
-            <div className="mt-9 flex flex-col items-start gap-3 sm:flex-row sm:items-center">
-              <ButtonLink href="/onboarding" size="lg" className="group">
-                Start free
-                <ArrowRight size={18} className="transition-transform group-hover:translate-x-0.5" />
-              </ButtonLink>
-              <span className="text-sm text-ink-3">From $6.66/mo. Cancel anytime.</span>
+            <div className="mt-9 max-w-md">
+              <PresaleForm source="hero" />
             </div>
           </Reveal>
           <Reveal delay={0.26}>
@@ -199,11 +211,8 @@ function FiveQuestions() {
         </div>
 
         <Reveal delay={0.1}>
-          <div className="mt-12 text-center">
-            <ButtonLink href="/onboarding" size="lg">
-              Start free
-              <ArrowRight size={18} />
-            </ButtonLink>
+          <div className="mx-auto mt-12 max-w-md">
+            <PresaleForm source="five_questions" cta="Practice all five" />
           </div>
         </Reveal>
       </div>
@@ -495,9 +504,9 @@ function Pricing() {
                 {q.price} once · save {q.saveAmount} · cancel anytime
               </p>
               <p className="mt-2 text-xs font-medium text-ink-3">🔥 What most people pick</p>
-              <ButtonLink href="/onboarding" className="mt-auto w-full !mt-5">
-                Start free
-              </ButtonLink>
+              <div className="mt-auto !mt-5">
+                <PresaleForm source="pricing_quarterly" compact cta="Lock this in" />
+              </div>
             </div>
           </Reveal>
 
@@ -512,9 +521,9 @@ function Pricing() {
                 </span>
               </div>
               <p className="mt-1 text-sm text-ink-3">Billed monthly · cancel anytime</p>
-              <ButtonLink href="/onboarding" variant="secondary" className="mt-auto w-full !mt-5">
-                Start free
-              </ButtonLink>
+              <div className="mt-auto !mt-5">
+                <PresaleForm source="pricing_monthly" compact cta="Lock this in" />
+              </div>
             </div>
           </Reveal>
         </div>
@@ -563,14 +572,11 @@ function FinalCTA() {
           </p>
         </Reveal>
         <Reveal delay={0.16}>
-          <div className="mt-10 flex flex-col items-center gap-3">
-            <ButtonLink href="/onboarding" size="lg" className="group">
-              Start free
-              <ArrowRight size={18} className="transition-transform group-hover:translate-x-0.5" />
-            </ButtonLink>
-            <span className="text-sm text-ink-3">
-              From $6.66/mo. Cancel anytime. You&apos;ve already spent more time thinking about it than it takes to try.
-            </span>
+          <div className="mx-auto mt-10 max-w-md">
+            <PresaleForm source="final_cta" />
+            <p className="mt-3 text-sm text-ink-3">
+              You&apos;ve already spent more time thinking about it than it takes to join the list.
+            </p>
           </div>
         </Reveal>
       </div>
@@ -639,17 +645,17 @@ function FAQ() {
 }
 
 /* ============================== PAGE ============================== */
-export default function LandingPage() {
+export default function AdLandingPage() {
   return (
     <>
-      <SiteNav />
+      <PresaleNav />
       <main>
         <Hero />
         <TestimonialCarousel />
         <DemoSection />
         <Stories />
         <HowItWorks />
-        <ProductFeatures />
+        <ProductFeatures presale />
         <FiveQuestions />
         <Numbers />
         <Comparison />
@@ -657,8 +663,8 @@ export default function LandingPage() {
         <FAQ />
         <FinalCTA />
       </main>
-      <SiteFooter />
-      <StickyCTA />
+      <PresaleFooter />
+      <PresaleSticky />
     </>
   );
 }

@@ -10,6 +10,7 @@ import { PremiumBadge } from "@/components/ui/PremiumBadge";
 import { getProfile, upgradeToPremium } from "@/lib/store";
 import { track } from "@/lib/analytics";
 import { PLANS, type PlanKey } from "@/lib/pricing";
+import { QuickReview } from "@/components/feedback/QuickReview";
 
 const INCLUDED = [
   "Unlimited scored mock interviews",
@@ -194,6 +195,14 @@ export default function UpgradePage() {
                   <p className="mt-3 flex items-center justify-center gap-1.5 text-xs text-ink-3">
                     <ShieldCheck size={13} /> Secure checkout · powered by Stripe · cancel anytime
                   </p>
+
+                  {/* Asked before payment, while intent is highest. Skippable,
+                      and it never gates the subscribe button. */}
+                  <QuickReview
+                    className="mt-5"
+                    stage="pre_payment"
+                    prompt="How's your first scored answer been?"
+                  />
                 </>
               )}
             </div>
