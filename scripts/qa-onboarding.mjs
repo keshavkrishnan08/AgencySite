@@ -7,7 +7,7 @@ const BASE = "http://localhost:3000";
 const browser = await chromium.launch();
 const page = await browser.newPage();
 const errors = [];
-page.on("console", (m) => { if (m.type() === "error" && !/_next|hot-update|posthog|supabase|stripe|favicon/.test(m.text())) errors.push("console: " + m.text().slice(0, 160)); });
+page.on("console", (m) => { if (m.type() === "error" && !/_next|hot-update|mixpanel|supabase|stripe|favicon/.test(m.text())) errors.push("console: " + m.text().slice(0, 160)); });
 page.on("pageerror", (e) => errors.push("EXCEPTION: " + String(e).slice(0, 160)));
 
 await page.goto(BASE + "/onboarding", { waitUntil: "networkidle" });

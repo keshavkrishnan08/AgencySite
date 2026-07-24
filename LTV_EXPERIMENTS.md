@@ -5,7 +5,7 @@ The two levers that move LTV are **plan mix** (more annual = churn-immune + prep
 ## The loop
 1. **North Star:** paid → *activated* (finished a first session) → *retained at month 1*. Activation is the leading indicator of churn.
 2. Ship **one experiment per week** against it.
-3. Instrument it in PostHog, read after ~2 weeks of data, **keep what moves the metric**, kill what doesn't.
+3. Instrument it in Mixpanel, read after ~2 weeks of data, **keep what moves the metric**, kill what doesn't.
 4. Log the result below. Update `scripts/ltv-ladder.mjs` assumptions as real numbers land.
 
 ## Backlog (ranked by impact ÷ effort)

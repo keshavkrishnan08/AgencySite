@@ -45,7 +45,7 @@ Not blockers, but you want these.
 The funnel is instrumented; it no-ops until you set the keys.
 
 - [ ] **Meta Pixel** — set `NEXT_PUBLIC_META_PIXEL_ID`. The Pixel is wired (`components/MetaPixel.tsx`) and fires standard events so the ad campaign can optimize and attribute: `PageView` (all pages), **Lead** (onboarding complete), **ViewContent** (paywall view), **InitiateCheckout** (clicked subscribe), **Subscribe** (paid, with $9.99 value). Verify with the Meta Pixel Helper extension.
-- [ ] **PostHog** — set `NEXT_PUBLIC_POSTHOG_KEY` (and `NEXT_PUBLIC_POSTHOG_HOST`). Captures the full funnel (`landing_cta_click`, `onboarding_complete`, `paywall_hit`, `upgrade_click`, `upgrade_success`, etc.) for product analytics. Verify in PostHog Live Events.
+- [ ] **Mixpanel** — set `NEXT_PUBLIC_MIXPANEL_TOKEN` (and `NEXT_PUBLIC_MIXPANEL_REPLAY_PCT`). Captures the full funnel (`landing_cta_click`, `onboarding_complete`, `paywall_hit`, `upgrade_click`, `upgrade_success`, etc.), plus autocaptured clicks and sampled session replay. Verify in Mixpanel Live View.
 - [ ] **Meta Conversions API (recommended).** Client Pixel events get blocked by ad-blockers/iOS. Fire **Subscribe** server-side from the Stripe webhook (you already get the event there) for accurate, durable attribution. This noticeably improves Meta's optimization on small budgets.
 - [ ] **Add UTM tracking** on ad links (`?utm_source=meta&utm_campaign=…&utm_content={{creative}}`) so you can attribute paid subs back to the winning creative.
 
@@ -111,8 +111,9 @@ ANTHROPIC_API_KEY=sk-ant-...                          # server only
 
 # Analytics (client-safe; wired, no-op until set)
 NEXT_PUBLIC_META_PIXEL_ID=...                         # Meta Pixel for ad optimization
-NEXT_PUBLIC_POSTHOG_KEY=...                           # product funnel analytics
-NEXT_PUBLIC_POSTHOG_HOST=https://us.i.posthog.com     # optional override
+NEXT_PUBLIC_MIXPANEL_TOKEN=...                        # product funnel analytics
+NEXT_PUBLIC_MIXPANEL_REPLAY_PCT=10                    # session replay sample %
+NEXT_PUBLIC_META_PIXEL_ID=...                         # ad attribution
 
 # Optional
 NEXT_PUBLIC_APP_URL=https://yourdomain.com
@@ -120,7 +121,7 @@ RESEND_API_KEY=...
 EMAIL_FROM=Axon Careers <hello@yourdomain.com>
 ```
 
-**Security rule:** only values prefixed `NEXT_PUBLIC_` reach the browser, and those are all meant to be public (Supabase anon, Stripe publishable, PostHog). Every secret (service role, Stripe secret, Anthropic, Resend, webhook secret) has no `NEXT_PUBLIC_` prefix and stays on the server.
+**Security rule:** only values prefixed `NEXT_PUBLIC_` reach the browser, and those are all meant to be public (Supabase publishable, Stripe publishable, Mixpanel token, Meta pixel). Every secret (service role, Stripe secret, Anthropic, Resend, webhook secret) has no `NEXT_PUBLIC_` prefix and stays on the server.
 
 ---
 
