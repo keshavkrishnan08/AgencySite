@@ -42,9 +42,11 @@ type Namespace =
   | "section"     // section:view
   | "onboarding"  // onboarding:step_view, onboarding:answer
   | "practice"    // practice:answer_start, practice:voice_start
+  | "session"     // session:results_view, session:share
   | "paywall"     // paywall:view, paywall:cta_click
   | "presale"     // presale:email_focus
   | "form"        // form:field_focus, form:error
+  | "account"     // account:signin, account:signup_error
   | "metrics"     // metrics:view
   | "tool";       // tool:run, tool:handoff
 
@@ -57,6 +59,7 @@ export type FunnelEvent =
   | "onboarding_complete"
   | "session_started"
   | "session_complete"
+  | "account_created"
   | "tool_opened"
   | "paywall_hit"
   | "voice_used"
@@ -78,7 +81,8 @@ const META_EVENT: Partial<Record<FunnelEvent, string>> = {
   // optimises for. Swap the objective to Subscribe once payments are live.
   lead_captured: "Lead",
   presale_intent: "InitiateCheckout",
-  onboarding_complete: "CompleteRegistration",
+  onboarding_complete: "Lead",
+  account_created: "CompleteRegistration",
   upgrade_view: "ViewContent",
   upgrade_click: "InitiateCheckout",
   upgrade_success: "Subscribe",
