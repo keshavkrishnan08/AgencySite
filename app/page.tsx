@@ -15,7 +15,7 @@ import { ProgressLineChart, MiniBars } from "@/components/charts/Charts";
 import { AvatarRow } from "@/components/ui/AvatarRow";
 import { ButtonLink } from "@/components/ui/Button";
 import { StartFreeButton } from "@/components/ui/StartFreeButton";
-import { PLANS, priceParts } from "@/lib/pricing";
+import { PLANS, priceParts, FROM_PER_DAY } from "@/lib/pricing";
 import { perDayLabel } from "@/lib/roi";
 
 /* ------------------------------------------------------------------ */
@@ -60,12 +60,32 @@ const PHOTO_PEERS =
   "https://images.unsplash.com/photo-1600880292203-757bb62b4baf?auto=format&fit=crop&w=1400&q=75";
 const PHOTO_PREP =
   "https://images.unsplash.com/photo-1522202176988-66273c2fd55f?auto=format&fit=crop&w=1400&q=75";
+const PHOTO_HERO =
+  "https://images.unsplash.com/photo-1590650153855-d9e808231d41?auto=format&fit=crop&w=1900&q=80";
 
 
 /* ============================== HERO ============================== */
 function Hero() {
   return (
     <section className="relative overflow-hidden pb-20 pt-14 sm:pt-20">
+      {/* Full-bleed hero photograph: a mid-career professional, ready. The scrim
+          keeps it firmly in the ivory palette and holds text contrast — the
+          image reads through on the right, the copy stays legible on the left. */}
+      <div className="pointer-events-none absolute inset-0 -z-10" aria-hidden>
+        {/* eslint-disable-next-line @next/next/no-img-element */}
+        <img src={PHOTO_HERO} alt="" className="h-full w-full object-cover object-[70%_center]" />
+        <div
+          className="absolute inset-0"
+          style={{
+            background:
+              "linear-gradient(90deg, var(--bg) 0%, var(--bg) 34%, rgba(247,243,233,0.86) 52%, rgba(247,243,233,0.45) 74%, rgba(247,243,233,0.28) 100%)",
+          }}
+        />
+        <div
+          className="absolute inset-x-0 bottom-0 h-40"
+          style={{ background: "linear-gradient(0deg, var(--bg), transparent)" }}
+        />
+      </div>
       <div className="container-wide grid items-center gap-14 lg:grid-cols-[1.05fr_0.95fr]">
         <div>
           <Reveal>
@@ -108,7 +128,7 @@ function Hero() {
           <Reveal delay={0.18}>
             <div className="mt-9 flex flex-col items-start gap-3 sm:flex-row sm:items-center">
 <StartFreeButton size="lg" source="hero" />
-              <span className="text-sm text-ink-3">From $16.66/mo. Cancel anytime.</span>
+              <span className="text-sm text-ink-3">From {FROM_PER_DAY}. Cancel anytime.</span>
             </div>
           </Reveal>
           <Reveal delay={0.26}>
@@ -394,7 +414,7 @@ function Stories() {
 
 /* ===================== COMPARISON ===================== */
 const ROWS: [string, string, string][] = [
-  ["Cost", "$150-300 / hour", "$16.66 / month"],
+  ["Cost", "$150-300 / hour", "56¢ a day"],
   ["Availability", "Business hours only", "Anytime"],
   ["Privacy", "Face to face", "Completely private"],
   ["Feedback", "Varies by coach", "Scored on 5 dimensions"],
@@ -622,7 +642,7 @@ function FinalCTA() {
           <div className="mt-10 flex flex-col items-center gap-3">
 <StartFreeButton size="lg" source="final_cta" />
             <span className="text-sm text-ink-3">
-              From $16.66/mo. Cancel anytime. You&apos;ve already spent more time thinking about it than it takes to try.
+              From {FROM_PER_DAY}. Cancel anytime. You&apos;ve already spent more time thinking about it than it takes to try.
             </span>
           </div>
         </Reveal>

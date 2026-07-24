@@ -1,5 +1,7 @@
 "use client";
 
+import { FROM_PER_DAY } from "@/lib/pricing";
+
 import { useEffect, useState } from "react";
 import Link from "next/link";
 import { ArrowRight } from "lucide-react";
@@ -30,7 +32,7 @@ export function StartSticky() {
         Start free <ArrowRight size={18} />
       </Link>
       <p className="mt-1.5 text-center text-2xs font-medium text-ink-3">
-        From $16.66/mo. Cancel anytime.
+        From {FROM_PER_DAY}. Cancel anytime.
       </p>
     </div>
   );
