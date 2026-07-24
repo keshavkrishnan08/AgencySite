@@ -408,7 +408,7 @@ function Stories() {
 
 /* ===================== COMPARISON ===================== */
 const ROWS: [string, string, string][] = [
-  ["Cost", "$150-300 / hour", "$16.66 / month"],
+  ["Cost", "$150-300 / hour", "56¢ a day"],
   ["Availability", "Business hours only", "Anytime"],
   ["Privacy", "Face to face", "Completely private"],
   ["Feedback", "Varies by coach", "Scored on 5 dimensions"],
