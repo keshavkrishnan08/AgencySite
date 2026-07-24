@@ -1,8 +1,11 @@
 import type { Metadata, Viewport } from "next";
 import { Fraunces, Hanken_Grotesk, JetBrains_Mono } from "next/font/google";
 import "./globals.css";
+import { Analytics } from "@vercel/analytics/next";
+import { SpeedInsights } from "@vercel/speed-insights/next";
 import { AuthProvider } from "@/lib/auth";
 import { MetaPixel } from "@/components/MetaPixel";
+import { Telemetry } from "@/components/Telemetry";
 
 const fraunces = Fraunces({
   subsets: ["latin"],
@@ -75,7 +78,13 @@ export default function RootLayout({
     >
       <body>
         <MetaPixel />
+        <Telemetry />
         <AuthProvider>{children}</AuthProvider>
+        {/* Vercel Web Analytics + Core Web Vitals. Both no-op locally and cost
+            nothing to keep mounted; on the ad landing page they're the
+            first-party pageview/traffic source of truth. */}
+        <Analytics />
+        <SpeedInsights />
       </body>
     </html>
   );

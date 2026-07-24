@@ -1,10 +1,12 @@
 "use client";
 
 import { useEffect, useState } from "react";
-import { ArrowRight, X } from "lucide-react";
-import { ButtonLink } from "@/components/ui/Button";
+import { X } from "lucide-react";
+import { PresaleForm } from "./PresaleForm";
 
-export function StickyCTA() {
+/* The StickyCTA from the marketing site, with the email form in place of the
+   link out. Appears once they've read enough to care. */
+export function PresaleSticky() {
   const [show, setShow] = useState(false);
   const [dismissed, setDismissed] = useState(false);
 
@@ -23,19 +25,19 @@ export function StickyCTA() {
       }`}
     >
       <div className="container-wide pb-4">
-        <div className="glass mx-auto flex max-w-3xl items-center justify-between gap-4 rounded-2xl border px-5 py-3.5 shadow-xl" style={{ borderColor: "var(--border)" }}>
-          <div className="hidden sm:block">
+        <div
+          className="glass mx-auto flex max-w-3xl items-center justify-between gap-4 rounded-2xl border px-5 py-3.5 shadow-xl"
+          style={{ borderColor: "var(--border)" }}
+        >
+          <div className="hidden shrink-0 sm:block">
             <p className="font-serif text-base font-semibold text-ink">Your next interview is coming.</p>
-            <p className="text-xs text-ink-2">From $6.66/mo · cancel anytime.</p>
+            <p className="text-xs text-ink-2">Founding-member pricing for the first list.</p>
           </div>
-          <p className="text-sm font-medium text-ink sm:hidden">Start free</p>
-          <div className="flex items-center gap-1">
-            <ButtonLink href="/onboarding" size="sm" className="group whitespace-nowrap">
-              Start free <ArrowRight size={15} className="transition-transform group-hover:translate-x-0.5" />
-            </ButtonLink>
+          <div className="flex flex-1 items-center gap-1">
+            <PresaleForm source="sticky" cta="Get access" className="flex-1" />
             <button
               onClick={() => setDismissed(true)}
-              className="rounded-full p-2 text-ink-3 transition-colors hover:bg-bg-tint hover:text-ink"
+              className="shrink-0 self-start rounded-full p-2 text-ink-3 transition-colors hover:bg-bg-tint hover:text-ink"
               aria-label="Dismiss"
             >
               <X size={16} />

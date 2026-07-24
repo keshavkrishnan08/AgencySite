@@ -148,7 +148,7 @@ export default function StartPage() {
           <Reveal delay={0.15}>
             <div className="mt-8 flex flex-col items-start gap-3">
               <ButtonLink href={CTA} size="lg" className="w-full sm:w-auto">
-                Get started <ArrowRight size={18} />
+                Start free <ArrowRight size={18} />
               </ButtonLink>
               <p className="text-sm font-medium text-ink-3">
                 From $6.66/mo. Cancel anytime.
@@ -343,7 +343,7 @@ export default function StartPage() {
                 className="glass inline-flex items-center gap-2 rounded-full px-9 py-4 text-base font-semibold shadow-xl"
                 style={{ color: "var(--primary-ink)" }}
               >
-                Get started <ArrowRight size={18} />
+                Start free <ArrowRight size={18} />
               </Link>
               <p className="text-sm text-white/70">From $6.66/mo. Cancel anytime.</p>
             </div>
