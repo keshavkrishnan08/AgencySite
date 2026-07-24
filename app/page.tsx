@@ -14,6 +14,7 @@ import { ScoreRing } from "@/components/ui/Score";
 import { ProgressLineChart, MiniBars } from "@/components/charts/Charts";
 import { AvatarRow } from "@/components/ui/AvatarRow";
 import { ButtonLink } from "@/components/ui/Button";
+import { PLANS } from "@/lib/pricing";
 
 /* ------------------------------------------------------------------ */
 
@@ -70,7 +71,7 @@ function Hero() {
                 Get started
                 <ArrowRight size={18} className="transition-transform group-hover:translate-x-0.5" />
               </ButtonLink>
-              <span className="text-sm text-ink-3">$9.99/mo. Cancel anytime.</span>
+              <span className="text-sm text-ink-3">From $6.66/mo. Cancel anytime.</span>
             </div>
           </Reveal>
           <Reveal delay={0.26}>
@@ -125,7 +126,7 @@ const QUESTIONS = [
   {
     q: "Tell me about yourself.",
     pain: "You have 90 seconds to summarize your entire career and it never comes out right. You ramble, forget the important parts, and somehow end up six years in the past wondering why.",
-    fix: "Our Story Builder walks you through a 60-second answer that sounds natural, hits the key points, and ends strong. You practice it until it flows like you've said it your whole life.",
+    fix: "It's the first question of every session, so you rehearse it more than any other. You get scored on structure and length until a 60-second version comes out clean, then you watch that score climb week over week.",
   },
   {
     q: "Explain this gap on your résumé.",
@@ -370,13 +371,13 @@ function Stories() {
 
 /* ===================== COMPARISON ===================== */
 const ROWS: [string, string, string][] = [
-  ["Cost", "$150-300 / hour", "$9.99 / month"],
+  ["Cost", "$150-300 / hour", "$6.66 / month"],
   ["Availability", "Business hours only", "Anytime"],
   ["Privacy", "Face to face", "Completely private"],
   ["Feedback", "Varies by coach", "Scored on 5 dimensions"],
-  ["Progress tracking", "They might remember last time", "Dashboard with charts and trends"],
+  ["Progress tracking", "They might remember last time", "Percentile, pace and projections"],
   ["Practice sessions", "1 / week at $200", "Unlimited"],
-  ["Salary negotiation", "Extra session, extra $200", "Included"],
+  ["Knowing when you're ready", "A gut feeling", "A number, and a date"],
 ];
 
 function Comparison() {
@@ -419,9 +420,9 @@ function Comparison() {
               className="grid grid-cols-[1.2fr_1fr_1fr] items-center border-t text-sm"
               style={{ borderColor: "var(--border)", background: "var(--primary-soft)" }}
             >
-              <div className="p-5 font-bold text-ink">Total for one month</div>
-              <div className="p-5 text-center font-semibold text-ink-2">$600-1,200</div>
-              <div className="p-5 text-center font-serif text-xl font-bold text-primary-ink">$9.99</div>
+              <div className="p-5 font-bold text-ink">Total for a 3-month search</div>
+              <div className="p-5 text-center font-semibold text-ink-2">$1,800-3,600</div>
+              <div className="p-5 text-center font-serif text-xl font-bold text-primary-ink">$19.99</div>
             </div>
           </div>
         </Reveal>
@@ -438,21 +439,23 @@ function Comparison() {
 
 /* ===================== PRICING ===================== */
 const PREMIUM_FEATURES = [
-  "Unlimited practice sessions",
-  "Full 5-dimension scoring with detailed feedback",
-  "Progress dashboard with all charts and analytics",
-  "Gap Story Builder with unlimited revisions",
-  "Company Research Briefing for any company",
+  "Unlimited scored mock interviews",
+  "All five dimensions, scored on every answer",
+  "A real follow-up question after each answer",
+  "The Anxiety Detector on every session",
+  "Your full metrics: percentile, pace, projections",
+  "Estimated time to a top 1% interview",
+  "Streaks, milestones and personal records",
   "Question Predictor for any job posting",
-  "Anxiety Detector with filler & hedging tracking",
-  "Interview Day timed pressure simulation",
-  "Salary Negotiation practice mode",
-  "Post-Interview Debrief and scoring",
+  "Practice the predicted questions, scored",
+  "Gap Story Builder with unlimited revisions",
   "Example 'great answers' for every question",
-  "Weekly progress reports by email",
+  "Speak your answers, with delivery metrics",
 ];
 
 function Pricing() {
+  const q = PLANS.quarterly;
+  const mo = PLANS.monthly;
   return (
     <section id="pricing" className="scroll-mt-20 border-y py-24 sm:py-32" style={{ background: "var(--bg-sunk)", borderColor: "var(--border)" }}>
       <div className="container-wide">
@@ -464,27 +467,35 @@ function Pricing() {
             Pick your plan.
           </h2>
         </Reveal>
+        <Reveal delay={0.08}>
+          <p className="mx-auto mt-5 max-w-prose text-center text-lg text-ink-2">
+            The average job search takes about three months. So we sell three months, not a year you
+            hope you won&apos;t need.
+          </p>
+        </Reveal>
 
         <div className="mx-auto mt-16 grid max-w-3xl gap-6 sm:grid-cols-2">
-          {/* Yearly — highlighted, led with (best value) */}
+          {/* 3 months — the plan that matches the job */}
           <Reveal delay={0.08}>
             <div className="relative flex h-full flex-col rounded-2xl border-2 p-8 shadow-xl" style={{ borderColor: "var(--primary)", background: "var(--surface)" }}>
               <span className="absolute -top-3 left-8 rounded-full px-3 py-1 text-2xs font-bold uppercase tracking-wider text-white" style={{ background: "linear-gradient(135deg, var(--gold), var(--gold-ink))" }}>
-                Best value · save 34%
+                Best value · save {q.savePct}%
               </span>
-              <h3 className="font-serif text-xl font-semibold" style={{ color: "var(--primary-ink)" }}>Yearly</h3>
-              <span className="mt-3 inline-flex w-fit items-center gap-1.5 rounded-full bg-coral-soft px-3 py-1 text-2xs font-bold uppercase tracking-wider text-coral-ink">
-                23% off · through next week
-              </span>
+              <h3 className="font-serif text-xl font-semibold" style={{ color: "var(--primary-ink)" }}>
+                3 months
+              </h3>
+              <p className="mt-2 text-sm text-ink-2">{q.pitch}</p>
               <div className="mt-3 flex items-baseline gap-2.5">
-                <span className="font-serif text-xl font-semibold text-ink-3 line-through">$103</span>
+                <span className="font-serif text-xl font-semibold text-ink-3 line-through">{q.was}</span>
                 <span className="font-serif text-5xl font-semibold text-ink">
-                  $6.58<span className="font-sans text-base font-medium text-ink-3"> / mo</span>
+                  $6.66<span className="font-sans text-base font-medium text-ink-3"> / mo</span>
                 </span>
               </div>
-              <p className="mt-1 text-sm text-sage-ink">Billed yearly at $79 · cancel anytime</p>
-              <p className="mt-2 text-xs font-medium text-ink-3">🔥 Most people choose yearly</p>
-              <ButtonLink href="/onboarding" className="mt-5 w-full">
+              <p className="mt-1 text-sm text-sage-ink">
+                {q.price} once · save {q.saveAmount} · cancel anytime
+              </p>
+              <p className="mt-2 text-xs font-medium text-ink-3">🔥 What most people pick</p>
+              <ButtonLink href="/onboarding" className="mt-auto w-full !mt-5">
                 Get started
               </ButtonLink>
             </div>
@@ -494,17 +505,14 @@ function Pricing() {
           <Reveal delay={0.14}>
             <div className="relative flex h-full flex-col rounded-2xl border-2 p-8 shadow-lg" style={{ borderColor: "var(--border)", background: "var(--surface)" }}>
               <h3 className="font-serif text-xl font-semibold text-ink">Monthly</h3>
-              <span className="mt-3 inline-flex w-fit items-center gap-1.5 rounded-full bg-coral-soft px-3 py-1 text-2xs font-bold uppercase tracking-wider text-coral-ink">
-                23% off · through next week
-              </span>
+              <p className="mt-2 text-sm text-ink-2">{mo.pitch}</p>
               <div className="mt-3 flex items-baseline gap-2.5">
-                <span className="font-serif text-xl font-semibold text-ink-3 line-through">$12.99</span>
                 <span className="font-serif text-5xl font-semibold text-ink">
                   $9.99<span className="font-sans text-base font-medium text-ink-3"> / mo</span>
                 </span>
               </div>
               <p className="mt-1 text-sm text-ink-3">Billed monthly · cancel anytime</p>
-              <ButtonLink href="/onboarding" variant="secondary" className="mt-7 w-full">
+              <ButtonLink href="/onboarding" variant="secondary" className="mt-auto w-full !mt-5">
                 Get started
               </ButtonLink>
             </div>
@@ -561,7 +569,7 @@ function FinalCTA() {
               <ArrowRight size={18} className="transition-transform group-hover:translate-x-0.5" />
             </ButtonLink>
             <span className="text-sm text-ink-3">
-              $9.99/mo. Cancel anytime. You&apos;ve already spent more time thinking about it than it takes to try.
+              From $6.66/mo. Cancel anytime. You&apos;ve already spent more time thinking about it than it takes to try.
             </span>
           </div>
         </Reveal>
@@ -590,7 +598,7 @@ const FAQS: [string, string][] = [
   ],
   [
     "Does practicing here actually help in the real room?",
-    "It builds the muscle that holds up under pressure: leading with your point, backing it with specifics, and cutting the filler and 'I just' that leak confidence. You can speak your answers out loud, and Interview Day mode rehearses you under a real clock with no do-overs.",
+    "It builds the muscle that holds up under pressure: leading with your point, backing it with specifics, and cutting the filler and 'I just' that leak confidence. You can speak your answers out loud, and the interviewer follows up on what you actually said, the way a real one does.",
   ],
   [
     "I haven't interviewed in years. Will this work for me?",
@@ -598,7 +606,11 @@ const FAQS: [string, string][] = [
   ],
   [
     "How does billing work?",
-    "Answer a few quick questions, create an account, and subscribe for $9.99/month or $79/year. You're charged right away, everything unlocks immediately, and you can cancel anytime in two clicks.",
+    "Answer a few quick questions, create an account, and pick a plan: $9.99 a month, or $19.99 for three months, which works out to $6.66 a month. We picked three months because that's roughly how long a job search runs. You're charged right away, everything unlocks immediately, and you can cancel anytime in two clicks.",
+  ],
+  [
+    "What do the metrics actually tell me?",
+    "Where you stand and how fast you're moving. Your readiness score, the percentile it puts you in, your points-per-session pace, and a projected date for reaching a top 1% interview based on that pace. Plus streaks, per-skill trends, and the Anxiety Detector tracking your filler words down over time. It's the part people come back for.",
   ],
   [
     "Is my practice private, and can I cancel easily?",

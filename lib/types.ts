@@ -1,7 +1,8 @@
 export type Situation = "returning" | "laid_off" | "promotion" | "career_change";
 export type InterviewGap = "<1yr" | "1-3yr" | "3-5yr" | "5+yr";
 export type Plan = "free" | "premium";
-export type SessionMode = "practice" | "interview_day" | "focus";
+export type BillingInterval = "monthly" | "quarterly";
+export type SessionMode = "practice" | "focus" | "predicted";
 
 export type Dimension =
   | "clarity"
@@ -104,18 +105,6 @@ export interface SavedGapAnswer {
   savedAt: string;
 }
 
-export interface CompanyBriefing {
-  id: string;
-  company: string;
-  role: string;
-  whatTheyDo: string;
-  recentNews: string[];
-  culture: string[];
-  roleFocus: string[];
-  questionsToAsk: string[];
-  savedAt: string;
-}
-
 export interface PredictedQuestion {
   question: string;
   why: string;
@@ -123,34 +112,11 @@ export interface PredictedQuestion {
   probability: number;
 }
 
-export interface PlanTask {
-  id: string;
-  label: string;
-  href: string;
-  done: boolean;
-}
-export interface PlanDay {
-  label: string;
-  whenISO: string;
-  tasks: PlanTask[];
-}
-export interface InterviewPlan {
+/** A predicted-question set handed off from the Question Predictor into Practice. */
+export interface PredictedSet {
   id: string;
   company: string;
   role: string;
-  dateISO: string;
-  createdAt: string;
-  days: PlanDay[];
-}
-
-export type InterviewStatus = "upcoming" | "completed" | "callback" | "offer" | "rejected";
-
-export interface InterviewRecord {
-  id: string;
-  company: string;
-  role: string;
-  date: string;
-  status: InterviewStatus;
-  notes?: string;
-  createdAt: string;
+  questions: PredictedQuestion[];
+  savedAt: string;
 }

@@ -27,7 +27,7 @@ export interface SubStatus {
   premium: boolean;
   status: string; // active | trialing | canceled | past_due | none ...
   until: string | null; // current_period_end ISO
-  interval: string | null; // 'monthly' | 'annual' | null
+  interval: string | null; // 'monthly' | 'quarterly' | 'annual' (legacy) | null
 }
 
 /* Authoritative access for an account, straight from the subscription row.

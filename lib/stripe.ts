@@ -21,10 +21,21 @@ export function getStripe(): Stripe {
   return client;
 }
 
+/* Two plans, both sized to a real job search.
+   - monthly:   $9.99/mo, for people who expect to land fast.
+   - quarterly: $19.99 every 3 months ($6.66/mo, 33% off). Most searches run
+     about three months, so this is the plan that actually covers the job you're
+     interviewing for — and it prepays the whole search in one go. */
 export const PRICES = {
   monthly: () => process.env.STRIPE_PRICE_ID || "",
-  annual: () => process.env.STRIPE_PRICE_ID_ANNUAL || process.env.STRIPE_PRICE_ID || "",
+  quarterly: () => process.env.STRIPE_PRICE_ID_QUARTERLY || process.env.STRIPE_PRICE_ID || "",
 };
+
+export type PlanKey = keyof typeof PRICES;
+
+export function isPlanKey(v: unknown): v is PlanKey {
+  return v === "monthly" || v === "quarterly";
+}
 
 // No free trial: charge immediately on subscribe. Set STRIPE_TRIAL_DAYS to
 // re-enable one later. checkout/route.ts only adds a trial when this is > 0.
