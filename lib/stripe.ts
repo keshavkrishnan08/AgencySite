@@ -22,8 +22,8 @@ export function getStripe(): Stripe {
 }
 
 /* Two plans, both sized to a real job search.
-   - monthly:   $9.99/mo, for people who expect to land fast.
-   - quarterly: $19.99 every 3 months ($6.66/mo, 33% off). Most searches run
+   - monthly:   $18.97/mo, for people who expect to land fast.
+   - quarterly: $49.97 every 3 months ($16.66/mo). Most searches run
      about three months, so this is the plan that actually covers the job you're
      interviewing for — and it prepays the whole search in one go. */
 export const PRICES = {

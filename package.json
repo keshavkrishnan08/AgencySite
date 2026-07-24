@@ -12,11 +12,13 @@
   "dependencies": {
     "@anthropic-ai/sdk": "^0.27.3",
     "@supabase/supabase-js": "^2.107.0",
+    "@types/mixpanel-browser": "^2.60.0",
     "@vercel/analytics": "^2.0.1",
     "@vercel/speed-insights": "^2.0.0",
     "clsx": "^2.1.1",
     "framer-motion": "^11.5.4",
     "lucide-react": "^0.441.0",
+    "mixpanel-browser": "^2.81.0",
     "next": "14.2.15",
     "react": "^18.3.1",
     "react-dom": "^18.3.1",

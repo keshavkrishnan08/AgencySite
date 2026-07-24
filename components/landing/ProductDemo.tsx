@@ -152,7 +152,7 @@ export function ProductDemo() {
     scene === "summary" ? 100 : scene === "question" ? ((qi + (phase === "scored" ? 1 : 0)) / total) * 100 : 4;
 
   return (
-    <div className="relative mx-auto w-full max-w-2xl">
+    <div className="relative mx-auto w-full max-w-5xl">
       {/* ambient glow */}
       <div
         className="absolute -inset-6 -z-10 rounded-[44px] opacity-60 blur-3xl"
@@ -191,7 +191,7 @@ export function ProductDemo() {
         </div>
 
         {/* ---- body ---- */}
-        <div className="min-h-[420px] p-6 sm:p-8">
+        <div className="min-h-[546px] p-6 sm:p-10">
           <AnimatePresence mode="wait">
             {/* ===== SETUP ===== */}
             {scene === "setup" && (
@@ -239,7 +239,7 @@ export function ProductDemo() {
 
             {/* ===== LOADING ===== */}
             {scene === "loading" && (
-              <motion.div key="loading" initial={{ opacity: 0 }} animate={{ opacity: 1 }} exit={{ opacity: 0 }} transition={{ duration: 0.3 }} className="flex min-h-[360px] flex-col items-center justify-center text-center">
+              <motion.div key="loading" initial={{ opacity: 0 }} animate={{ opacity: 1 }} exit={{ opacity: 0 }} transition={{ duration: 0.3 }} className="flex min-h-[468px] flex-col items-center justify-center text-center">
                 <Loader2 size={32} className="animate-spin text-primary" />
                 <p className="mt-5 font-serif text-xl font-semibold text-ink">Building your questions…</p>
                 <p className="mt-2 text-sm text-ink-2">
@@ -255,7 +255,7 @@ export function ProductDemo() {
                   <>
                     <p className="text-2xs font-semibold uppercase tracking-[0.18em] text-primary-ink">Question {qi + 1}</p>
                     <h3 className="mt-2 font-serif text-2xl font-semibold leading-snug text-ink sm:text-3xl">{cur.q}</h3>
-                    <div className="field mt-5 min-h-[140px] leading-relaxed text-ink">
+                    <div className="field mt-5 min-h-[182px] leading-relaxed text-ink">
                       {typed || <span className="text-ink-3">Type your answer, or tap the mic to speak…</span>}
                       {phase === "typing" && <span className="ml-0.5 inline-block animate-pulse text-primary-ink">▌</span>}
                     </div>
@@ -295,7 +295,7 @@ export function ProductDemo() {
                 <h3 className="mt-4 font-serif text-2xl font-semibold text-ink">Session complete</h3>
                 <ScoreNumber key={rev} value={SUMMARY_AVG} className="mt-2 text-[3.5rem]" />
                 <p className="text-sm font-semibold text-sage-ink">You&apos;re interview-ready.</p>
-                <div className="mx-auto mt-6 max-w-sm space-y-2 text-left">
+                <div className="mx-auto mt-6 max-w-md space-y-2 text-left">
                   {QUESTIONS.map((q) => (
                     <div key={q.q} className="flex items-center justify-between rounded-xl bg-bg-sunk px-4 py-2.5">
                       <span className="truncate pr-3 text-sm text-ink-2">{q.q}</span>

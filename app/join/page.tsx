@@ -15,7 +15,8 @@ import { ScoreRing } from "@/components/ui/Score";
 import { ProgressLineChart, MiniBars } from "@/components/charts/Charts";
 import { AvatarRow } from "@/components/ui/AvatarRow";
 import { ButtonLink } from "@/components/ui/Button";
-import { PLANS } from "@/lib/pricing";
+import { PLANS, priceParts } from "@/lib/pricing";
+import { perDayLabel } from "@/lib/roi";
 
 import type { Metadata } from "next";
 
@@ -37,6 +38,44 @@ export const metadata: Metadata = {
 function Eyebrow({ children }: { children: React.ReactNode }) {
   return <p className="eyebrow mb-4 justify-center">{children}</p>;
 }
+
+/* Two real photographs, hotlinked from Unsplash (same approach the testimonial
+   avatars already use). Chosen for the actual audience: mid-career, warm
+   natural light, no glossy 22-year-olds in a white startup office. Plain <img>
+   rather than next/image because remote domains would need
+   images.remotePatterns in next.config, and a broken hero photo is a worse
+   trade than an unoptimised one. */
+function Photo({
+  src,
+  alt,
+  className,
+}: {
+  src: string;
+  alt: string;
+  className?: string;
+}) {
+  return (
+    <div
+      className={`overflow-hidden rounded-2xl border shadow-lg ${className ?? ""}`}
+      style={{ borderColor: "var(--border)" }}
+    >
+      {/* eslint-disable-next-line @next/next/no-img-element */}
+      <img
+        src={src}
+        alt={alt}
+        loading="lazy"
+        decoding="async"
+        className="h-full w-full object-cover"
+      />
+    </div>
+  );
+}
+
+const PHOTO_PEERS =
+  "https://images.unsplash.com/photo-1600880292203-757bb62b4baf?auto=format&fit=crop&w=1400&q=75";
+const PHOTO_PREP =
+  "https://images.unsplash.com/photo-1522202176988-66273c2fd55f?auto=format&fit=crop&w=1400&q=75";
+
 
 /* ============================== HERO ============================== */
 function Hero() {
@@ -212,6 +251,15 @@ function HowItWorks() {
         </Reveal>
       </div>
       <FlowDiagram />
+      <div className="container-wide">
+        <Reveal delay={0.1}>
+          <Photo
+            src={PHOTO_PREP}
+            alt="People preparing at a table with laptops"
+            className="mx-auto mt-16 aspect-[16/6] max-w-4xl"
+          />
+        </Reveal>
+      </div>
     </section>
   );
 }
@@ -329,7 +377,15 @@ function Stories() {
           </h2>
         </Reveal>
 
-        <div className="mt-16 grid gap-6 lg:grid-cols-3">
+        <Reveal delay={0.08}>
+          <Photo
+            src={PHOTO_PEERS}
+            alt="Two colleagues in their forties celebrating at a desk"
+            className="mx-auto mt-14 aspect-[16/7] max-w-4xl"
+          />
+        </Reveal>
+
+        <div className="mt-10 grid gap-6 lg:grid-cols-3">
           {STORIES.map((s, i) => (
             <Reveal key={s.tag} delay={i * 0.1}>
               <figure className="card h-full p-7">
@@ -352,7 +408,7 @@ function Stories() {
 
 /* ===================== COMPARISON ===================== */
 const ROWS: [string, string, string][] = [
-  ["Cost", "$150-300 / hour", "$6.66 / month"],
+  ["Cost", "$150-300 / hour", "$16.66 / month"],
   ["Availability", "Business hours only", "Anytime"],
   ["Privacy", "Face to face", "Completely private"],
   ["Feedback", "Varies by coach", "Scored on 5 dimensions"],
@@ -403,7 +459,7 @@ function Comparison() {
             >
               <div className="p-5 font-bold text-ink">Total for a 3-month search</div>
               <div className="p-5 text-center font-semibold text-ink-2">$1,800-3,600</div>
-              <div className="p-5 text-center font-serif text-xl font-bold text-primary-ink">$19.99</div>
+              <div className="p-5 text-center font-serif text-xl font-bold text-primary-ink">{PLANS.quarterly.price}</div>
             </div>
           </div>
         </Reveal>
@@ -437,6 +493,8 @@ const PREMIUM_FEATURES = [
 function Pricing() {
   const q = PLANS.quarterly;
   const mo = PLANS.monthly;
+  const [qD, qC] = priceParts("quarterly");
+  const [mD, mC] = priceParts("monthly");
   return (
     <section id="pricing" className="scroll-mt-20 border-y py-24 sm:py-32" style={{ background: "var(--bg-sunk)", borderColor: "var(--border)" }}>
       <div className="container-wide">
@@ -456,46 +514,77 @@ function Pricing() {
         </Reveal>
 
         <div className="mx-auto mt-16 grid max-w-3xl gap-6 sm:grid-cols-2">
-          {/* 3 months — the plan that matches the job */}
+          {/* 3 months — the plan that matches how long a search takes */}
           <Reveal delay={0.08}>
-            <div className="relative flex h-full flex-col rounded-2xl border-2 p-8 shadow-xl" style={{ borderColor: "var(--primary)", background: "var(--surface)" }}>
-              <span className="absolute -top-3 left-8 rounded-full px-3 py-1 text-2xs font-bold uppercase tracking-wider text-white" style={{ background: "linear-gradient(135deg, var(--gold), var(--gold-ink))" }}>
-                Best value · save {q.savePct}%
+            <div
+              className="relative flex h-full flex-col rounded-2xl border-2 p-8 shadow-xl"
+              style={{ borderColor: "var(--primary)", background: "var(--surface)" }}
+            >
+              <span
+                className="absolute -top-3 left-8 rounded-full px-3 py-1 text-2xs font-bold uppercase tracking-wider text-white"
+                style={{ background: "linear-gradient(135deg, var(--gold), var(--gold-ink))" }}
+              >
+                Save {q.savePct}%
               </span>
               <h3 className="font-serif text-xl font-semibold" style={{ color: "var(--primary-ink)" }}>
                 3 months
               </h3>
-              <p className="mt-2 text-sm text-ink-2">{q.pitch}</p>
-              <div className="mt-3 flex items-baseline gap-2.5">
-                <span className="font-serif text-xl font-semibold text-ink-3 line-through">{q.was}</span>
-                <span className="font-serif text-5xl font-semibold text-ink">
-                  $6.66<span className="font-sans text-base font-medium text-ink-3"> / mo</span>
-                </span>
+              <p className="mt-1.5 text-sm text-ink-2">{q.pitch}</p>
+
+              <div className="mt-6 flex items-baseline gap-1">
+                <span className="font-serif text-2xl font-semibold text-ink-3">$</span>
+                <span className="font-serif text-6xl font-semibold leading-none text-ink">{qD}</span>
+                <span className="font-serif text-2xl font-semibold text-ink-3">.{qC}</span>
               </div>
-              <p className="mt-1 text-sm text-sage-ink">
-                {q.price} once · save {q.saveAmount} · cancel anytime
+              <p className="mt-2 text-sm text-ink-3">
+                Billed once every 3 months
               </p>
-              <p className="mt-2 text-xs font-medium text-ink-3">🔥 What most people pick</p>
-              <div className="mt-auto !mt-5">
-                <PresaleForm source="pricing_quarterly" compact cta="Lock this in" />
-              </div>
+              <p className="mt-1 text-sm font-semibold text-sage-ink">
+                {perDayLabel("quarterly")} a day · {q.perMonth}
+              </p>
+
+              <ul className="mt-6 space-y-2.5 border-t pt-6" style={{ borderColor: "var(--border)" }}>
+                {["Unlimited scored mock interviews", "Your full metrics and projections", "Both prep builders"].map((f) => (
+                  <li key={f} className="flex items-start gap-2.5 text-sm text-ink-2">
+                    <Check size={16} className="mt-0.5 shrink-0 text-primary" />
+                    {f}
+                  </li>
+                ))}
+              </ul>
+
+              <div className="mt-auto !mt-7"><PresaleForm source="pricing_quarterly" compact cta="Lock this in" /></div>
             </div>
           </Reveal>
 
           {/* Monthly */}
           <Reveal delay={0.14}>
-            <div className="relative flex h-full flex-col rounded-2xl border-2 p-8 shadow-lg" style={{ borderColor: "var(--border)", background: "var(--surface)" }}>
+            <div
+              className="relative flex h-full flex-col rounded-2xl border-2 p-8 shadow-lg"
+              style={{ borderColor: "var(--border)", background: "var(--surface)" }}
+            >
               <h3 className="font-serif text-xl font-semibold text-ink">Monthly</h3>
-              <p className="mt-2 text-sm text-ink-2">{mo.pitch}</p>
-              <div className="mt-3 flex items-baseline gap-2.5">
-                <span className="font-serif text-5xl font-semibold text-ink">
-                  $9.99<span className="font-sans text-base font-medium text-ink-3"> / mo</span>
-                </span>
+              <p className="mt-1.5 text-sm text-ink-2">{mo.pitch}</p>
+
+              <div className="mt-6 flex items-baseline gap-1">
+                <span className="font-serif text-2xl font-semibold text-ink-3">$</span>
+                <span className="font-serif text-6xl font-semibold leading-none text-ink">{mD}</span>
+                <span className="font-serif text-2xl font-semibold text-ink-3">.{mC}</span>
               </div>
-              <p className="mt-1 text-sm text-ink-3">Billed monthly · cancel anytime</p>
-              <div className="mt-auto !mt-5">
-                <PresaleForm source="pricing_monthly" compact cta="Lock this in" />
-              </div>
+              <p className="mt-2 text-sm text-ink-3">Billed monthly</p>
+              <p className="mt-1 text-sm font-medium text-ink-2">
+                {perDayLabel("monthly")} a day · cancel anytime
+              </p>
+
+              <ul className="mt-6 space-y-2.5 border-t pt-6" style={{ borderColor: "var(--border)" }}>
+                {["Unlimited scored mock interviews", "Your full metrics and projections", "Both prep builders"].map((f) => (
+                  <li key={f} className="flex items-start gap-2.5 text-sm text-ink-2">
+                    <Check size={16} className="mt-0.5 shrink-0 text-primary" />
+                    {f}
+                  </li>
+                ))}
+              </ul>
+
+              <div className="mt-auto !mt-7"><PresaleForm source="pricing_monthly" compact cta="Lock this in" /></div>
             </div>
           </Reveal>
         </div>
@@ -584,7 +673,7 @@ const FAQS: [string, string][] = [
   ],
   [
     "How does billing work?",
-    "Answer a few quick questions, create an account, and pick a plan: $9.99 a month, or $19.99 for three months, which works out to $6.66 a month. We picked three months because that's roughly how long a job search runs. You're charged right away, everything unlocks immediately, and you can cancel anytime in two clicks.",
+    "Answer a few quick questions, create an account, and pick a plan: $18.97 a month, or $49.97 for three months, which works out to $16.66 a month. We picked three months because that's roughly how long a job search runs. You're charged right away, everything unlocks immediately, and you can cancel anytime in two clicks.",
   ],
   [
     "What do the metrics actually tell me?",

@@ -1,17 +1,17 @@
-/* Axon Careers — CAC / LTV under the shipped pricing ($9.99/mo, $19.99/3mo).
+/* Axon Careers — CAC / LTV under the shipped pricing ($18.97/mo, $49.97/3mo).
  *
  * CAC figures are carried over from this repo's own agent-based campaign
  * simulation (scripts/campaign-model.mjs, campaign-abm.mjs), which modelled
  * Meta prospecting + lookalike + retargeting against the target personas.
  * Everything else is recomputed here, because replacing the $79 annual plan
- * with a $19.99 quarterly plan changes LTV materially.
+ * with a $49.97 quarterly plan changes LTV materially.
  *
  *   node scripts/cac-ltv.mjs
  *   CHURN=0.18 QSHARE=0.7 node scripts/cac-ltv.mjs
  */
 
-const PM = 9.99;                                   // monthly plan
-const PQ = 19.99;                                  // 3-month plan
+const PM = 18.97;                                  // monthly plan
+const PQ = 49.97;                                  // 3-month plan
 const PA_OLD = 79;                                 // the annual plan we replaced
 const AI = Number(process.env.AI || 1.44);         // Claude COGS / user / month
 const CHURN = Number(process.env.CHURN || 0.22);   // monthly churn (job seekers)
@@ -51,8 +51,8 @@ console.log("\n================ CAC / LTV — shipped pricing ================\n
 console.log(`  Assumptions: ${f(CHURN * 100, 0)}% monthly churn · ${f(QSHARE * 100, 0)}% pick 3-month · $${f(AI)}/user/mo AI COGS\n`);
 
 console.log("  LTV (net contribution after Stripe + AI)");
-console.log(`    Monthly $9.99    lives ${f(monthsMonthly, 1)} mo        ->  $${f(ltvMonthly)}`);
-console.log(`    3-month $19.99   ${f(termsQuarterly, 2)} terms (${f(termsQuarterly * 3, 1)} mo)  ->  $${f(ltvQuarterly)}`);
+console.log(`    Monthly $${f(PM)}   lives ${f(monthsMonthly, 1)} mo         ->  $${f(ltvMonthly)}`);
+console.log(`    3-month $${f(PQ)}  ${f(termsQuarterly, 2)} terms (${f(termsQuarterly * 3, 1)} mo)  ->  $${f(ltvQuarterly)}`);
 console.log(`    BLENDED                                  ->  $${f(ltv)}\n`);
 
 console.log("  LTV : CAC");
@@ -86,8 +86,8 @@ const levers = [
     const a = 0.6;
     return (1 - QSHARE) * (1 / CHURN) * (PM - fee(PM) - a) + QSHARE * termsQuarterly * (PQ - fee(PQ) - a * 3);
   }],
-  ["3-month plan $19.99 -> $24.99", () => {
-    const p = 24.99;
+  ["3-month plan $49.97 -> $44.97 (bigger gap)", () => {
+    const p = 44.97;
     return (1 - QSHARE) * ltvMonthly + QSHARE * termsQuarterly * (p - fee(p) - AI * 3);
   }],
   ["Everyone takes the 3-month plan (QSHARE 100%)", () => ltvQuarterly],

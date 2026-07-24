@@ -20,6 +20,7 @@ import { SITUATION_META } from "@/lib/utils";
 import { setOnboarding, setProfile } from "@/lib/store";
 import { track } from "@/lib/analytics";
 import { CADENCE_META, HIRING_STATS, projectPlan, type Cadence, type SkillLevel } from "@/lib/plan-projection";
+import { computeRoi, usd } from "@/lib/roi";
 import type { InterviewGap, Situation } from "@/lib/types";
 
 type Demo = "convo" | "skills" | "progress" | "questions" | "delivery";
@@ -29,7 +30,8 @@ type Cond = (a: Record<string, string>) => boolean;
 type Screen =
   | { kind: "form"; fields: Field[]; demo: Demo; when?: Cond }
   | { kind: "validation"; slot: 1 | 2; demo: Demo; when?: Cond }
-  | { kind: "plan"; demo: Demo; when?: Cond };
+  | { kind: "plan"; demo: Demo; when?: Cond }
+  | { kind: "roi"; demo: Demo; when?: Cond };
 
 const SITUATIONS: Situation[] = ["returning", "laid_off", "promotion", "career_change"];
 
@@ -215,6 +217,7 @@ const SCREENS: Screen[] = [
     ],
   },
   { kind: "plan", demo: "progress" },
+  { kind: "roi", demo: "progress" },
 ];
 
 /* ---- modular validation: the stat is built from prior selections ---- */
@@ -486,6 +489,71 @@ export default function OnboardingPage() {
                       <div className="mt-8 flex items-center justify-center gap-3 sm:justify-start">
                         <Button variant="ghost" size="sm" onClick={() => go(screen - 1)}><ArrowLeft size={15} /> Back</Button>
                         <Button size="sm" onClick={() => go(screen + 1)}>{screen + 1 >= total ? "Start practicing" : "Keep going"} <ArrowRight size={15} /></Button>
+                      </div>
+                    </div>
+                  );
+                })()}
+
+
+                {cur.kind === "roi" && (() => {
+                  const r = computeRoi(answers.industry, "quarterly");
+                  const mins = Math.max(1, Math.round(r.minutesToPayBack));
+                  return (
+                    <div>
+                      <span className="eyebrow">What it&apos;s worth</span>
+                      <h1 className="mt-4 text-balance font-serif text-2xl font-semibold leading-tight text-ink sm:text-3xl">
+                        It pays for itself in{" "}
+                        <span className="text-primary-ink">
+                          <AnimatedNumber value={mins} duration={1100} startOnView={false} /> minutes
+                        </span>{" "}
+                        of work.
+                      </h1>
+                      <p className="mt-3 text-ink-2">
+                        The full three months costs {usd(r.planPrice, 2)}. At the median{" "}
+                        {(answers.industry || "").replace("_", " ") || "salary"} wage that&apos;s about{" "}
+                        {mins} minutes on the clock. Then everything after it is upside.
+                      </p>
+
+                      <div className="mt-6 space-y-2.5">
+                        {[
+                          {
+                            k: "Land one week sooner",
+                            v: `${usd(r.oneWeekSooner)}`,
+                            m: `${Math.round(r.weekReturn)}× what you paid`,
+                          },
+                          {
+                            k: "Negotiate 5% more",
+                            v: `${usd(r.negotiationWin)}/yr`,
+                            m: `${Math.round(r.negotiationReturn)}× what you paid`,
+                          },
+                          {
+                            k: "One month in the role",
+                            v: `${usd(r.monthlyPay)}`,
+                            m: `${Math.round(r.monthReturn)}× what you paid`,
+                          },
+                        ].map((row) => (
+                          <div
+                            key={row.k}
+                            className="flex items-center justify-between gap-3 rounded-xl border p-4"
+                            style={{ borderColor: "var(--border)", background: "var(--surface)" }}
+                          >
+                            <div>
+                              <p className="text-sm font-medium text-ink">{row.k}</p>
+                              <p className="text-2xs text-ink-3">{row.m}</p>
+                            </div>
+                            <p className="shrink-0 font-mono text-lg font-semibold text-sage-ink">{row.v}</p>
+                          </div>
+                        ))}
+                      </div>
+
+                      <p className="mt-4 text-xs leading-relaxed text-ink-3">
+                        Based on median full-time pay in your field, as a reference point rather than a
+                        forecast of your offer. The cost is exact; the returns depend on you.
+                      </p>
+
+                      <div className="mt-7 flex items-center gap-3">
+                        <Button variant="ghost" size="sm" onClick={() => go(screen - 1)}><ArrowLeft size={15} /> Back</Button>
+                        <Button size="sm" onClick={() => go(screen + 1)}>Start free <ArrowRight size={15} /></Button>
                       </div>
                     </div>
                   );

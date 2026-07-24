@@ -26,11 +26,11 @@ import { StartSticky } from "@/components/landing/StartSticky";
 export const metadata: Metadata = {
   title: "Practice your interview in private",
   description:
-    "Haven't interviewed in years? Practice with a private AI coach, five minutes a day, and walk in sure. From $6.66/month.",
+    "Haven't interviewed in years? Practice with a private AI coach, five minutes a day, and walk in sure. From $16.66/month.",
   openGraph: {
     title: "You're more ready than you think.",
     description:
-      "A private place to practice your interview until the fear turns into calm. From $6.66/month.",
+      "A private place to practice your interview until the fear turns into calm. From $16.66/month.",
   },
   robots: { index: false }, // ad destination, not for organic search
 };
@@ -84,7 +84,7 @@ const ASSURANCES = [
   { icon: ShieldCheck, label: "Cancel anytime" },
   { icon: Lock, label: "Completely private" },
   { icon: Smartphone, label: "Works on your phone" },
-  { icon: CreditCard, label: "From $6.66/month" },
+  { icon: CreditCard, label: "From $16.66/month" },
 ];
 
 function Stars({ className = "" }: { className?: string }) {
@@ -104,7 +104,7 @@ export default function StartPage() {
       <header className="container-wide flex items-center justify-between py-5">
         <Logo href={null} size={30} />
         <span className="chip hidden bg-sage-soft text-sage-ink sm:inline-flex">
-          <Star size={13} className="fill-sage-ink" /> From $6.66/month
+          <Star size={13} className="fill-sage-ink" /> From $16.66/month
         </span>
       </header>
 
@@ -151,7 +151,7 @@ export default function StartPage() {
                 Start free <ArrowRight size={18} />
               </ButtonLink>
               <p className="text-sm font-medium text-ink-3">
-                From $6.66/mo. Cancel anytime.
+                From $16.66/mo. Cancel anytime.
               </p>
             </div>
           </Reveal>
@@ -345,7 +345,7 @@ export default function StartPage() {
               >
                 Start free <ArrowRight size={18} />
               </Link>
-              <p className="text-sm text-white/70">From $6.66/mo. Cancel anytime.</p>
+              <p className="text-sm text-white/70">From $16.66/mo. Cancel anytime.</p>
             </div>
           </Reveal>
         </div>
