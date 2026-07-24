@@ -6,7 +6,7 @@ export const dynamic = "force-dynamic";
 
 /* Durable funnel events.
  *
- * PostHog is where you'll actually analyse the funnel. This is the copy you
+ * Mixpanel is where you'll actually analyse the funnel. This is the copy you
  * own: ad blockers eat roughly a fifth of pixel traffic in this demographic,
  * and that fifth is not random — it skews to the exact cautious, older users
  * we're targeting. Losing them silently would bias every conversion rate you

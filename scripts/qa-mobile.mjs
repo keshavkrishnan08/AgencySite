@@ -9,7 +9,7 @@ const browser = await chromium.launch();
 const ctx = await browser.newContext({ ...iphone });
 const page = await ctx.newPage();
 const errs = [];
-const benign = (s) => /_next|hot-update|posthog|supabase\.co|stripe|favicon|status of (400|401|404|422)|Failed to load resource|Failed to fetch RSC|Falling back to browser/.test(s);
+const benign = (s) => /_next|hot-update|mixpanel|supabase\.co|stripe|favicon|status of (400|401|404|422)|Failed to load resource|Failed to fetch RSC|Falling back to browser/.test(s);
 page.on("pageerror", (e) => { if (!benign(String(e))) errs.push("EXC: " + String(e).slice(0, 120)); });
 page.on("console", (m) => { if (m.type() === "error" && !benign(m.text())) errs.push("console: " + m.text().slice(0, 120)); });
 

@@ -2,7 +2,7 @@
 
 // Baseline security headers applied to every response. These are the low-risk,
 // high-value ones. A full Content-Security-Policy is intentionally left for a
-// dedicated pass (it has to allowlist Stripe, Supabase, PostHog, and remote
+// dedicated pass (it has to allowlist Stripe, Supabase, Mixpanel, and remote
 // avatar images, and a wrong CSP takes the whole site down).
 const securityHeaders = [
   { key: "Strict-Transport-Security", value: "max-age=63072000; includeSubDomains; preload" },

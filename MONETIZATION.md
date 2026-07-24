@@ -66,7 +66,7 @@ The product converts; now feed it people. From the PRD, the wedge is Meta ads to
 - Retention: the metrics page. Streaks, milestones, percentile, and a projected date for reaching a top 1% interview.
 
 ## Measure the funnel (analytics)
-The app fires PostHog-compatible events with zero setup cost (no-op until keyed). Set `NEXT_PUBLIC_POSTHOG_KEY` and you'll see the whole funnel:
+The app fires events into Mixpanel with zero setup cost (no-op until keyed). Set `NEXT_PUBLIC_MIXPANEL_TOKEN` and you'll see the whole funnel, plus autocaptured clicks and sampled session replay:
 
 `landing_cta_click` → `onboarding_situation` → `onboarding_complete` → `session_complete` → `paywall_hit` → `upgrade_view` → `upgrade_click` → `upgrade_success`, plus `tool_opened`, `questions_predicted`, and `gap_story_built`.
 
@@ -75,7 +75,7 @@ Watch two numbers: free-to-first-session (activation) and first-session-to-upgra
 ## Launch checklist (zero to first dollar)
 1. **Charge for real.** Add Stripe keys (Step 2 above) and the Supabase persistence (Step 3). Until the webhook writes plan state to a DB, Premium is per-browser only.
 2. **Deploy.** Import the repo on Vercel, add every env var from `.env.example`, deploy, point your domain at it, and register the Stripe webhook URL.
-3. **Turn on analytics.** Add the PostHog key so you can see where people drop.
+3. **Turn on analytics.** Add the Mixpanel token so you can see where people drop.
 4. **Send 100 visitors.** Run one Meta ad set (below) at $20/day to the landing page.
 5. **Read the funnel after 100 visitors.** Low activation means fix onboarding. Low conversion means fix the paywall moment. High both means raise spend.
 

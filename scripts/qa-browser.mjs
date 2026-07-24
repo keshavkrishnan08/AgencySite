@@ -39,7 +39,7 @@ for (const route of ROUTES) {
     const status = resp?.status() ?? 0;
     // ignore benign Next dev HMR/websocket + Supabase/analytics network noise
     const real = issues.filter((i) =>
-      !/_next\/static|hot-update|webpack|posthog|supabase\.co|stripe|fonts\.|favicon|googleapis/.test(i) &&
+      !/_next\/static|hot-update|webpack|mixpanel|supabase\.co|stripe|fonts\.|favicon|googleapis/.test(i) &&
       // benign: the auth gate redirects unauthenticated users to /signin and the
       // prefetch of that redirect target is aborted — expected, not a bug.
       !/\/signin\?next=.*ERR_ABORTED|\/signin\?next=.*_rsc/.test(i)
