@@ -334,12 +334,12 @@ function Numbers() {
 
 /* ===================== COMPARISON ===================== */
 const ROWS: [string, string, string][] = [
-  ["Cost", "$150-300 / hour", "$0.33 a day"],
-  ["Availability", "Business hours only", "Anytime"],
-  ["Privacy", "Face to face", "Completely private"],
-  ["Feedback", "Varies by coach", "Scored on 5 dimensions"],
+  ["Cost", "$150–300 / hour", "$0.33 a day"],
+  ["Available", "Business hours", "3 a.m., the night before"],
+  ["Judgment", "You feel watched", "Completely private"],
+  ["Feedback", "A vague gut feel", "Scored on 5 dimensions"],
+  ["Reps", "One session", "Unlimited, until it's easy"],
   ["Progress tracking", "They might remember last time", "Percentile, pace and projections"],
-  ["Practice sessions", "1 / week at $200", "Unlimited"],
   ["Knowing when you're ready", "A gut feeling", "A number, and a date"],
 ];
 
@@ -360,7 +360,7 @@ function Comparison() {
           <div className="card-elevated mt-14 overflow-hidden p-0">
             <div className="grid grid-cols-[1.2fr_1fr_1fr] border-b" style={{ borderColor: "var(--border)" }}>
               <div className="p-5" />
-              <div className="p-5 text-center text-sm font-semibold text-ink-2">Career coach</div>
+              <div className="p-5 text-center text-sm font-semibold text-ink-2">Coach or recruiter</div>
               <div
                 className="p-5 text-center text-sm font-bold text-white"
                 style={{ background: "linear-gradient(135deg, var(--primary-bright), var(--primary-ink))" }}

@@ -42,7 +42,7 @@ for (const [name, sessions] of CASES) {
   const ctx = await b.newContext({ viewport: { width: 1280, height: 900 } });
   const p = await ctx.newPage();
   const errs = [];
-  p.on("pageerror", e => errs.push(e.message));
+  p.on("pageerror", e => { if (!/_vercel|insights/.test(e.message)) errs.push(e.message); });
   p.on("console", m => m.type() === "error" && errs.push(m.text()));
   await p.goto(B + "/", { waitUntil: "domcontentloaded" });
   await p.evaluate((s) => {
