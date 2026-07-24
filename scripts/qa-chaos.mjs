@@ -12,7 +12,7 @@ const errs = [];
 // Benign: build assets, analytics, AND expected auth/API rejections (wrong
 // password -> 400, bad signup -> 422, not-found -> 404). These are handled
 // inline by the app; the browser just logs the resource status.
-const benign = (s) => /_next|hot-update|webpack|posthog|supabase\.co|stripe|fonts|favicon|googleapis|\/signin\?next|status of (400|401|422|404)|Failed to load resource/.test(s);
+const benign = (s) => /_next|hot-update|webpack|mixpanel|supabase\.co|stripe|fonts|favicon|googleapis|\/signin\?next|status of (400|401|422|404)|Failed to load resource/.test(s);
 page.on("pageerror", (e) => { if (!benign(String(e))) errs.push("EXCEPTION: " + String(e).slice(0, 140)); });
 page.on("console", (m) => { if (m.type() === "error" && !benign(m.text())) errs.push("console: " + m.text().slice(0, 140)); });
 

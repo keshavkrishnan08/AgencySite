@@ -15,7 +15,7 @@ const ctx = await browser.newContext();
 await ctx.addInitScript(() => { try { const p = JSON.parse(localStorage.getItem("pp:profile") || "{}"); p.plan = "premium"; localStorage.setItem("pp:profile", JSON.stringify(p)); } catch {} });
 const page = await ctx.newPage();
 const errs = [];
-const benign = (s) => /_next|hot-update|posthog|supabase\.co|stripe|favicon|status of (400|401|404|422)/.test(s);
+const benign = (s) => /_next|hot-update|mixpanel|supabase\.co|stripe|favicon|status of (400|401|404|422)/.test(s);
 page.on("pageerror", (e) => { if (!benign(String(e))) errs.push("EXC: " + String(e).slice(0, 140)); });
 page.on("console", (m) => { if (m.type() === "error" && /Hydration|unmount|Cannot update|Warning: Can't perform/.test(m.text())) errs.push("react: " + m.text().slice(0, 140)); });
 
