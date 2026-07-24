@@ -96,14 +96,9 @@ const browser = await chromium.launch();
   for (const [slug, name] of [
     ["tools", "07-tools-hub"],
     ["tools/gap-story", "08-gap-story"],
-    ["tools/company-research", "09-company"],
     ["tools/question-predictor", "10-predictor"],
-    ["tools/salary", "11-salary"],
-    ["tools/debrief", "12-debrief"],
-    ["tools/your-story", "13-your-story"],
     ["upgrade", "14-upgrade"],
     ["settings", "15-settings"],
-    ["interview-day", "16-interview-day"],
   ]) {
     await page.goto(`${BASE}/${slug}`, { waitUntil: "networkidle" });
     await shot(page, name, { wait: 900 });

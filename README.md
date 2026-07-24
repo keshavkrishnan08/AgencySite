@@ -8,34 +8,43 @@ Axon Careers gives them a private room to practice in. You answer real interview
 
 ---
 
-## What it does
+## One main feature, two that feed it
 
-The core loop is simple: **Practice → Score → Feedback → Improve → watch your score rise → practice more.**
+The product does one job and does it deep. Everything else was cut.
 
-- **Tailored practice sessions.** Eight questions matched to your role, situation, and the actual company + job posting you paste in, scored on clarity, relevance, specificity, confidence, and conciseness — with one specific fix per answer.
-- **You can speak your answers.** A built-in voice button transcribes speech to text in the browser (no key). Axon Careers listens; it doesn't talk back.
-- **A conversational interviewer.** After each answer, Claude asks a real follow-up that probes what you actually said — the way a live interviewer tests whether your story holds up.
-- **A retention-grade dashboard.** Readiness ring, a progress line that climbs toward a "Ready" marker at 80, per-skill sparklines with deltas, streaks, and stats.
-- **An honest Anxiety Detector** baked into every score. It catches the filler words, hedging, apologies, and self-undermining qualifiers you don't hear yourself say.
+### The main thing: Practice
 
-And a full toolkit around the interview:
+Eight questions matched to your role, situation, and the actual company and posting you paste in. Every answer is scored on **clarity, relevance, specificity, confidence, and conciseness**, with one specific fix. Then the interviewer asks a real follow-up that probes what you actually said — the way a live one tests whether your story holds up. You can speak your answers; the browser transcribes them and measures your pace, pauses, and words per minute.
+
+The **Anxiety Detector** runs on every answer, counting the filler words, hedges, apologies, and self-undermining qualifiers you don't hear yourself say.
+
+### The metrics page
+
+This is why people come back. Everything is computed from your own sessions in `lib/metrics.ts`:
+
+- **Readiness** and the **percentile** it puts you in ("you answer better than 73% of candidates")
+- **Estimated time to a top 1% interview** — a trend line fit through your last ten sessions gives your points-per-session, divided into the gap to 94 at your current practice frequency, projected to a real calendar date
+- **Trajectory chart** — your actual scores, plus a dashed line extending your pace to the Ready (80) and Top 1% (94) bars
+- **Streaks**, a 28-day activity strip, consistency percentage, week-over-week, best week, rest days
+- **Per-skill breakdown** — current, best, delta, rank, pace, and days-to-80 for each of the five dimensions
+- **Anxiety trends** — fillers, hedges, apologies and underminers per 100 words, versus where you started
+- **Answer spread**, performance by question type, delivery metrics, personal records
+- An **11-step milestone ladder** with the next one always in progress
+
+### The two builders that feed it
 
 | Tool | What it's for |
 |---|---|
+| **Question Predictor** | Paste the posting, get the five questions they'll likely ask, ranked by probability — then drill all five in a scored session with one tap |
 | **Gap Story Builder** | Turns any résumé gap into three confident 30-second answers |
-| **Company Research Briefing** | A one-page brief so you can answer "why us?" |
-| **Question Predictor** | Paste the posting, get the five questions they'll likely ask |
-| **Salary Negotiation** | A live, multi-round negotiation that pushes back |
-| **Post-Interview Debrief** | Score how the real interview actually went |
-| **Your Story Builder** | Build "tell me about yourself" in four steps |
-| **Interview Tracker** | Log real interviews and outcomes — because offers are the point, not scores |
-| **Interview Day Mode** | A timed, no-going-back pressure simulation for the night before |
+
+Both exist because they make the practice loop better. Nothing else does, so nothing else ships.
 
 ---
 
 ## It works with zero setup
 
-Here's the important part: **Axon Careers runs fully without any API keys.** Every score, every piece of feedback, and the Anxiety Detector are powered by a real heuristic engine (`lib/scoring.ts`) that analyzes your actual words — filler density, STAR structure, concrete numbers, hedging, length. So the product is demonstrable the second you start it.
+**Axon Careers runs fully without any API keys.** Every score, every piece of feedback, and the Anxiety Detector are powered by a real heuristic engine (`lib/scoring.ts`) that analyzes your actual words — filler density, STAR structure, concrete numbers, hedging, length. So the product is demonstrable the second you start it.
 
 Add an `ANTHROPIC_API_KEY` and the same routes quietly upgrade to live Claude scoring and generation. If a call ever fails, it falls straight back to the local engine. Nothing breaks.
 
@@ -51,11 +60,18 @@ ANTHROPIC_API_KEY=sk-ant-...
 ANTHROPIC_MODEL=claude-sonnet-4-6
 ```
 
-Build and serve production:
+---
 
-```bash
-npm run build && npm run start
-```
+## Pricing
+
+Two plans, both sized to a real job search. Defined once in `lib/pricing.ts`, read by the landing page, the paywall, and the upgrade screen.
+
+| Plan | Price | Effective |
+|---|---|---|
+| Monthly | $9.99 / month | $9.99 a month |
+| **3 months** | **$19.99 once** | **$6.66 a month — save 33%** |
+
+Three months, not a year: that's roughly how long a search runs, so it's the plan that actually covers the job you're interviewing for. And it costs less than buying two months alone.
 
 ---
 
@@ -67,7 +83,7 @@ The look is **"calm confidence, elevated."** The demographic is anxious, so the 
 - **Color:** deep ink navy text, a calm **teal** primary, sage / amber / coral for score states, and warm **gold** for premium (no cliché purple gradients).
 - **Type:** **Fraunces** (a warm editorial serif) for emotional headlines, **Hanken Grotesk** for the UI, **JetBrains Mono** for scores and data.
 - **Surfaces:** layered soft shadows, glass panels, a custom glass logo emblem, and count-up score animations.
-- **Charts:** Recharts with gradient fills, custom tooltips, and a dashed "Ready" reference line.
+- **Charts:** Recharts with gradient fills, custom tooltips, and dashed reference lines at Ready and Top 1%.
 
 The whole system lives in `app/globals.css` and `tailwind.config.ts`.
 
@@ -77,37 +93,34 @@ The whole system lives in `app/globals.css` and `tailwind.config.ts`.
 
 ```
 app/
-  page.tsx                 Landing (11 sections)
-  onboarding/              3-screen, no-auth intake
+  page.tsx                 Landing
+  start/                   Dedicated ad landing page for paid traffic
+  onboarding/              3-screen intake
   practice/                The core Practice → Score loop
   session/[id]/            Session results: radar, progress, per-answer review
-  dashboard/               Retention hub: readiness, charts, streak, stats
-  interview-day/           Timed pressure simulation (premium)
-  upgrade/  settings/      Plan + account
-  tools/                   The six interview tools
-  api/                     7 routes — Claude when keyed, heuristic otherwise
+  dashboard/               The metrics page
+  tools/question-predictor Paste a posting → 5 questions → practice them
+  tools/gap-story          Three 30-second gap answers
+  signin/ upgrade/ settings/
+  api/                     11 routes — Claude when keyed, heuristic otherwise
 components/                ui / charts / layout / landing / practice
 lib/
-  scoring.ts               The heuristic scoring + Anxiety Detector engine
-  ai.ts                    Claude wrapper (prompt caching, JSON extraction)
-  store.ts                 localStorage persistence (Supabase-shaped API)
-  client.ts                Fetch helpers with offline fallback
-  questions.ts examples.ts seed.ts roles.ts share.ts
+  scoring.ts               Heuristic scoring + Anxiety Detector engine
+  metrics.ts               Every number on the dashboard, computed from sessions
+  pricing.ts               Single source of truth for what we charge
+  stripe.ts supabase.ts    Payments and server-side subscription truth
+  store.ts cloud.ts        localStorage, mirrored to Supabase when signed in
+  ai.ts client.ts questions.ts examples.ts roles.ts share.ts
 ```
 
-**Stack:** Next.js 14 (App Router) · TypeScript · Tailwind · Framer Motion · Recharts · Anthropic SDK.
+**Stack:** Next.js 14 (App Router) · TypeScript · Tailwind · Framer Motion · Recharts · Anthropic SDK · Supabase · Stripe.
 
-**Persistence** is `localStorage` today, behind a small data layer whose API mirrors a Supabase implementation — so swapping in a real backend later is a drop-in. **Payments** are real, key-gated Stripe Checkout (with a 7-day trial and monthly/annual prices): set the Stripe env vars and it charges live; leave them unset and `/upgrade` runs a demo flow so the app stays runnable. The full go-live runbook for getting paying customers is in **[MONETIZATION.md](./MONETIZATION.md)**.
+**Access is gated.** `components/layout/AppShell.tsx` is the single gate: not signed in goes to `/signin`, signed in without a subscription goes to `/upgrade`, and the decision is authoritative from the `subscriptions` table — never from a localStorage flag. A canceled-at-period-end subscriber keeps access until their paid time runs out. The gate is inert until the Supabase anon key is set, so local development keeps working.
 
----
+**Persistence** is `localStorage`, mirrored to Supabase when signed in. See `supabase/schema.sql` — three tables (`profiles`, `sessions`, `subscriptions`), all RLS-protected, with `subscriptions` writable only by the service role.
 
-## A note on scope
-
-I trimmed to the single job: getting you ready for an interview. The marketing machinery in the spec (Meta ad campaigns, email drip sequences) isn't app code, so it's out. The Anxiety Detector isn't a separate page — it's woven into every score, which is where it actually belongs. Voice input is stubbed for a later pass; everything is typed for now.
-
-Every screenshot in `/tmp/shots` was generated and checked with Playwright (`scripts/shots.mjs`) — all 20+ surfaces render with zero console errors.
+**Payments** are real, key-gated Stripe Checkout. The full go-live runbook is in **[MONETIZATION.md](./MONETIZATION.md)**.
 
 ---
 
 Built by Keshav Krishnan. Axon Careers is a practice tool, not a guarantee of employment.
- 

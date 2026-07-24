@@ -26,7 +26,7 @@ export function StickyCTA() {
         <div className="glass mx-auto flex max-w-3xl items-center justify-between gap-4 rounded-2xl border px-5 py-3.5 shadow-xl" style={{ borderColor: "var(--border)" }}>
           <div className="hidden sm:block">
             <p className="font-serif text-base font-semibold text-ink">Your next interview is coming.</p>
-            <p className="text-xs text-ink-2">$9.99/mo · cancel anytime.</p>
+            <p className="text-xs text-ink-2">From $6.66/mo · cancel anytime.</p>
           </div>
           <p className="text-sm font-medium text-ink sm:hidden">Get started</p>
           <div className="flex items-center gap-1">

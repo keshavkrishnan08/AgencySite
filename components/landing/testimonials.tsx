@@ -38,14 +38,14 @@ export const TESTIMONIALS: T[] = [
   },
   {
     quote:
-      "Rehearsed the salary talk three times the night before. They offered 70, I asked for 78 without my voice cracking once, and we landed at 76. That's $6k from one practice session!!",
+      "Pasted the job posting in and it guessed four of the five questions they actually asked me. I'd already answered all four out loud. Felt like I had the test beforehand!!",
     name: "Marcus T.",
     role: "Sales Rep",
     photo: "https://randomuser.me/api/portraits/men/51.jpg",
   },
   {
     quote:
-      "Did the night-before sim at 11pm, totally terrified. And then... I actually slept?! First time ever before an interview. Game changer.",
+      "Watching that number climb from 44 to 81 was the whole thing for me. I stopped guessing whether I was ready and just... knew. First time ever before an interview.",
     name: "Janet R.",
     role: "Registered Nurse",
     photo: "https://randomuser.me/api/portraits/women/65.jpg",
@@ -132,7 +132,7 @@ function CompactCard({ t }: { t: T }) {
 export function TestimonialCarousel() {
   const row = [...TESTIMONIALS, ...TESTIMONIALS];
   return (
-    <section className="border-y py-6" style={{ background: "var(--bg-sunk)", borderColor: "var(--border)" }}>
+    <section className="overflow-hidden border-y py-6" style={{ background: "var(--bg-sunk)", borderColor: "var(--border)" }}>
       <div className="marquee-mask overflow-hidden">
         <div className="marquee-track flex w-max gap-4">
           {row.map((t, i) => (

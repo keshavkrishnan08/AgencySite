@@ -58,7 +58,7 @@ const SCREENS: Screen[] = [
           { value: "hard_q", label: "Hard questions", emoji: "🧠" },
           { value: "selling", label: "Selling myself", emoji: "🙈" },
           { value: "gap", label: "Explaining my gap", emoji: "🕳️" },
-          { value: "salary", label: "Salary talk", emoji: "💸" },
+          { value: "filler", label: "Um, like, I just…", emoji: "😬" },
         ],
       },
     ],

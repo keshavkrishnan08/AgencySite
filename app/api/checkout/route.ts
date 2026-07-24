@@ -1,6 +1,6 @@
 import { rateLimit } from "@/lib/ratelimit";
 import { NextResponse } from "next/server";
-import { getStripe, stripeConfigured, PRICES, TRIAL_DAYS } from "@/lib/stripe";
+import { getStripe, stripeConfigured, PRICES, TRIAL_DAYS, isPlanKey } from "@/lib/stripe";
 
 export const runtime = "nodejs";
 export const dynamic = "force-dynamic";
@@ -22,7 +22,8 @@ export async function POST(req: Request) {
   } catch {
     /* default body */
   }
-  const plan = body?.plan === "annual" ? "annual" : "monthly";
+  const requested: unknown = body?.plan;
+  const plan = isPlanKey(requested) ? requested : "monthly";
   const email: string | undefined = body?.email || undefined;
 
   const origin =
@@ -33,7 +34,7 @@ export async function POST(req: Request) {
   try {
     const session = await getStripe().checkout.sessions.create({
       mode: "subscription",
-      line_items: [{ price: plan === "annual" ? PRICES.annual() : PRICES.monthly(), quantity: 1 }],
+      line_items: [{ price: PRICES[plan](), quantity: 1 }],
       customer_email: email,
       allow_promotion_codes: true,
       subscription_data: TRIAL_DAYS > 0 ? { trial_period_days: TRIAL_DAYS } : undefined,
