@@ -1,15 +1,13 @@
 "use client";
 
-/* Lightweight funnel analytics. PostHog-compatible capture over fetch, so there
-   is no SDK dependency. No-ops with no key, so the app runs untouched until you
-   set NEXT_PUBLIC_POSTHOG_KEY. See the launch runbook in MONETIZATION.md. */
+/* Funnel analytics fan-out. Mixpanel is the analysis surface; Supabase is the
+   durable copy we own; Vercel and Meta cover traffic and ad optimisation.
+   Every sink no-ops without its key, so the app runs untouched when unset.
+   See the launch runbook in MONETIZATION.md. */
 
 import { track as vercelTrack } from "@vercel/analytics";
 import { attribution } from "./attribution";
 import { initMixpanel, mixpanelIdentify, mixpanelRegister, mixpanelTrack } from "./mixpanel";
-
-const KEY = process.env.NEXT_PUBLIC_POSTHOG_KEY;
-const HOST = process.env.NEXT_PUBLIC_POSTHOG_HOST || "https://us.i.posthog.com";
 
 function distinctId(): string {
   if (typeof window === "undefined") return "server";
@@ -104,12 +102,11 @@ export function setContext(props: Record<string, unknown>): void {
   mixpanelRegister(props);
 }
 
-/* Five sinks, in order of how much we trust them:
+/* Four sinks, in order of how much we trust them:
      1. Supabase  — ours, survives ad blockers, the number we spend against
-     2. PostHog   — funnel analysis
-     3. Mixpanel  — deep analysis: funnels, retention, replays, click rates
-     4. Vercel    — traffic and vitals, next to the deployment
-     5. Meta      — so the campaign can optimise for conversions
+     2. Mixpanel  — the analysis surface: funnels, retention, replays, click rates
+     3. Vercel    — traffic and vitals, next to the deployment
+     4. Meta      — so the campaign can optimise for conversions
    Each is fire-and-forget and independently guarded. A dead sink never blocks
    the other two and never surfaces to the user. */
 export function track(event: PPEvent, properties: Record<string, unknown> = {}): void {
@@ -139,31 +136,7 @@ export function track(event: PPEvent, properties: Record<string, unknown> = {}):
     /* never break the app */
   }
 
-  // 2. PostHog.
-  if (KEY) {
-    try {
-      void fetch(`${HOST}/capture/`, {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        keepalive: true,
-        body: JSON.stringify({
-          api_key: KEY,
-          event,
-          distinct_id: identity || anon,
-          properties: {
-            ...properties,
-            ...attribution(),
-            $current_url: path,
-            ...(identity ? { $set: { email: identity } } : {}),
-          },
-        }),
-      }).catch(() => {});
-    } catch {
-      /* never break the app */
-    }
-  }
-
-  // 3. Mixpanel — the analysis surface. Autocapture already records raw
+  // 2. Mixpanel — the analysis surface. Autocapture already records raw
   //    clicks and submits; these are the named steps worth building funnels on.
   try {
     initMixpanel();
@@ -172,7 +145,7 @@ export function track(event: PPEvent, properties: Record<string, unknown> = {}):
     /* never break the app */
   }
 
-  // 4. Vercel Web Analytics custom event, so conversions sit next to the
+  // 3. Vercel Web Analytics custom event, so conversions sit next to the
   //    pageview and traffic-source data on the same dashboard as the deploy.
   try {
     const flat: Record<string, string | number | boolean | null> = {};
@@ -186,7 +159,7 @@ export function track(event: PPEvent, properties: Record<string, unknown> = {}):
     /* never break the app */
   }
 
-  // 5. Meta Pixel standard event (fires only when the Pixel is loaded).
+  // 4. Meta Pixel standard event (fires only when the Pixel is loaded).
   const metaEvent = (META_EVENT as Record<string, string | undefined>)[event];
   if (metaEvent && typeof window.fbq === "function") {
     try {
