@@ -1,5 +1,6 @@
 import { NextResponse } from "next/server";
 import { getStripe, stripeConfigured } from "@/lib/stripe";
+import { syncSubscription } from "@/lib/billing";
 
 export const runtime = "nodejs";
 export const dynamic = "force-dynamic";
@@ -25,6 +26,18 @@ export async function POST(req: Request) {
       s.payment_status === "paid" ||
       s.payment_status === "no_payment_required" ||
       (s.status === "complete" && s.payment_status !== "unpaid");
+    // Eagerly reconcile from Stripe so access is written to the DB immediately,
+    // winning the race against the webhook (never trust the client redirect).
+    if (paid) {
+      const customerId = typeof s.customer === "string" ? s.customer : s.customer?.id ?? null;
+      if (customerId) {
+        try {
+          await syncSubscription(customerId);
+        } catch {
+          /* the webhook will reconcile shortly */
+        }
+      }
+    }
     return NextResponse.json({ paid, email: s.customer_details?.email ?? null });
   } catch {
     return NextResponse.json({ paid: false });
