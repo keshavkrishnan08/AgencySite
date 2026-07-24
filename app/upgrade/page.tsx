@@ -7,7 +7,7 @@ import { Check, Lock, ShieldCheck, Loader2, PartyPopper } from "lucide-react";
 import { AppShell } from "@/components/layout/AppShell";
 import { Button, ButtonLink } from "@/components/ui/Button";
 import { PremiumBadge } from "@/components/ui/PremiumBadge";
-import { getProfile, upgradeToPremium } from "@/lib/store";
+import { getOnboarding, getProfile, upgradeToPremium } from "@/lib/store";
 import { track } from "@/lib/analytics";
 import { PLANS, type PlanKey } from "@/lib/pricing";
 import { QuickReview } from "@/components/feedback/QuickReview";
@@ -33,10 +33,28 @@ export default function UpgradePage() {
   // Default to quarterly: it matches how long a search actually takes, and the
   // pre-selected option is the single biggest lever on plan mix.
   const [plan, setPlan] = useState<PlanKey>("quarterly");
+  // Personalise to what they told us in onboarding, so the paywall isn't
+  // generic after a personalised flow (Superwall's strongest paywall rule).
+  const [pitch, setPitch] = useState<string>("");
   const p = PLANS[plan];
 
   useEffect(() => {
     track("upgrade_view");
+    const ob = getOnboarding();
+    const t = ob?.timeline;
+    if (t === "this_week" || t === "two_weeks") {
+      // Interview is imminent → the search is now; 3 months covers it.
+      setPlan("quarterly");
+      setPitch(
+        t === "this_week"
+          ? "Your interview is this week. The 3-month plan gives you unlimited practice between now and then, and covers the rest of your search."
+          : "Your interview is days away. Three months of unlimited practice covers this one and whatever comes next."
+      );
+    } else if (t === "none") {
+      setPitch("No interview booked yet? Good — that's the time to get ahead. Most searches run about three months.");
+    } else if (ob?.targetRole) {
+      setPitch(`Everything you need to walk into your ${ob.targetRole} interview ready.`);
+    }
   }, []);
 
   const subscribe = async () => {
@@ -76,7 +94,7 @@ export default function UpgradePage() {
             Everything you need to walk in ready.
           </h1>
           <p className="mx-auto mt-4 max-w-prose text-lg text-ink-2">
-            The average job search runs about three months. So does the plan most people pick.
+            {pitch || "The average job search runs about three months. So does the plan most people pick."}
           </p>
         </div>
 

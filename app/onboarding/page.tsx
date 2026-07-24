@@ -429,7 +429,7 @@ export default function OnboardingPage() {
     const gap = (answers.gap as InterviewGap) || "1-3yr";
     const finalRole = role.trim() || query.trim() || "Office Manager";
     const company = (answers.company || "").trim();
-    setOnboarding({ situation, targetRole: finalRole, company, interviewGap: gap });
+    setOnboarding({ situation, targetRole: finalRole, company, interviewGap: gap, timeline: answers.timeline, salaryBand: answers.salaryBand });
     setProfile({ situation, targetRole: finalRole, company, interviewGap: gap });
     // Every onboarding answer, prefixed so it groups in Mixpanel, on the
     // completion event AND registered as super properties so it rides along on
