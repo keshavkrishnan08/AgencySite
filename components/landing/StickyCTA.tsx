@@ -2,7 +2,7 @@
 
 import { useEffect, useState } from "react";
 import { ArrowRight, X } from "lucide-react";
-import { ButtonLink } from "@/components/ui/Button";
+import { StartFreeButton } from "@/components/ui/StartFreeButton";
 
 export function StickyCTA() {
   const [show, setShow] = useState(false);
@@ -28,11 +28,9 @@ export function StickyCTA() {
             <p className="font-serif text-base font-semibold text-ink">Your next interview is coming.</p>
             <p className="text-xs text-ink-2">From $6.66/mo · cancel anytime.</p>
           </div>
-          <p className="text-sm font-medium text-ink sm:hidden">Start free</p>
+          <p className="text-sm font-medium text-ink sm:hidden">Start for free</p>
           <div className="flex items-center gap-1">
-            <ButtonLink href="/onboarding" size="sm" className="group whitespace-nowrap">
-              Start free <ArrowRight size={15} className="transition-transform group-hover:translate-x-0.5" />
-            </ButtonLink>
+<StartFreeButton size="sm" source="sticky" className="whitespace-nowrap" />
             <button
               onClick={() => setDismissed(true)}
               className="rounded-full p-2 text-ink-3 transition-colors hover:bg-bg-tint hover:text-ink"
