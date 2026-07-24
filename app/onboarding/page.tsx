@@ -19,8 +19,9 @@ import { ROLES } from "@/lib/roles";
 import { SITUATION_META } from "@/lib/utils";
 import { setOnboarding, setProfile } from "@/lib/store";
 import { track } from "@/lib/analytics";
-import { CADENCE_META, HIRING_STATS, projectPlan, type Cadence, type SkillLevel } from "@/lib/plan-projection";
-import { computeRoi, usd } from "@/lib/roi";
+import { CADENCE_META, projectPlan, type Cadence, type SkillLevel } from "@/lib/plan-projection";
+import { computeRoi } from "@/lib/roi";
+import { PLANS } from "@/lib/pricing";
 import type { InterviewGap, Situation } from "@/lib/types";
 
 type Demo = "convo" | "skills" | "progress" | "questions" | "delivery";
@@ -30,193 +31,207 @@ type Cond = (a: Record<string, string>) => boolean;
 type Screen =
   | { kind: "form"; fields: Field[]; demo: Demo; when?: Cond }
   | { kind: "validation"; slot: 1 | 2; demo: Demo; when?: Cond }
+  | { kind: "compare"; demo: Demo; when?: Cond }
   | { kind: "plan"; demo: Demo; when?: Cond }
   | { kind: "roi"; demo: Demo; when?: Cond };
 
 const SITUATIONS: Situation[] = ["returning", "laid_off", "promotion", "career_change"];
 
 const SCREENS: Screen[] = [
+  // ── One question per screen. A tap advances you, top-app style. Each screen
+  //    carries a single decision, so nothing feels like a form. ──
   {
     kind: "form",
     demo: "convo",
-    fields: [
-      {
-        key: "confidence",
-        q: "How do you feel about interviewing right now?",
-        options: [
-          { value: "terrified", label: "Honestly terrified", emoji: "😱" },
-          { value: "rusty", label: "Pretty rusty", emoji: "😬" },
-          { value: "shaky", label: "A little shaky", emoji: "😟" },
-          { value: "out_of_practice", label: "Out of practice", emoji: "🕰️" },
-          { value: "okay", label: "I do okay", emoji: "🙂" },
-          { value: "confident", label: "Fairly confident", emoji: "😎" },
-        ],
-      },
-      {
-        key: "struggle",
-        q: "What trips you up the most?",
-        options: [
-          { value: "nerves", label: "Nerves", emoji: "😰" },
-          { value: "blank", label: "My mind blanks", emoji: "🫥" },
-          { value: "ramble", label: "I ramble", emoji: "🗣️" },
-          { value: "hard_q", label: "Hard questions", emoji: "🧠" },
-          { value: "selling", label: "Selling myself", emoji: "🙈" },
-          { value: "gap", label: "Explaining my gap", emoji: "🕳️" },
-          { value: "filler", label: "Um, like, I just…", emoji: "😬" },
-        ],
-      },
-    ],
+    fields: [{
+      key: "confidence",
+      q: "How are you feeling about interviewing right now?",
+      options: [
+        { value: "terrified", label: "Honestly terrified", emoji: "😱" },
+        { value: "rusty", label: "Pretty rusty", emoji: "😬" },
+        { value: "shaky", label: "A little shaky", emoji: "😟" },
+        { value: "out_of_practice", label: "Out of practice", emoji: "🕰️" },
+        { value: "okay", label: "I do okay", emoji: "🙂" },
+        { value: "confident", label: "Fairly confident", emoji: "😎" },
+      ],
+    }],
+  },
+  {
+    kind: "form",
+    demo: "convo",
+    fields: [{
+      key: "struggle",
+      q: "What trips you up the most?",
+      options: [
+        { value: "nerves", label: "Nerves take over", emoji: "😰" },
+        { value: "blank", label: "My mind goes blank", emoji: "🫥" },
+        { value: "ramble", label: "I ramble", emoji: "🗣️" },
+        { value: "hard_q", label: "The hard questions", emoji: "🧠" },
+        { value: "selling", label: "Selling myself", emoji: "🙈" },
+        { value: "gap", label: "Explaining my gap", emoji: "🕳️" },
+        { value: "filler", label: "Um, like, I just…", emoji: "😬" },
+      ],
+    }],
   },
   {
     kind: "form",
     demo: "skills",
-    fields: [
-      {
-        key: "industry",
-        q: "What field are you in?",
-        options: [
-          { value: "healthcare", label: "Healthcare", emoji: "🩺" },
-          { value: "education", label: "Education", emoji: "🎓" },
-          { value: "finance", label: "Finance", emoji: "💼" },
-          { value: "tech", label: "Technology", emoji: "💻" },
-          { value: "operations", label: "Operations", emoji: "⚙️" },
-          { value: "sales", label: "Sales & Marketing", emoji: "📈" },
-          { value: "retail", label: "Retail & Service", emoji: "🛍️" },
-          { value: "hospitality", label: "Hospitality", emoji: "🍽️" },
-          { value: "manufacturing", label: "Manufacturing", emoji: "🏭" },
-          { value: "logistics", label: "Logistics", emoji: "🚚" },
-          { value: "legal", label: "Legal", emoji: "⚖️" },
-          { value: "creative", label: "Creative & Design", emoji: "🎨" },
-          { value: "support", label: "Customer Support", emoji: "🎧" },
-          { value: "nonprofit", label: "Nonprofit & Gov", emoji: "🏛️" },
-          { value: "trades", label: "Skilled trades", emoji: "🔧" },
-          { value: "other", label: "Something else", emoji: "✨" },
-        ],
-      },
-      {
-        key: "situation",
-        q: "What brings you here?",
-        options: SITUATIONS.map((s) => ({ value: s, label: SITUATION_META[s].short, emoji: SITUATION_META[s].emoji })),
-      },
-    ],
+    fields: [{
+      key: "industry",
+      q: "What field are you in?",
+      options: [
+        { value: "healthcare", label: "Healthcare", emoji: "🩺" },
+        { value: "education", label: "Education", emoji: "🎓" },
+        { value: "finance", label: "Finance", emoji: "💼" },
+        { value: "tech", label: "Technology", emoji: "💻" },
+        { value: "operations", label: "Operations", emoji: "⚙️" },
+        { value: "sales", label: "Sales & Marketing", emoji: "📈" },
+        { value: "retail", label: "Retail & Service", emoji: "🛍️" },
+        { value: "hospitality", label: "Hospitality", emoji: "🍽️" },
+        { value: "manufacturing", label: "Manufacturing", emoji: "🏭" },
+        { value: "logistics", label: "Logistics", emoji: "🚚" },
+        { value: "legal", label: "Legal", emoji: "⚖️" },
+        { value: "creative", label: "Creative & Design", emoji: "🎨" },
+        { value: "support", label: "Customer Support", emoji: "🎧" },
+        { value: "nonprofit", label: "Nonprofit & Gov", emoji: "🏛️" },
+        { value: "trades", label: "Skilled trades", emoji: "🔧" },
+        { value: "other", label: "Something else", emoji: "✨" },
+      ],
+    }],
   },
   {
-    // Only for career changers: where they're coming from, to frame the pivot.
+    kind: "form",
+    demo: "skills",
+    fields: [{
+      key: "situation",
+      q: "What brings you here?",
+      options: SITUATIONS.map((s) => ({ value: s, label: SITUATION_META[s].short, emoji: SITUATION_META[s].emoji })),
+    }],
+  },
+  {
+    // Career changers only: where they're coming from, to frame the pivot.
     kind: "form",
     demo: "skills",
     when: (a) => a.situation === "career_change",
-    fields: [
-      {
-        key: "fromField",
-        q: "What field are you coming from?",
-        options: [
-          { value: "education", label: "Education", emoji: "🎓" },
-          { value: "healthcare", label: "Healthcare", emoji: "🩺" },
-          { value: "corporate", label: "Corporate", emoji: "💼" },
-          { value: "service", label: "Service & retail", emoji: "🛍️" },
-          { value: "trades", label: "Trades", emoji: "🔧" },
-          { value: "military", label: "Military", emoji: "🎖️" },
-          { value: "other", label: "Something else", emoji: "✨" },
-        ],
-      },
-    ],
+    fields: [{
+      key: "fromField",
+      q: "What field are you coming from?",
+      options: [
+        { value: "education", label: "Education", emoji: "🎓" },
+        { value: "healthcare", label: "Healthcare", emoji: "🩺" },
+        { value: "corporate", label: "Corporate", emoji: "💼" },
+        { value: "service", label: "Service & retail", emoji: "🛍️" },
+        { value: "trades", label: "Trades", emoji: "🔧" },
+        { value: "military", label: "Military", emoji: "🎖️" },
+        { value: "other", label: "Something else", emoji: "✨" },
+      ],
+    }],
   },
+  // ── First validation: name the problem. Single stat, calm. ──
+  { kind: "validation", slot: 1, demo: "convo" },
   {
-    // Only for the less-confident: name the fear so we can target it.
-    kind: "form",
-    demo: "convo",
-    when: (a) => ["terrified", "rusty", "shaky"].includes(a.confidence),
-    fields: [
-      {
-        key: "dread",
-        q: "What's the part you dread most?",
-        options: [
-          { value: "first", label: "The first question", emoji: "🥶" },
-          { value: "curveball", label: "A curveball", emoji: "🌀" },
-          { value: "blank", label: "Going blank", emoji: "🫥" },
-          { value: "judged", label: "Being judged", emoji: "👀" },
-        ],
-      },
-    ],
-  },
-  {
-    /* Self-assessment. This is the single most useful input we take: it sets
-       the starting point of the projection two screens later, so the promise
-       is built from their own honest answer rather than a flat template. */
+    // Self-rated skill — sets the projection's starting point.
     kind: "form",
     demo: "skills",
-    fields: [
-      {
-        key: "skill",
-        q: "Honestly, how good are you in an interview right now?",
-        options: [
-          { value: "novice", label: "I freeze up", emoji: "🥶" },
-          { value: "rusty", label: "Rusty, it's been years", emoji: "🕰️" },
-          { value: "middling", label: "Hit or miss", emoji: "🎲" },
-          { value: "solid", label: "Pretty solid", emoji: "👍" },
-          { value: "strong", label: "Strong, I want an edge", emoji: "🎯" },
-        ],
-      },
-      {
-        key: "cadence",
-        q: "How often can you realistically practice?",
-        options: [
-          { value: "light", label: "A couple times a week", emoji: "🌱" },
-          { value: "steady", label: "Most weekdays", emoji: "📈" },
-          { value: "committed", label: "Almost every day", emoji: "🔥" },
-          { value: "intense", label: "Twice a day, it's soon", emoji: "⚡" },
-        ],
-      },
-    ],
-  },
-  {
-    /* Stakes. What the job is worth, and how soon. Both shape the plan and
-       both make the person state their own reason for being here. */
-    kind: "form",
-    demo: "progress",
-    fields: [
-      {
-        key: "stakes",
-        q: "What would landing this actually change?",
-        options: [
-          { value: "income", label: "A real pay rise", emoji: "💰" },
-          { value: "stability", label: "Stability again", emoji: "🏠" },
-          { value: "out", label: "Getting out of where I am", emoji: "🚪" },
-          { value: "restart", label: "Restarting my career", emoji: "🌅" },
-          { value: "growth", label: "A bigger role", emoji: "📊" },
-        ],
-      },
-      {
-        key: "timeline",
-        q: "When's your next interview?",
-        options: [
-          { value: "this_week", label: "This week", emoji: "😳" },
-          { value: "two_weeks", label: "Next couple weeks", emoji: "📅" },
-          { value: "month", label: "Within a month", emoji: "🗓️" },
-          { value: "none", label: "Nothing booked yet", emoji: "🔎" },
-        ],
-      },
-    ],
+    fields: [{
+      key: "skill",
+      q: "Honestly, how good are you in an interview today?",
+      options: [
+        { value: "novice", label: "I freeze up", emoji: "🥶" },
+        { value: "rusty", label: "Rusty, it's been years", emoji: "🕰️" },
+        { value: "middling", label: "Hit or miss", emoji: "🎲" },
+        { value: "solid", label: "Pretty solid", emoji: "👍" },
+        { value: "strong", label: "Strong, I want an edge", emoji: "🎯" },
+      ],
+    }],
   },
   {
     kind: "form",
     demo: "questions",
-    fields: [
-      { key: "role", type: "role", q: "What job are you preparing for?" },
-      { key: "company", type: "text", optional: true, q: "Any company in mind? (optional)" },
-      {
-        key: "gap",
-        q: "When did you last interview?",
-        options: [
-          { value: "<1yr", label: "< 1 year" },
-          { value: "1-3yr", label: "1–3 years" },
-          { value: "3-5yr", label: "3–5 years" },
-          { value: "5+yr", label: "5+ years" },
-        ],
-      },
-    ],
+    fields: [{ key: "role", type: "role", q: "What job are you preparing for?" }],
   },
+  {
+    kind: "form",
+    demo: "questions",
+    fields: [{
+      key: "gap",
+      q: "When did you last interview?",
+      options: [
+        { value: "<1yr", label: "Within the last year", emoji: "🗓️" },
+        { value: "1-3yr", label: "1–3 years ago", emoji: "⌛" },
+        { value: "3-5yr", label: "3–5 years ago", emoji: "🕰️" },
+        { value: "5+yr", label: "5+ years ago", emoji: "🧭" },
+      ],
+    }],
+  },
+  {
+    // Cadence — the other input to the projection.
+    kind: "form",
+    demo: "progress",
+    fields: [{
+      key: "cadence",
+      q: "How often can you practice?",
+      options: [
+        { value: "light", label: "A couple times a week", emoji: "🌱" },
+        { value: "steady", label: "Most weekdays", emoji: "📈" },
+        { value: "committed", label: "Almost every day", emoji: "🔥" },
+        { value: "intense", label: "Twice a day, it's soon", emoji: "⚡" },
+      ],
+    }],
+  },
+  {
+    kind: "form",
+    demo: "progress",
+    fields: [{
+      key: "timeline",
+      q: "When's your next interview?",
+      options: [
+        { value: "this_week", label: "This week", emoji: "😳" },
+        { value: "two_weeks", label: "In a week or two", emoji: "📅" },
+        { value: "month", label: "Within a month", emoji: "🗓️" },
+        { value: "none", label: "Nothing booked yet", emoji: "🔎" },
+      ],
+    }],
+  },
+  {
+    // Quality lead question: what the job pays. Feeds the ROI card and makes
+    // the lead worth far more than an anonymous email.
+    kind: "form",
+    demo: "progress",
+    fields: [{
+      key: "salaryBand",
+      q: "What does this role pay, roughly?",
+      options: [
+        { value: "u40", label: "Under $40k", emoji: "🌱" },
+        { value: "40_60", label: "$40–60k", emoji: "💵" },
+        { value: "60_90", label: "$60–90k", emoji: "💰" },
+        { value: "90_130", label: "$90–130k", emoji: "💎" },
+        { value: "130p", label: "$130k+", emoji: "🚀" },
+        { value: "unsure", label: "Not sure yet", emoji: "🤷" },
+      ],
+    }],
+  },
+  {
+    // Quality lead question: the stake. Why this matters to them, in their words.
+    kind: "form",
+    demo: "progress",
+    fields: [{
+      key: "stakes",
+      q: "What would landing this actually change?",
+      options: [
+        { value: "income", label: "A real pay rise", emoji: "💰" },
+        { value: "stability", label: "Stability again", emoji: "🏠" },
+        { value: "out", label: "Getting out of where I am", emoji: "🚪" },
+        { value: "restart", label: "Restarting my career", emoji: "🌅" },
+        { value: "growth", label: "A bigger role", emoji: "📊" },
+      ],
+    }],
+  },
+  // ── Recruiter comparison: why practice beats winging it / a coach. ──
+  { kind: "compare", demo: "skills" },
+  // ── The plan: top 10% in a week, top 1% in a month. ──
   { kind: "plan", demo: "progress" },
+  // ── The payoff: a simple animated return card. ──
   { kind: "roi", demo: "progress" },
 ];
 
@@ -306,6 +321,7 @@ export default function OnboardingPage() {
   const [answers, setAnswers] = useState<Record<string, string>>({});
   const [role, setRole] = useState("");
   const [query, setQuery] = useState("");
+  const [roleFocused, setRoleFocused] = useState(false);
 
   // Active screens depend on the answers, so the total step count is dynamic
   // (e.g. career changers and less-confident users get an extra tailored step).
@@ -419,15 +435,18 @@ export default function OnboardingPage() {
                               <input
                                 autoFocus
                                 value={query}
-                                onChange={(e) => { setQuery(e.target.value); setRole(e.target.value); }}
+                                onChange={(e) => { setQuery(e.target.value); setRole(e.target.value); setRoleFocused(true); }}
+                                onFocus={() => setRoleFocused(true)}
+                                // Delay so a click on a suggestion still registers before the list hides.
+                                onBlur={() => window.setTimeout(() => setRoleFocused(false), 150)}
                                 placeholder="e.g., Office Manager, Registered Nurse…"
                                 className="field !pl-10 !py-3"
                               />
                             </div>
-                            {suggestions.length > 0 && (
+                            {roleFocused && suggestions.length > 0 && (
                               <div className="absolute z-10 mt-2 w-full overflow-hidden rounded-xl border bg-white shadow-lg" style={{ borderColor: "var(--border)" }}>
                                 {suggestions.map((s) => (
-                                  <button key={s} onClick={() => { setRole(s); setQuery(s); }} className="block w-full px-4 py-2.5 text-left text-sm text-ink-2 transition-colors hover:bg-bg-tint hover:text-ink">{s}</button>
+                                  <button key={s} onClick={() => { setRole(s); setQuery(s); setRoleFocused(false); }} className="block w-full px-4 py-2.5 text-left text-sm text-ink-2 transition-colors hover:bg-bg-tint hover:text-ink">{s}</button>
                                 ))}
                               </div>
                             )}
@@ -479,16 +498,55 @@ export default function OnboardingPage() {
                   return (
                     <div className="text-center sm:text-left">
                       <span className="eyebrow">{v.eyebrow}</span>
-                      <div className="mt-5 font-serif text-7xl font-semibold leading-none text-primary-ink">
+                      <div className="mt-6 font-serif text-8xl font-semibold leading-none text-primary-ink">
                         <AnimatedNumber value={v.value} duration={1400} startOnView={false} />
                         <span className="text-4xl">{v.suffix}</span>
                       </div>
-                      <h1 className="mt-5 text-balance font-serif text-2xl font-semibold text-ink sm:text-3xl">{v.headline}</h1>
-                      <p className="mt-3 text-ink-2">{v.body}</p>
-                      <p className="mt-4 text-xs text-ink-3">{v.source}</p>
-                      <div className="mt-8 flex items-center justify-center gap-3 sm:justify-start">
+                      <h1 className="mt-6 text-balance font-serif text-2xl font-semibold text-ink sm:text-3xl">{v.headline}</h1>
+                      <p className="mt-3 max-w-md text-ink-2">{v.body}</p>
+                      <div className="mt-9 flex items-center justify-center gap-3 sm:justify-start">
                         <Button variant="ghost" size="sm" onClick={() => go(screen - 1)}><ArrowLeft size={15} /> Back</Button>
-                        <Button size="sm" onClick={() => go(screen + 1)}>{screen + 1 >= total ? "Start practicing" : "Keep going"} <ArrowRight size={15} /></Button>
+                        <Button size="sm" onClick={() => go(screen + 1)}>Keep going <ArrowRight size={15} /></Button>
+                      </div>
+                    </div>
+                  );
+                })()}
+
+                {cur.kind === "compare" && (() => {
+                  const rows: { label: string; other: string; us: string }[] = [
+                    { label: "Cost", other: "$150–300 / hour", us: "$0.33 a day" },
+                    { label: "Available", other: "Business hours", us: "3 a.m., the night before" },
+                    { label: "Feedback", other: "A vague gut feel", us: "Scored on 5 dimensions" },
+                    { label: "Judgment", other: "You feel watched", us: "Completely private" },
+                    { label: "Reps", other: "One session", us: "Unlimited, until it's easy" },
+                  ];
+                  return (
+                    <div>
+                      <span className="eyebrow">Why not just wing it</span>
+                      <h1 className="mt-4 text-balance font-serif text-2xl font-semibold leading-tight text-ink sm:text-3xl">
+                        A recruiter friend can&apos;t sit with you at 3 a.m.
+                      </h1>
+                      <p className="mt-3 max-w-md text-ink-2">
+                        A coach costs hundreds an hour and judges you in the room. This is the same
+                        rehearsal, private, and yours as many times as it takes.
+                      </p>
+                      <div className="mt-6 overflow-hidden rounded-2xl border" style={{ borderColor: "var(--border)" }}>
+                        <div className="grid grid-cols-[1fr_1fr_1fr] border-b text-2xs font-semibold uppercase tracking-wider" style={{ borderColor: "var(--border)" }}>
+                          <span className="p-3 text-ink-3" />
+                          <span className="p-3 text-center text-ink-3">Coach / recruiter</span>
+                          <span className="p-3 text-center text-white" style={{ background: "linear-gradient(135deg, var(--primary-bright), var(--primary-ink))" }}>Axon</span>
+                        </div>
+                        {rows.map((r, i) => (
+                          <div key={r.label} className="grid grid-cols-[1fr_1fr_1fr] items-center text-sm" style={{ background: i % 2 ? "var(--surface-2)" : "transparent" }}>
+                            <span className="p-3 font-medium text-ink">{r.label}</span>
+                            <span className="p-3 text-center text-ink-3">{r.other}</span>
+                            <span className="p-3 text-center font-medium text-primary-ink">{r.us}</span>
+                          </div>
+                        ))}
+                      </div>
+                      <div className="mt-8 flex items-center gap-3">
+                        <Button variant="ghost" size="sm" onClick={() => go(screen - 1)}><ArrowLeft size={15} /> Back</Button>
+                        <Button size="sm" onClick={() => go(screen + 1)}>See my plan <ArrowRight size={15} /></Button>
                       </div>
                     </div>
                   );
@@ -496,62 +554,31 @@ export default function OnboardingPage() {
 
 
                 {cur.kind === "roi" && (() => {
-                  const r = computeRoi(answers.industry, "quarterly");
-                  const mins = Math.max(1, Math.round(r.minutesToPayBack));
+                  // A single, clean number: the job's yearly pay divided by the
+                  // plan price. Salary from what THEY told us, falling back to
+                  // the field median. Framed as an estimate, not a promise.
+                  const SAL: Record<string, number> = { u40: 32000, "40_60": 50000, "60_90": 75000, "90_130": 110000, "130p": 160000 };
+                  const salary = SAL[answers.salaryBand] ?? computeRoi(answers.industry, "quarterly").salary;
+                  const planPrice = PLANS.quarterly.amountCents / 100;
+                  const multiple = Math.round(salary / planPrice / 50) * 50; // clean to nearest 50
                   return (
-                    <div>
-                      <span className="eyebrow">What it&apos;s worth</span>
-                      <h1 className="mt-4 text-balance font-serif text-2xl font-semibold leading-tight text-ink sm:text-3xl">
-                        It pays for itself in{" "}
-                        <span className="text-primary-ink">
-                          <AnimatedNumber value={mins} duration={1100} startOnView={false} /> minutes
-                        </span>{" "}
-                        of work.
-                      </h1>
-                      <p className="mt-3 text-ink-2">
-                        The full three months costs {usd(r.planPrice, 2)}. At the median{" "}
-                        {(answers.industry || "").replace("_", " ") || "salary"} wage that&apos;s about{" "}
-                        {mins} minutes on the clock. Then everything after it is upside.
-                      </p>
-
-                      <div className="mt-6 space-y-2.5">
-                        {[
-                          {
-                            k: "Land one week sooner",
-                            v: `${usd(r.oneWeekSooner)}`,
-                            m: `${Math.round(r.weekReturn)}× what you paid`,
-                          },
-                          {
-                            k: "Negotiate 5% more",
-                            v: `${usd(r.negotiationWin)}/yr`,
-                            m: `${Math.round(r.negotiationReturn)}× what you paid`,
-                          },
-                          {
-                            k: "One month in the role",
-                            v: `${usd(r.monthlyPay)}`,
-                            m: `${Math.round(r.monthReturn)}× what you paid`,
-                          },
-                        ].map((row) => (
-                          <div
-                            key={row.k}
-                            className="flex items-center justify-between gap-3 rounded-xl border p-4"
-                            style={{ borderColor: "var(--border)", background: "var(--surface)" }}
-                          >
-                            <div>
-                              <p className="text-sm font-medium text-ink">{row.k}</p>
-                              <p className="text-2xs text-ink-3">{row.m}</p>
-                            </div>
-                            <p className="shrink-0 font-mono text-lg font-semibold text-sage-ink">{row.v}</p>
-                          </div>
-                        ))}
+                    <div className="text-center sm:text-left">
+                      <span className="eyebrow">The math</span>
+                      <div className="mt-6 font-serif text-8xl font-semibold leading-none text-primary-ink">
+                        <AnimatedNumber value={multiple} duration={1500} startOnView={false} />×
                       </div>
-
-                      <p className="mt-4 text-xs leading-relaxed text-ink-3">
-                        Based on median full-time pay in your field, as a reference point rather than a
-                        forecast of your offer. The cost is exact; the returns depend on you.
+                      <h1 className="mt-6 text-balance font-serif text-2xl font-semibold leading-tight text-ink sm:text-3xl">
+                        We estimate every dollar comes back about {multiple.toLocaleString()}×.
+                      </h1>
+                      <p className="mt-3 max-w-md text-ink-2">
+                        This role pays around ${salary.toLocaleString()} a year. The plan is ${planPrice.toFixed(2)}.
+                        Walking in a little readier — landing even a week sooner — dwarfs that.
                       </p>
-
-                      <div className="mt-7 flex items-center gap-3">
+                      <p className="mt-4 max-w-md text-xs leading-relaxed text-ink-3">
+                        Based on the pay you told us, as a reference point, not a forecast of your offer.
+                        The cost is exact; the return depends on you.
+                      </p>
+                      <div className="mt-9 flex items-center justify-center gap-3 sm:justify-start">
                         <Button variant="ghost" size="sm" onClick={() => go(screen - 1)}><ArrowLeft size={15} /> Back</Button>
                         <Button size="sm" onClick={() => go(screen + 1)}>Start free <ArrowRight size={15} /></Button>
                       </div>
@@ -570,19 +597,26 @@ export default function OnboardingPage() {
                     <div>
                       <span className="eyebrow">Your plan</span>
                       <h1 className="mt-4 text-balance font-serif text-2xl font-semibold leading-tight text-ink sm:text-3xl">
-                        We think you can reach the{" "}
-                        <span className="text-primary-ink">top {plan.targetTopPercent}%</span> in{" "}
-                        <span className="text-primary-ink">
-                          <AnimatedNumber value={plan.days} duration={1200} startOnView={false} /> days
-                        </span>
-                        .
+                        Top 10% in <span className="text-primary-ink">{plan.toTop10.when}</span>.
+                        <br />
+                        Top 1% in <span className="text-primary-ink">{plan.toTop1.when}</span>.
                       </h1>
                       <p className="mt-3 text-ink-2">
-                        {cad.blurb} is {plan.sessions} sessions, about {plan.minutesTotal} minutes total.
-                        {urgent
-                          ? " Your interview is close, so we'll front-load the questions you're most likely to get."
-                          : " That's the whole commitment."}
+                        {cad.blurb} gets you there — {plan.toTop1.sessions} short sessions, about{" "}
+                        {plan.minutesTotal} minutes total.
+                        {urgent ? " Your interview is close, so we front-load the questions you're most likely to get." : ""}
                       </p>
+
+                      {/* the two milestones */}
+                      <div className="mt-6 grid grid-cols-2 gap-3">
+                        {[plan.toTop10, plan.toTop1].map((m) => (
+                          <div key={m.topPercent} className="rounded-2xl border-2 p-4 text-center" style={{ borderColor: m.topPercent === 1 ? "var(--primary)" : "var(--border)", background: m.topPercent === 1 ? "var(--primary-soft)" : "var(--surface)" }}>
+                            <p className="text-2xs font-semibold uppercase tracking-wider text-ink-3">Top {m.topPercent}%</p>
+                            <p className="mt-1 font-serif text-3xl font-semibold text-primary-ink">{m.when}</p>
+                            <p className="mt-0.5 text-2xs text-ink-3">~{m.sessions} sessions</p>
+                          </div>
+                        ))}
+                      </div>
 
                       {/* start -> target, on the same scale the dashboard uses */}
                       <div className="mt-6 rounded-2xl border p-5" style={{ borderColor: "var(--border)", background: "var(--surface)" }}>
@@ -611,14 +645,6 @@ export default function OnboardingPage() {
                         </div>
                       </div>
 
-                      <div className="mt-5 grid grid-cols-3 gap-2.5">
-                        {HIRING_STATS.map((h) => (
-                          <div key={h.label} className="rounded-xl bg-bg-sunk p-3 text-center">
-                            <p className="font-serif text-xl font-semibold text-ink">{h.stat}</p>
-                            <p className="mt-0.5 text-2xs leading-tight text-ink-2">{h.label}</p>
-                          </div>
-                        ))}
-                      </div>
 
                       <p className="mt-4 text-xs leading-relaxed text-ink-3">
                         Projected from your own answers, on the same five-dimension scale your
