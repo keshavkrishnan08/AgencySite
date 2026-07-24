@@ -91,3 +91,17 @@ export function priceParts(plan: PlanKey): [dollars: string, cents: string] {
   const cents = PLANS[plan].amountCents;
   return [String(Math.floor(cents / 100)), String(cents % 100).padStart(2, "0")];
 }
+
+/** Per-day cost, in whole cents, for the cheapest plan — the "56¢ a day"
+    framing that makes the price feel like nothing. Derived, so it tracks the
+    amount automatically. Quarterly billed over 3×30 days. */
+export function perDayCents(plan: PlanKey = "quarterly"): number {
+  const p = PLANS[plan];
+  return Math.round(p.amountCents / (p.months * 30));
+}
+
+/** "56¢ a day" / "$1.05 a day" — the marketing subtext. */
+export const FROM_PER_DAY = (() => {
+  const c = perDayCents("quarterly");
+  return c < 100 ? `${c}¢ a day` : `$${(c / 100).toFixed(2)} a day`;
+})();
