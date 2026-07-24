@@ -3,22 +3,7 @@
 import { useEffect, useState } from "react";
 import Link from "next/link";
 import { usePathname } from "next/navigation";
-import {
-  LayoutDashboard,
-  Mic,
-  CalendarCheck,
-  Timer,
-  Sprout,
-  Search,
-  Wand2,
-  MessageCircle,
-  NotebookPen,
-  Star,
-  CalendarDays,
-  Crown,
-  LogOut,
-  type LucideIcon,
-} from "lucide-react";
+import { LineChart, Mic, Sprout, Wand2, Crown, LogOut, type LucideIcon } from "lucide-react";
 import { useRouter } from "next/navigation";
 import { LogoMark } from "@/components/ui/Logo";
 import { cn } from "@/lib/utils";
@@ -32,20 +17,15 @@ interface Item {
 }
 
 const MAIN: Item[] = [
-  { href: "/dashboard", label: "Dashboard", icon: LayoutDashboard },
   { href: "/practice", label: "Practice", icon: Mic },
-  { href: "/plan", label: "My Plan", icon: CalendarCheck },
-  { href: "/interview-day", label: "Interview Day", icon: Timer },
+  { href: "/dashboard", label: "Metrics", icon: LineChart },
 ];
 
+/* The two builders that feed Practice: one writes the questions you'll be
+   asked, the other writes the answer people freeze on. */
 const TOOLS: Item[] = [
-  { href: "/tools/gap-story", label: "Gap Story", icon: Sprout },
-  { href: "/tools/company-research", label: "Company Briefing", icon: Search },
   { href: "/tools/question-predictor", label: "Question Predictor", icon: Wand2 },
-  { href: "/tools/salary", label: "Salary Practice", icon: MessageCircle },
-  { href: "/tools/debrief", label: "Debrief", icon: NotebookPen },
-  { href: "/tools/your-story", label: "Your Story", icon: Star },
-  { href: "/tools/tracker", label: "Tracker", icon: CalendarDays },
+  { href: "/tools/gap-story", label: "Gap Story", icon: Sprout },
 ];
 
 /* Hover-expand navigation rail. Collapsed to an icon strip; widens on hover to
@@ -115,7 +95,7 @@ export function AppSidebar() {
 
       <div className="px-5 pb-1 pt-5">
         <span className="whitespace-nowrap text-2xs font-semibold uppercase tracking-wider text-ink-3 opacity-0 transition-opacity duration-200 group-hover:opacity-100">
-          Tools
+          Prep
         </span>
       </div>
 

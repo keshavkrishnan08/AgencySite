@@ -34,8 +34,8 @@ export type PPEvent =
   | "upgrade_view"
   | "upgrade_click"
   | "upgrade_success"
-  | "interview_tracked"
-  | "offer_logged";
+  | "questions_predicted"
+  | "gap_story_built";
 
 /* Map our funnel events to Meta's standard events so the ad campaign can
    optimize for and attribute conversions. */
@@ -59,7 +59,7 @@ export function track(event: PPEvent, properties: Record<string, unknown> = {}):
   const metaEvent = META_EVENT[event];
   if (metaEvent && typeof window.fbq === "function") {
     try {
-      const payload = event === "upgrade_success" ? { currency: "USD", value: 9.99 } : {};
+      const payload = event === "upgrade_success" ? { currency: "USD", value: 19.99 } : {};
       window.fbq("track", metaEvent, payload);
     } catch {
       /* never break the app */

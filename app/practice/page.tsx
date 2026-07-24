@@ -12,14 +12,7 @@ import { VoiceButton } from "@/components/ui/VoiceButton";
 import { InfoTip } from "@/components/ui/Tooltip";
 import { apiFollowUp, apiGenerateExample, apiGenerateQuestions, apiScoreAnswer } from "@/lib/client";
 import { aggregateDimensions, computeOverall } from "@/lib/scoring";
-import {
-  getOnboarding,
-  getProfile,
-  getSessions,
-  saveSession,
-  isPremium,
-  getActiveInterview,
-} from "@/lib/store";
+import { getOnboarding, getPredictedSet, getProfile, getSessions, saveSession, isPremium } from "@/lib/store";
 import { average, cn, uid } from "@/lib/utils";
 import { track } from "@/lib/analytics";
 import type { Dimension, DeliveryMetrics, Question, ScoredAnswer, Session, Situation } from "@/lib/types";
@@ -32,6 +25,10 @@ function PracticeInner() {
   const params = useSearchParams();
   const focusDim = (params.get("focus") as Dimension) || undefined;
   const autostart = params.get("autostart") === "1";
+  // Handoff from the Question Predictor: run this session on the exact
+  // questions we predicted for that posting, in likelihood order.
+  const predictedId = params.get("predicted") || "";
+  const [fromPredicted, setFromPredicted] = useState(false);
 
   const [phase, setPhase] = useState<Phase>("loading");
   const [role, setRole] = useState("");
@@ -60,7 +57,7 @@ function PracticeInner() {
   const fuDeliveryRef = useRef<DeliveryMetrics | null>(null);
 
   const start = useCallback(
-    async (r: string, s: Situation | null) => {
+    async (r: string, s: Situation | null, predictedSetId?: string) => {
       setPhase("loading");
       setRole(r);
       setSituation(s);
@@ -84,6 +81,32 @@ function PracticeInner() {
       }
       perso.current = { weakestDimension, recentAverage, name: profile.name, interviewGap: profile.interviewGap || "" };
       setGentle(hist.length === 0);
+
+      // Predictor handoff: skip generation entirely and drill the exact
+      // questions we told them this posting would ask, most likely first.
+      const set = predictedSetId ? getPredictedSet(predictedSetId) : undefined;
+      if (set?.questions?.length) {
+        setFromPredicted(true);
+        if (set.company) setCompany(set.company);
+        setQuestions(
+          [...set.questions]
+            .sort((a, b) => (b.probability || 0) - (a.probability || 0))
+            .map((q, i) => ({
+              number: i + 1,
+              text: q.question,
+              category: "behavioral",
+              tip: q.why || "",
+            }))
+        );
+        setIndex(0);
+        setAnswers([]);
+        setScored(null);
+        setAnswerText("");
+        sessionStart.current = Date.now();
+        setPhase("answer");
+        return;
+      }
+      setFromPredicted(false);
 
       // Recent questions to steer the generator away from repeats across sessions.
       const recentQuestions = Array.from(
@@ -116,17 +139,16 @@ function PracticeInner() {
   useEffect(() => {
     const profile = getProfile();
     const ob = getOnboarding();
-    // Prefer the interview you're actively prepping for (from the schedule).
-    const active = getActiveInterview();
-    const r = active?.role || profile.targetRole || ob?.targetRole || "";
+    const set = predictedId ? getPredictedSet(predictedId) : undefined;
+    const r = set?.role || profile.targetRole || ob?.targetRole || "";
     const s = profile.situation || ob?.situation || null;
     setRole(r);
     setSituation(s);
-    setCompany(active?.company || profile.company || ob?.company || "");
-    // If we already know their role (from onboarding/profile/active interview),
+    setCompany(set?.company || profile.company || ob?.company || "");
+    // If we already know their role (from onboarding/profile/a predicted set),
     // go straight into the questions. Only show setup when we have nothing.
-    if (autostart || focusDim || r.trim()) {
-      start(r || "Office Manager", s);
+    if (predictedId || autostart || focusDim || r.trim()) {
+      start(r || "Office Manager", s, predictedId || undefined);
     } else {
       setPhase("setup");
     }
@@ -244,7 +266,7 @@ function PracticeInner() {
       targetRole: role,
       company: company.trim() || undefined,
       situation,
-      mode: focusDim ? "focus" : "practice",
+      mode: focusDim ? "focus" : fromPredicted ? "predicted" : "practice",
       overall: computeOverall(dimensions),
       dimensions,
       durationSeconds: Math.round((Date.now() - sessionStart.current) / 1000),
@@ -326,6 +348,9 @@ function PracticeInner() {
             <span className="chip">Preparing for: <strong className="text-ink">{role}</strong></span>
             {company && <span className="chip">at <strong className="text-ink">{company}</strong></span>}
             {focusDim && <span className="chip bg-primary-soft text-primary-ink">Focus: {focusDim}</span>}
+            {fromPredicted && (
+              <span className="chip bg-gold-soft text-gold-ink">Predicted questions</span>
+            )}
           </div>
         )}
 
@@ -669,7 +694,7 @@ const UNLOCKS = [
   "Your full score on all five dimensions",
   "Personal coaching with one clear fix",
   "The other seven questions in this session",
-  "Every tool: gap stories, salary, research",
+  "Your metrics: percentile, pace, and time to top 1%",
 ];
 function PaywallScore({ answer, gentle, role }: { answer: ScoredAnswer; gentle: boolean; role: string }) {
   return (
@@ -711,7 +736,7 @@ function PaywallScore({ answer, gentle, role }: { answer: ScoredAnswer; gentle: 
             ))}
           </ul>
           <ButtonLink href="/upgrade" variant="gold" size="lg" className="mt-7 w-full">
-            Unlock my score, $9.99/mo
+            Unlock my score, from $6.66/mo
           </ButtonLink>
           <ButtonLink href="/dashboard" variant="ghost" size="sm" className="mt-1">
             Maybe later

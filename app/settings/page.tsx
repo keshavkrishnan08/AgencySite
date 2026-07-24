@@ -143,7 +143,7 @@ export default function SettingsPage() {
                   </span>
                 </p>
                 <p className="text-sm text-ink-3">
-                  {premium ? "$9.99/month · renews monthly" : "2 sessions per week"}
+                  {premium ? "Active · cancel anytime" : "One scored answer, then it's locked"}
                 </p>
               </div>
               {premium ? (

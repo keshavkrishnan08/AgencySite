@@ -9,28 +9,30 @@ import { Button, ButtonLink } from "@/components/ui/Button";
 import { PremiumBadge } from "@/components/ui/PremiumBadge";
 import { getProfile, upgradeToPremium } from "@/lib/store";
 import { track } from "@/lib/analytics";
+import { PLANS, type PlanKey } from "@/lib/pricing";
 
 const INCLUDED = [
-  "Unlimited practice sessions",
-  "Full 5-dimension scoring & detailed feedback",
-  "Progress dashboard with charts and trends",
-  "Gap Story Builder. Unlimited revisions",
-  "Company Research Briefing",
-  "Question Predictor",
-  "Anxiety Detector with trend tracking",
-  "Interview Day pressure simulation",
-  "Salary Negotiation practice",
-  "Post-Interview Debrief & scoring",
+  "Unlimited scored mock interviews",
+  "All five dimensions, scored on every answer",
+  "A real follow-up question after each answer",
+  "The Anxiety Detector on every session",
+  "Your full metrics: percentile, pace, projections",
+  "Estimated time to a top 1% interview",
+  "Streaks, milestones and personal records",
+  "Question Predictor for any job posting",
+  "Practice the predicted questions, scored",
+  "Gap Story Builder with unlimited revisions",
   "Example great answers for every question",
-  "Weekly progress reports by email",
+  "Speak your answers, with delivery metrics",
 ];
 
 export default function UpgradePage() {
   const router = useRouter();
   const [state, setState] = useState<"idle" | "processing" | "done">("idle");
-  // Default to annual: it's the highest-LTV plan (churn-immune + prepaid), and the
+  // Default to quarterly: it matches how long a search actually takes, and the
   // pre-selected option is the single biggest lever on plan mix.
-  const [interval, setIntervalPlan] = useState<"monthly" | "annual">("annual");
+  const [plan, setPlan] = useState<PlanKey>("quarterly");
+  const p = PLANS[plan];
 
   useEffect(() => {
     track("upgrade_view");
@@ -38,13 +40,13 @@ export default function UpgradePage() {
 
   const subscribe = async () => {
     setState("processing");
-    track("upgrade_click", { interval });
+    track("upgrade_click", { plan });
     // Try real Stripe Checkout first; fall back to demo if not configured.
     try {
       const res = await fetch("/api/checkout", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ plan: interval, email: getProfile().email || undefined }),
+        body: JSON.stringify({ plan, email: getProfile().email || undefined }),
       });
       const data = await res.json();
       if (data?.url) {
@@ -57,16 +59,11 @@ export default function UpgradePage() {
     // Demo path (no Stripe keys): optimistic local upgrade.
     setTimeout(() => {
       upgradeToPremium();
-      track("upgrade_success", { interval, mode: "demo" });
+      track("upgrade_success", { plan, mode: "demo" });
       setState("done");
       setTimeout(() => router.push("/dashboard"), 1700);
     }, 1100);
   };
-
-  const price = interval === "annual" ? "$79" : "$9.99";
-  const wasPrice = interval === "annual" ? "$103" : "$12.99"; // pre-discount, struck through
-  const cadence = interval === "annual" ? "per year" : "per month";
-  const sub = interval === "annual" ? "Just $6.58/mo, billed yearly. Save 34%" : "Billed monthly · cancel anytime";
 
   return (
     <AppShell>
@@ -78,7 +75,7 @@ export default function UpgradePage() {
             Everything you need to walk in ready.
           </h1>
           <p className="mx-auto mt-4 max-w-prose text-lg text-ink-2">
-            Less than a coffee a day. One better answer could be worth the job itself.
+            The average job search runs about three months. So does the plan most people pick.
           </p>
         </div>
 
@@ -105,70 +102,79 @@ export default function UpgradePage() {
 
           {/* Order summary */}
           <div className="lg:sticky lg:top-24 lg:self-start">
-            <div className="rounded-2xl border-2 p-7 shadow-lg" style={{ borderColor: "var(--primary)", background: "var(--surface)" }}>
+            <div
+              className="rounded-2xl border-2 p-7 shadow-lg"
+              style={{ borderColor: "var(--primary)", background: "var(--surface)" }}
+            >
               {state === "done" ? (
-                <motion.div initial={{ opacity: 0, scale: 0.95 }} animate={{ opacity: 1, scale: 1 }} className="py-8 text-center">
+                <motion.div
+                  initial={{ opacity: 0, scale: 0.95 }}
+                  animate={{ opacity: 1, scale: 1 }}
+                  className="py-8 text-center"
+                >
                   <span className="mx-auto grid h-16 w-16 place-items-center rounded-full bg-sage-soft text-sage-ink">
                     <PartyPopper size={30} />
                   </span>
                   <h3 className="mt-5 font-serif text-2xl font-semibold text-ink">You&apos;re Premium! 🎉</h3>
-                  <p className="mt-2 text-ink-2">Every tool is unlocked. Taking you to your dashboard…</p>
+                  <p className="mt-2 text-ink-2">Everything is unlocked. Taking you to your metrics…</p>
                 </motion.div>
               ) : (
                 <>
-                  {/* billing interval toggle */}
+                  {/* plan toggle */}
                   <div className="mb-2 flex rounded-full bg-bg-tint p-1">
-                    {(["monthly", "annual"] as const).map((opt) => (
+                    {(Object.keys(PLANS) as PlanKey[]).map((key) => (
                       <button
-                        key={opt}
-                        onClick={() => setIntervalPlan(opt)}
-                        className={`flex-1 rounded-full px-4 py-2 text-sm font-medium capitalize transition-all ${
-                          interval === opt ? "bg-white text-ink shadow-xs" : "text-ink-2 hover:text-ink"
+                        key={key}
+                        onClick={() => setPlan(key)}
+                        className={`flex-1 rounded-full px-3 py-2 text-sm font-medium transition-all ${
+                          plan === key ? "bg-white text-ink shadow-xs" : "text-ink-2 hover:text-ink"
                         }`}
                       >
-                        {opt}
-                        {opt === "annual" && <span className="ml-1.5 text-2xs font-bold text-sage-ink">−34%</span>}
+                        {PLANS[key].toggle}
+                        {PLANS[key].savePct > 0 && (
+                          <span className="ml-1.5 text-2xs font-bold text-sage-ink">
+                            −{PLANS[key].savePct}%
+                          </span>
+                        )}
                       </button>
                     ))}
                   </div>
-                  {/* social proof: nudge toward annual */}
                   <p className="mb-5 text-center text-2xs font-medium text-ink-3">
-                    🔥 Most people choose yearly
+                    🔥 Most people pick 3 months. It&apos;s how long a search takes.
                   </p>
 
-                  <div className="mb-2 flex justify-end">
-                    <span className="inline-flex items-center gap-1.5 rounded-full bg-coral-soft px-2.5 py-1 text-2xs font-bold uppercase tracking-wider text-coral-ink">
-                      23% off · through next week
-                    </span>
-                  </div>
-                  <div className="flex items-baseline justify-between">
-                    <h2 className="font-serif text-xl font-semibold text-ink">Axon Careers Premium</h2>
+                  <div className="flex items-baseline justify-between gap-3">
+                    <h2 className="font-serif text-xl font-semibold text-ink">Premium</h2>
                     <span className="flex items-baseline gap-2">
-                      <span className="font-serif text-xl font-semibold text-ink-3 line-through">{wasPrice}</span>
+                      {p.was && (
+                        <span className="font-serif text-xl font-semibold text-ink-3 line-through">{p.was}</span>
+                      )}
                       <span className="font-serif text-3xl font-semibold" style={{ color: "var(--primary-ink)" }}>
-                        {price}
+                        {p.price}
                       </span>
                     </span>
                   </div>
-                  <p className="text-sm text-ink-3">{cadence} · {sub}</p>
+                  <p className="text-sm text-ink-3">{p.cadence}</p>
+                  <p className="mt-1 text-sm font-medium text-sage-ink">{p.perMonth}</p>
 
                   <div className="my-6 hairline" />
 
                   <div className="space-y-2 text-sm">
-                    <Row label={interval === "annual" ? "Was (per year)" : "Was (per month)"} value={wasPrice} />
-                    <Row label="23% off this week" value={`-${interval === "annual" ? "$24" : "$3"}`} />
-                    <Row label="Due today" value={price} bold />
+                    <Row label={`Premium · ${p.toggle}`} value={p.was ?? p.price} />
+                    {p.saveAmount && <Row label={`You save ${p.savePct}%`} value={`-${p.saveAmount}`} />}
+                    <Row label="Due today" value={p.price} bold />
                   </div>
 
-                  {/* Nudge monthly pickers toward the higher-LTV annual plan */}
-                  {interval === "monthly" && (
+                  {/* Nudge monthly pickers toward the plan that covers the search */}
+                  {plan === "monthly" && (
                     <button
-                      onClick={() => setIntervalPlan("annual")}
+                      onClick={() => setPlan("quarterly")}
                       className="mt-4 flex w-full items-center justify-between gap-2 rounded-xl border-2 border-dashed px-4 py-3 text-left text-sm transition-colors hover:bg-sage-soft/40"
                       style={{ borderColor: "var(--sage)" }}
                     >
                       <span className="text-ink-2">
-                        💡 Pay yearly and <span className="font-semibold text-sage-ink">save $41</span> (just $6.58/mo)
+                        💡 Three months costs less than two.{" "}
+                        <span className="font-semibold text-sage-ink">Save $9.98</span>
                       </span>
                       <span className="shrink-0 font-semibold text-sage-ink">Switch →</span>
                     </button>
@@ -181,7 +187,7 @@ export default function UpgradePage() {
                       </>
                     ) : (
                       <>
-                        <Lock size={16} /> Subscribe — {price}/{interval === "annual" ? "yr" : "mo"}
+                        <Lock size={16} /> Subscribe — {p.price}
                       </>
                     )}
                   </Button>

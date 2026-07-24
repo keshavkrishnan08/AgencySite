@@ -6,9 +6,8 @@ import { chromium } from "playwright";
 const BASE = "http://localhost:3000";
 const ROUTES = [
   "/", "/start", "/onboarding", "/signin", "/upgrade",
-  "/dashboard", "/practice", "/interview-day", "/plan", "/settings",
-  "/tools", "/tools/gap-story", "/tools/company-research", "/tools/question-predictor",
-  "/tools/salary", "/tools/debrief", "/tools/your-story", "/tools/tracker", "/whats-changed",
+  "/dashboard", "/practice", "/settings",
+  "/tools/question-predictor", "/tools/gap-story",
 ];
 
 // Seed local state so the paid-gate renders app content (auth gate is inert

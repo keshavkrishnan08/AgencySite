@@ -17,25 +17,22 @@ export function SiteFooter() {
               title="Product"
               links={[
                 { href: "/onboarding", label: "Start practicing" },
-                { href: "/dashboard", label: "Dashboard" },
-                { href: "/tools/gap-story", label: "Gap Story Builder" },
-                { href: "/tools/company-research", label: "Company Briefing" },
+                { href: "/practice", label: "Mock interview" },
+                { href: "/dashboard", label: "Your metrics" },
               ]}
             />
             <FooterCol
-              title="Tools"
+              title="Prep"
               links={[
                 { href: "/tools/question-predictor", label: "Question Predictor" },
-                { href: "/tools/salary", label: "Salary Practice" },
-                { href: "/tools/debrief", label: "Post-Interview Debrief" },
-                { href: "/interview-day", label: "Interview Day Mode" },
+                { href: "/tools/gap-story", label: "Gap Story Builder" },
               ]}
             />
             <FooterCol
               title="Company"
               links={[
                 { href: "#pricing", label: "Pricing" },
-                { href: "/whats-changed", label: "What's changed in interviews" },
+                { href: "#how", label: "How it works" },
                 { href: "#", label: "Privacy" },
                 { href: "#", label: "Contact" },
               ]}
