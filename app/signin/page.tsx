@@ -8,6 +8,7 @@ import { ArrowRight, Loader2, Mail, Lock, User, CheckCircle2 } from "lucide-reac
 import { Logo } from "@/components/ui/Logo";
 import { Button } from "@/components/ui/Button";
 import { useAuth } from "@/lib/auth";
+import { identify, track } from "@/lib/analytics";
 import { ReviewWall } from "@/components/auth/ReviewWall";
 
 type Mode = "signin" | "signup";
@@ -34,12 +35,24 @@ function SignInInner() {
     try {
       if (mode === "signup") {
         const r = await signUp(email.trim(), password, name.trim());
-        if (r.error) return setError(r.error);
+        if (r.error) {
+          track("account:signup_error", { reason: r.error.slice(0, 80) });
+          return setError(r.error);
+        }
+        // Join the anonymous pre-signup journey (ads -> onboarding) to the real
+        // person. This is the alias moment: everything before now was anon.
+        identify(email.trim(), { name: name.trim() || undefined });
+        track("account_created", { next });
         if (r.needsConfirm) return setNotice("Check your email to confirm your account, then sign in.");
         router.push(next);
       } else {
         const r = await signIn(email.trim(), password);
-        if (r.error) return setError(r.error);
+        if (r.error) {
+          track("account:signin_error", { reason: r.error.slice(0, 80) });
+          return setError(r.error);
+        }
+        identify(email.trim());
+        track("account:signin", { next });
         router.push(next);
       }
     } finally {
@@ -55,6 +68,8 @@ function SignInInner() {
     const r = await signInWithLink(email.trim());
     setBusy(false);
     if (r.error) return setError(r.error);
+    identify(email.trim());
+    track("account:magic_link_sent", {});
     setNotice("We sent you a sign-in link. Check your email.");
   };
 
