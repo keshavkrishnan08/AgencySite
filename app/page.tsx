@@ -68,7 +68,7 @@ function Hero() {
           <Reveal delay={0.18}>
             <div className="mt-9 flex flex-col items-start gap-3 sm:flex-row sm:items-center">
               <ButtonLink href="/onboarding" size="lg" className="group">
-                Get started
+                Start free
                 <ArrowRight size={18} className="transition-transform group-hover:translate-x-0.5" />
               </ButtonLink>
               <span className="text-sm text-ink-3">From $6.66/mo. Cancel anytime.</span>
@@ -201,7 +201,7 @@ function FiveQuestions() {
         <Reveal delay={0.1}>
           <div className="mt-12 text-center">
             <ButtonLink href="/onboarding" size="lg">
-              Practice all five
+              Start free
               <ArrowRight size={18} />
             </ButtonLink>
           </div>
@@ -496,7 +496,7 @@ function Pricing() {
               </p>
               <p className="mt-2 text-xs font-medium text-ink-3">🔥 What most people pick</p>
               <ButtonLink href="/onboarding" className="mt-auto w-full !mt-5">
-                Get started
+                Start free
               </ButtonLink>
             </div>
           </Reveal>
@@ -513,7 +513,7 @@ function Pricing() {
               </div>
               <p className="mt-1 text-sm text-ink-3">Billed monthly · cancel anytime</p>
               <ButtonLink href="/onboarding" variant="secondary" className="mt-auto w-full !mt-5">
-                Get started
+                Start free
               </ButtonLink>
             </div>
           </Reveal>
@@ -565,7 +565,7 @@ function FinalCTA() {
         <Reveal delay={0.16}>
           <div className="mt-10 flex flex-col items-center gap-3">
             <ButtonLink href="/onboarding" size="lg" className="group">
-              Get started
+              Start free
               <ArrowRight size={18} className="transition-transform group-hover:translate-x-0.5" />
             </ButtonLink>
             <span className="text-sm text-ink-3">

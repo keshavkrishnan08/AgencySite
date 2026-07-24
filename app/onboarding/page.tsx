@@ -1,6 +1,6 @@
 "use client";
 
-import { useMemo, useState } from "react";
+import { useEffect, useMemo, useState } from "react";
 import { useRouter } from "next/navigation";
 import Link from "next/link";
 import { AnimatePresence, motion } from "framer-motion";
@@ -19,6 +19,7 @@ import { ROLES } from "@/lib/roles";
 import { SITUATION_META } from "@/lib/utils";
 import { setOnboarding, setProfile } from "@/lib/store";
 import { track } from "@/lib/analytics";
+import { CADENCE_META, HIRING_STATS, projectPlan, type Cadence, type SkillLevel } from "@/lib/plan-projection";
 import type { InterviewGap, Situation } from "@/lib/types";
 
 type Demo = "convo" | "skills" | "progress" | "questions" | "delivery";
@@ -27,7 +28,8 @@ type Field = { key: string; q: string; type?: "role" | "text"; optional?: boolea
 type Cond = (a: Record<string, string>) => boolean;
 type Screen =
   | { kind: "form"; fields: Field[]; demo: Demo; when?: Cond }
-  | { kind: "validation"; slot: 1 | 2; demo: Demo; when?: Cond };
+  | { kind: "validation"; slot: 1 | 2; demo: Demo; when?: Cond }
+  | { kind: "plan"; demo: Demo; when?: Cond };
 
 const SITUATIONS: Situation[] = ["returning", "laid_off", "promotion", "career_change"];
 
@@ -136,6 +138,65 @@ const SCREENS: Screen[] = [
     ],
   },
   {
+    /* Self-assessment. This is the single most useful input we take: it sets
+       the starting point of the projection two screens later, so the promise
+       is built from their own honest answer rather than a flat template. */
+    kind: "form",
+    demo: "skills",
+    fields: [
+      {
+        key: "skill",
+        q: "Honestly, how good are you in an interview right now?",
+        options: [
+          { value: "novice", label: "I freeze up", emoji: "🥶" },
+          { value: "rusty", label: "Rusty, it's been years", emoji: "🕰️" },
+          { value: "middling", label: "Hit or miss", emoji: "🎲" },
+          { value: "solid", label: "Pretty solid", emoji: "👍" },
+          { value: "strong", label: "Strong, I want an edge", emoji: "🎯" },
+        ],
+      },
+      {
+        key: "cadence",
+        q: "How often can you realistically practice?",
+        options: [
+          { value: "light", label: "A couple times a week", emoji: "🌱" },
+          { value: "steady", label: "Most weekdays", emoji: "📈" },
+          { value: "committed", label: "Almost every day", emoji: "🔥" },
+          { value: "intense", label: "Twice a day, it's soon", emoji: "⚡" },
+        ],
+      },
+    ],
+  },
+  {
+    /* Stakes. What the job is worth, and how soon. Both shape the plan and
+       both make the person state their own reason for being here. */
+    kind: "form",
+    demo: "progress",
+    fields: [
+      {
+        key: "stakes",
+        q: "What would landing this actually change?",
+        options: [
+          { value: "income", label: "A real pay rise", emoji: "💰" },
+          { value: "stability", label: "Stability again", emoji: "🏠" },
+          { value: "out", label: "Getting out of where I am", emoji: "🚪" },
+          { value: "restart", label: "Restarting my career", emoji: "🌅" },
+          { value: "growth", label: "A bigger role", emoji: "📊" },
+        ],
+      },
+      {
+        key: "timeline",
+        q: "When's your next interview?",
+        options: [
+          { value: "this_week", label: "This week", emoji: "😳" },
+          { value: "two_weeks", label: "Next couple weeks", emoji: "📅" },
+          { value: "month", label: "Within a month", emoji: "🗓️" },
+          { value: "none", label: "Nothing booked yet", emoji: "🔎" },
+        ],
+      },
+    ],
+  },
+  {
     kind: "form",
     demo: "questions",
     fields: [
@@ -153,6 +214,7 @@ const SCREENS: Screen[] = [
       },
     ],
   },
+  { kind: "plan", demo: "progress" },
 ];
 
 /* ---- modular validation: the stat is built from prior selections ---- */
@@ -248,6 +310,13 @@ export default function OnboardingPage() {
   const total = active.length;
   const cur = active[Math.min(screen, total - 1)];
 
+  // Every step view, so the drop-off point in this flow is measurable per
+  // screen rather than only "started" vs "completed".
+  useEffect(() => {
+    if (!cur) return;
+    track("onboarding:step_view", { step: screen + 1, total, kind: cur.kind });
+  }, [screen, total, cur]);
+
   const go = (next: number) => {
     if (next >= total) return finish();
     setDir(next > screen ? 1 : -1);
@@ -256,6 +325,7 @@ export default function OnboardingPage() {
 
   const pick = (key: string, value: string) => {
     setAnswers((a) => ({ ...a, [key]: value }));
+    track("onboarding:answer", { key, value, step: screen + 1 });
     if (key === "situation") track("onboarding_situation", { situation: value });
   };
 
@@ -265,6 +335,7 @@ export default function OnboardingPage() {
   const selectOption = (key: string, value: string) => {
     const na = { ...answers, [key]: value };
     setAnswers(na);
+    track("onboarding:answer", { key, value, step: screen + 1 });
     if (key === "situation") track("onboarding_situation", { situation: value });
     if (
       cur.kind === "form" &&
@@ -415,6 +486,81 @@ export default function OnboardingPage() {
                       <div className="mt-8 flex items-center justify-center gap-3 sm:justify-start">
                         <Button variant="ghost" size="sm" onClick={() => go(screen - 1)}><ArrowLeft size={15} /> Back</Button>
                         <Button size="sm" onClick={() => go(screen + 1)}>{screen + 1 >= total ? "Start practicing" : "Keep going"} <ArrowRight size={15} /></Button>
+                      </div>
+                    </div>
+                  );
+                })()}
+
+                {cur.kind === "plan" && (() => {
+                  const plan = projectPlan(
+                    (answers.skill as SkillLevel) || "rusty",
+                    (answers.cadence as Cadence) || "steady"
+                  );
+                  const cad = CADENCE_META[(answers.cadence as Cadence) || "steady"];
+                  const urgent = answers.timeline === "this_week" || answers.timeline === "two_weeks";
+                  return (
+                    <div>
+                      <span className="eyebrow">Your plan</span>
+                      <h1 className="mt-4 text-balance font-serif text-2xl font-semibold leading-tight text-ink sm:text-3xl">
+                        We think you can reach the{" "}
+                        <span className="text-primary-ink">top {plan.targetTopPercent}%</span> in{" "}
+                        <span className="text-primary-ink">
+                          <AnimatedNumber value={plan.days} duration={1200} startOnView={false} /> days
+                        </span>
+                        .
+                      </h1>
+                      <p className="mt-3 text-ink-2">
+                        {cad.blurb} is {plan.sessions} sessions, about {plan.minutesTotal} minutes total.
+                        {urgent
+                          ? " Your interview is close, so we'll front-load the questions you're most likely to get."
+                          : " That's the whole commitment."}
+                      </p>
+
+                      {/* start -> target, on the same scale the dashboard uses */}
+                      <div className="mt-6 rounded-2xl border p-5" style={{ borderColor: "var(--border)", background: "var(--surface)" }}>
+                        <div className="flex items-end justify-between gap-4">
+                          <div>
+                            <p className="text-2xs font-semibold uppercase tracking-wider text-ink-3">Starting around</p>
+                            <p className="font-serif text-3xl font-semibold text-ink">{plan.startScore}</p>
+                            <p className="text-xs text-ink-3">top {plan.startTopPercent}%</p>
+                          </div>
+                          <div className="mb-2 flex-1">
+                            <div className="h-2 overflow-hidden rounded-full" style={{ background: "var(--bg-tint)" }}>
+                              <motion.div
+                                className="h-full rounded-full"
+                                initial={{ width: `${plan.startScore}%` }}
+                                animate={{ width: `${plan.targetScore}%` }}
+                                transition={{ duration: 1.4, ease: [0.22, 1, 0.36, 1], delay: 0.3 }}
+                                style={{ background: "linear-gradient(90deg, var(--primary), var(--primary-bright))" }}
+                              />
+                            </div>
+                          </div>
+                          <div className="text-right">
+                            <p className="text-2xs font-semibold uppercase tracking-wider text-primary-ink">Target</p>
+                            <p className="font-serif text-3xl font-semibold text-primary-ink">{plan.targetScore}</p>
+                            <p className="text-xs text-ink-3">top {plan.targetTopPercent}%</p>
+                          </div>
+                        </div>
+                      </div>
+
+                      <div className="mt-5 grid grid-cols-3 gap-2.5">
+                        {HIRING_STATS.map((h) => (
+                          <div key={h.label} className="rounded-xl bg-bg-sunk p-3 text-center">
+                            <p className="font-serif text-xl font-semibold text-ink">{h.stat}</p>
+                            <p className="mt-0.5 text-2xs leading-tight text-ink-2">{h.label}</p>
+                          </div>
+                        ))}
+                      </div>
+
+                      <p className="mt-4 text-xs leading-relaxed text-ink-3">
+                        Projected from your own answers, on the same five-dimension scale your
+                        dashboard scores you against. It updates every session, and it&apos;s an
+                        estimate, not a promise.
+                      </p>
+
+                      <div className="mt-7 flex items-center gap-3">
+                        <Button variant="ghost" size="sm" onClick={() => go(screen - 1)}><ArrowLeft size={15} /> Back</Button>
+                        <Button size="sm" onClick={() => go(screen + 1)}>Start free <ArrowRight size={15} /></Button>
                       </div>
                     </div>
                   );
