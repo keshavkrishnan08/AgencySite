@@ -1,5 +1,7 @@
 "use client";
 
+import { FROM_PER_DAY } from "@/lib/pricing";
+
 import { useEffect, useState } from "react";
 import { ArrowRight, X } from "lucide-react";
 import { StartFreeButton } from "@/components/ui/StartFreeButton";
@@ -26,7 +28,7 @@ export function StickyCTA() {
         <div className="glass mx-auto flex max-w-3xl items-center justify-between gap-4 rounded-2xl border px-5 py-3.5 shadow-xl" style={{ borderColor: "var(--border)" }}>
           <div className="hidden sm:block">
             <p className="font-serif text-base font-semibold text-ink">Your next interview is coming.</p>
-            <p className="text-xs text-ink-2">From $16.66/mo · cancel anytime.</p>
+            <p className="text-xs text-ink-2">From {FROM_PER_DAY} · cancel anytime.</p>
           </div>
           <p className="text-sm font-medium text-ink sm:hidden">Start for free</p>
           <div className="flex items-center gap-1">

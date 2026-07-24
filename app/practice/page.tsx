@@ -792,7 +792,7 @@ function PaywallScore({ answer, gentle, role }: { answer: ScoredAnswer; gentle: 
             className="mt-7 w-full"
             onClick={() => track("paywall:cta_click", { role })}
           >
-            Unlock my score, from $16.66/mo
+            Unlock my score, from 56¢ a day
           </ButtonLink>
           <ButtonLink href="/dashboard" variant="ghost" size="sm" className="mt-1">
             Maybe later
