@@ -92,13 +92,6 @@ export default function UpgradePage() {
                 </li>
               ))}
             </ul>
-            <div className="mt-7 rounded-xl bg-bg-sunk p-5">
-              <p className="text-[0.95rem] italic leading-relaxed text-ink-2">
-                &ldquo;I practiced my gap answer nine times. On the tenth it sounded like I&apos;d been saying it
-                my whole life. I got the job.&rdquo;
-              </p>
-              <p className="mt-2 text-sm font-semibold text-primary-ink">Rachel, returning to work after 4 years</p>
-            </div>
           </div>
 
           {/* Order summary */}

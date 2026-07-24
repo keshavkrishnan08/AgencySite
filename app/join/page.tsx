@@ -3,17 +3,14 @@ import { PresaleNav } from "@/components/landing/PresaleNav";
 import { PresaleFooter } from "@/components/landing/PresaleFooter";
 import { HeroDemo } from "@/components/landing/HeroDemo";
 import { ProductDemo } from "@/components/landing/ProductDemo";
-import { Avatar } from "@/components/ui/Avatar";
 import { ProductFeatures } from "@/components/landing/features";
 import { FlowDiagram } from "@/components/landing/FlowDiagram";
-import { TestimonialCarousel } from "@/components/landing/testimonials";
 import { FAQAccordion } from "@/components/landing/FAQAccordion";
 import { PresaleSticky } from "@/components/landing/PresaleSticky";
 import { PresaleForm } from "@/components/landing/PresaleForm";
 import { Reveal } from "@/components/ui/Reveal";
 import { ScoreRing } from "@/components/ui/Score";
 import { ProgressLineChart, MiniBars } from "@/components/charts/Charts";
-import { AvatarRow } from "@/components/ui/AvatarRow";
 import { ButtonLink } from "@/components/ui/Button";
 import { PLANS } from "@/lib/pricing";
 import { PricingCards } from "@/components/landing/PricingCards";
@@ -40,8 +37,6 @@ function Eyebrow({ children }: { children: React.ReactNode }) {
   return <p className="eyebrow mb-4 justify-center">{children}</p>;
 }
 
-const PHOTO_PEERS =
-  "https://images.unsplash.com/photo-1600880292203-757bb62b4baf?auto=format&fit=crop&w=1900&q=78";
 const PHOTO_PREP =
   "https://images.unsplash.com/photo-1522202176988-66273c2fd55f?auto=format&fit=crop&w=1900&q=78";
 const PHOTO_HERO =
@@ -114,14 +109,6 @@ function Hero() {
           <Reveal delay={0.18}>
             <div className="mt-9 max-w-md">
               <PresaleForm source="hero" />
-            </div>
-          </Reveal>
-          <Reveal delay={0.26}>
-            <div className="mt-10 flex items-center gap-4">
-              <AvatarRow />
-              <p className="text-sm text-ink-2">
-                <span className="font-semibold text-ink">12,000+ people</span> have practiced with Axon Careers
-              </p>
             </div>
           </Reveal>
         </div>
@@ -325,62 +312,6 @@ function Numbers() {
   );
 }
 
-/* ===================== STORIES ===================== */
-const STORIES = [
-  {
-    tag: "The 3 AM panic",
-    name: "Maria, 38",
-    photo: "https://randomuser.me/api/portraits/women/90.jpg",
-    body: "It was 3 AM and my interview was at 9. Every answer in my head sounded wrong and there was no one I could call. I was so stressed out I felt sick. So I opened Axon Careers and ran through five questions. I hit a 78. I finally closed my eyes thinking, okay. I've actually done this before.",
-  },
-  {
-    tag: "The parking lot",
-    name: "Rachel, 41",
-    photo: "https://randomuser.me/api/portraits/women/33.jpg",
-    body: "I hadn't worked since 2021. I stayed home with my kids, and I'd make that choice again. But there I was in the parking lot, ten minutes out, hands shaking about the gap. The night before, I'd practiced explaining it nine times. On the tenth, it finally came out easy.",
-  },
-  {
-    tag: "The career change",
-    name: "James, 45",
-    photo: "https://randomuser.me/api/portraits/men/45.jpg",
-    body: "I loved teaching. The burnout is what broke me. Everyone kept asking 'why leave education?' and I heard judgment that probably wasn't even there. I practiced my answer twelve times. Now it comes out true, because it is.",
-  },
-];
-
-function Stories() {
-  return (
-    <section className="relative overflow-hidden py-28 sm:py-40">
-      <SectionBg src={PHOTO_PEERS} tint="bg" />
-      <div className="container-wide">
-        <Reveal>
-          <Eyebrow>For the moments no one sees</Eyebrow>
-        </Reveal>
-        <Reveal delay={0.05}>
-          <h2 className="text-balance text-center font-serif text-display font-semibold text-ink">
-            Real moments.
-          </h2>
-        </Reveal>
-
-        <div className="mt-14 grid gap-6 lg:grid-cols-3">
-          {STORIES.map((s, i) => (
-            <Reveal key={s.tag} delay={i * 0.1}>
-              <figure className="card h-full p-7">
-                <div className="flex items-center gap-3">
-                  <Avatar src={s.photo} name={s.name} size={48} className="ring-2 ring-white" />
-                  <div>
-                    <div className="text-sm font-semibold text-ink">{s.name}</div>
-                    <div className="text-xs font-medium text-primary-ink">{s.tag}</div>
-                  </div>
-                </div>
-                <p className="mt-4 leading-relaxed text-ink-2">{s.body}</p>
-              </figure>
-            </Reveal>
-          ))}
-        </div>
-      </div>
-    </section>
-  );
-}
 
 /* ===================== COMPARISON ===================== */
 const ROWS: [string, string, string][] = [
@@ -610,9 +541,7 @@ export default function AdLandingPage() {
       <PresaleNav />
       <main>
         <Hero />
-        <TestimonialCarousel />
         <DemoSection />
-        <Stories />
         <HowItWorks />
         <ProductFeatures presale />
         <FiveQuestions />

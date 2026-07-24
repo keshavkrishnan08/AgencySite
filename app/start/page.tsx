@@ -15,8 +15,6 @@ import {
 import { Logo } from "@/components/ui/Logo";
 import { ButtonLink } from "@/components/ui/Button";
 import { Reveal } from "@/components/ui/Reveal";
-import { Avatar } from "@/components/ui/Avatar";
-import { AvatarRow } from "@/components/ui/AvatarRow";
 import { HeroDemo } from "@/components/landing/HeroDemo";
 import { StartSticky } from "@/components/landing/StartSticky";
 
@@ -27,11 +25,11 @@ import { StartSticky } from "@/components/landing/StartSticky";
 export const metadata: Metadata = {
   title: "Practice your interview in private",
   description:
-    "Haven't interviewed in years? Practice with a private AI coach, five minutes a day, and walk in sure. From 56¢ a day.",
+    "Haven't interviewed in years? Practice with a private AI coach, five minutes a day, and walk in sure. From $0.33 a day.",
   openGraph: {
     title: "You're more ready than you think.",
     description:
-      "A private place to practice your interview until the fear turns into calm. From 56¢ a day.",
+      "A private place to practice your interview until the fear turns into calm. From $0.33 a day.",
   },
   robots: { index: false }, // ad destination, not for organic search
 };
@@ -39,27 +37,6 @@ export const metadata: Metadata = {
 const CTA = "/onboarding";
 
 /* Compact proof set — concrete before/after beats adjectives. */
-const PROOF = [
-  {
-    quote: "I hadn't interviewed in six years. My score went from 44 to 81. I got the job.",
-    name: "Rachel M.",
-    role: "Office Manager",
-    photo: "https://randomuser.me/api/portraits/women/68.jpg",
-  },
-  {
-    quote: "It caught how many times I said 'um.' I had no idea. Two weeks later, gone.",
-    name: "David K.",
-    role: "Operations Lead",
-    photo: "https://randomuser.me/api/portraits/men/32.jpg",
-  },
-  {
-    quote: "The gap question used to wreck me. Now I have an answer I actually believe.",
-    name: "Priya N.",
-    role: "Account Manager",
-    photo: "https://randomuser.me/api/portraits/women/44.jpg",
-  },
-];
-
 const STEPS = [
   {
     n: "01",
@@ -85,18 +62,8 @@ const ASSURANCES = [
   { icon: ShieldCheck, label: "Cancel anytime" },
   { icon: Lock, label: "Completely private" },
   { icon: Smartphone, label: "Works on your phone" },
-  { icon: CreditCard, label: "From 56¢ a day" },
+  { icon: CreditCard, label: "From $0.33 a day" },
 ];
-
-function Stars({ className = "" }: { className?: string }) {
-  return (
-    <div className={`flex gap-0.5 ${className}`}>
-      {Array.from({ length: 5 }).map((_, i) => (
-        <Star key={i} size={15} className="fill-gold text-gold" />
-      ))}
-    </div>
-  );
-}
 
 export default function StartPage() {
   return (
@@ -105,7 +72,7 @@ export default function StartPage() {
       <header className="container-wide flex items-center justify-between py-5">
         <Logo href={null} size={30} />
         <span className="chip hidden bg-sage-soft text-sage-ink sm:inline-flex">
-          <Star size={13} className="fill-sage-ink" /> From 56¢ a day
+          <Star size={13} className="fill-sage-ink" /> From $0.33 a day
         </span>
       </header>
 
@@ -154,19 +121,6 @@ export default function StartPage() {
               <p className="text-sm font-medium text-ink-3">
                 From {FROM_PER_DAY}. Cancel anytime.
               </p>
-            </div>
-          </Reveal>
-
-          <Reveal delay={0.2}>
-            <div className="mt-8 flex items-center gap-3">
-              <AvatarRow />
-              <div className="text-sm">
-                <div className="flex items-center gap-1.5">
-                  <Stars />
-                  <span className="font-semibold text-ink">4.9</span>
-                </div>
-                <span className="text-ink-3">12,000+ people have practiced here</span>
-              </div>
             </div>
           </Reveal>
         </div>
@@ -262,36 +216,6 @@ export default function StartPage() {
         </div>
       </section>
 
-      {/* ───────────────────────── PROOF (compact) ───────────────────────── */}
-      <section className="container-wide py-16 sm:py-24">
-        <Reveal>
-          <p className="eyebrow justify-center">Real people, real interviews</p>
-        </Reveal>
-        <Reveal delay={0.05}>
-          <h2 className="mx-auto mt-4 max-w-2xl text-balance text-center font-serif text-display font-semibold text-ink">
-            They walked in nervous. They walked out hired.
-          </h2>
-        </Reveal>
-        <div className="mt-12 grid gap-5 md:grid-cols-3">
-          {PROOF.map((t, i) => (
-            <Reveal key={t.name} delay={i * 0.07}>
-              <figure className="card flex h-full flex-col p-6">
-                <Stars />
-                <p className="mt-3 flex-1 text-[0.95rem] leading-relaxed text-ink">
-                  &ldquo;{t.quote}&rdquo;
-                </p>
-                <figcaption className="mt-5 flex items-center gap-3">
-                  <Avatar src={t.photo} name={t.name} size={44} className="ring-2 ring-white" />
-                  <div>
-                    <div className="text-sm font-semibold text-ink">{t.name}</div>
-                    <div className="text-xs text-ink-3">{t.role}</div>
-                  </div>
-                </figcaption>
-              </figure>
-            </Reveal>
-          ))}
-        </div>
-      </section>
 
       {/* ───────────────────────── SAFETY / OBJECTION ───────────────────────── */}
       <section className="container-content pb-4 text-center">
