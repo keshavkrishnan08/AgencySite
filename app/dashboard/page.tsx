@@ -442,7 +442,9 @@ function Trajectory({ m }: { m: Metrics }) {
         </div>
       ) : (
         <p className="py-16 text-center text-ink-3">
-          Complete one more session and your trend line and projection appear here.
+          {range && m.sessionCount >= 2
+            ? `No sessions in the last ${range} days. Practice this week to extend your line, or switch to All.`
+            : "Complete one more session and your trend line and projection appear here."}
         </p>
       )}
     </section>

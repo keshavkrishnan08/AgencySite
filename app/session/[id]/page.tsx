@@ -18,8 +18,8 @@ import { AppShell } from "@/components/layout/AppShell";
 import { Inline } from "@/components/ui/RichText";
 import { Button, ButtonLink } from "@/components/ui/Button";
 import { AnimatedNumber } from "@/components/ui/AnimatedNumber";
-import { ScoreNumber } from "@/components/ui/Score";
 import { AnswerScoreCard } from "@/components/practice/AnswerScoreCard";
+import { apiGenerateExample } from "@/lib/client";
 import { ProgressLineChart, RadarScoreChart } from "@/components/charts/Charts";
 import {
   getSession,
@@ -157,7 +157,9 @@ export default function SessionPage() {
             <div className="mb-1.5 flex items-center gap-2 text-2xs font-semibold uppercase tracking-wider text-amber-ink">
               <TargetIcon size={14} /> Focus area
             </div>
-            <p className="text-ink-2"><Inline text={session.answers[0]?.growthSummary ?? growthOf(weakest)} /></p>
+            <p className="text-ink-2">
+              <strong className="text-ink">{labelOf(weakest)}</strong>. <Inline text={growthOf(weakest)} />
+            </p>
           </div>
         </div>
 
@@ -250,15 +252,6 @@ function AccountPrompt({ onDone }: { onDone: () => void }) {
         />
         <Button onClick={save}>Create account</Button>
       </div>
-      <button
-        onClick={() => {
-          setProfile({ email: "you@axoncareers.com", name: "You" });
-          onDone();
-        }}
-        className="mt-3 text-sm text-ink-2 underline-offset-2 hover:underline"
-      >
-        Or continue with Google
-      </button>
     </motion.div>
   );
 }
@@ -352,7 +345,11 @@ function QuestionAccordion({
             <p className="text-2xs font-semibold uppercase tracking-wider text-ink-3">Your answer</p>
             <p className="mt-1.5 text-sm leading-relaxed text-ink-2">{answer.answerText}</p>
           </div>
-          <AnswerScoreCard answer={answer} animate={false} />
+          <AnswerScoreCard
+            answer={answer}
+            animate={false}
+            loadExample={(a) => apiGenerateExample(a.questionText, role, a.category)}
+          />
         </div>
       )}
     </div>
