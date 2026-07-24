@@ -50,17 +50,32 @@ create table if not exists public.subscriptions (
   email text not null,
   stripe_customer_id text,
   stripe_subscription_id text unique,
-  status text not null,                          -- active|trialing|canceled|past_due|...
+  status text not null,                          -- active|trialing|past_due|unpaid|canceled|paused|incomplete...
   plan text not null default 'premium',
   interval text,                                 -- monthly | quarterly | annual (legacy)
   current_period_end timestamptz,
+  cancel_at_period_end boolean not null default false,
+  price_id text,
   updated_at timestamptz not null default now()
 );
 create index if not exists subscriptions_email_idx on public.subscriptions (email);
 
+-- Idempotency ledger: the webhook inserts each Stripe event.id here and skips
+-- any that already exist (at-least-once delivery → duplicates). Service-role
+-- only (RLS on, no policy).
+create table if not exists public.stripe_events (
+  id text primary key,                           -- Stripe evt_... id
+  type text not null,
+  processed_at timestamptz not null default now(),
+  payload jsonb
+);
+alter table public.stripe_events enable row level security;
+
 -- Older deployments may predate these columns. Add them in place so re-running
 -- this file upgrades an existing project instead of failing on it.
 alter table public.subscriptions add column if not exists interval text;
+alter table public.subscriptions add column if not exists cancel_at_period_end boolean not null default false;
+alter table public.subscriptions add column if not exists price_id text;
 alter table public.sessions      add column if not exists client_id text;
 alter table public.sessions      add column if not exists data jsonb;
 
