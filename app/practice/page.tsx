@@ -35,6 +35,8 @@ function PracticeInner() {
   const [role, setRole] = useState("");
   const [situation, setSituation] = useState<Situation | null>(null);
   const [company, setCompany] = useState("");
+  const companyRef = useRef("");
+  useEffect(() => { companyRef.current = company; }, [company]);
   const [posting, setPosting] = useState("");
   const [questions, setQuestions] = useState<Question[]>([]);
   const [index, setIndex] = useState(0);
@@ -121,7 +123,10 @@ function PracticeInner() {
         interviewGap: profile.interviewGap,
         seed: (hist.length * 101 + Math.floor(Date.now() / 1000)) % 9973,
         focusDimension: focusDim,
-        company: company.trim(),
+        // Read the ref, not the state: on the first autostarted session the
+        // company was just setCompany'd in the mount effect and the closure
+        // value here would still be "".
+        company: companyRef.current.trim(),
         posting: posting.trim(),
         name: profile.name,
         weakestDimension,
@@ -154,7 +159,9 @@ function PracticeInner() {
     const s = profile.situation || ob?.situation || null;
     setRole(r);
     setSituation(s);
-    setCompany(set?.company || profile.company || ob?.company || "");
+    const resolvedCompany = set?.company || profile.company || ob?.company || "";
+    companyRef.current = resolvedCompany;
+    setCompany(resolvedCompany);
     // If we already know their role (from onboarding/profile/a predicted set),
     // go straight into the questions. Only show setup when we have nothing.
     if (predictedId || autostart || focusDim || r.trim()) {
@@ -571,7 +578,11 @@ function PracticeInner() {
                   </>
                 ) : (
                   <div className="mt-4">
-                    <AnswerScoreCard answer={followUpScored} animate={false} />
+                    <AnswerScoreCard
+                      answer={followUpScored}
+                      animate={false}
+                      loadExample={(a) => apiGenerateExample(a.questionText, role, a.category)}
+                    />
                   </div>
                 )}
               </motion.div>
@@ -624,7 +635,7 @@ function SetupCard({
           </span>
           <h1 className="mt-6 font-serif text-3xl font-semibold text-ink">Ready to practice?</h1>
           <p className="mt-3 text-ink-2">
-            8 tailored questions for <strong className="text-ink">{role || "your role"}</strong>. About 10
+            A set of tailored questions for <strong className="text-ink">{role || "your role"}</strong>. About 10
             minutes. Scored as you go.
           </p>
         </div>

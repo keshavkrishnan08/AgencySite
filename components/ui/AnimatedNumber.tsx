@@ -25,11 +25,16 @@ export function AnimatedNumber({
   const [display, setDisplay] = useState(0);
   const ref = useRef<HTMLSpanElement>(null);
   const started = useRef(false);
+  // The value we last animated to. When `value` changes (live store updates,
+  // navigating session→session), re-animate from the current display rather
+  // than freezing on the first render's number.
+  const fromRef = useRef(0);
 
   useEffect(() => {
     const run = () => {
-      if (started.current) return;
       started.current = true;
+      const from = fromRef.current;
+      fromRef.current = value;
       if (typeof window !== "undefined" && window.matchMedia("(prefers-reduced-motion: reduce)").matches) {
         setDisplay(value);
         return;
@@ -37,12 +42,19 @@ export function AnimatedNumber({
       const start = performance.now();
       const tick = (now: number) => {
         const t = Math.min((now - start) / duration, 1);
-        setDisplay(value * easeOutCubic(t));
+        setDisplay(from + (value - from) * easeOutCubic(t));
         if (t < 1) requestAnimationFrame(tick);
         else setDisplay(value);
       };
       requestAnimationFrame(tick);
     };
+
+    // Already animated once and the value changed → animate straight away from
+    // the last value (no need to wait for re-intersection).
+    if (started.current) {
+      if (fromRef.current !== value) run();
+      return;
+    }
 
     if (!startOnView) {
       run();
