@@ -30,7 +30,7 @@ export function StartSticky() {
         Start free <ArrowRight size={18} />
       </Link>
       <p className="mt-1.5 text-center text-2xs font-medium text-ink-3">
-        From $6.66/mo. Cancel anytime.
+        From $16.66/mo. Cancel anytime.
       </p>
     </div>
   );
