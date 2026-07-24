@@ -21,20 +21,21 @@ export function getStripe(): Stripe {
   return client;
 }
 
-/* Two plans, both sized to a real job search.
-   - monthly:   $18.97/mo, for people who expect to land fast.
-   - quarterly: $49.97 every 3 months ($16.66/mo). Most searches run
-     about three months, so this is the plan that actually covers the job you're
-     interviewing for — and it prepays the whole search in one go. */
+/* Three plans (good/better/best). Amounts live in lib/pricing.ts; these are the
+   matching Stripe Price IDs, env-gated.
+   - monthly:   $18.97/mo
+   - quarterly: $49.97 every 3 months ($16.66/mo) — the default
+   - annual:    $119/yr ($9.92/mo) — best value, prepaid */
 export const PRICES = {
   monthly: () => process.env.STRIPE_PRICE_ID || "",
   quarterly: () => process.env.STRIPE_PRICE_ID_QUARTERLY || process.env.STRIPE_PRICE_ID || "",
+  annual: () => process.env.STRIPE_PRICE_ID_ANNUAL || process.env.STRIPE_PRICE_ID || "",
 };
 
 export type PlanKey = keyof typeof PRICES;
 
 export function isPlanKey(v: unknown): v is PlanKey {
-  return v === "monthly" || v === "quarterly";
+  return v === "monthly" || v === "quarterly" || v === "annual";
 }
 
 // No free trial: charge immediately on subscribe. Set STRIPE_TRIAL_DAYS to
