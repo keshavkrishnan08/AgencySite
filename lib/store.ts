@@ -207,7 +207,6 @@ export function setOnboarding(d: OnboardingDraft): void {
   write(KEYS.onboarding, d);
 }
 
-/* ----------------------- Demo seed ----------------------- */
 
 /** Subscribe to any store change (used by the dashboard to stay live). */
 export function onStoreChange(cb: () => void): () => void {
