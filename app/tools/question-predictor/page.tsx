@@ -7,17 +7,25 @@ import { ToolShell } from "@/components/layout/ToolShell";
 import { Inline } from "@/components/ui/RichText";
 import { PredictorIcon } from "@/components/icons";
 import { Button, ButtonLink } from "@/components/ui/Button";
-import { getProfile } from "@/lib/store";
+import { getProfile, savePredictedSet } from "@/lib/store";
+import { uid } from "@/lib/utils";
+import { track } from "@/lib/analytics";
 import type { PredictedQuestion } from "@/lib/types";
 
 export default function QuestionPredictorPage() {
   const [posting, setPosting] = useState("");
   const [role, setRole] = useState("");
+  const [company, setCompany] = useState("");
   const [loading, setLoading] = useState(false);
   const [questions, setQuestions] = useState<PredictedQuestion[]>([]);
+  const [setId, setSetId] = useState("");
   const [error, setError] = useState("");
 
-  useEffect(() => setRole(getProfile().targetRole || ""), []);
+  useEffect(() => {
+    const p = getProfile();
+    setRole(p.targetRole || "");
+    setCompany(p.company || "");
+  }, []);
 
   const predict = async () => {
     if (posting.trim().length < 30) {
@@ -27,6 +35,7 @@ export default function QuestionPredictorPage() {
     setError("");
     setLoading(true);
     setQuestions([]);
+    setSetId("");
     try {
       const res = await fetch("/api/question-predictor", {
         method: "POST",
@@ -34,8 +43,20 @@ export default function QuestionPredictorPage() {
         body: JSON.stringify({ posting, role }),
       });
       const data = await res.json();
-      if (data.questions) setQuestions(data.questions);
-      else setError(data.error || "Something went wrong.");
+      if (data.questions) {
+        setQuestions(data.questions);
+        // Persist so Practice can run a session on these exact questions.
+        const id = uid("pq");
+        savePredictedSet({
+          id,
+          company: company.trim(),
+          role: role.trim(),
+          questions: data.questions,
+          savedAt: new Date().toISOString(),
+        });
+        setSetId(id);
+        track("questions_predicted", { count: data.questions.length, role });
+      } else setError(data.error || "Something went wrong.");
     } finally {
       setLoading(false);
     }
@@ -56,6 +77,17 @@ export default function QuestionPredictorPage() {
             placeholder="Paste the entire job description here. Responsibilities, requirements, the company blurb, everything…"
             className="field min-h-[200px] resize-y leading-relaxed"
             autoFocus
+          />
+        </label>
+        <label className="mt-4 block">
+          <span className="mb-1.5 block text-sm font-medium text-ink-2">
+            Company <span className="font-normal text-ink-3">(optional)</span>
+          </span>
+          <input
+            value={company}
+            onChange={(e) => setCompany(e.target.value)}
+            placeholder="e.g., Mercy Hospital"
+            className="field"
           />
         </label>
         {error && <p className="mt-2 text-sm text-coral-ink">{error}</p>}
@@ -97,9 +129,20 @@ export default function QuestionPredictorPage() {
               </div>
             </article>
           ))}
-          <div className="rounded-xl border bg-surface p-5 text-center" style={{ borderColor: "var(--border)" }}>
-            <p className="text-ink-2">Now practice answering them out loud. Scored, with feedback.</p>
-            <ButtonLink href="/practice" className="mt-3">Start a practice session</ButtonLink>
+          <div
+            className="rounded-2xl border-2 p-6 text-center"
+            style={{ borderColor: "var(--primary)", background: "var(--primary-soft)" }}
+          >
+            <h3 className="font-serif text-lg font-semibold text-primary-ink">
+              Now answer them before they do.
+            </h3>
+            <p className="mx-auto mt-1.5 max-w-md text-sm text-ink-2">
+              Run a full scored session on these exact questions, most likely first. Every answer is graded on all
+              five dimensions and feeds your metrics.
+            </p>
+            <ButtonLink href={setId ? `/practice?predicted=${setId}` : "/practice"} size="lg" className="mt-4">
+              Practice these {questions.length} questions <Sparkles size={16} />
+            </ButtonLink>
           </div>
         </motion.div>
       )}

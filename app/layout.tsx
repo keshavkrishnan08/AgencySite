@@ -31,7 +31,7 @@ export const metadata: Metadata = {
     template: "%s · Axon Careers",
   },
   description:
-    "An AI mock interview coach for career changers, returning professionals, and job seekers. Practice privately, get scored on five dimensions, and watch your confidence climb. For $9.99/month.",
+    "An AI mock interview coach for career changers, returning professionals, and job seekers. Practice privately, get scored on five dimensions, and watch your confidence climb. From $6.66/month.",
   keywords: [
     "interview practice",
     "mock interview",

@@ -6,6 +6,11 @@
 
 -- ---------------------------------------------------------------------------
 -- Tables
+--
+-- Three tables, matching the three things the product actually stores:
+--   profiles      who you are
+--   sessions      every scored practice session (the metrics page reads these)
+--   subscriptions who is paying, written only by the Stripe webhook
 -- ---------------------------------------------------------------------------
 
 create table if not exists public.profiles (
@@ -24,64 +29,46 @@ create table if not exists public.profiles (
 create table if not exists public.sessions (
   id uuid primary key default gen_random_uuid(),
   user_id uuid not null references public.profiles(id) on delete cascade,
+  client_id text,                                -- the browser-side session id
   target_role text,
   company text,
-  mode text not null default 'practice',
+  mode text not null default 'practice',         -- practice | focus | predicted
   overall integer,
   dimensions jsonb,
   duration_seconds integer,
   answers jsonb,
+  data jsonb,                                    -- the full Session record
   created_at timestamptz not null default now()
 );
 create index if not exists sessions_user_idx on public.sessions (user_id, created_at desc);
-
-create table if not exists public.interviews (
-  id uuid primary key default gen_random_uuid(),
-  user_id uuid not null references public.profiles(id) on delete cascade,
-  company text,
-  role text,
-  date date,
-  status text not null default 'upcoming',       -- upcoming|completed|callback|offer|rejected
-  notes text,
-  created_at timestamptz not null default now()
-);
-create index if not exists interviews_user_idx on public.interviews (user_id, date);
-
-create table if not exists public.plans (
-  id uuid primary key default gen_random_uuid(),
-  user_id uuid not null references public.profiles(id) on delete cascade,
-  company text,
-  role text,
-  interview_date date,
-  days jsonb,                                    -- the day-by-day task plan
-  created_at timestamptz not null default now()
-);
-create index if not exists plans_user_idx on public.plans (user_id);
-
-create table if not exists public.schedule (
-  id uuid primary key default gen_random_uuid(),
-  user_id uuid not null references public.profiles(id) on delete cascade,
-  client_id text,
-  company text,
-  role text,
-  interview_date date,
-  data jsonb,                                    -- full ScheduledInterview record
-  created_at timestamptz not null default now()
-);
-create index if not exists schedule_user_idx on public.schedule (user_id, interview_date);
-create unique index if not exists schedule_user_client_idx on public.schedule (user_id, client_id);
+-- The client upserts on (user_id, client_id); without this unique index that
+-- upsert errors and history silently stops syncing.
+create unique index if not exists sessions_user_client_idx on public.sessions (user_id, client_id);
 
 create table if not exists public.subscriptions (
   id uuid primary key default gen_random_uuid(),
   email text not null,
   stripe_customer_id text,
   stripe_subscription_id text unique,
-  status text not null,                          -- active|trialing|canceled|...
+  status text not null,                          -- active|trialing|canceled|past_due|...
   plan text not null default 'premium',
+  interval text,                                 -- monthly | quarterly | annual (legacy)
   current_period_end timestamptz,
   updated_at timestamptz not null default now()
 );
 create index if not exists subscriptions_email_idx on public.subscriptions (email);
+
+-- Older deployments may predate these columns. Add them in place so re-running
+-- this file upgrades an existing project instead of failing on it.
+alter table public.subscriptions add column if not exists interval text;
+alter table public.sessions      add column if not exists client_id text;
+alter table public.sessions      add column if not exists data jsonb;
+
+-- Tables from the trimmed-down feature set. Dropped so the schema matches the
+-- app exactly and no orphaned user data lingers.
+drop table if exists public.schedule;
+drop table if exists public.plans;
+drop table if exists public.interviews;
 
 -- ---------------------------------------------------------------------------
 -- Row Level Security: every table on. Users touch only their own rows.
@@ -91,9 +78,6 @@ create index if not exists subscriptions_email_idx on public.subscriptions (emai
 
 alter table public.profiles      enable row level security;
 alter table public.sessions      enable row level security;
-alter table public.interviews    enable row level security;
-alter table public.plans         enable row level security;
-alter table public.schedule      enable row level security;
 alter table public.subscriptions enable row level security;
 
 drop policy if exists "own profile" on public.profiles;
@@ -102,18 +86,6 @@ create policy "own profile" on public.profiles
 
 drop policy if exists "own sessions" on public.sessions;
 create policy "own sessions" on public.sessions
-  for all using (auth.uid() = user_id) with check (auth.uid() = user_id);
-
-drop policy if exists "own interviews" on public.interviews;
-create policy "own interviews" on public.interviews
-  for all using (auth.uid() = user_id) with check (auth.uid() = user_id);
-
-drop policy if exists "own plans" on public.plans;
-create policy "own plans" on public.plans
-  for all using (auth.uid() = user_id) with check (auth.uid() = user_id);
-
-drop policy if exists "own schedule" on public.schedule;
-create policy "own schedule" on public.schedule
   for all using (auth.uid() = user_id) with check (auth.uid() = user_id);
 
 -- ---------------------------------------------------------------------------

@@ -94,8 +94,8 @@ export default function SessionPage() {
             style={{ background: "radial-gradient(circle, #ffffff66, transparent)" }}
           />
           <p className="text-2xs font-semibold uppercase tracking-[0.2em] text-white/70">
-            {session.mode === "interview_day"
-              ? "Interview Day complete"
+            {session.mode === "predicted"
+              ? "Predicted questions complete"
               : session.mode === "focus"
               ? "Focus drill complete"
               : "Session complete"}

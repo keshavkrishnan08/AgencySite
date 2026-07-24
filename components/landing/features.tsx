@@ -79,7 +79,7 @@ const PracticeVisual = () => (
   </Mock>
 );
 
-// Gap Story + Your Story + Anxiety Detector
+// Gap Story Builder + the Anxiety Detector
 const AnswersVisual = () => {
   const rows = [
     { t: "The Confident Pivot", sel: true },
@@ -115,27 +115,24 @@ const AnswersVisual = () => {
   );
 };
 
-// Company Briefing + Question Predictor
-const ResearchVisual = () => {
+// Question Predictor: paste the posting, get the questions, then drill them.
+const PredictorVisual = () => {
   const qs = [
-    { q: "Tell me about a conflict.", p: 90 },
+    { q: "Tell me about a conflict.", p: 91 },
     { q: "How do you handle pressure?", p: 84 },
+    { q: "Why this role, right now?", p: 78 },
   ];
   return (
     <Mock>
-      <p className="font-serif text-lg font-semibold text-ink">Mercy Hospital</p>
-      <div className="mt-2 space-y-2">
-        <div>
-          <p className="text-2xs font-semibold uppercase tracking-wider text-primary-ink">What they do</p>
-          <p className="text-sm text-ink-2">A regional care network. Patients first.</p>
-        </div>
-        <div>
-          <p className="text-2xs font-semibold uppercase tracking-wider text-primary-ink">Ask them</p>
-          <p className="text-sm text-ink-2">What does success look like in 90 days?</p>
-        </div>
+      <Label>Job posting</Label>
+      <div className="mt-2 rounded-lg bg-bg-sunk p-3">
+        <p className="line-clamp-2 text-xs leading-relaxed text-ink-3">
+          Office Manager, Mercy Hospital. Fast-paced clinic environment. Must coordinate across
+          departments and stay calm under pressure…
+        </p>
       </div>
       <Divider />
-      <Label>Likely questions</Label>
+      <Label>The 5 they&apos;ll likely ask</Label>
       <div className="mt-2 space-y-2.5">
         {qs.map((x) => (
           <div key={x.q}>
@@ -149,69 +146,47 @@ const ResearchVisual = () => {
           </div>
         ))}
       </div>
+      <div
+        className="mt-4 rounded-xl px-3.5 py-2.5 text-center text-sm font-semibold text-white"
+        style={{ background: TEAL }}
+      >
+        Practice these 5 questions →
+      </div>
     </Mock>
   );
 };
 
-// Interview Day (solo, dark). Live mic: a volume meter + scrambling transcript,
-// and a corner clock that ticks up to 1:00 then loops back to 0:42.
-const FAIL_TRANSCRIPT =
-  "I missed a deadline that really mattered. I owned it the next morning, and I changed how I plan every project now.";
-
-// Static volume-meter heights (no animation; the demo below the hero is the
-// one moving showcase now).
-const VBARS = [10, 18, 8, 24, 14, 28, 12, 20, 9, 26, 16, 22, 11, 19, 13, 25];
-
-function InterviewDayVisual() {
-  return (
-    <Mock dark>
-      <div className="flex items-center justify-between text-xs text-white/55">
-        <span>Question 4 of 8</span>
-        <span className="rounded-full bg-coral/20 px-2.5 py-1 font-mono font-bold tabular-nums text-coral">
-          0:48
-        </span>
-      </div>
-      <p className="mt-4 font-serif text-xl font-semibold text-white">Tell me about a time you failed.</p>
-
-      <div className="mt-4 rounded-lg border border-white/10 bg-white/5 p-3">
-        <div className="flex items-center gap-2.5">
-          <span className="flex h-7 items-end gap-[2.5px]">
-            {VBARS.map((h, i) => (
-              <span
-                key={i}
-                className="w-[3px] rounded-full"
-                style={{ height: h, background: "linear-gradient(to top, var(--primary-bright), #d7fbff)" }}
-              />
-            ))}
-          </span>
-          <span className="font-mono text-2xs uppercase tracking-wider text-primary-bright">Listening</span>
-        </div>
-        <p className="mt-2 min-h-[2.5rem] text-xs leading-relaxed text-white/70">{FAIL_TRANSCRIPT}</p>
-      </div>
-
-      <p className="mt-3 text-xs text-white/45">No scores until the end. No going back.</p>
-    </Mock>
-  );
-}
-
-// Salary + Debrief + Tracker
-const AfterVisual = () => (
+// The metrics page: percentile, pace, and the date you'd reach the top 1%.
+const MetricsVisual = () => (
   <Mock>
-    <Label>The pay talk</Label>
-    <div className="mt-2.5 flex items-start gap-2">
-      <HM />
-      <Bubble>We were thinking $65,000 to start. Does that work for you?</Bubble>
-    </div>
-    <div className="mt-2 flex justify-end">
-      <Bubble you>I&apos;m really excited about this. For this role, and what I&apos;m seeing for similar jobs here, I was hoping for $72,000.</Bubble>
-    </div>
-    <Divider />
     <div className="flex items-center justify-between">
       <div>
-        <p className="text-sm font-semibold text-ink">Mercy Hospital</p>
-        <p className="text-xs text-ink-3">Office Manager</p>
+        <Label>Readiness</Label>
+        <p className="font-serif text-4xl font-semibold text-ink">78</p>
+        <p className="text-xs text-ink-2">Top 21% of candidates</p>
       </div>
-      <span className="rounded-full bg-sage-soft px-3 py-1 text-sm font-bold text-sage-ink">Offer 🎉</span>
+      <div className="text-right">
+        <Label>To top 1%</Label>
+        <p className="font-serif text-2xl font-semibold text-gold-ink">18 days</p>
+        <p className="text-xs text-ink-3">at 2.4 pts a session</p>
+      </div>
+    </div>
+    <div className="mt-3">
+      <Sparkline values={[44, 51, 55, 62, 66, 71, 74, 78]} width={320} height={54} />
+    </div>
+    <Divider />
+    <div className="grid grid-cols-3 gap-2 text-center">
+      {[
+        ["Streak", "9", "days"],
+        ["Pace", "+2.4", "per session"],
+        ["Fillers", "-64%", "since day 1"],
+      ].map(([k, v, s]) => (
+        <div key={k} className="rounded-xl bg-bg-sunk px-2 py-2.5">
+          <p className="text-2xs uppercase tracking-wider text-ink-3">{k}</p>
+          <p className="font-mono text-base font-semibold text-ink">{v}</p>
+          <p className="text-2xs text-ink-3">{s}</p>
+        </div>
+      ))}
     </div>
   </Mock>
 );
@@ -227,45 +202,44 @@ interface Feat {
   href?: string;
 }
 
+/* Three things, deliberately. One you do, one that shows you're getting better,
+   and two small builders that feed the first. Anything else was noise. */
 const FEATURES: Feat[] = [
   {
-    eyebrow: "The core",
+    eyebrow: "The main thing",
     title: "Practice out loud. Get scored.",
-    body: "Pick your role. Speak or type your answers. AI scores you on five things, gives one clear fix, and asks follow-ups like a real interviewer.",
-    bullets: ["Speak or type, your choice", "Smart follow-up questions", "Scored on 5 things, one fix each"],
+    body: "Pick your role. Speak or type your answers. AI scores you on five things, gives one clear fix, and asks a real follow-up like an interviewer who was actually listening.",
+    bullets: ["Speak or type, your choice", "A follow-up on what you just said", "Scored on 5 things, one fix each"],
     visual: <PracticeVisual />,
     href: "/onboarding",
   },
   {
-    eyebrow: "Most popular",
-    title: "Your hardest answers, made strong.",
-    body: "The gap question. The 'tell me about yourself.' The little words that make you sound unsure. We help you fix all three.",
-    bullets: ["3 ready gap answers", "Your 60-second intro", "Catches 'um' and 'I just'"],
+    eyebrow: "Why people stay",
+    title: "Know exactly where you stand.",
+    body: "Not a vague feeling. A readiness score, the percentile it puts you in, how fast you're improving, and a projected date for reaching a top 1% interview at your current pace.",
+    bullets: [
+      "Your percentile against real candidates",
+      "Estimated time to a top 1% interview",
+      "Streaks, milestones, and per-skill trends",
+    ],
+    visual: <MetricsVisual />,
+    href: "/dashboard",
+  },
+  {
+    eyebrow: "Before you practice",
+    title: "See the questions before they ask them.",
+    body: "Paste the job posting. We read the role, the seniority, and their exact language, then predict the five questions most likely to come up. One tap drills all five, scored.",
+    bullets: ["The 5 questions, ranked by likelihood", "Why they ask each one", "Practice them in one tap"],
+    visual: <PredictorVisual />,
+    href: "/tools/question-predictor",
+  },
+  {
+    eyebrow: "The question people freeze on",
+    title: "Your gap, made into a strength.",
+    body: "Layoff, kids, health, a career change. Three confident 30-second versions of the answer, and the Anxiety Detector catching the little words that leak doubt.",
+    bullets: ["3 ready gap answers", "30 seconds, sounds like you", "Catches 'um' and 'I just'"],
     visual: <AnswersVisual />,
     href: "/tools/gap-story",
-  },
-  {
-    eyebrow: "Done for you",
-    title: "In-depth research, for your benefit.",
-    body: "Give us the company and the job post. We dig up what they do, recent news, and the questions they'll likely ask, so you walk in over-prepared.",
-    bullets: ["One-page company brief", "The 5 likely questions", "Smart questions to ask them"],
-    visual: <ResearchVisual />,
-    href: "/tools/company-research",
-  },
-  {
-    eyebrow: "The night before",
-    title: "A real-pressure rehearsal.",
-    body: "A timer. No do-overs. No scores until the end. If you hold up here, you're ready for the real thing.",
-    bullets: ["60 seconds per answer", "No going back", "See how you held up"],
-    visual: <InterviewDayVisual />,
-  },
-  {
-    eyebrow: "After the interview",
-    title: "From the offer to the signature.",
-    body: "Practice the pay talk so you don't leave money behind. Debrief how the real one went. Track every interview through to the offer.",
-    bullets: ["Practice the pay talk", "Debrief the real interview", "Track every interview to the offer"],
-    visual: <AfterVisual />,
-    href: "/tools/salary",
   },
 ];
 

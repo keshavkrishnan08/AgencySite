@@ -1,24 +1,14 @@
 "use client";
 
 import type {
-  CompanyBriefing,
-  InterviewPlan,
-  InterviewRecord,
+  PredictedSet,
   SavedGapAnswer,
   Session,
   Streak,
   UserProfile,
 } from "./types";
-import { todayKey, uid } from "./utils";
-import {
-  pushProfile,
-  pushSession,
-  pushInterview,
-  deleteInterviewCloud,
-  pushPlan,
-  pushScheduled,
-  deleteScheduledCloud,
-} from "./cloud";
+import { todayKey } from "./utils";
+import { pushProfile, pushSession } from "./cloud";
 
 /* Client-side persistence layer.
  * Uses localStorage so the whole product. Sessions, streaks, dashboard,
@@ -30,12 +20,9 @@ const KEYS = {
   sessions: "pp:sessions",
   streak: "pp:streak",
   gaps: "pp:gaps",
-  briefings: "pp:briefings",
+  predicted: "pp:predicted",
   onboarding: "pp:onboarding",
-  interviews: "pp:interviews",
-  plan: "pp:plan",
   goal: "pp:goal",
-  schedule: "pp:schedule",
 } as const;
 
 function read<T>(key: string, fallback: T): T {
@@ -121,7 +108,7 @@ export function deleteSession(id: string): void {
   );
 }
 
-/** Sessions started this calendar week (for the free-plan limit). */
+/** Sessions started this calendar week (Monday-anchored). Feeds the metrics page. */
 export function sessionsThisWeek(): number {
   const now = new Date();
   const day = now.getDay();
@@ -129,12 +116,6 @@ export function sessionsThisWeek(): number {
   monday.setDate(now.getDate() - ((day + 6) % 7));
   monday.setHours(0, 0, 0, 0);
   return getSessions().filter((s) => new Date(s.createdAt) >= monday).length;
-}
-
-export const FREE_WEEKLY_LIMIT = 2;
-
-export function canStartSession(): boolean {
-  return isPremium() || sessionsThisWeek() < FREE_WEEKLY_LIMIT;
 }
 
 /* ----------------------- Streaks ----------------------- */
@@ -180,59 +161,24 @@ export function deleteGapAnswer(id: string): void {
   write(KEYS.gaps, getGapAnswers().filter((x) => x.id !== id));
 }
 
-/* ----------------------- Company briefings ----------------------- */
+/* ----------------------- Predicted question sets ----------------------- */
+/* The Question Predictor writes here; Practice reads it to run a session on the
+   exact questions this posting is likely to ask. That handoff is the whole
+   reason the sub-feature exists. */
 
-export function getBriefings(): CompanyBriefing[] {
-  return read<CompanyBriefing[]>(KEYS.briefings, []);
+export function getPredictedSets(): PredictedSet[] {
+  return read<PredictedSet[]>(KEYS.predicted, []);
 }
-export function saveBriefing(b: CompanyBriefing): void {
-  const all = getBriefings().filter((x) => x.id !== b.id);
-  all.unshift(b);
-  write(KEYS.briefings, all.slice(0, 12));
+export function getPredictedSet(id: string): PredictedSet | undefined {
+  return getPredictedSets().find((s) => s.id === id);
 }
-
-/* ----------------------- Interview tracker (outcome loop) ----------------------- */
-
-export function getInterviews(): InterviewRecord[] {
-  return read<InterviewRecord[]>(KEYS.interviews, []).sort(
-    (a, b) => (b.date || "").localeCompare(a.date || "")
-  );
+export function getLatestPredictedSet(): PredictedSet | null {
+  return getPredictedSets()[0] ?? null;
 }
-export function saveInterview(rec: InterviewRecord): void {
-  const all = getInterviews().filter((x) => x.id !== rec.id);
-  all.push(rec);
-  write(KEYS.interviews, all);
-  void pushInterview(rec);
-}
-export function deleteInterview(id: string): void {
-  write(KEYS.interviews, getInterviews().filter((x) => x.id !== id));
-  void deleteInterviewCloud(id);
-}
-
-/* ----------------------- Interview prep plan ----------------------- */
-
-export function getPlan(): InterviewPlan | null {
-  return read<InterviewPlan | null>(KEYS.plan, null);
-}
-export function savePlan(plan: InterviewPlan): void {
-  write(KEYS.plan, plan);
-  void pushPlan(plan);
-}
-export function clearPlan(): void {
-  if (typeof window !== "undefined") window.localStorage.removeItem(KEYS.plan);
-  window.dispatchEvent?.(new CustomEvent("pp:change", { detail: { key: KEYS.plan } }));
-}
-export function togglePlanTask(taskId: string): void {
-  const plan = getPlan();
-  if (!plan) return;
-  for (const day of plan.days) {
-    const task = day.tasks.find((t) => t.id === taskId);
-    if (task) {
-      task.done = !task.done;
-      break;
-    }
-  }
-  savePlan(plan);
+export function savePredictedSet(set: PredictedSet): void {
+  const all = getPredictedSets().filter((x) => x.id !== set.id);
+  all.unshift(set);
+  write(KEYS.predicted, all.slice(0, 8));
 }
 
 /* ----------------------- Onboarding draft ----------------------- */
@@ -252,60 +198,6 @@ export function getGoal(): Goal {
 }
 export function setGoal(g: Goal): void {
   write(KEYS.goal, g);
-}
-
-/* ----------------------- Interview schedule ----------------------- */
-export interface ScheduledInterview {
-  id: string;
-  company: string;
-  role: string;
-  dateISO: string; // YYYY-MM-DD
-  createdAt: string;
-}
-interface ScheduleState {
-  items: ScheduledInterview[];
-  activeId: string | null;
-}
-function readSchedule(): ScheduleState {
-  return read<ScheduleState>(KEYS.schedule, { items: [], activeId: null });
-}
-/** All upcoming interviews, soonest first (linear prep order). */
-export function getSchedule(): ScheduledInterview[] {
-  return readSchedule().items.slice().sort((a, b) => a.dateISO.localeCompare(b.dateISO));
-}
-export function addScheduled(rec: Omit<ScheduledInterview, "id" | "createdAt">): ScheduledInterview {
-  const s = readSchedule();
-  const item: ScheduledInterview = { ...rec, id: uid(), createdAt: new Date().toISOString() };
-  const items = [...s.items, item];
-  write(KEYS.schedule, { items, activeId: s.activeId ?? item.id });
-  void pushScheduled(item);
-  return item;
-}
-export function updateScheduled(id: string, patch: Partial<ScheduledInterview>): void {
-  const s = readSchedule();
-  const items = s.items.map((i) => (i.id === id ? { ...i, ...patch } : i));
-  write(KEYS.schedule, { ...s, items });
-  const updated = items.find((i) => i.id === id);
-  if (updated) void pushScheduled(updated);
-}
-export function removeScheduled(id: string): void {
-  const s = readSchedule();
-  const items = s.items.filter((i) => i.id !== id);
-  write(KEYS.schedule, { items, activeId: s.activeId === id ? null : s.activeId });
-  void deleteScheduledCloud(id);
-}
-export function setActiveInterview(id: string): void {
-  write(KEYS.schedule, { ...readSchedule(), activeId: id });
-}
-/** The interview you're currently prepping for: the chosen one, else the soonest upcoming. */
-export function getActiveInterview(): ScheduledInterview | null {
-  const s = readSchedule();
-  const items = getSchedule();
-  if (!items.length) return null;
-  const chosen = items.find((i) => i.id === s.activeId);
-  if (chosen) return chosen;
-  const today = new Date().toISOString().slice(0, 10);
-  return items.find((i) => i.dateISO >= today) || items[0];
 }
 
 export function getOnboarding(): OnboardingDraft | null {
@@ -333,28 +225,13 @@ export function onStoreChange(cb: () => void): () => void {
 export function hydrateLocal(data: {
   profile?: Partial<UserProfile> | null;
   sessions?: Session[];
-  interviews?: InterviewRecord[];
-  plan?: InterviewPlan | null;
-  schedule?: ScheduledInterview[];
 }): void {
   if (data.profile) write(KEYS.profile, { ...getProfile(), ...data.profile });
-  if (data.schedule?.length) {
-    const cur = readSchedule();
-    const map = new Map(cur.items.map((i) => [i.id, i] as const));
-    data.schedule.forEach((i) => map.set(i.id, i));
-    write(KEYS.schedule, { items: Array.from(map.values()), activeId: cur.activeId });
-  }
   if (data.sessions?.length) {
     const map = new Map(read<Session[]>(KEYS.sessions, []).map((s) => [s.id, s] as const));
     data.sessions.forEach((s) => map.set(s.id, s));
     write(KEYS.sessions, Array.from(map.values()));
   }
-  if (data.interviews?.length) {
-    const map = new Map(read<InterviewRecord[]>(KEYS.interviews, []).map((r) => [r.id, r] as const));
-    data.interviews.forEach((r) => map.set(r.id, r));
-    write(KEYS.interviews, Array.from(map.values()));
-  }
-  if (data.plan && !getPlan()) write(KEYS.plan, data.plan);
 }
 
 export function upgradeToPremium(): void {

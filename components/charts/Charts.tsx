@@ -7,6 +7,7 @@ import {
   BarChart,
   CartesianGrid,
   Cell,
+  ComposedChart,
   Line,
   LineChart,
   PolarAngleAxis,
@@ -28,6 +29,7 @@ const grid = "#ece7da";
 const primary = "#14808e";
 const primaryBright = "#19a9b8";
 const sage = "#3e9d6e";
+const gold = "#b8893b";
 
 function ChartTooltip({ active, payload, label }: any) {
   if (!active || !payload?.length) return null;
@@ -59,7 +61,7 @@ export function ProgressLineChart({
 }) {
   return (
     <ResponsiveContainer width="100%" height={height}>
-      <AreaChart data={data} margin={{ top: 12, right: 12, bottom: 0, left: -18 }}>
+      <AreaChart data={data} margin={{ top: 12, right: 12, bottom: 0, left: -4 }}>
         <defs>
           <linearGradient id="progFill" x1="0" y1="0" x2="0" y2="1">
             <stop offset="0%" stopColor={primaryBright} stopOpacity={0.22} />
@@ -174,6 +176,128 @@ export function MiniBars({
         <Bar dataKey="value" name="Avg" radius={[6, 6, 0, 0]} maxBarSize={30} animationDuration={900}>
           {data.map((d, i) => (
             <Cell key={i} fill={scoreColor(100 - d.value * 10)} />
+          ))}
+        </Bar>
+      </BarChart>
+    </ResponsiveContainer>
+  );
+}
+
+/* ----------------- Projection: where you are, where you're headed -----------------
+   One chart that carries the whole retention story: the solid line is what you
+   actually scored, the dashed line is your own measured pace extended forward,
+   and the two reference lines are the bars that matter (Ready at 80, Top 1% at
+   94). Seeing the dashed line cross the top line is the reason to come back. */
+export function ProjectionChart({
+  data,
+  readyAt,
+  topAt,
+  height = 300,
+}: {
+  data: { label: string; actual?: number | null; projected?: number | null }[];
+  readyAt: number;
+  topAt: number;
+  height?: number;
+}) {
+  return (
+    <ResponsiveContainer width="100%" height={height}>
+      {/* ComposedChart, not AreaChart: AreaChart drops non-Area children, so the
+          dashed projection Line renders as nothing at all. */}
+      <ComposedChart data={data} margin={{ top: 14, right: 46, bottom: 0, left: -4 }}>
+        <defs>
+          <linearGradient id="projFill" x1="0" y1="0" x2="0" y2="1">
+            <stop offset="0%" stopColor={primaryBright} stopOpacity={0.24} />
+            <stop offset="100%" stopColor={primaryBright} stopOpacity={0} />
+          </linearGradient>
+        </defs>
+        <CartesianGrid stroke={grid} strokeDasharray="4 6" vertical={false} />
+        <XAxis
+          dataKey="label"
+          tick={{ fill: ink2, fontSize: 11, fontFamily: "var(--font-sans)" }}
+          axisLine={false}
+          tickLine={false}
+          dy={8}
+          interval="preserveStartEnd"
+          minTickGap={22}
+        />
+        <YAxis
+          domain={[0, 100]}
+          ticks={[0, 25, 50, 75, 100]}
+          tick={{ fill: ink2, fontSize: 11, fontFamily: "var(--font-mono)" }}
+          axisLine={false}
+          tickLine={false}
+          width={40}
+        />
+        <ReferenceLine
+          y={readyAt}
+          stroke={sage}
+          strokeDasharray="5 5"
+          strokeWidth={1.5}
+          label={{ value: "Ready", position: "right", fill: sage, fontSize: 11, fontWeight: 600 }}
+        />
+        <ReferenceLine
+          y={topAt}
+          stroke={gold}
+          strokeDasharray="5 5"
+          strokeWidth={1.5}
+          label={{ value: "Top 1%", position: "right", fill: gold, fontSize: 11, fontWeight: 600 }}
+        />
+        <Tooltip content={<ChartTooltip />} cursor={{ stroke: grid, strokeWidth: 2 }} />
+        <Area
+          type="monotone"
+          dataKey="actual"
+          name="You"
+          stroke="url(#progStroke)"
+          strokeWidth={3}
+          fill="url(#projFill)"
+          connectNulls
+          dot={{ fill: "#fff", stroke: primary, strokeWidth: 2.5, r: 3.5 }}
+          activeDot={{ fill: primary, stroke: "#fff", strokeWidth: 3, r: 6 }}
+          animationDuration={1100}
+        />
+        <Line
+          type="monotone"
+          dataKey="projected"
+          name="Projected"
+          stroke={gold}
+          strokeWidth={2.5}
+          strokeDasharray="6 5"
+          connectNulls
+          dot={false}
+          animationDuration={1100}
+        />
+      </ComposedChart>
+    </ResponsiveContainer>
+  );
+}
+
+/* ----------------- Score distribution (histogram) ----------------- */
+export function DistributionBars({
+  data,
+  height = 170,
+}: {
+  data: { bucket: string; count: number }[];
+  height?: number;
+}) {
+  // Bucket midpoints drive the color so the histogram reads left-to-right
+  // exactly like every score in the app: coral, amber, teal, sage.
+  const mid = [20, 47, 62, 75, 85, 95];
+  return (
+    <ResponsiveContainer width="100%" height={height}>
+      <BarChart data={data} margin={{ top: 10, right: 6, bottom: 0, left: -26 }}>
+        <CartesianGrid stroke={grid} strokeDasharray="4 6" vertical={false} />
+        <XAxis
+          dataKey="bucket"
+          tick={{ fill: ink2, fontSize: 11, fontFamily: "var(--font-mono)" }}
+          axisLine={false}
+          tickLine={false}
+          dy={6}
+        />
+        <YAxis hide domain={[0, "dataMax + 1"]} />
+        <Tooltip content={<ChartTooltip />} cursor={{ fill: "rgba(27,32,48,0.04)" }} />
+        <Bar dataKey="count" name="Answers" radius={[6, 6, 0, 0]} maxBarSize={44} animationDuration={900}>
+          {data.map((_, i) => (
+            <Cell key={i} fill={scoreColor(mid[i] ?? 60)} />
           ))}
         </Bar>
       </BarChart>
