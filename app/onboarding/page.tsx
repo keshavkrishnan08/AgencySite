@@ -18,7 +18,8 @@ import {
 import { ROLES } from "@/lib/roles";
 import { SITUATION_META } from "@/lib/utils";
 import { setOnboarding, setProfile } from "@/lib/store";
-import { setContext, track } from "@/lib/analytics";
+import { identify, setContext, track } from "@/lib/analytics";
+import { anonId, attribution } from "@/lib/attribution";
 import { CADENCE_META, projectPlan, type Cadence, type SkillLevel } from "@/lib/plan-projection";
 import { computeRoi } from "@/lib/roi";
 import { PLANS } from "@/lib/pricing";
@@ -31,6 +32,7 @@ type Cond = (a: Record<string, string>) => boolean;
 type Screen =
   | { kind: "form"; fields: Field[]; demo: Demo; when?: Cond }
   | { kind: "validation"; slot: 1 | 2; demo: Demo; when?: Cond }
+  | { kind: "email"; demo: Demo; when?: Cond }
   | { kind: "plan"; demo: Demo; when?: Cond }
   | { kind: "roi"; demo: Demo; when?: Cond };
 
@@ -226,7 +228,11 @@ const SCREENS: Screen[] = [
       ],
     }],
   },
-  // ── The plan: top 10% in a week, top 1% in a month. ──
+  // ── Email gate, right before the payoff. Captures the lead (with every quiz
+  //    answer) even if they never finish signup, and the plan reveal is the
+  //    peak-value moment people trade an email for. ──
+  { kind: "email", demo: "progress" },
+  // ── The plan: interview-ready in about two weeks. ──
   { kind: "plan", demo: "progress" },
   // ── The payoff: a simple animated return card. ──
   { kind: "roi", demo: "progress" },
@@ -319,6 +325,9 @@ export default function OnboardingPage() {
   const [role, setRole] = useState("");
   const [query, setQuery] = useState("");
   const [roleFocused, setRoleFocused] = useState(false);
+  const [email, setEmail] = useState("");
+  const [emailErr, setEmailErr] = useState("");
+  const [emailBusy, setEmailBusy] = useState(false);
 
   // Active screens depend on the answers, so the total step count is dynamic
   // (e.g. career changers and less-confident users get an extra tailored step).
@@ -373,6 +382,46 @@ export default function OnboardingPage() {
     return s.fields.every((f) =>
       f.optional ? true : f.type === "role" ? Boolean(role.trim() || query.trim()) : Boolean(answers[f.key])
     );
+  };
+
+  // Email gate: capture the lead (with every quiz answer) before the plan
+  // reveal. Fire-and-forget to Supabase via /api/lead; never block the reveal.
+  const submitEmail = async () => {
+    const value = email.trim().toLowerCase();
+    if (!/^[^@\s]+@[^@\s.]+\.[^@\s]+$/.test(value)) {
+      setEmailErr("That email doesn't look right.");
+      track("form:error", { form: "onboarding_email", reason: "invalid" });
+      return;
+    }
+    setEmailErr("");
+    setEmailBusy(true);
+    identify(value);
+    setProfile({ email: value });
+    const finalRole = role.trim() || query.trim() || "";
+    try {
+      await fetch("/api/lead", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({
+          email: value,
+          source: "onboarding",
+          anonId: anonId(),
+          attribution: attribution(),
+          name: answers.name,
+          situation: answers.situation,
+          targetRole: finalRole,
+          interviewGap: answers.gap,
+          intent: "onboarding",
+          // the quiz payload — makes this a rich, scored lead
+          ...Object.fromEntries(Object.entries(answers).map(([k, v]) => [`q_${k}`, v])),
+        }),
+      });
+    } catch {
+      /* never block the plan reveal on a network hiccup */
+    }
+    track("lead_captured", { source: "onboarding" });
+    setEmailBusy(false);
+    go(screen + 1);
   };
 
   const finish = () => {
@@ -548,6 +597,45 @@ export default function OnboardingPage() {
                     </div>
                   );
                 })()}
+
+                {cur.kind === "email" && (
+                  <div className="text-center sm:text-left">
+                    <span className="eyebrow">One last thing</span>
+                    <h1 className="mt-4 text-balance font-serif text-3xl font-semibold leading-tight text-ink sm:text-4xl">
+                      Where should we send your plan?
+                    </h1>
+                    <p className="mt-3 max-w-md text-ink-2">
+                      We built a plan from your answers. Add your email to see it and save your
+                      progress. No spam, ever.
+                    </p>
+                    <form
+                      onSubmit={(e) => { e.preventDefault(); void submitEmail(); }}
+                      className="mt-7 max-w-sm"
+                    >
+                      <input
+                        autoFocus
+                        type="email"
+                        value={email}
+                        onChange={(e) => setEmail(e.target.value)}
+                        placeholder="you@email.com"
+                        className="field !py-3"
+                        aria-label="Email address"
+                      />
+                      {emailErr && <p className="mt-2 text-sm text-coral-ink">{emailErr}</p>}
+                      <div className="mt-5 flex items-center gap-3">
+                        <Button variant="ghost" size="sm" type="button" onClick={() => go(screen - 1)}>
+                          <ArrowLeft size={15} /> Back
+                        </Button>
+                        <Button size="sm" type="submit" disabled={emailBusy}>
+                          {emailBusy ? "Saving…" : "See my plan"} <ArrowRight size={15} />
+                        </Button>
+                      </div>
+                      <p className="mt-3 flex items-center gap-1.5 text-xs text-ink-3">
+                        <ShieldCheck size={13} /> Private by design. We never share your email.
+                      </p>
+                    </form>
+                  </div>
+                )}
 
                 {cur.kind === "plan" && (() => {
                   const plan = projectPlan(
