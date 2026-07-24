@@ -15,7 +15,7 @@ set -euo pipefail
 
 DOMAIN="${1:-axonservices.dev}"
 # The Vercel project that already owns the domain. Override as arg 2.
-PROJECT="${2:-AgencySite}"
+PROJECT="${2:-agency-site}"
 VC="npx --yes vercel@latest"
 
 cd "$(dirname "$0")/.."

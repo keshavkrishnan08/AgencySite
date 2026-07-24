@@ -4,6 +4,7 @@ import { useEffect, useRef } from "react";
 import { usePathname, useSearchParams } from "next/navigation";
 import { Suspense } from "react";
 import { track } from "@/lib/analytics";
+import { initMixpanel } from "@/lib/mixpanel";
 
 /* Automatic page-level telemetry.
  *
@@ -25,6 +26,12 @@ const TICKS = [10, 30, 60, 120];
 function TelemetryInner() {
   const pathname = usePathname();
   const search = useSearchParams();
+
+  // Initialise Mixpanel on first paint, so autocapture starts recording clicks
+  // and inputs immediately — before the first named event fires.
+  useEffect(() => {
+    initMixpanel();
+  }, []);
 
   const prevPath = useRef<string | null>(null);
   const startedAt = useRef(0);

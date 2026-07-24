@@ -29,6 +29,7 @@ import {
   getProfile,
 } from "@/lib/store";
 import { DIMENSIONS, cn, formatDate, formatDuration, scoreColor } from "@/lib/utils";
+import { track } from "@/lib/analytics";
 import { drawShareCard } from "@/lib/share";
 import type { Dimension, ScoredAnswer, Session } from "@/lib/types";
 
@@ -42,9 +43,15 @@ export default function SessionPage() {
 
   useEffect(() => {
     setMounted(true);
-    setSession(getSession(id) ?? null);
+    const s = getSession(id) ?? null;
+    setSession(s);
     setAll(getSessions());
     setSigned(isSignedIn());
+    // The results screen is the emotional peak of the loop — where the score
+    // lands. Track it with the number so drop-off here is measurable.
+    if (s) {
+      track("session:results_view", { overall: s.overall, mode: s.mode, questions: s.answers.length });
+    }
   }, [id]);
 
   const radarData = useMemo(
