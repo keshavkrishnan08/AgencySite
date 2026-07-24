@@ -1,4 +1,4 @@
-import { PLANS } from "./pricing";
+import { PLANS, type PlanKey } from "./pricing";
 
 /* Return on the subscription, framed against what the job is actually worth.
  *
@@ -53,7 +53,7 @@ export interface Roi {
   negotiationReturn: number;
 }
 
-export function computeRoi(industry: string | undefined, plan: "monthly" | "quarterly" = "quarterly"): Roi {
+export function computeRoi(industry: string | undefined, plan: PlanKey = "quarterly"): Roi {
   const salary = MEDIAN_SALARY[industry || "other"] ?? MEDIAN_SALARY.other;
   const p = PLANS[plan];
   const planPrice = p.amountCents / 100;
@@ -85,7 +85,7 @@ export function usd(n: number, decimals = 0): string {
 }
 
 /** "$0.22" — the number that makes the price feel like nothing. */
-export function perDayLabel(plan: "monthly" | "quarterly"): string {
+export function perDayLabel(plan: PlanKey): string {
   const p = PLANS[plan];
   const perDay = p.amountCents / 100 / (p.months * 30);
   return `$${perDay.toFixed(2)}`;

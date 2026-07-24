@@ -5,18 +5,15 @@
  * another. The Stripe Price IDs live in env (see lib/stripe.ts) and must match
  * these amounts — that pairing is the one thing to check before going live.
  *
- * Why monthly + 3 months instead of monthly + annual: a job search takes about
- * three months. A yearly plan asks someone to buy nine months they hope not to
- * need, which is a worse offer and a worse promise. Three months covers the
- * search and prepays it in one go.
+ * A good/better/best ladder:
+ *   monthly    $18.97/mo   — entry, for a search you expect to be short
+ *   3 months   $49.97      — the default; a search runs about three months
+ *   yearly     $119/yr     — best value anchor, prepaid and churn-immune
  *
- * NOTE on the current gap: at $18.97/mo vs $49.97/3mo the discount is only 12%
- * ($6.94). That is a thin incentive — most people will just take monthly. If the
- * 3-month plan is meant to be the default choice, it wants to land nearer $44
- * (≈23% off). Deliberate call either way, but the copy must not overstate it.
+ * The cheapest effective rate (yearly, ~33¢/day) is what "from" copy leads with.
  */
 
-export type PlanKey = "monthly" | "quarterly";
+export type PlanKey = "monthly" | "quarterly" | "annual";
 
 export interface PlanCopy {
   key: PlanKey;
@@ -32,7 +29,7 @@ export interface PlanCopy {
   was: string | null;
   /** "billed monthly" / "billed once every 3 months". */
   cadence: string;
-  /** "$6.66 a month" */
+  /** "$16.66 a month" */
   perMonth: string;
   /** Percent saved vs paying monthly. 0 for the monthly plan. */
   savePct: number;
@@ -40,16 +37,26 @@ export interface PlanCopy {
   saveAmount: string | null;
   /** One-line reason this plan exists. */
   pitch: string;
+  /** Badge shown on the card, or null. */
+  badge: string | null;
 }
 
 const MONTHLY_CENTS = 1897;
 const QUARTERLY_CENTS = 4997;
+const ANNUAL_CENTS = 11900;
 
 const quarterlyFull = MONTHLY_CENTS * 3; // 5691
 const quarterlySave = quarterlyFull - QUARTERLY_CENTS; // 694
+const annualFull = MONTHLY_CENTS * 12; // 22764
+const annualSave = annualFull - ANNUAL_CENTS; // 10864
 
 function usd(cents: number): string {
-  return `$${(cents / 100).toFixed(2)}`;
+  const dollars = cents / 100;
+  return Number.isInteger(dollars) ? `$${dollars}` : `$${dollars.toFixed(2)}`;
+}
+
+function perMonthLabel(cents: number, months: number): string {
+  return `$${(cents / 100 / months).toFixed(2)} a month`;
 }
 
 export const PLANS: Record<PlanKey, PlanCopy> = {
@@ -61,10 +68,11 @@ export const PLANS: Record<PlanKey, PlanCopy> = {
     months: 1,
     was: null,
     cadence: "billed monthly · cancel anytime",
-    perMonth: "$18.97 a month",
+    perMonth: perMonthLabel(MONTHLY_CENTS, 1),
     savePct: 0,
     saveAmount: null,
     pitch: "For a search you expect to be short.",
+    badge: null,
   },
   quarterly: {
     key: "quarterly",
@@ -74,16 +82,35 @@ export const PLANS: Record<PlanKey, PlanCopy> = {
     months: 3,
     was: usd(quarterlyFull),
     cadence: "billed once every 3 months · cancel anytime",
-    perMonth: "$16.66 a month",
+    perMonth: perMonthLabel(QUARTERLY_CENTS, 3),
     savePct: Math.round((quarterlySave / quarterlyFull) * 100), // 12
     saveAmount: usd(quarterlySave),
-    pitch: "Covers the whole search, and cheaper than paying by the month.",
+    pitch: "Covers the whole search. What most people pick.",
+    badge: "Most popular",
+  },
+  annual: {
+    key: "annual",
+    toggle: "Yearly",
+    price: usd(ANNUAL_CENTS),
+    amountCents: ANNUAL_CENTS,
+    months: 12,
+    was: usd(annualFull),
+    cadence: "billed once a year · cancel anytime",
+    perMonth: perMonthLabel(ANNUAL_CENTS, 12),
+    savePct: Math.round((annualSave / annualFull) * 100), // 48
+    saveAmount: usd(annualSave),
+    pitch: "A whole year at the lowest rate. Best value.",
+    badge: "Best value",
   },
 };
 
+/** Display order for the pricing cards, cheapest-effective last so the eye
+    lands on the anchor. */
+export const PLAN_ORDER: PlanKey[] = ["monthly", "quarterly", "annual"];
+
 /** The number to lead with in marketing copy: the cheapest effective rate. */
-export const FROM_PRICE = PLANS.quarterly.perMonth; // "$16.66 a month"
-export const HEADLINE_PRICE = "$16.66/mo";
+export const FROM_PRICE = PLANS.annual.perMonth;
+export const HEADLINE_PRICE = `${PLANS.annual.perMonth.replace(" a month", "")}/mo`;
 
 /** Price split for big-type display: ["49", "97"]. Keeps the pricing cards
     from hardcoding digits that then drift when the amount changes. */
@@ -92,16 +119,13 @@ export function priceParts(plan: PlanKey): [dollars: string, cents: string] {
   return [String(Math.floor(cents / 100)), String(cents % 100).padStart(2, "0")];
 }
 
-/** Per-day cost, in whole cents, for the cheapest plan — the "56¢ a day"
-    framing that makes the price feel like nothing. Derived, so it tracks the
-    amount automatically. Quarterly billed over 3×30 days. */
-export function perDayCents(plan: PlanKey = "quarterly"): number {
+/** Per-day cost, in whole cents, for a plan — the "33¢ a day" framing that
+    makes the price feel like nothing. Derived, so it tracks the amount. */
+export function perDayCents(plan: PlanKey = "annual"): number {
   const p = PLANS[plan];
   return Math.round(p.amountCents / (p.months * 30));
 }
 
-/** "56¢ a day" / "$1.05 a day" — the marketing subtext. */
-export const FROM_PER_DAY = (() => {
-  const c = perDayCents("quarterly");
-  return c < 100 ? `${c}¢ a day` : `$${(c / 100).toFixed(2)} a day`;
-})();
+/** "$0.33 a day" — the marketing subtext, from the cheapest plan. Dollar format
+    (not "33¢") for consistency with every other price on the page. */
+export const FROM_PER_DAY = `$${(perDayCents("annual") / 100).toFixed(2)} a day`;
