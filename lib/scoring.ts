@@ -275,8 +275,11 @@ function feedbackFor(
 
     case "confidence": {
       if (ctx.anx.underminerCount > 0) {
-        const u = ctx.anx.underminers[0] ?? "I just";
-        return `You undermined yourself with "${u}." You didn't *${u.replace(/^i /, "")}* do it. You did it. Drop the qualifier.`;
+        const raw = (ctx.anx.underminers[0] ?? "I just").trim();
+        // Show the phrase the way a reader would, capitalized; never splice it
+        // into a sentence (some phrases like "just a" would read broken).
+        const u = raw.charAt(0).toUpperCase() + raw.slice(1);
+        return `You undermined yourself with "${u}." You didn't do it a little — you did it. Drop the qualifier and own the win.`;
       }
       if (ctx.anx.apologyCount > 0)
         return "You apologized inside your answer. Never apologize for your experience. State it plainly.";
@@ -361,6 +364,16 @@ export function scoreAnswer(input: {
   const strongest = entries.reduce((a, b) => (b[1] > a[1] ? b : a))[0];
   const weakest = entries.reduce((a, b) => (b[1] < a[1] ? b : a))[0];
 
+  // Actionable "Work on this next" items so the coaching card is populated even
+  // without an AI key: the two lowest dimensions scoring below "great", newest
+  // fix first. Falls back to the single weakest so the card is never empty.
+  const improve = entries
+    .filter(([, v]) => v < 80)
+    .sort((a, b) => a[1] - b[1])
+    .slice(0, 2)
+    .map(([d]) => GROWTH_LINE[d]);
+  if (improve.length === 0) improve.push(GROWTH_LINE[weakest]);
+
   return {
     questionNumber,
     questionText: question,
@@ -370,6 +383,7 @@ export function scoreAnswer(input: {
     feedback,
     strengthSummary: STRENGTH_LINE[strongest],
     growthSummary: GROWTH_LINE[weakest],
+    improve,
     anxiety: anx,
     wordCount: wc,
     source: "heuristic",

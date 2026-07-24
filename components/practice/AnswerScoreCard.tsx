@@ -224,28 +224,33 @@ export function AnswerScoreCard({
         </div>
       </div>
 
-      {/* Example answer */}
-      <div className="card overflow-hidden p-0">
-        <button
-          onClick={onToggle}
-          className="flex w-full items-center justify-between p-5 text-left transition-colors hover:bg-bg-tint"
-        >
-          <span className="font-medium text-primary-ink">See an example strong answer</span>
-          <ChevronDown size={18} className={cn("text-ink-3 transition-transform", open && "rotate-180")} />
-        </button>
-        {open && (
-          <div className="border-t px-5 pb-6 pt-4" style={{ borderColor: "var(--border)" }}>
-            <p className="mb-2 text-2xs uppercase tracking-wider text-ink-3">
-              Example. Not the only right answer, just one approach
-            </p>
-            {loading ? (
-              <p className="text-ink-3">Writing an example…</p>
-            ) : (
-              <RichText text={example} />
-            )}
-          </div>
-        )}
-      </div>
+      {/* Example answer — only shown when we already have one or can fetch one,
+          so the expander never opens to a blank box. */}
+      {(example || loadExample) && (
+        <div className="card overflow-hidden p-0">
+          <button
+            onClick={onToggle}
+            className="flex w-full items-center justify-between p-5 text-left transition-colors hover:bg-bg-tint"
+          >
+            <span className="font-medium text-primary-ink">See an example strong answer</span>
+            <ChevronDown size={18} className={cn("text-ink-3 transition-transform", open && "rotate-180")} />
+          </button>
+          {open && (
+            <div className="border-t px-5 pb-6 pt-4" style={{ borderColor: "var(--border)" }}>
+              <p className="mb-2 text-2xs uppercase tracking-wider text-ink-3">
+                Example. Not the only right answer, just one approach
+              </p>
+              {loading ? (
+                <p className="text-ink-3">Writing an example…</p>
+              ) : example ? (
+                <RichText text={example} />
+              ) : (
+                <p className="text-ink-3">Couldn&apos;t load an example just now. Try again in a moment.</p>
+              )}
+            </div>
+          )}
+        </div>
+      )}
     </div>
   );
 }
