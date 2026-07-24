@@ -9,6 +9,8 @@ import { GapStoryIcon } from "@/components/icons";
 import { Button } from "@/components/ui/Button";
 import { cn } from "@/lib/utils";
 import { deleteGapAnswer, getGapAnswers, getProfile, saveGapAnswer } from "@/lib/store";
+import { track } from "@/lib/analytics";
+import { mixpanelIncrement } from "@/lib/mixpanel";
 import type { SavedGapAnswer } from "@/lib/types";
 import { uid } from "@/lib/utils";
 
@@ -33,7 +35,10 @@ export default function GapStoryPage() {
   const [saved, setSaved] = useState<SavedGapAnswer[]>([]);
   const [copied, setCopied] = useState(false);
 
-  useEffect(() => setSaved(getGapAnswers()), []);
+  useEffect(() => {
+    track("tool_opened", { tool: "gap_story" });
+    setSaved(getGapAnswers());
+  }, []);
 
   const generate = async () => {
     setLoading(true);
@@ -47,6 +52,8 @@ export default function GapStoryPage() {
       });
       const data = await res.json();
       setVersions(data.versions ?? []);
+      track("gap_story_built", { gapType, duration, versions: (data.versions ?? []).length });
+      mixpanelIncrement("gap_story_runs");
     } finally {
       setLoading(false);
     }
