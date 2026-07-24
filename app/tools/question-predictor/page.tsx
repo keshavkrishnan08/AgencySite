@@ -10,6 +10,7 @@ import { Button, ButtonLink } from "@/components/ui/Button";
 import { getProfile, savePredictedSet } from "@/lib/store";
 import { uid } from "@/lib/utils";
 import { track } from "@/lib/analytics";
+import { mixpanelIncrement } from "@/lib/mixpanel";
 import type { PredictedQuestion } from "@/lib/types";
 
 export default function QuestionPredictorPage() {
@@ -22,6 +23,7 @@ export default function QuestionPredictorPage() {
   const [error, setError] = useState("");
 
   useEffect(() => {
+    track("tool_opened", { tool: "question_predictor" });
     const p = getProfile();
     setRole(p.targetRole || "");
     setCompany(p.company || "");
@@ -55,7 +57,8 @@ export default function QuestionPredictorPage() {
           savedAt: new Date().toISOString(),
         });
         setSetId(id);
-        track("questions_predicted", { count: data.questions.length, role });
+        track("questions_predicted", { count: data.questions.length, role, postingChars: posting.trim().length });
+        mixpanelIncrement("predictor_runs");
       } else setError(data.error || "Something went wrong.");
     } finally {
       setLoading(false);
@@ -140,7 +143,12 @@ export default function QuestionPredictorPage() {
               Run a full scored session on these exact questions, most likely first. Every answer is graded on all
               five dimensions and feeds your metrics.
             </p>
-            <ButtonLink href={setId ? `/practice?predicted=${setId}` : "/practice"} size="lg" className="mt-4">
+            <ButtonLink
+              href={setId ? `/practice?predicted=${setId}` : "/practice"}
+              size="lg"
+              className="mt-4"
+              onClick={() => track("tool:handoff", { from: "question_predictor", count: questions.length })}
+            >
               Practice these {questions.length} questions <Sparkles size={16} />
             </ButtonLink>
           </div>

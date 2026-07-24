@@ -1,6 +1,6 @@
 "use client";
 
-import { useEffect, useMemo, useState } from "react";
+import { useEffect, useMemo, useRef, useState } from "react";
 import Link from "next/link";
 import {
   ArrowRight,
@@ -29,6 +29,7 @@ import { InfoTip } from "@/components/ui/Tooltip";
 import { AnimatedNumber } from "@/components/ui/AnimatedNumber";
 import { DistributionBars, ProjectionChart, Sparkline } from "@/components/charts/Charts";
 import { getProfile, getSessions, getStreak, onStoreChange } from "@/lib/store";
+import { setContext, track } from "@/lib/analytics";
 import {
   READY_SCORE,
   TOP_1_SCORE,
@@ -63,13 +64,32 @@ export default function DashboardPage() {
     const sync = () => {
       setSessions(getSessions());
       setStreak(getStreak());
-      setName(getProfile().name || "");
+      const prof = getProfile();
+      setName(prof.name || "");
+      // Ride-along context: every later event can be split by plan and by how
+      // deep into the product this person is.
+      setContext({ plan: prof.plan, situation: prof.situation, sessions: getSessions().length });
     };
     sync();
     return onStoreChange(sync);
   }, []);
 
   const m = useMemo(() => computeMetrics(sessions, streak), [sessions, streak]);
+
+  // Fires once the metrics are real, carrying the headline numbers so cohorts
+  // can be built on readiness/streak without a separate query.
+  const reported = useRef(false);
+  useEffect(() => {
+    if (reported.current || !m.hasData) return;
+    reported.current = true;
+    track("metrics:view", {
+      readiness: m.readiness,
+      percentile: m.percentile,
+      sessions: m.sessionCount,
+      streak: m.streak.current,
+      daysToTop1: m.toTop1.days,
+    });
+  }, [m]);
   const tip = DAILY_TIPS[new Date().getDate() % DAILY_TIPS.length];
 
   if (!mounted) {
@@ -405,7 +425,7 @@ function Trajectory({ m }: { m: Metrics }) {
           ).map(([v, label]) => (
             <button
               key={label}
-              onClick={() => setRange(v)}
+              onClick={() => { setRange(v); track("ui:click", { label: "metrics_range", value: String(v) }); }}
               className={cn(
                 "rounded-full px-3 py-1 text-xs font-medium transition-colors",
                 range === v ? "bg-white text-ink shadow-xs" : "text-ink-2 hover:text-ink"
@@ -466,6 +486,7 @@ function SkillRow({ d }: { d: DimensionMetric }) {
   return (
     <Link
       href={`/practice?focus=${d.key}`}
+      onClick={() => track("ui:click", { label: "skill_drill", dimension: d.key, score: d.current })}
       className="group block rounded-xl border p-4 transition-all hover:-translate-y-0.5 hover:shadow-sm"
       style={{ borderColor: "var(--border)" }}
     >

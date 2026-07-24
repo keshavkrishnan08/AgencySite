@@ -126,7 +126,7 @@ export default function UpgradePage() {
                     {(Object.keys(PLANS) as PlanKey[]).map((key) => (
                       <button
                         key={key}
-                        onClick={() => setPlan(key)}
+                        onClick={() => { setPlan(key); track("ui:click", { label: "plan_toggle", plan: key }); }}
                         className={`flex-1 rounded-full px-3 py-2 text-sm font-medium transition-all ${
                           plan === key ? "bg-white text-ink shadow-xs" : "text-ink-2 hover:text-ink"
                         }`}
