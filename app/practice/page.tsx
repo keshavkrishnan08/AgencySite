@@ -736,7 +736,7 @@ function PaywallScore({ answer, gentle, role }: { answer: ScoredAnswer; gentle: 
             ))}
           </ul>
           <ButtonLink href="/upgrade" variant="gold" size="lg" className="mt-7 w-full">
-            Unlock my score, from $6.66/mo
+            Unlock my score, from $16.66/mo
           </ButtonLink>
           <ButtonLink href="/dashboard" variant="ghost" size="sm" className="mt-1">
             Maybe later
