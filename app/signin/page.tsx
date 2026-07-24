@@ -9,7 +9,6 @@ import { Logo } from "@/components/ui/Logo";
 import { Button } from "@/components/ui/Button";
 import { useAuth } from "@/lib/auth";
 import { identify, track } from "@/lib/analytics";
-import { ReviewWall } from "@/components/auth/ReviewWall";
 
 type Mode = "signin" | "signup";
 
@@ -74,7 +73,7 @@ function SignInInner() {
   };
 
   return (
-    <main className="min-h-screen lg:grid lg:grid-cols-2">
+    <main className="min-h-screen">
     <div className="relative flex min-h-screen flex-col items-center justify-center overflow-hidden px-5 py-12">
       {/* ambient glow */}
       <div
@@ -167,7 +166,6 @@ function SignInInner() {
         <Link href="/onboarding" className="font-medium text-ink-2 hover:text-ink">See how it works</Link>
       </p>
     </div>
-      <ReviewWall />
     </main>
   );
 }
