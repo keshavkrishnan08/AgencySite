@@ -4,7 +4,7 @@ import { Suspense, useState } from "react";
 import { useRouter, useSearchParams } from "next/navigation";
 import Link from "next/link";
 import { motion } from "framer-motion";
-import { ArrowRight, Loader2, Mail, Lock, User, CheckCircle2 } from "lucide-react";
+import { ArrowRight, Loader2, Mail, Lock, User, CheckCircle2, Star } from "lucide-react";
 import { Logo } from "@/components/ui/Logo";
 import { Button } from "@/components/ui/Button";
 import { useAuth } from "@/lib/auth";
@@ -73,7 +73,7 @@ function SignInInner() {
   };
 
   return (
-    <main className="min-h-screen">
+    <main className="min-h-screen lg:grid lg:grid-cols-2">
     <div className="relative flex min-h-screen flex-col items-center justify-center overflow-hidden px-5 py-12">
       {/* ambient glow */}
       <div
@@ -166,7 +166,47 @@ function SignInInner() {
         <Link href="/onboarding" className="font-medium text-ink-2 hover:text-ink">See how it works</Link>
       </p>
     </div>
+
+    <SignInReviews />
     </main>
+  );
+}
+
+/* The reviews half of the create-account screen. Teal panel matching the
+   onboarding aesthetic, hidden on small screens where the form stands alone. */
+const SIGNIN_REVIEWS = [
+  { quote: "I hadn't interviewed in six years. Watching my score climb from 44 to 81 is what got me to walk in calm.", name: "Rachel M.", role: "Office Manager" },
+  { quote: "It counted every 'um' I said. I had no idea. Two weeks later they were gone.", name: "David K.", role: "Operations Lead" },
+  { quote: "The gap question used to wreck me. Now I have an answer I actually believe.", name: "Priya N.", role: "Account Manager" },
+];
+
+function SignInReviews() {
+  return (
+    <aside className="relative hidden overflow-hidden lg:block" style={{ background: "linear-gradient(160deg, #19a9b8 0%, #14808e 50%, #0c5660 120%)" }}>
+      <div className="pointer-events-none absolute -right-20 -top-24 h-80 w-80 rounded-full opacity-40 blur-3xl" style={{ background: "radial-gradient(circle, #ffffff66, transparent)" }} />
+      <div className="pointer-events-none absolute -bottom-28 -left-20 h-80 w-80 rounded-full opacity-30 blur-3xl" style={{ background: "radial-gradient(circle, #ffe0a655, transparent)" }} />
+      <div className="sticky top-0 flex min-h-screen flex-col justify-center px-12 py-16 text-white xl:px-16">
+        <div className="flex items-center gap-1.5">
+          {Array.from({ length: 5 }).map((_, i) => <Star key={i} size={16} className="fill-white text-white" />)}
+          <span className="ml-2 text-sm font-medium text-white/85">Loved by 12,000+ job seekers</span>
+        </div>
+        <h2 className="mt-6 max-w-md font-serif text-[2.1rem] font-semibold leading-tight">
+          Your progress, saved and waiting.
+        </h2>
+        <div className="mt-9 space-y-5">
+          {SIGNIN_REVIEWS.map((r) => (
+            <figure key={r.name} className="glass-card rounded-2xl p-5">
+              <div className="flex items-center gap-1">
+                {Array.from({ length: 5 }).map((_, i) => <Star key={i} size={12} className="fill-white text-white" />)}
+              </div>
+              <p className="mt-2.5 text-[0.95rem] leading-relaxed text-white/90">&ldquo;{r.quote}&rdquo;</p>
+              <figcaption className="mt-3 text-xs font-medium text-white/70">{r.name} · {r.role}</figcaption>
+            </figure>
+          ))}
+        </div>
+        <p className="mt-10 flex items-center gap-2 text-sm text-white/75"><CheckCircle2 size={16} /> Private by design. Cancel anytime.</p>
+      </div>
+    </aside>
   );
 }
 

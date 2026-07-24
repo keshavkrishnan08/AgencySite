@@ -18,7 +18,7 @@ import {
 import { ROLES } from "@/lib/roles";
 import { SITUATION_META } from "@/lib/utils";
 import { setOnboarding, setProfile } from "@/lib/store";
-import { track } from "@/lib/analytics";
+import { setContext, track } from "@/lib/analytics";
 import { CADENCE_META, projectPlan, type Cadence, type SkillLevel } from "@/lib/plan-projection";
 import { computeRoi } from "@/lib/roi";
 import { PLANS } from "@/lib/pricing";
@@ -31,7 +31,6 @@ type Cond = (a: Record<string, string>) => boolean;
 type Screen =
   | { kind: "form"; fields: Field[]; demo: Demo; when?: Cond }
   | { kind: "validation"; slot: 1 | 2; demo: Demo; when?: Cond }
-  | { kind: "compare"; demo: Demo; when?: Cond }
   | { kind: "plan"; demo: Demo; when?: Cond }
   | { kind: "roi"; demo: Demo; when?: Cond };
 
@@ -227,8 +226,6 @@ const SCREENS: Screen[] = [
       ],
     }],
   },
-  // ── Recruiter comparison: why practice beats winging it / a coach. ──
-  { kind: "compare", demo: "skills" },
   // ── The plan: top 10% in a week, top 1% in a month. ──
   { kind: "plan", demo: "progress" },
   // ── The payoff: a simple animated return card. ──
@@ -385,7 +382,14 @@ export default function OnboardingPage() {
     const company = (answers.company || "").trim();
     setOnboarding({ situation, targetRole: finalRole, company, interviewGap: gap });
     setProfile({ situation, targetRole: finalRole, company, interviewGap: gap });
-    track("onboarding_complete", { situation, role: finalRole, gap, ...answers });
+    // Every onboarding answer, prefixed so it groups in Mixpanel, on the
+    // completion event AND registered as super properties so it rides along on
+    // every future event and is queryable per person once they sign in.
+    const answerProps = Object.fromEntries(
+      Object.entries({ ...answers, role: finalRole }).map(([k, v]) => [`ob_${k}`, v])
+    );
+    setContext(answerProps);
+    track("onboarding_complete", { situation, role: finalRole, gap, ...answerProps });
     // Flow: onboarding questions -> create account -> payment -> app.
     router.push("/signin?mode=signup&next=%2Fupgrade");
   };
@@ -497,13 +501,11 @@ export default function OnboardingPage() {
                   const v = buildValidation(cur.slot, answers, role || query);
                   return (
                     <div className="text-center sm:text-left">
-                      <span className="eyebrow">{v.eyebrow}</span>
-                      <div className="mt-6 font-serif text-8xl font-semibold leading-none text-primary-ink">
+                      <div className="font-serif text-8xl font-semibold leading-none text-primary-ink">
                         <AnimatedNumber value={v.value} duration={1400} startOnView={false} />
                         <span className="text-4xl">{v.suffix}</span>
                       </div>
                       <h1 className="mt-6 text-balance font-serif text-2xl font-semibold text-ink sm:text-3xl">{v.headline}</h1>
-                      <p className="mt-3 max-w-md text-ink-2">{v.body}</p>
                       <div className="mt-9 flex items-center justify-center gap-3 sm:justify-start">
                         <Button variant="ghost" size="sm" onClick={() => go(screen - 1)}><ArrowLeft size={15} /> Back</Button>
                         <Button size="sm" onClick={() => go(screen + 1)}>Keep going <ArrowRight size={15} /></Button>
@@ -512,45 +514,6 @@ export default function OnboardingPage() {
                   );
                 })()}
 
-                {cur.kind === "compare" && (() => {
-                  const rows: { label: string; other: string; us: string }[] = [
-                    { label: "Cost", other: "$150–300 / hour", us: "$0.33 a day" },
-                    { label: "Available", other: "Business hours", us: "3 a.m., the night before" },
-                    { label: "Feedback", other: "A vague gut feel", us: "Scored on 5 dimensions" },
-                    { label: "Judgment", other: "You feel watched", us: "Completely private" },
-                    { label: "Reps", other: "One session", us: "Unlimited, until it's easy" },
-                  ];
-                  return (
-                    <div>
-                      <span className="eyebrow">Why not just wing it</span>
-                      <h1 className="mt-4 text-balance font-serif text-2xl font-semibold leading-tight text-ink sm:text-3xl">
-                        A recruiter friend can&apos;t sit with you at 3 a.m.
-                      </h1>
-                      <p className="mt-3 max-w-md text-ink-2">
-                        A coach costs hundreds an hour and judges you in the room. This is the same
-                        rehearsal, private, and yours as many times as it takes.
-                      </p>
-                      <div className="mt-6 overflow-hidden rounded-2xl border" style={{ borderColor: "var(--border)" }}>
-                        <div className="grid grid-cols-[1fr_1fr_1fr] border-b text-2xs font-semibold uppercase tracking-wider" style={{ borderColor: "var(--border)" }}>
-                          <span className="p-3 text-ink-3" />
-                          <span className="p-3 text-center text-ink-3">Coach / recruiter</span>
-                          <span className="p-3 text-center text-white" style={{ background: "linear-gradient(135deg, var(--primary-bright), var(--primary-ink))" }}>Axon</span>
-                        </div>
-                        {rows.map((r, i) => (
-                          <div key={r.label} className="grid grid-cols-[1fr_1fr_1fr] items-center text-sm" style={{ background: i % 2 ? "var(--surface-2)" : "transparent" }}>
-                            <span className="p-3 font-medium text-ink">{r.label}</span>
-                            <span className="p-3 text-center text-ink-3">{r.other}</span>
-                            <span className="p-3 text-center font-medium text-primary-ink">{r.us}</span>
-                          </div>
-                        ))}
-                      </div>
-                      <div className="mt-8 flex items-center gap-3">
-                        <Button variant="ghost" size="sm" onClick={() => go(screen - 1)}><ArrowLeft size={15} /> Back</Button>
-                        <Button size="sm" onClick={() => go(screen + 1)}>See my plan <ArrowRight size={15} /></Button>
-                      </div>
-                    </div>
-                  );
-                })()}
 
 
                 {cur.kind === "roi" && (() => {
@@ -594,65 +557,17 @@ export default function OnboardingPage() {
                   const cad = CADENCE_META[(answers.cadence as Cadence) || "steady"];
                   const urgent = answers.timeline === "this_week" || answers.timeline === "two_weeks";
                   return (
-                    <div>
+                    <div className="text-center sm:text-left">
                       <span className="eyebrow">Your plan</span>
-                      <h1 className="mt-4 text-balance font-serif text-2xl font-semibold leading-tight text-ink sm:text-3xl">
-                        Top 10% in <span className="text-primary-ink">{plan.toTop10.when}</span>.
-                        <br />
-                        Top 1% in <span className="text-primary-ink">{plan.toTop1.when}</span>.
+                      <h1 className="mt-4 text-balance font-serif text-3xl font-semibold leading-tight text-ink sm:text-4xl">
+                        We can get you interview-ready in about{" "}
+                        <span className="text-primary-ink">{plan.toTop10.when}</span>.
                       </h1>
-                      <p className="mt-3 text-ink-2">
-                        {cad.blurb} gets you there — {plan.toTop1.sessions} short sessions, about{" "}
-                        {plan.minutesTotal} minutes total.
-                        {urgent ? " Your interview is close, so we front-load the questions you're most likely to get." : ""}
+                      <p className="mt-4 max-w-md text-ink-2">
+                        {cad.blurb}. That&apos;s the whole plan.
+                        {urgent ? " Your interview is close, so we start with the questions you're most likely to get." : ""}
                       </p>
-
-                      {/* the two milestones */}
-                      <div className="mt-6 grid grid-cols-2 gap-3">
-                        {[plan.toTop10, plan.toTop1].map((m) => (
-                          <div key={m.topPercent} className="rounded-2xl border-2 p-4 text-center" style={{ borderColor: m.topPercent === 1 ? "var(--primary)" : "var(--border)", background: m.topPercent === 1 ? "var(--primary-soft)" : "var(--surface)" }}>
-                            <p className="text-2xs font-semibold uppercase tracking-wider text-ink-3">Top {m.topPercent}%</p>
-                            <p className="mt-1 font-serif text-3xl font-semibold text-primary-ink">{m.when}</p>
-                            <p className="mt-0.5 text-2xs text-ink-3">~{m.sessions} sessions</p>
-                          </div>
-                        ))}
-                      </div>
-
-                      {/* start -> target, on the same scale the dashboard uses */}
-                      <div className="mt-6 rounded-2xl border p-5" style={{ borderColor: "var(--border)", background: "var(--surface)" }}>
-                        <div className="flex items-end justify-between gap-4">
-                          <div>
-                            <p className="text-2xs font-semibold uppercase tracking-wider text-ink-3">Starting around</p>
-                            <p className="font-serif text-3xl font-semibold text-ink">{plan.startScore}</p>
-                            <p className="text-xs text-ink-3">top {plan.startTopPercent}%</p>
-                          </div>
-                          <div className="mb-2 flex-1">
-                            <div className="h-2 overflow-hidden rounded-full" style={{ background: "var(--bg-tint)" }}>
-                              <motion.div
-                                className="h-full rounded-full"
-                                initial={{ width: `${plan.startScore}%` }}
-                                animate={{ width: `${plan.targetScore}%` }}
-                                transition={{ duration: 1.4, ease: [0.22, 1, 0.36, 1], delay: 0.3 }}
-                                style={{ background: "linear-gradient(90deg, var(--primary), var(--primary-bright))" }}
-                              />
-                            </div>
-                          </div>
-                          <div className="text-right">
-                            <p className="text-2xs font-semibold uppercase tracking-wider text-primary-ink">Target</p>
-                            <p className="font-serif text-3xl font-semibold text-primary-ink">{plan.targetScore}</p>
-                            <p className="text-xs text-ink-3">top {plan.targetTopPercent}%</p>
-                          </div>
-                        </div>
-                      </div>
-
-
-                      <p className="mt-4 text-xs leading-relaxed text-ink-3">
-                        Projected from your own answers, on the same five-dimension scale your
-                        dashboard scores you against. It updates every session, and it&apos;s an
-                        estimate, not a promise.
-                      </p>
-
-                      <div className="mt-7 flex items-center gap-3">
+                      <div className="mt-9 flex items-center justify-center gap-3 sm:justify-start">
                         <Button variant="ghost" size="sm" onClick={() => go(screen - 1)}><ArrowLeft size={15} /> Back</Button>
                         <Button size="sm" onClick={() => go(screen + 1)}>Start free <ArrowRight size={15} /></Button>
                       </div>
