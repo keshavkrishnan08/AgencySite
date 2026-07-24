@@ -6,6 +6,7 @@
 
 import { track as vercelTrack } from "@vercel/analytics";
 import { attribution } from "./attribution";
+import { initMixpanel, mixpanelIdentify, mixpanelRegister, mixpanelTrack } from "./mixpanel";
 
 const KEY = process.env.NEXT_PUBLIC_POSTHOG_KEY;
 const HOST = process.env.NEXT_PUBLIC_POSTHOG_HOST || "https://us.i.posthog.com";
@@ -46,6 +47,7 @@ type Namespace =
   | "paywall"     // paywall:view, paywall:cta_click
   | "presale"     // presale:email_focus
   | "form"        // form:field_focus, form:error
+  | "metrics"     // metrics:view
   | "tool";       // tool:run, tool:handoff
 
 export type MicroEvent = `${Namespace}:${string}`;
@@ -92,14 +94,22 @@ declare global {
 
 /** Set once the user identifies themselves, so events join to a lead/profile. */
 let identity: string | null = null;
-export function identify(email: string): void {
+export function identify(email: string, props: Record<string, unknown> = {}): void {
   identity = (email || "").trim().toLowerCase() || null;
+  if (identity) mixpanelIdentify(identity, props);
 }
 
-/* Three sinks, in order of how much we trust them:
+/** Properties that should ride on every subsequent event (plan, cohort, etc). */
+export function setContext(props: Record<string, unknown>): void {
+  mixpanelRegister(props);
+}
+
+/* Five sinks, in order of how much we trust them:
      1. Supabase  — ours, survives ad blockers, the number we spend against
-     2. PostHog   — where the funnel actually gets analysed
-     3. Meta      — so the campaign can optimise for conversions
+     2. PostHog   — funnel analysis
+     3. Mixpanel  — deep analysis: funnels, retention, replays, click rates
+     4. Vercel    — traffic and vitals, next to the deployment
+     5. Meta      — so the campaign can optimise for conversions
    Each is fire-and-forget and independently guarded. A dead sink never blocks
    the other two and never surfaces to the user. */
 export function track(event: PPEvent, properties: Record<string, unknown> = {}): void {
@@ -153,7 +163,16 @@ export function track(event: PPEvent, properties: Record<string, unknown> = {}):
     }
   }
 
-  // 3. Vercel Web Analytics custom event, so conversions sit next to the
+  // 3. Mixpanel — the analysis surface. Autocapture already records raw
+  //    clicks and submits; these are the named steps worth building funnels on.
+  try {
+    initMixpanel();
+    mixpanelTrack(event, { ...properties, path });
+  } catch {
+    /* never break the app */
+  }
+
+  // 4. Vercel Web Analytics custom event, so conversions sit next to the
   //    pageview and traffic-source data on the same dashboard as the deploy.
   try {
     const flat: Record<string, string | number | boolean | null> = {};
@@ -167,7 +186,7 @@ export function track(event: PPEvent, properties: Record<string, unknown> = {}):
     /* never break the app */
   }
 
-  // 4. Meta Pixel standard event (fires only when the Pixel is loaded).
+  // 5. Meta Pixel standard event (fires only when the Pixel is loaded).
   const metaEvent = (META_EVENT as Record<string, string | undefined>)[event];
   if (metaEvent && typeof window.fbq === "function") {
     try {
