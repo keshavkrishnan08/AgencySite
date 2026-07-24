@@ -5,12 +5,17 @@
 # Secrets are read from .env.local and piped straight to Vercel. Nothing is
 # echoed, so this is safe to run with the output visible.
 #
-#   ./scripts/deploy-vercel.sh [domain]
+#   ./scripts/deploy-vercel.sh [domain] [vercel-project]
+#
+# Git already deploys this repo. The job this script really does is push the
+# environment variables, without which /api/lead 503s and every presale email
+# is refused.
 #
 set -euo pipefail
 
 DOMAIN="${1:-axonservices.dev}"
-PROJECT="axon-careers"
+# The Vercel project that already owns the domain. Override as arg 2.
+PROJECT="${2:-AgencySite}"
 VC="npx --yes vercel@latest"
 
 cd "$(dirname "$0")/.."
