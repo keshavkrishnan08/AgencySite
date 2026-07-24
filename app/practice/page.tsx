@@ -38,6 +38,13 @@ function PracticeInner() {
   const companyRef = useRef("");
   useEffect(() => { companyRef.current = company; }, [company]);
   const [posting, setPosting] = useState("");
+  // Session customization (from the setup screen). Refs so the mount-time
+  // start() reads current values, mirroring the company fix.
+  const [focusTypes, setFocusTypes] = useState<string[]>([]);
+  const [difficulty, setDifficulty] = useState("standard");
+  const [count, setCount] = useState(8);
+  const customRef = useRef({ focusTypes: [] as string[], difficulty: "standard", count: 8 });
+  useEffect(() => { customRef.current = { focusTypes, difficulty, count }; }, [focusTypes, difficulty, count]);
   const [questions, setQuestions] = useState<Question[]>([]);
   const [index, setIndex] = useState(0);
   const [answerText, setAnswerText] = useState("");
@@ -132,6 +139,9 @@ function PracticeInner() {
         weakestDimension,
         sessionCount: hist.length,
         avoid: recentQuestions,
+        focusTypes: customRef.current.focusTypes,
+        difficulty: customRef.current.difficulty,
+        count: customRef.current.count,
       });
       setQuestions(questions);
       setIndex(0);
@@ -413,6 +423,12 @@ function PracticeInner() {
             posting={posting}
             setCompany={setCompany}
             setPosting={setPosting}
+            focusTypes={focusTypes}
+            setFocusTypes={setFocusTypes}
+            difficulty={difficulty}
+            setDifficulty={setDifficulty}
+            count={count}
+            setCount={setCount}
             onStart={() => start(role || "Office Manager", situation)}
           />
         )}
@@ -607,12 +623,27 @@ function PracticeInner() {
 
 /* ---------------- sub-views ---------------- */
 
+const QUESTION_TYPES: { value: string; label: string; emoji: string }[] = [
+  { value: "warmup", label: "Tell me about yourself", emoji: "👋" },
+  { value: "behavioral", label: "Behavioral", emoji: "💬" },
+  { value: "situation", label: "Situational", emoji: "🧩" },
+  { value: "leadership", label: "Leadership & conflict", emoji: "🤝" },
+  { value: "gap", label: "The gap question", emoji: "🕳️" },
+  { value: "closer", label: "Questions to ask them", emoji: "🎯" },
+];
+
 function SetupCard({
   role,
   company,
   posting,
   setCompany,
   setPosting,
+  focusTypes,
+  setFocusTypes,
+  difficulty,
+  setDifficulty,
+  count,
+  setCount,
   onStart,
 }: {
   role: string;
@@ -620,9 +651,18 @@ function SetupCard({
   posting: string;
   setCompany: (v: string) => void;
   setPosting: (v: string) => void;
+  focusTypes: string[];
+  setFocusTypes: (v: string[]) => void;
+  difficulty: string;
+  setDifficulty: (v: string) => void;
+  count: number;
+  setCount: (v: number) => void;
   onStart: () => void;
 }) {
   const [showContext, setShowContext] = useState(Boolean(company || posting));
+  const [showCustom, setShowCustom] = useState(false);
+  const toggleType = (t: string) =>
+    setFocusTypes(focusTypes.includes(t) ? focusTypes.filter((x) => x !== t) : [...focusTypes, t]);
   return (
     <div className="mx-auto max-w-xl">
       <motion.div initial={{ opacity: 0, y: 16 }} animate={{ opacity: 1, y: 0 }} className="card-elevated p-8 sm:p-9">
@@ -680,6 +720,92 @@ function SetupCard({
                   className="field min-h-[120px] resize-y leading-relaxed text-sm"
                 />
               </label>
+            </div>
+          )}
+        </div>
+
+        {/* Customize the session (optional) */}
+        <div className="mt-4 rounded-xl border bg-bg-sunk/60 p-5" style={{ borderColor: "var(--border)" }}>
+          <button
+            onClick={() => setShowCustom((v) => !v)}
+            className="flex w-full items-center justify-between text-left"
+          >
+            <span className="flex items-center gap-2 font-medium text-ink">
+              <Sparkles size={16} className="text-primary" />
+              Customize this session
+              <span className="text-sm font-normal text-ink-3">
+                {focusTypes.length ? `· ${focusTypes.length} type${focusTypes.length === 1 ? "" : "s"}` : "(optional)"}
+              </span>
+            </span>
+            <ChevronDown size={18} className={cn("text-ink-3 transition-transform", showCustom && "rotate-180")} />
+          </button>
+
+          {showCustom && (
+            <div className="mt-4 space-y-5">
+              <div>
+                <p className="mb-2 text-sm font-medium text-ink-2">Focus on these question types</p>
+                <div className="flex flex-wrap gap-2">
+                  {QUESTION_TYPES.map((t) => {
+                    const on = focusTypes.includes(t.value);
+                    return (
+                      <button
+                        key={t.value}
+                        onClick={() => toggleType(t.value)}
+                        className="rounded-full border px-3 py-1.5 text-[0.8rem] font-medium transition-all"
+                        style={{
+                          borderColor: on ? "var(--primary)" : "var(--border-strong)",
+                          background: on ? "var(--primary-soft)" : "var(--surface)",
+                          color: on ? "var(--primary-ink)" : "var(--ink-2)",
+                        }}
+                      >
+                        {t.emoji} {t.label}
+                      </button>
+                    );
+                  })}
+                </div>
+                <p className="mt-1.5 text-xs text-ink-3">Leave blank for a balanced mix.</p>
+              </div>
+
+              <div className="grid gap-4 sm:grid-cols-2">
+                <div>
+                  <p className="mb-2 text-sm font-medium text-ink-2">Difficulty</p>
+                  <div className="flex gap-1 rounded-full bg-bg-tint p-1">
+                    {[
+                      ["easy", "Gentle"],
+                      ["standard", "Standard"],
+                      ["hard", "Tough"],
+                    ].map(([v, label]) => (
+                      <button
+                        key={v}
+                        onClick={() => setDifficulty(v)}
+                        className={cn(
+                          "flex-1 rounded-full px-2 py-1.5 text-xs font-medium transition-colors",
+                          difficulty === v ? "bg-white text-ink shadow-xs" : "text-ink-2 hover:text-ink"
+                        )}
+                      >
+                        {label}
+                      </button>
+                    ))}
+                  </div>
+                </div>
+                <div>
+                  <p className="mb-2 text-sm font-medium text-ink-2">How many questions</p>
+                  <div className="flex gap-1 rounded-full bg-bg-tint p-1">
+                    {[5, 8, 12].map((n) => (
+                      <button
+                        key={n}
+                        onClick={() => setCount(n)}
+                        className={cn(
+                          "flex-1 rounded-full px-2 py-1.5 text-xs font-medium transition-colors",
+                          count === n ? "bg-white text-ink shadow-xs" : "text-ink-2 hover:text-ink"
+                        )}
+                      >
+                        {n}
+                      </button>
+                    ))}
+                  </div>
+                </div>
+              </div>
             </div>
           )}
         </div>
