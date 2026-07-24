@@ -15,6 +15,7 @@ import { aggregateDimensions, computeOverall } from "@/lib/scoring";
 import { getOnboarding, getPredictedSet, getProfile, getSessions, saveSession, isPremium } from "@/lib/store";
 import { average, cn, uid } from "@/lib/utils";
 import { track } from "@/lib/analytics";
+import { mixpanelIncrement } from "@/lib/mixpanel";
 import type { Dimension, DeliveryMetrics, Question, ScoredAnswer, Session, Situation } from "@/lib/types";
 
 // After the first answer, free users hit a hard paywall (analyzing -> paywall).
@@ -103,6 +104,8 @@ function PracticeInner() {
         setScored(null);
         setAnswerText("");
         sessionStart.current = Date.now();
+        track("session_started", { mode: "predicted", role: r, questions: set.questions.length });
+        mixpanelIncrement("sessions_started");
         setPhase("answer");
         return;
       }
@@ -131,6 +134,13 @@ function PracticeInner() {
       setScored(null);
       setAnswerText("");
       sessionStart.current = Date.now();
+      track("session_started", {
+        mode: focusDim ? "focus" : "practice",
+        role: r,
+        questions: questions.length,
+        sessionCount: hist.length,
+      });
+      mixpanelIncrement("sessions_started");
       setPhase("answer");
     },
     [focusDim, company, posting]
@@ -168,8 +178,27 @@ function PracticeInner() {
   // Stamp the clock each time a fresh question is presented, so we can measure
   // how long the candidate spends per question.
   useEffect(() => {
-    if (phase === "answer") questionStart.current = Date.now();
+    if (phase !== "answer") return;
+    questionStart.current = Date.now();
+    const q = questions[index];
+    if (q) track("practice:question_view", { index: index + 1, total: questions.length, category: q.category });
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [phase, index]);
+
+  // First keystroke on a question: the gap between seeing it and starting to
+  // answer is where hesitation shows up, and where people abandon.
+  const startedRef = useRef(false);
+  useEffect(() => {
+    startedRef.current = false;
+  }, [index]);
+  const noteAnswerStart = () => {
+    if (startedRef.current) return;
+    startedRef.current = true;
+    track("practice:answer_start", {
+      index: index + 1,
+      secondsToStart: questionStart.current ? Math.round((Date.now() - questionStart.current) / 1000) : 0,
+    });
+  };
 
   const wordCount = answerText.trim() ? answerText.trim().split(/\s+/).length : 0;
   const MIN_WORDS = 5;
@@ -206,6 +235,14 @@ function PracticeInner() {
       : undefined;
     setScored(result);
     setSubmitting(false);
+    track("practice:scored", {
+      index: index + 1,
+      overall: result.scores?.overall ?? 0,
+      words: result.wordCount,
+      source: result.source,
+      spoken: Boolean(result.delivery),
+    });
+    mixpanelIncrement("answers_scored");
     window.scrollTo({ top: 0, behavior: "smooth" });
 
     // Hard paywall: free users answer one question, then must upgrade. Their
@@ -228,7 +265,10 @@ function PracticeInner() {
         situation: situation || "",
         interviewGap: perso.current.interviewGap,
       })
-        .then(setFollowUp)
+        .then((fu) => {
+          setFollowUp(fu);
+          if (fu) track("practice:followup_shown", { index: index + 1 });
+        })
         .catch(() => setFollowUp(null));
     }
   };
@@ -252,6 +292,8 @@ function PracticeInner() {
     result.delivery = fuDeliveryRef.current ?? undefined;
     setFollowUpScored(result);
     setSubmittingFollowUp(false);
+    track("practice:followup_answered", { index: index + 1, overall: result.scores?.overall ?? 0 });
+    mixpanelIncrement("followups_answered");
   };
 
   const finishSession = (finalAnswers: ScoredAnswer[]) => {
@@ -275,7 +317,8 @@ function PracticeInner() {
       focusDimension: focusDim,
     };
     saveSession(session);
-    track("session_complete", { overall: session.overall, mode: session.mode, role });
+    track("session_complete", { overall: session.overall, mode: session.mode, role, questions: finalAnswers.length });
+    mixpanelIncrement("sessions_completed");
     router.push(`/session/${session.id}`);
   };
 
@@ -304,6 +347,7 @@ function PracticeInner() {
   };
 
   const endEarly = () => {
+    track("practice:end_early", { index: index + 1, total: questions.length, answered: answers.length });
     const finalAnswers = scored ? collectAnswers() : answers;
     if (finalAnswers.length > 0) finishSession(finalAnswers);
     else router.push("/dashboard");
@@ -413,7 +457,7 @@ function PracticeInner() {
                 <textarea
                   autoFocus
                   value={answerText}
-                  onChange={(e) => setAnswerText(e.target.value)}
+                  onChange={(e) => { noteAnswerStart(); setAnswerText(e.target.value); }}
                   placeholder="Type your answer here… speak naturally, as if you're in the interview."
                   className="field min-h-[180px] resize-y leading-relaxed"
                   style={{ maxHeight: 420 }}
@@ -503,7 +547,13 @@ function PracticeInner() {
                         onDelivery={(m) => (fuDeliveryRef.current = m)}
                       />
                       <div className="flex items-center gap-2">
-                        <button onClick={() => setFollowUp(null)} className="btn-ghost text-sm">
+                        <button
+                          onClick={() => {
+                            track("practice:followup_skipped", { index: index + 1 });
+                            setFollowUp(null);
+                          }}
+                          className="btn-ghost text-sm"
+                        >
                           Skip
                         </button>
                         <Button
@@ -735,7 +785,13 @@ function PaywallScore({ answer, gentle, role }: { answer: ScoredAnswer; gentle: 
               </li>
             ))}
           </ul>
-          <ButtonLink href="/upgrade" variant="gold" size="lg" className="mt-7 w-full">
+          <ButtonLink
+            href="/upgrade"
+            variant="gold"
+            size="lg"
+            className="mt-7 w-full"
+            onClick={() => track("paywall:cta_click", { role })}
+          >
             Unlock my score, from $16.66/mo
           </ButtonLink>
           <ButtonLink href="/dashboard" variant="ghost" size="sm" className="mt-1">
