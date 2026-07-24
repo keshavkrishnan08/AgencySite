@@ -188,6 +188,10 @@ export interface OnboardingDraft {
   targetRole: string;
   company?: string;
   interviewGap: UserProfile["interviewGap"];
+  // Kept so the paywall can personalise to what they told us (Superwall: never
+  // show a generic paywall after a personalised flow).
+  timeline?: string; // this_week | two_weeks | month | none
+  salaryBand?: string;
 }
 /* ----------------------- Goal (interview countdown) ----------------------- */
 export interface Goal {
