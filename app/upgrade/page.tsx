@@ -2,39 +2,29 @@
 
 import { useEffect, useState } from "react";
 import { useRouter } from "next/navigation";
+import Link from "next/link";
 import { motion } from "framer-motion";
-import { Check, Lock, ShieldCheck, Loader2, PartyPopper } from "lucide-react";
+import { Check, Lock, ShieldCheck, Loader2, PartyPopper, Star } from "lucide-react";
 import { AppShell } from "@/components/layout/AppShell";
-import { Button, ButtonLink } from "@/components/ui/Button";
-import { PremiumBadge } from "@/components/ui/PremiumBadge";
+import { Button } from "@/components/ui/Button";
+import { Logo } from "@/components/ui/Logo";
 import { getOnboarding, getProfile, upgradeToPremium } from "@/lib/store";
 import { track } from "@/lib/analytics";
-import { PLANS, type PlanKey } from "@/lib/pricing";
-import { QuickReview } from "@/components/feedback/QuickReview";
+import { PLANS, PLAN_ORDER, type PlanKey } from "@/lib/pricing";
 
 const INCLUDED = [
-  "Unlimited scored mock interviews",
-  "All five dimensions, scored on every answer",
-  "A real follow-up question after each answer",
+  "Unlimited AI-scored mock interviews",
+  "Feedback on all five dimensions, every answer",
   "The Anxiety Detector on every session",
-  "Your full metrics: percentile, pace, projections",
-  "Estimated time to a top 1% interview",
-  "Streaks, milestones and personal records",
-  "Question Predictor for any job posting",
-  "Practice the predicted questions, scored",
-  "Gap Story Builder with unlimited revisions",
-  "Example great answers for every question",
-  "Speak your answers, with delivery metrics",
+  "Your readiness metrics + time to top 1%",
+  "Question Predictor, Gap Story & Job Breakdown",
+  "Speak your answers, with delivery coaching",
 ];
 
 export default function UpgradePage() {
   const router = useRouter();
   const [state, setState] = useState<"idle" | "processing" | "done">("idle");
-  // Default to quarterly: it matches how long a search actually takes, and the
-  // pre-selected option is the single biggest lever on plan mix.
   const [plan, setPlan] = useState<PlanKey>("quarterly");
-  // Personalise to what they told us in onboarding, so the paywall isn't
-  // generic after a personalised flow (Superwall's strongest paywall rule).
   const [pitch, setPitch] = useState<string>("");
   const p = PLANS[plan];
 
@@ -43,15 +33,12 @@ export default function UpgradePage() {
     const ob = getOnboarding();
     const t = ob?.timeline;
     if (t === "this_week" || t === "two_weeks") {
-      // Interview is imminent → the search is now; 3 months covers it.
       setPlan("quarterly");
-      setPitch(
-        t === "this_week"
-          ? "Your interview is this week. The 3-month plan gives you unlimited practice between now and then, and covers the rest of your search."
-          : "Your interview is days away. Three months of unlimited practice covers this one and whatever comes next."
-      );
+      setPitch(t === "this_week"
+        ? "Your interview is this week. Three months of unlimited practice covers it and the rest of your search."
+        : "Your interview is days away. Three months covers this one and whatever comes next.");
     } else if (t === "none") {
-      setPitch("No interview booked yet? Good — that's the time to get ahead. Most searches run about three months.");
+      setPitch("No interview booked yet? That's the time to get ahead — most searches run about three months.");
     } else if (ob?.targetRole) {
       setPitch(`Everything you need to walk into your ${ob.targetRole} interview ready.`);
     }
@@ -60,7 +47,6 @@ export default function UpgradePage() {
   const subscribe = async () => {
     setState("processing");
     track("upgrade_click", { plan });
-    // Try real Stripe Checkout first; fall back to demo if not configured.
     try {
       const res = await fetch("/api/checkout", {
         method: "POST",
@@ -68,14 +54,8 @@ export default function UpgradePage() {
         body: JSON.stringify({ plan, email: getProfile().email || undefined }),
       });
       const data = await res.json();
-      if (data?.url) {
-        window.location.href = data.url; // real Stripe Checkout
-        return;
-      }
-    } catch {
-      /* fall through to demo */
-    }
-    // Demo path (no Stripe keys): optimistic local upgrade.
+      if (data?.url) { window.location.href = data.url; return; }
+    } catch { /* fall through to demo */ }
     setTimeout(() => {
       upgradeToPremium();
       track("upgrade_success", { plan, mode: "demo" });
@@ -85,155 +65,102 @@ export default function UpgradePage() {
   };
 
   return (
-    <AppShell>
-      <main className="container-wide max-w-5xl py-12">
-        <div className="text-center">
-          <PremiumBadge label="Axon Careers Premium" className="mx-auto" />
-          <span className="sr-only">Axon Careers Premium</span>
-          <h1 className="mt-5 text-balance font-serif text-display font-semibold text-ink">
-            Everything you need to walk in ready.
-          </h1>
-          <p className="mx-auto mt-4 max-w-prose text-lg text-ink-2">
-            {pitch || "The average job search runs about three months. So does the plan most people pick."}
-          </p>
-        </div>
-
-        <div className="mt-12 grid gap-6 lg:grid-cols-[1.2fr_1fr]">
-          {/* Benefits */}
-          <div className="card-elevated p-8">
-            <h2 className="font-serif text-xl font-semibold text-ink">What&apos;s included</h2>
-            <ul className="mt-5 grid gap-3 sm:grid-cols-2">
+    <AppShell bare requirePremium={false}>
+      <main className="min-h-screen bg-surface lg:grid lg:grid-cols-2">
+        {/* LEFT — the pitch, on a calm tinted panel */}
+        <aside className="relative hidden flex-col justify-between overflow-hidden px-12 py-14 lg:flex xl:px-16"
+          style={{ background: "linear-gradient(165deg, #19a9b8 0%, #14808e 55%, #0c5660 130%)" }}>
+          <div className="pointer-events-none absolute -right-24 -top-24 h-80 w-80 rounded-full opacity-30 blur-3xl" style={{ background: "radial-gradient(circle, #ffffff66, transparent)" }} />
+          <Logo href="/dashboard" size={30} className="text-white [&_*]:text-white" />
+          <div className="relative">
+            <div className="flex items-center gap-1">
+              {Array.from({ length: 5 }).map((_, i) => <Star key={i} size={14} className="fill-white text-white" />)}
+              <span className="ml-2 text-sm text-white/85">Loved by 12,000+ job seekers</span>
+            </div>
+            <h2 className="mt-5 max-w-sm font-serif text-[2.4rem] font-semibold leading-tight text-white">
+              Walk in ready.
+            </h2>
+            <p className="mt-3 max-w-sm text-white/85">{pitch || "Unlimited practice, scored, until the interview feels easy."}</p>
+            <ul className="mt-8 space-y-3">
               {INCLUDED.map((f) => (
-                <li key={f} className="flex items-start gap-2.5 text-sm text-ink-2">
-                  <Check size={17} className="mt-0.5 shrink-0 text-primary" />
+                <li key={f} className="flex items-start gap-2.5 text-[0.95rem] text-white/90">
+                  <span className="mt-0.5 grid h-5 w-5 shrink-0 place-items-center rounded-full bg-white/15"><Check size={12} className="text-white" /></span>
                   {f}
                 </li>
               ))}
             </ul>
           </div>
+          <p className="relative flex items-center gap-2 text-sm text-white/70"><ShieldCheck size={15} /> Private by design · cancel anytime</p>
+        </aside>
 
-          {/* Order summary */}
-          <div className="lg:sticky lg:top-24 lg:self-start">
-            <div
-              className="rounded-2xl border-2 p-7 shadow-lg"
-              style={{ borderColor: "var(--primary)", background: "var(--surface)" }}
-            >
-              {state === "done" ? (
-                <motion.div
-                  initial={{ opacity: 0, scale: 0.95 }}
-                  animate={{ opacity: 1, scale: 1 }}
-                  className="py-8 text-center"
-                >
-                  <span className="mx-auto grid h-16 w-16 place-items-center rounded-full bg-sage-soft text-sage-ink">
-                    <PartyPopper size={30} />
-                  </span>
-                  <h3 className="mt-5 font-serif text-2xl font-semibold text-ink">You&apos;re Premium! 🎉</h3>
-                  <p className="mt-2 text-ink-2">Everything is unlocked. Taking you to your metrics…</p>
-                </motion.div>
-              ) : (
-                <>
-                  {/* plan toggle */}
-                  <div className="mb-2 flex rounded-full bg-bg-tint p-1">
-                    {(Object.keys(PLANS) as PlanKey[]).map((key) => (
-                      <button
-                        key={key}
-                        onClick={() => { setPlan(key); track("ui:click", { label: "plan_toggle", plan: key }); }}
-                        className={`flex-1 rounded-full px-3 py-2 text-sm font-medium transition-all ${
-                          plan === key ? "bg-white text-ink shadow-xs" : "text-ink-2 hover:text-ink"
-                        }`}
-                      >
-                        {PLANS[key].toggle}
-                        {PLANS[key].savePct > 0 && (
-                          <span className="ml-1.5 text-2xs font-bold text-sage-ink">
-                            −{PLANS[key].savePct}%
-                          </span>
-                        )}
-                      </button>
-                    ))}
-                  </div>
-                  <p className="mb-5 text-center text-2xs font-medium text-ink-3">
-                    🔥 Most people pick 3 months. It&apos;s how long a search takes.
-                  </p>
+        {/* RIGHT — the checkout card */}
+        <div className="flex min-h-screen items-center justify-center px-5 py-12 sm:px-10">
+          {state === "done" ? (
+            <motion.div initial={{ opacity: 0, scale: 0.96 }} animate={{ opacity: 1, scale: 1 }} className="text-center">
+              <span className="mx-auto grid h-16 w-16 place-items-center rounded-full bg-sage-soft text-sage-ink"><PartyPopper size={30} /></span>
+              <h3 className="mt-5 font-serif text-2xl font-semibold text-ink">You&apos;re in.</h3>
+              <p className="mt-2 text-ink-2">Everything&apos;s unlocked. Taking you to your dashboard…</p>
+            </motion.div>
+          ) : (
+            <div className="w-full max-w-md">
+              <div className="lg:hidden"><Logo size={28} /></div>
+              <h1 className="mt-6 font-serif text-3xl font-semibold text-ink lg:mt-0">Choose your plan</h1>
+              <p className="mt-1.5 text-ink-2">Unlimited practice. Cancel anytime.</p>
 
-                  <div className="flex items-baseline justify-between gap-3">
-                    <h2 className="font-serif text-xl font-semibold text-ink">Premium</h2>
-                    <span className="flex items-baseline gap-2">
-                      {p.was && (
-                        <span className="font-serif text-xl font-semibold text-ink-3 line-through">{p.was}</span>
-                      )}
-                      <span className="font-serif text-3xl font-semibold" style={{ color: "var(--primary-ink)" }}>
-                        {p.price}
-                      </span>
-                    </span>
-                  </div>
-                  <p className="text-sm text-ink-3">{p.cadence}</p>
-                  <p className="mt-1 text-sm font-medium text-sage-ink">{p.perMonth}</p>
-
-                  <div className="my-6 hairline" />
-
-                  <div className="space-y-2 text-sm">
-                    <Row label={`Premium · ${p.toggle}`} value={p.was ?? p.price} />
-                    {p.saveAmount && <Row label={`You save ${p.savePct}%`} value={`-${p.saveAmount}`} />}
-                    <Row label="Due today" value={p.price} bold />
-                  </div>
-
-                  {/* Nudge monthly pickers toward the plan that covers the search */}
-                  {plan === "monthly" && (
+              {/* plan options — stacked, selectable rows (Stripe-style) */}
+              <div className="mt-7 space-y-2.5">
+                {PLAN_ORDER.map((key) => {
+                  const pl = PLANS[key];
+                  const on = plan === key;
+                  return (
                     <button
-                      onClick={() => setPlan("quarterly")}
-                      className="mt-4 flex w-full items-center justify-between gap-2 rounded-xl border-2 border-dashed px-4 py-3 text-left text-sm transition-colors hover:bg-sage-soft/40"
-                      style={{ borderColor: "var(--sage)" }}
+                      key={key}
+                      onClick={() => { setPlan(key); track("ui:click", { label: "plan_select", plan: key }); }}
+                      className="flex w-full items-center gap-3 rounded-xl border p-4 text-left transition-all"
+                      style={{
+                        borderColor: on ? "var(--primary)" : "var(--border-strong)",
+                        background: on ? "var(--primary-soft)" : "var(--surface)",
+                        boxShadow: on ? "0 0 0 1px var(--primary)" : "none",
+                      }}
                     >
-                      <span className="text-ink-2">
-                        💡 Three months costs less than two.{" "}
-                        <span className="font-semibold text-sage-ink">Save $9.98</span>
+                      <span className="grid h-5 w-5 shrink-0 place-items-center rounded-full border-2" style={{ borderColor: on ? "var(--primary)" : "var(--border-strong)" }}>
+                        {on && <span className="h-2.5 w-2.5 rounded-full" style={{ background: "var(--primary)" }} />}
                       </span>
-                      <span className="shrink-0 font-semibold text-sage-ink">Switch →</span>
+                      <span className="min-w-0 flex-1">
+                        <span className="flex items-center gap-2">
+                          <span className="font-semibold text-ink">{pl.toggle}</span>
+                          {pl.savePct > 0 && <span className="rounded-full bg-sage-soft px-2 py-0.5 text-2xs font-bold text-sage-ink">Save {pl.savePct}%</span>}
+                        </span>
+                        <span className="mt-0.5 block text-xs text-ink-3">{pl.perMonth}</span>
+                      </span>
+                      <span className="shrink-0 text-right">
+                        <span className="font-serif text-lg font-semibold text-ink">{pl.price}</span>
+                        {pl.was && <span className="block text-2xs text-ink-3 line-through">{pl.was}</span>}
+                      </span>
                     </button>
-                  )}
+                  );
+                })}
+              </div>
 
-                  <Button onClick={subscribe} disabled={state === "processing"} size="lg" className="mt-6 w-full">
-                    {state === "processing" ? (
-                      <>
-                        <Loader2 size={18} className="animate-spin" /> Processing…
-                      </>
-                    ) : (
-                      <>
-                        <Lock size={16} /> Subscribe — {p.price}
-                      </>
-                    )}
-                  </Button>
-                  <p className="mt-3 flex items-center justify-center gap-1.5 text-xs text-ink-3">
-                    <ShieldCheck size={13} /> Secure checkout · powered by Stripe · cancel anytime
-                  </p>
+              {/* summary */}
+              <div className="mt-6 space-y-2 border-t pt-5 text-sm" style={{ borderColor: "var(--border)" }}>
+                <div className="flex items-center justify-between"><span className="text-ink-2">Premium · {p.toggle}</span><span className="font-mono text-ink">{p.was ?? p.price}</span></div>
+                {p.saveAmount && <div className="flex items-center justify-between text-sage-ink"><span>You save {p.savePct}%</span><span className="font-mono">−{p.saveAmount}</span></div>}
+                <div className="flex items-center justify-between border-t pt-2 font-semibold" style={{ borderColor: "var(--border)" }}><span className="text-ink">Due today</span><span className="font-mono text-ink">{p.price}</span></div>
+              </div>
 
-                  {/* Asked before payment, while intent is highest. Skippable,
-                      and it never gates the subscribe button. */}
-                  <QuickReview
-                    className="mt-5"
-                    stage="pre_payment"
-                    prompt="How's your first scored answer been?"
-                  />
-                </>
-              )}
+              <Button onClick={subscribe} disabled={state === "processing"} size="lg" className="mt-6 w-full">
+                {state === "processing" ? <><Loader2 size={18} className="animate-spin" /> Redirecting to secure checkout…</> : <><Lock size={16} /> Subscribe · {p.price}</>}
+              </Button>
+              <p className="mt-3 flex items-center justify-center gap-1.5 text-xs text-ink-3"><ShieldCheck size={13} /> Secure checkout, powered by Stripe · cancel anytime</p>
+
+              <div className="mt-5 text-center">
+                <Link href="/dashboard" className="text-sm text-ink-3 transition-colors hover:text-ink-2">Maybe later</Link>
+              </div>
             </div>
-            <div className="mt-4 text-center">
-              <ButtonLink href="/dashboard" variant="ghost" size="sm">
-                Maybe later
-              </ButtonLink>
-            </div>
-          </div>
+          )}
         </div>
       </main>
     </AppShell>
-  );
-}
-
-function Row({ label, value, bold }: { label: string; value: string; bold?: boolean }) {
-  return (
-    <div className="flex items-center justify-between">
-      <span className={bold ? "font-semibold text-ink" : "text-ink-2"}>{label}</span>
-      <span className={bold ? "font-mono font-semibold text-ink" : "font-mono text-ink-2"}>{value}</span>
-    </div>
   );
 }

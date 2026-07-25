@@ -28,7 +28,15 @@ import { FROM_PER_DAY } from "@/lib/pricing";
 // so navigating between authed pages doesn't re-show the gate loader.
 let checkedFor: string | null = null;
 
-export function AppShell({ children, requirePremium = true }: { children: ReactNode; requirePremium?: boolean }) {
+export function AppShell({
+  children,
+  requirePremium = true,
+  bare = false,
+}: {
+  children: ReactNode;
+  requirePremium?: boolean;
+  bare?: boolean;
+}) {
   const { configured, user, loading } = useAuth();
   const router = useRouter();
   const pathname = usePathname();
@@ -172,6 +180,10 @@ export function AppShell({ children, requirePremium = true }: { children: ReactN
       </main>
     );
   }
+
+  // Chromeless mode: a focused surface (e.g. checkout) with no clickable nav or
+  // sidebar — just the gated content.
+  if (bare) return <>{children}</>;
 
   return (
     <>

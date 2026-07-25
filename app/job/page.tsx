@@ -60,7 +60,7 @@ export default function JobPage() {
 
   return (
     <AppShell requirePremium={false}>
-      <main className="mx-auto max-w-4xl px-5 py-8 sm:px-8 sm:py-10">
+      <main className="mx-auto max-w-5xl px-5 py-8 sm:px-8 sm:py-10">
         {/* Header */}
         <div className="flex items-center gap-2 text-2xs font-semibold uppercase tracking-[0.14em] text-primary-ink">
           <Briefcase size={14} /> Job breakdown
