@@ -17,7 +17,10 @@ import { VoiceButton } from "@/components/ui/VoiceButton";
 import { InfoTip } from "@/components/ui/Tooltip";
 import { apiFollowUp, apiGenerateExample, apiGenerateQuestions, apiScoreAnswer } from "@/lib/client";
 import { aggregateDimensions, computeOverall } from "@/lib/scoring";
-import { getOnboarding, getPredictedSet, getProfile, getSessions, saveSession } from "@/lib/store";
+import {
+  getOnboarding, getPredictedSet, getProfile, getSessions, saveSession,
+  getRoutines, saveRoutine, deleteRoutine, onStoreChange, type PracticeRoutine,
+} from "@/lib/store";
 import { average, cn, uid } from "@/lib/utils";
 import { track } from "@/lib/analytics";
 import { mixpanelIncrement } from "@/lib/mixpanel";
@@ -509,6 +512,14 @@ function PracticeInner() {
             voiceFirst={voiceFirst}
             setVoiceFirst={setVoiceFirst}
             onBack={() => setPhase("setup")}
+            onSaveRoutine={(name) =>
+              saveRoutine({
+                id: uid("rt"),
+                name,
+                createdAt: new Date().toISOString(),
+                cfg: { domain, focusTypes, difficulty, count, tone, interviewer, timed, voice: voiceFirst },
+              })
+            }
             onStart={() => {
               customRef.current = { focusTypes, difficulty, count, tone, interviewer };
               domainRef.current = domain;
@@ -798,6 +809,26 @@ const PRESETS: { title: string; desc: string; badge: string; cfg: LaunchCfg }[] 
   { title: "Curveballs", desc: "Scenario questions you can't rehearse — think on your feet.", badge: "Scenario", cfg: { tone: "scenario", difficulty: "hard", label: "preset_curveball" } },
 ];
 
+// Surgical single-skill drills — narrower than presets, aimed at one weakness.
+const DRILLS: { title: string; desc: string; cfg: LaunchCfg }[] = [
+  { title: "Filler-word killer", desc: "Speak your answers; every um and hedge gets flagged.", cfg: { count: 5, voice: true, tone: "conversational", label: "drill_filler" } },
+  { title: "Cut it to 60 seconds", desc: "Tight, timed answers — no rambling.", cfg: { count: 6, timed: true, label: "drill_60s" } },
+  { title: "Tell me about yourself", desc: "Drill the opener until it's automatic.", cfg: { count: 4, focusTypes: ["warmup"], label: "drill_tmay" } },
+  { title: "The weakness question", desc: "Turn your weakness into a strong, honest answer.", cfg: { count: 4, focusTypes: ["behavioral"], tone: "formal", label: "drill_weakness" } },
+  { title: "Questions to ask them", desc: "Close strong with sharp questions of your own.", cfg: { count: 4, focusTypes: ["closer"], label: "drill_closer" } },
+  { title: "Impromptu speaking", desc: "Random topics, 60 seconds each, on your feet.", cfg: { domain: "public_speaking", count: 6, timed: true, label: "drill_impromptu" } },
+];
+
+function routineSummary(r: PracticeRoutine): string {
+  const c = r.cfg;
+  const noun = c.domain === "storytelling" ? "stories" : c.domain === "public_speaking" ? "drills" : "Qs";
+  const parts = [`${c.count || 8} ${noun}`];
+  if (c.difficulty && c.difficulty !== "standard") parts.push(c.difficulty);
+  if (c.timed) parts.push("timed");
+  if (c.voice) parts.push("voice");
+  return parts.join(" · ");
+}
+
 function PracticeHub({
   role,
   interviewGap,
@@ -819,6 +850,13 @@ function PracticeHub({
     situation === "returning" ||
     situation === "laid_off" ||
     situation === "career_change";
+
+  const [routines, setRoutines] = useState<PracticeRoutine[]>([]);
+  useEffect(() => {
+    const sync = () => setRoutines(getRoutines());
+    sync();
+    return onStoreChange(sync);
+  }, []);
 
   return (
     <div className="mx-auto max-w-4xl">
@@ -846,6 +884,37 @@ function PracticeHub({
         </span>
         <ArrowRight size={22} className="transition-transform group-hover:translate-x-1" />
       </button>
+
+      {/* Your saved routines */}
+      {routines.length > 0 && (
+        <>
+          <SectionLabel icon={Repeat} title="Your routines" sub="Saved session setups. One tap to run again." />
+          <div className="grid gap-3 sm:grid-cols-2 lg:grid-cols-3">
+            {routines.map((r) => (
+              <div
+                key={r.id}
+                className="flex items-center gap-3 rounded-xl border p-4 transition-all hover:shadow-sm"
+                style={{ borderColor: "var(--border)" }}
+              >
+                <button
+                  onClick={() => onLaunch({ ...r.cfg, domain: r.cfg.domain as Domain })}
+                  className="min-w-0 flex-1 text-left"
+                >
+                  <span className="block truncate font-medium text-ink">{r.name}</span>
+                  <span className="block text-xs text-ink-3">{routineSummary(r)}</span>
+                </button>
+                <button
+                  onClick={() => deleteRoutine(r.id)}
+                  title="Delete routine"
+                  className="shrink-0 text-ink-3 transition-colors hover:text-coral-ink"
+                >
+                  <X size={15} />
+                </button>
+              </div>
+            ))}
+          </div>
+        </>
+      )}
 
       {/* Tracks / domains */}
       <SectionLabel icon={Layers} title="Choose a track" sub="Interviews are one skill. These build the others too." />
@@ -930,6 +999,25 @@ function PracticeHub({
             <span className="font-medium text-ink">{f.label}</span>
             <span className="mt-0.5 block text-xs text-ink-3">{f.blurb}</span>
           </Link>
+        ))}
+      </div>
+
+      {/* Targeted drills — surgical single-skill reps. */}
+      <SectionLabel icon={Target} title="Targeted drills" sub="Short, surgical reps aimed at one habit." />
+      <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
+        {DRILLS.map((d) => (
+          <button
+            key={d.title}
+            onClick={() => onLaunch(d.cfg)}
+            className="group flex flex-col rounded-2xl border bg-surface p-5 text-left transition-all hover:-translate-y-0.5 hover:shadow-md"
+            style={{ borderColor: "var(--border)" }}
+          >
+            <span className="font-serif text-base font-semibold text-ink">{d.title}</span>
+            <span className="mt-1 flex-1 text-sm leading-relaxed text-ink-2">{d.desc}</span>
+            <span className="mt-3 inline-flex items-center gap-1 text-sm font-medium text-primary-ink">
+              Start <ArrowRight size={14} className="transition-transform group-hover:translate-x-0.5" />
+            </span>
+          </button>
         ))}
       </div>
 
@@ -1115,6 +1203,7 @@ function SetupCard({
   setVoiceFirst,
   onStart,
   onBack,
+  onSaveRoutine,
 }: {
   role: string;
   company: string;
@@ -1139,11 +1228,21 @@ function SetupCard({
   setVoiceFirst: (v: boolean) => void;
   onStart: () => void;
   onBack?: () => void;
+  onSaveRoutine: (name: string) => void;
 }) {
   const [showContext, setShowContext] = useState(Boolean(company || posting));
+  const [saved, setSaved] = useState(false);
   const toggleType = (t: string) =>
     setFocusTypes(focusTypes.includes(t) ? focusTypes.filter((x) => x !== t) : [...focusTypes, t]);
   const domainLabel = DOMAINS_OPT.find((d) => d.value === domain)?.label || "Interview";
+  const handleSave = () => {
+    const name = window.prompt("Name this routine", `${domainLabel} · ${count} ${domain === "interview" ? "Qs" : "drills"}`);
+    if (name && name.trim()) {
+      onSaveRoutine(name.trim());
+      setSaved(true);
+      window.setTimeout(() => setSaved(false), 2000);
+    }
+  };
   const summary =
     `${count} ${domain === "interview" ? "Qs" : "drills"} · ${domainLabel}` +
     `${difficulty !== "standard" ? ` · ${difficulty}` : ""}${timed ? " · timed" : ""}${voiceFirst ? " · voice" : ""}`;
@@ -1265,9 +1364,12 @@ function SetupCard({
         <Button onClick={onStart} size="lg" className="mt-7 w-full">
           Start · {summary} <ArrowRight size={18} />
         </Button>
-        <div className="text-center">
-          <ButtonLink href="/onboarding" variant="ghost" size="sm" className="mt-2">
-            Change role or situation
+        <div className="mt-3 flex items-center justify-center gap-4">
+          <button onClick={handleSave} className="btn-ghost text-sm">
+            {saved ? <><Check size={15} /> Saved</> : "Save as routine"}
+          </button>
+          <ButtonLink href="/onboarding" variant="ghost" size="sm">
+            Change role
           </ButtonLink>
         </div>
       </motion.div>

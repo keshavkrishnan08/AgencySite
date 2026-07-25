@@ -23,6 +23,7 @@ const KEYS = {
   predicted: "pp:predicted",
   onboarding: "pp:onboarding",
   goal: "pp:goal",
+  routines: "pp:routines",
 } as const;
 
 function read<T>(key: string, fallback: T): T {
@@ -209,6 +210,35 @@ export function getOnboarding(): OnboardingDraft | null {
 }
 export function setOnboarding(d: OnboardingDraft): void {
   write(KEYS.onboarding, d);
+}
+
+/* ----------------------- Saved practice routines -----------------------
+   A named, reusable session configuration built in the Session Builder. Stored
+   locally like everything else; the hub lists them for one-tap launch. */
+export interface PracticeRoutine {
+  id: string;
+  name: string;
+  cfg: {
+    domain?: string;
+    focusTypes?: string[];
+    difficulty?: string;
+    count?: number;
+    tone?: string;
+    interviewer?: string;
+    timed?: boolean;
+    voice?: boolean;
+  };
+  createdAt: string;
+}
+export function getRoutines(): PracticeRoutine[] {
+  return read<PracticeRoutine[]>(KEYS.routines, []);
+}
+export function saveRoutine(r: PracticeRoutine): void {
+  const rest = getRoutines().filter((x) => x.id !== r.id);
+  write(KEYS.routines, [r, ...rest].slice(0, 24));
+}
+export function deleteRoutine(id: string): void {
+  write(KEYS.routines, getRoutines().filter((r) => r.id !== id));
 }
 
 
