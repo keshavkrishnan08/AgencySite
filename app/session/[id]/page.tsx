@@ -72,7 +72,7 @@ export default function SessionPage() {
   if (!session) {
     return (
       <AppShell>
-        <main className="container-content py-24 text-center">
+        <main className="container-wide py-24 text-center">
           <h1 className="font-serif text-2xl font-semibold text-ink">Session not found</h1>
           <p className="mt-2 text-ink-2">It may have been cleared. Start a fresh one.</p>
           <ButtonLink href="/practice" className="mt-6">
