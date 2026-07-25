@@ -1,7 +1,7 @@
 import { rateLimit } from "@/lib/ratelimit";
 import { recordUsage } from "@/lib/usage";
 import { NextResponse } from "next/server";
-import { callClaude, FAST_MODEL, extractJson, hasAI } from "@/lib/ai";
+import { callClaude, FAST_MODEL, extractJson, hasAI, asStr, asStrArray, clampInt } from "@/lib/ai";
 import { COACH_PERSONA } from "@/lib/prompt";
 import type { PredictedQuestion } from "@/lib/types";
 
@@ -107,9 +107,19 @@ export async function POST(req: Request) {
     try {
       const user = `Target role: ${role || "inferred from posting"}\n\nJob posting:\n"""${posting.slice(0, 6000)}"""`;
       const text = await callClaude({ model: FAST_MODEL, system: SYSTEM, user, maxTokens: 1100, temperature: 0.5 });
-      const parsed = extractJson<{ questions: PredictedQuestion[] }>(text);
+      const parsed = extractJson<{ questions: Partial<PredictedQuestion>[] }>(text);
       if (parsed?.questions?.length) {
-        return NextResponse.json({ questions: parsed.questions.slice(0, 5), source: "ai" });
+        // Normalise every field so the UI always gets a well-formed set.
+        const questions: PredictedQuestion[] = parsed.questions
+          .map((q) => ({
+            question: asStr(q?.question, 240),
+            why: asStr(q?.why, 300),
+            strongAnswer: asStrArray(q?.strongAnswer, 5, 160),
+            probability: clampInt(q?.probability, 10, 99, 70),
+          }))
+          .filter((q) => q.question.length > 0)
+          .slice(0, 5);
+        if (questions.length) return NextResponse.json({ questions, source: "ai" });
       }
     } catch {
       /* fall through */

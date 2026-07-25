@@ -80,6 +80,8 @@ export async function apiScoreAnswer(
     weakestDimension?: string;
     recentAverage?: number;
     lengthTarget?: string;
+    focusDimension?: string; // this session is a drill on this dimension
+    domain?: string;         // interview | storytelling | public_speaking
   },
   withExample = false
 ): Promise<ScoredAnswer> {

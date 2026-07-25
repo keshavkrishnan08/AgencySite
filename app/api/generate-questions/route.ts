@@ -2,7 +2,7 @@ import { rateLimit } from "@/lib/ratelimit";
 import { recordUsage } from "@/lib/usage";
 import { NextResponse } from "next/server";
 import { generateQuestions, generateFocusQuestions } from "@/lib/questions";
-import { callClaude, extractJson, hasAI, FAST_MODEL } from "@/lib/ai";
+import { callClaude, extractJson, hasAI, FAST_MODEL, asStr } from "@/lib/ai";
 import { COACH_PERSONA, candidateBlock } from "@/lib/prompt";
 import type { Question } from "@/lib/types";
 
@@ -214,15 +214,21 @@ export async function POST(req: Request) {
       const user = `${candidateBlock({ name, situation: situation || "", targetRole, company, interviewGap, posting, weakestDimension })}${variety}${dom === "interview" ? typeLine : ""}${diffLine}${toneLine}${interviewerLine}${seniorityLine}${stageLine}${frameworkLine}\n\nWrite their ${n} ${dom === "interview" ? "questions" : "drills"} now.`;
       // Higher temperature than scoring: for questions, variety matters more than determinism.
       const text = await callClaude({ model: FAST_MODEL, system, user, maxTokens: 1100, temperature: 0.85 });
-      const parsed = extractJson<{ questions: Question[] }>(text);
+      const parsed = extractJson<{ questions: Partial<Question>[] }>(text);
       if (parsed?.questions?.length) {
-        const questions = parsed.questions.slice(0, n).map((q, i) => ({
-          number: i + 1,
-          text: q.text,
-          category: q.category || (dom === "interview" ? "behavioral" : domainCategory),
-          tip: q.tip || "",
-        }));
-        return NextResponse.json({ questions, source: "ai" });
+        // Coerce every field, drop any question with no text, then renumber so
+        // the set handed to the UI is always well-formed and 1..k.
+        const questions: Question[] = parsed.questions
+          .map((q) => ({
+            number: 0,
+            text: asStr(q?.text, 300),
+            category: asStr(q?.category, 40) || (dom === "interview" ? "behavioral" : domainCategory),
+            tip: asStr(q?.tip, 200),
+          }))
+          .filter((q) => q.text.length > 0)
+          .slice(0, n)
+          .map((q, i) => ({ ...q, number: i + 1 }));
+        if (questions.length) return NextResponse.json({ questions, source: "ai" });
       }
     } catch {
       /* fall through */
