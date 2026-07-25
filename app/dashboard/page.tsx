@@ -13,7 +13,7 @@ import { AnimatedNumber } from "@/components/ui/AnimatedNumber";
 import { getOnboarding, getProfile, getSessions, getStreak, onStoreChange } from "@/lib/store";
 import { apiInsights, type CareerInsights } from "@/lib/client";
 import { computeMetrics } from "@/lib/metrics";
-import { cn, formatDuration, scoreColor } from "@/lib/utils";
+import { cn, formatDuration, formatDate, scoreColor } from "@/lib/utils";
 import type { Session, Streak } from "@/lib/types";
 
 /* The dashboard HOME: a calm, Attio-style overview. Usage at a glance (streak,
@@ -123,9 +123,9 @@ export default function DashboardPage() {
             return (
               <div key={t.label} className={cn(i > 0 && "lg:border-l lg:pl-6")} style={{ borderColor: "var(--border)" }}>
                 <div className="flex items-center gap-1.5 text-2xs font-semibold uppercase tracking-wider text-ink-3">
-                  <Icon size={13} style={{ color: t.tone }} /> {t.label}
+                  <Icon size={13} className="text-ink-3" /> {t.label}
                 </div>
-                <p className="mt-1.5 font-mono text-[2rem] font-semibold leading-none" style={{ color: t.tone }}>
+                <p className="mt-1.5 font-mono text-[2rem] font-semibold leading-none text-ink">
                   <AnimatedNumber value={t.value} />
                 </p>
                 <p className="mt-1.5 text-xs text-ink-3">{t.sub}</p>
@@ -254,6 +254,38 @@ export default function DashboardPage() {
             </div>
           </div>
         )}
+
+        {/* Recent practice */}
+        <section className="card p-6 sm:p-7">
+          <div className="mb-4 flex items-center justify-between">
+            <h2 className="font-serif text-lg font-semibold text-ink">Recent practice</h2>
+            {sessions.length > 0 && <Link href="/analytics" className="text-sm text-primary-ink hover:underline">View all</Link>}
+          </div>
+          {sessions.length === 0 ? (
+            <div className="grid place-items-center rounded-xl py-12 text-center" style={{ background: "var(--bg-sunk)" }}>
+              <p className="text-sm text-ink-3">Nothing yet</p>
+            </div>
+          ) : (
+            <div className="space-y-2">
+              {[...sessions].reverse().slice(0, 5).map((s) => (
+                <Link
+                  key={s.id}
+                  href={`/session/${s.id}`}
+                  className="flex items-center gap-4 rounded-xl border p-3.5 transition-colors hover:bg-bg-tint"
+                  style={{ borderColor: "var(--border)" }}
+                >
+                  <div className="min-w-0 flex-1">
+                    <p className="truncate font-medium text-ink">{s.targetRole}</p>
+                    <p className="text-2xs text-ink-3">{formatDate(s.createdAt)} · {s.answers.length} questions</p>
+                  </div>
+                  <span className="grid h-9 w-9 shrink-0 place-items-center rounded-full font-mono text-sm font-bold text-white" style={{ background: scoreColor(s.overall) }}>
+                    {s.overall}
+                  </span>
+                </Link>
+              ))}
+            </div>
+          )}
+        </section>
 
         {!m.hasData && (
           <div className="rounded-2xl border-2 border-dashed p-6 text-center" style={{ borderColor: "var(--border-strong)" }}>
