@@ -164,12 +164,14 @@ h1, h2, h3, h4, h5 {
     border: 1px solid rgba(255, 255, 255, 0.08);
   }
 
+  /* Flat / embedded aesthetic: content sits on the background with a thin rule,
+     not floating on heavy shadows. */
   .card {
-    @apply rounded-xl border bg-surface shadow-sm;
+    @apply rounded-xl border bg-surface;
     border-color: var(--border);
   }
   .card-elevated {
-    @apply relative rounded-2xl border bg-surface shadow-lg;
+    @apply relative rounded-2xl border bg-surface shadow-sm;
     border-color: var(--border);
   }
   /* faint top sheen for a crafted, premium feel */
