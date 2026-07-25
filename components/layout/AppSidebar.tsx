@@ -3,11 +3,11 @@
 import { useEffect, useState } from "react";
 import Link from "next/link";
 import { usePathname } from "next/navigation";
-import { LineChart, Mic, Sprout, Wand2, Crown, LogOut, BarChart3, LayoutDashboard, type LucideIcon } from "lucide-react";
+import { LineChart, Mic, Sprout, Wand2, LogOut, BarChart3, LayoutDashboard, Briefcase, SlidersHorizontal, type LucideIcon } from "lucide-react";
 import { useRouter } from "next/navigation";
 import { LogoMark } from "@/components/ui/Logo";
 import { cn } from "@/lib/utils";
-import { getProfile, isPremium, onStoreChange } from "@/lib/store";
+import { getProfile, onStoreChange } from "@/lib/store";
 import { useAuth } from "@/lib/auth";
 
 interface Item {
@@ -26,6 +26,7 @@ const MAIN: Item[] = [
 /* The two builders that feed Practice: one writes the questions you'll be
    asked, the other writes the answer people freeze on. */
 const TOOLS: Item[] = [
+  { href: "/job", label: "Job Breakdown", icon: Briefcase },
   { href: "/tools/question-predictor", label: "Question Predictor", icon: Wand2 },
   { href: "/tools/gap-story", label: "Gap Story", icon: Sprout },
 ];
@@ -36,13 +37,11 @@ export function AppSidebar() {
   const pathname = usePathname();
   const router = useRouter();
   const { configured, user, signOut } = useAuth();
-  const [premium, setPremium] = useState(false);
   const [name, setName] = useState("");
 
   useEffect(() => {
     const sync = () => {
       const p = getProfile();
-      setPremium(isPremium());
       setName(p.name || p.email || "");
     };
     sync();
@@ -107,20 +106,9 @@ export function AppSidebar() {
         ))}
       </nav>
 
-      {/* footer: upgrade + account */}
+      {/* footer: preferences + account */}
       <div className="mt-auto flex flex-col gap-1 border-t px-3 py-3" style={{ borderColor: "var(--border)" }}>
-        {!premium && (
-          <Link
-            href="/upgrade"
-            title="Upgrade to Premium"
-            className="flex items-center gap-3 rounded-xl px-3 py-2.5 text-gold-ink transition-colors hover:bg-gold-soft"
-          >
-            <Crown size={20} className="shrink-0" />
-            <span className="whitespace-nowrap text-sm font-semibold opacity-0 transition-opacity duration-200 group-hover:opacity-100">
-              Upgrade to Premium
-            </span>
-          </Link>
-        )}
+        <Row item={{ href: "/preferences", label: "Preferences", icon: SlidersHorizontal }} />
         <Link
           href="/settings"
           title="Account settings"
