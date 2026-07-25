@@ -3,10 +3,10 @@
 import { useEffect, useState } from "react";
 import Link from "next/link";
 import { usePathname } from "next/navigation";
-import { Flame, Menu, X } from "lucide-react";
+import { Flame, Menu, X, Settings } from "lucide-react";
 import { Logo } from "@/components/ui/Logo";
 import { cn } from "@/lib/utils";
-import { getProfile, getStreak, onStoreChange } from "@/lib/store";
+import { getStreak, onStoreChange } from "@/lib/store";
 
 /* The overview (Dashboard), the one thing to do (Practice), the deep numbers
    (Analytics), and the two builders that feed the practice loop. */
@@ -23,7 +23,6 @@ const NAV = [
 export function AppNav({ minimal = false }: { minimal?: boolean }) {
   const pathname = usePathname();
   const [mounted, setMounted] = useState(false);
-  const [name, setName] = useState("");
   const [streak, setStreak] = useState(0);
   const [mobileOpen, setMobileOpen] = useState(false);
 
@@ -32,16 +31,10 @@ export function AppNav({ minimal = false }: { minimal?: boolean }) {
 
   useEffect(() => {
     setMounted(true);
-    const sync = () => {
-      const p = getProfile();
-      setName(p.name || p.email || "");
-      setStreak(getStreak().current);
-    };
+    const sync = () => setStreak(getStreak().current);
     sync();
     return onStoreChange(sync);
   }, []);
-
-  const initial = (name || "Y").trim().charAt(0).toUpperCase();
 
   return (
     <header className="sticky top-0 z-50 w-full">
@@ -87,11 +80,10 @@ export function AppNav({ minimal = false }: { minimal?: boolean }) {
             )}
             <Link
               href="/settings"
-              className="grid h-9 w-9 place-items-center rounded-full text-sm font-semibold text-white shadow-sm"
-              style={{ background: "linear-gradient(140deg, var(--primary-bright), var(--primary-ink))" }}
-              aria-label="Account settings"
+              className="grid h-9 w-9 place-items-center rounded-lg text-ink-3 transition-colors hover:bg-bg-tint hover:text-ink"
+              aria-label="Settings"
             >
-              {mounted ? initial : "Y"}
+              <Settings size={18} />
             </Link>
           </div>
         </nav>
