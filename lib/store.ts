@@ -24,6 +24,7 @@ const KEYS = {
   onboarding: "pp:onboarding",
   goal: "pp:goal",
   routines: "pp:routines",
+  prefs: "pp:prefs",
 } as const;
 
 function read<T>(key: string, fallback: T): T {
@@ -239,6 +240,34 @@ export function saveRoutine(r: PracticeRoutine): void {
 }
 export function deleteRoutine(id: string): void {
   write(KEYS.routines, getRoutines().filter((r) => r.id !== id));
+}
+
+/* ----------------------- Experience preferences -----------------------
+   The defaults your practice sessions start from, plus coaching feel. Set once
+   in /preferences, applied everywhere. */
+export interface Prefs {
+  domain: string;        // interview | storytelling | public_speaking
+  difficulty: string;    // easy | standard | hard
+  count: number;         // questions per session
+  tone: string;          // phrasing
+  interviewer: string;   // persona
+  timed: boolean;
+  voice: boolean;        // voice-first
+  lengthTarget: string;  // short | medium | long
+  coachTone: string;     // gentle | balanced | direct
+  autostart: boolean;    // skip the hub and drop straight into a session
+}
+export const DEFAULT_PREFS: Prefs = {
+  domain: "interview", difficulty: "standard", count: 8, tone: "", interviewer: "",
+  timed: false, voice: false, lengthTarget: "medium", coachTone: "balanced", autostart: false,
+};
+export function getPrefs(): Prefs {
+  return { ...DEFAULT_PREFS, ...read<Partial<Prefs>>(KEYS.prefs, {}) };
+}
+export function setPrefs(patch: Partial<Prefs>): Prefs {
+  const next = { ...getPrefs(), ...patch };
+  write(KEYS.prefs, next);
+  return next;
 }
 
 

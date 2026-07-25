@@ -19,7 +19,7 @@ import { apiFollowUp, apiGenerateExample, apiGenerateQuestions, apiScoreAnswer }
 import { aggregateDimensions, computeOverall } from "@/lib/scoring";
 import {
   getOnboarding, getPredictedSet, getProfile, getSessions, saveSession,
-  getRoutines, saveRoutine, deleteRoutine, onStoreChange, type PracticeRoutine,
+  getRoutines, saveRoutine, deleteRoutine, onStoreChange, getPrefs, type PracticeRoutine,
 } from "@/lib/store";
 import { average, cn, uid } from "@/lib/utils";
 import { track } from "@/lib/analytics";
@@ -272,6 +272,17 @@ function PracticeInner() {
     const resolvedCompany = set?.company || profile.company || ob?.company || "";
     companyRef.current = resolvedCompany;
     setCompany(resolvedCompany);
+
+    // Seed every session default from the user's saved preferences, so their
+    // choices in /preferences actually shape the builder + quick launches.
+    const prefs = getPrefs();
+    setDomain(prefs.domain as Domain); domainRef.current = prefs.domain as Domain;
+    setDifficulty(prefs.difficulty); setCount(prefs.count);
+    setTone(prefs.tone); setInterviewer(prefs.interviewer);
+    setTimed(prefs.timed); setVoiceFirst(prefs.voice);
+    setLengthTarget((prefs.lengthTarget as "short" | "medium" | "long") || "medium");
+    customRef.current = { focusTypes: [], difficulty: prefs.difficulty, count: prefs.count, tone: prefs.tone, interviewer: prefs.interviewer };
+
     // A preset card can fully configure a session by URL (?autostart=1 plus any
     // of domain/types/count/difficulty/tone/interviewer/timed/voice). Apply that
     // config to the refs before start() reads them.
@@ -295,6 +306,9 @@ function PracticeInner() {
     // or a focus instead of being thrown into questions.
     if (predictedId || autostart || focusDim) {
       start(r || "Office Manager", s, predictedId || undefined);
+    } else if (prefs.autostart) {
+      // "Skip the hub" preference: drop straight into a session on the defaults.
+      start(r || "Office Manager", s);
     } else {
       setPhase("setup");
     }
@@ -1360,7 +1374,6 @@ function SetupCard({
   onBack?: () => void;
   onSaveRoutine: (name: string) => void;
 }) {
-  const [showContext, setShowContext] = useState(Boolean(company || posting));
   const [saved, setSaved] = useState(false);
   const toggleType = (t: string) =>
     setFocusTypes(focusTypes.includes(t) ? focusTypes.filter((x) => x !== t) : [...focusTypes, t]);
@@ -1480,32 +1493,23 @@ function SetupCard({
             </div>
           </BuilderSection>
 
-          {/* Job context */}
-          <div className="rounded-xl border bg-bg-sunk/60 p-5" style={{ borderColor: "var(--border)" }}>
-            <button onClick={() => setShowContext((v) => !v)} className="flex w-full items-center justify-between text-left">
-              <span className="flex items-center gap-2 text-sm font-medium text-ink">
-                <Building2 size={16} className="text-primary" /> Tailor to a specific job
-                <span className="text-xs font-normal text-ink-3">{company ? `· ${company}` : "(optional)"}</span>
-              </span>
-              <ChevronDown size={18} className={cn("text-ink-3 transition-transform", showContext && "rotate-180")} />
-            </button>
-            {showContext && (
-              <div className="mt-4 space-y-4">
-                <input
-                  value={company}
-                  onChange={(e) => setCompany(e.target.value)}
-                  placeholder="Company (e.g., Mercy Hospital)"
-                  className="field"
-                />
-                <textarea
-                  value={posting}
-                  onChange={(e) => setPosting(e.target.value)}
-                  placeholder="Paste the job posting for questions a real hiring manager for THIS job would ask."
-                  className="field min-h-[110px] resize-y text-sm leading-relaxed"
-                />
-              </div>
-            )}
-          </div>
+          {/* Job context — embedded, no dropdown */}
+          <BuilderSection icon={Building2} title="Tailor to a specific job" hint="optional — company + posting">
+            <div className="space-y-3">
+              <input
+                value={company}
+                onChange={(e) => setCompany(e.target.value)}
+                placeholder="Company (e.g., Mercy Hospital)"
+                className="field"
+              />
+              <textarea
+                value={posting}
+                onChange={(e) => setPosting(e.target.value)}
+                placeholder="Paste the job posting for questions a real hiring manager for THIS job would ask."
+                className="field min-h-[110px] resize-y text-sm leading-relaxed"
+              />
+            </div>
+          </BuilderSection>
         </div>
 
         <Button onClick={onStart} size="lg" className="mt-7 w-full">
