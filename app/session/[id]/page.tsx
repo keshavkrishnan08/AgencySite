@@ -87,7 +87,7 @@ export default function SessionPage() {
 
   return (
     <AppShell>
-      <main className="container-wide max-w-4xl py-10 sm:py-12">
+      <main className="container-wide py-10 sm:py-12">
         {/* Hero score card */}
         <motion.div
           initial={{ opacity: 0, y: 18 }}

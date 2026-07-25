@@ -59,8 +59,8 @@
   --shadow-glow: 0 0 0 1px rgba(20, 128, 142, 0.12), 0 12px 40px rgba(20, 128, 142, 0.18);
   --shadow-glow-gold: 0 0 0 1px rgba(184, 137, 59, 0.18), 0 12px 40px rgba(184, 137, 59, 0.16);
 
-  --max-content: 720px;
-  --max-wide: 1120px;
+  --max-content: 760px;
+  --max-wide: 1240px;
 }
 
 * {
@@ -258,6 +258,15 @@ h1, h2, h3, h4, h5 {
     letter-spacing: 0.18em;
     color: var(--primary-ink);
     font-family: var(--font-sans);
+  }
+  /* Inline link on light (Stripe link-on-light) */
+  .link {
+    color: var(--primary-ink);
+    font-weight: 500;
+    transition: color 0.15s;
+  }
+  .link:hover {
+    text-decoration: underline;
   }
 
   /* Inputs */
