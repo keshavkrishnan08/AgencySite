@@ -71,6 +71,9 @@ try {
   check(/Daily practice/i.test(dash), "dashboard: 'Daily practice' graph present");
   check(/What your coach knows/i.test(dash), "dashboard: 'what your coach knows' context banner present");
   check(await page.locator("svg").count() > 0, "dashboard: chart SVG rendered");
+  check(/Skill breakdown/i.test(dash), "dashboard: skill-breakdown bar chart present");
+  check(/Answer scores/i.test(dash), "dashboard: answer-scores donut present");
+  check(await page.locator("svg").count() >= 3, "dashboard: multiple chart types render (line+bars+donut)");
   check(/Trajectory|Consistency|Next milestone/i.test(dash), "dashboard: extra stat cards present");
 
   log("5) Analytics graphs (not blank)");
