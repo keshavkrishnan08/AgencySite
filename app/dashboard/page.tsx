@@ -15,7 +15,7 @@ import { apiInsights, type CareerInsights } from "@/lib/client";
 import { pushInsight, pullLatestInsight } from "@/lib/cloud";
 import { computeMetrics } from "@/lib/metrics";
 import { contextSummary, persistOverview } from "@/lib/context";
-import { ProgressLineChart } from "@/components/charts/Charts";
+import { ProgressLineChart, DonutChart, HBarChart } from "@/components/charts/Charts";
 import { todayKey } from "@/lib/utils";
 import { cn, formatDuration, formatDate, scoreColor } from "@/lib/utils";
 import type { Session, Streak } from "@/lib/types";
@@ -23,6 +23,12 @@ import type { Session, Streak } from "@/lib/types";
 /* The dashboard HOME: a calm, Attio-style overview. Usage at a glance (streak,
    volume, readiness) plus a weekly, cheap-LLM career read. The deep performance
    analytics live one click away at /analytics. */
+
+// Midpoint of each score band, so the donut slices take the same colour a score
+// of that value would elsewhere in the app.
+const BAND_MID: Record<string, number> = {
+  "0-39": 20, "40-54": 47, "55-69": 62, "70-79": 75, "80-89": 85, "90+": 95,
+};
 
 function isoWeekKey(): string {
   const d = new Date();
@@ -224,9 +230,10 @@ export default function DashboardPage() {
           </section>
         )}
 
-        {/* Graphs — readiness trend + daily practice volume, full width */}
+        {/* Graphs — a mix of line, bars, and a donut so it's not one chart type */}
         {m.hasData && (
           <section className="grid gap-6 lg:grid-cols-2">
+            {/* Line: readiness over time */}
             <div className="card p-6">
               <div className="mb-2 flex items-center justify-between">
                 <h2 className="font-serif text-lg font-semibold text-ink">Readiness over time</h2>
@@ -235,10 +242,35 @@ export default function DashboardPage() {
               <p className="mb-3 text-sm text-ink-3">Your session score, every time you practice.</p>
               <ProgressLineChart data={m.trend.map((t) => ({ label: t.label, score: t.score }))} height={220} showReady />
             </div>
+            {/* Vertical bars: daily practice volume */}
             <div className="card p-6">
               <h2 className="font-serif text-lg font-semibold text-ink">Daily practice</h2>
               <p className="mb-3 text-sm text-ink-3">Sessions a day over the last two weeks.</p>
               <DailyUsage activity={m.activity.slice(-14)} />
+            </div>
+            {/* Horizontal bars: skill breakdown, ranked */}
+            <div className="card p-6">
+              <h2 className="font-serif text-lg font-semibold text-ink">Skill breakdown</h2>
+              <p className="mb-3 text-sm text-ink-3">Where you stand on each of the five, strongest first.</p>
+              <HBarChart
+                data={[...m.dimensions]
+                  .map((d) => ({ label: d.label, value: Math.round(d.current) }))
+                  .sort((a, b) => b.value - a.value)}
+                height={220}
+              />
+            </div>
+            {/* Donut: score distribution */}
+            <div className="card p-6">
+              <h2 className="font-serif text-lg font-semibold text-ink">Answer scores</h2>
+              <p className="mb-3 text-sm text-ink-3">How your {m.questionsAnswered} answers land across the range.</p>
+              <DonutChart
+                data={m.distribution
+                  .filter((d) => d.count > 0)
+                  .map((d) => ({ name: d.bucket, value: d.count, color: scoreColor(BAND_MID[d.bucket] ?? 60) }))}
+                height={220}
+                centerLabel="answers"
+                centerValue={String(m.questionsAnswered)}
+              />
             </div>
           </section>
         )}
