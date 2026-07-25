@@ -66,6 +66,8 @@ export function buildContext(): UserContext {
         }
       : undefined,
     anxietyPer100: m.hasData ? m.anxietyPer100 : undefined,
+    wpm: m.avgWpm || undefined,
+    avgAnswerSeconds: m.avgSecondsPerQuestion || undefined,
 
     questionsAnswered: m.questionsAnswered || undefined,
     wordsSpoken: m.wordsSpoken || undefined,
