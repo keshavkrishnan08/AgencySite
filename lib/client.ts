@@ -149,6 +149,9 @@ export interface CareerInsights {
   skills: string[];
   outlook: string;
   tip: string;
+  salary?: string;
+  channels?: string[];
+  actions?: string[];
 }
 
 /* Weekly career insights for the dashboard. Cheap by design; the dashboard

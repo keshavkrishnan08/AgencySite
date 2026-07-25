@@ -23,6 +23,9 @@ interface Insights {
   skills: string[];
   outlook: string;
   tip: string;
+  salary: string;
+  channels: string[];
+  actions: string[];
 }
 
 const FALLBACK_SKILLS: Record<string, string[]> = {
@@ -45,6 +48,9 @@ function fallback(role: string, industry: string): Insights {
     skills,
     outlook: `Demand is steady — employers are selective, so a sharp, specific interview is what separates finalists.`,
     tip: `Lead every answer with the result, then the number. It's the fastest way to sound senior for ${r}.`,
+    salary: `Pay for ${r} varies widely by location and employer — research the range for your city before you name a number.`,
+    channels: ["Referrals from your network", "Company career pages directly", "A focused niche job board for your field"],
+    actions: ["Apply to 5 roles that fit", "Reach out to 2 people in your network", "Run 3 practice sessions"],
   };
 }
 
@@ -73,16 +79,25 @@ export async function POST(req: Request) {
       `JSON keys: market (2 tight sentences on demand and competition for this role), ` +
       `skills (array of 4 short in-demand skills/keywords), ` +
       `outlook (1 sentence: is hiring up, steady, or tight, and why), ` +
-      `tip (1 specific interview-prep tip for this field).`;
-    const text = await callClaude({ model: FAST_MODEL, system: SYSTEM, user, maxTokens: 300, temperature: 0.5 });
+      `tip (1 specific interview-prep tip for this field), ` +
+      `salary (1 sentence rough pay guidance, say it varies by location, no false precision), ` +
+      `channels (array of 3 best places to find these jobs), ` +
+      `actions (array of 3 concrete job-search actions to do this week).`;
+    const text = await callClaude({ model: FAST_MODEL, system: SYSTEM, user, maxTokens: 420, temperature: 0.5 });
     const parsed = extractJson<Insights>(text);
     if (parsed?.market && Array.isArray(parsed.skills)) {
+      const arr = (v: unknown, n: number) =>
+        Array.isArray(v) ? v.slice(0, n).map((s) => String(s).slice(0, 60)) : [];
+      const fb = fallback(role, industry);
       return NextResponse.json({
         insights: {
           market: String(parsed.market).slice(0, 400),
-          skills: parsed.skills.slice(0, 5).map((s) => String(s).slice(0, 40)),
+          skills: arr(parsed.skills, 5),
           outlook: String(parsed.outlook || "").slice(0, 240),
           tip: String(parsed.tip || "").slice(0, 240),
+          salary: String(parsed.salary || fb.salary).slice(0, 240),
+          channels: arr(parsed.channels, 3).length ? arr(parsed.channels, 3) : fb.channels,
+          actions: arr(parsed.actions, 3).length ? arr(parsed.actions, 3) : fb.actions,
         },
         source: "ai",
       });
