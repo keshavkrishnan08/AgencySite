@@ -289,9 +289,25 @@ export const FAMILIES: Record<string, JobFamily> = {
   },
 };
 
-export function getJobBreakdown(role: string): { role: string; family: JobFamily } {
+/* Deterministic per-role variation so two roles in the same family don't show
+   identical pay. A stable hash of the title gives ±15%, seniority scales it. */
+function hashStr(s: string): number {
+  let h = 2166136261;
+  for (let i = 0; i < s.length; i++) { h ^= s.charCodeAt(i); h = Math.imul(h, 16777619); }
+  return h >>> 0;
+}
+function adjustSalary(base: JobFamily["salary"], role: string, seniority?: string): JobFamily["salary"] {
+  const roleMult = 0.85 + (hashStr((role || "").toLowerCase()) % 31) / 100; // 0.85–1.15
+  const senMult = seniority === "entry" ? 0.8 : seniority === "senior" ? 1.28 : seniority === "exec" ? 1.7 : 1;
+  const m = roleMult * senMult;
+  const r = (n: number) => Math.max(20000, Math.round((n * m) / 500) * 500);
+  return { low: r(base.low), mid: r(base.mid), high: r(base.high) };
+}
+
+export function getJobBreakdown(role: string, seniority?: string): { role: string; family: JobFamily } {
   const key = classifyRole(role);
-  return { role: role || "your role", family: FAMILIES[key] || FAMILIES.generic };
+  const base = FAMILIES[key] || FAMILIES.generic;
+  return { role: role || "your role", family: { ...base, salary: adjustSalary(base.salary, role, seniority) } };
 }
 
 export const money = (n: number): string =>

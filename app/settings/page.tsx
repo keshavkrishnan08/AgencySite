@@ -93,7 +93,7 @@ export default function SettingsPage() {
 
   return (
     <AppShell>
-      <main className="mx-auto max-w-5xl px-5 py-8 sm:px-8 sm:py-10">
+      <main className="mx-auto max-w-4xl px-5 py-8 sm:px-8 sm:py-10">
         <div className="flex flex-wrap items-center justify-between gap-3">
           <div>
             <h1 className="font-serif text-3xl font-semibold text-ink sm:text-4xl">Settings</h1>
@@ -104,7 +104,6 @@ export default function SettingsPage() {
           </span>
         </div>
 
-        <div className="grid items-start gap-x-10 lg:grid-cols-2">
         {/* ── Account ── */}
         <Section icon={User} title="Account" note="who you are on Axon Careers">
           <div className="grid gap-4 sm:grid-cols-2">
@@ -123,7 +122,7 @@ export default function SettingsPage() {
         </Section>
 
         {/* ── Subscription (deep) ── */}
-        <Section icon={CreditCard} title="Subscription" note="plan, billing, and cancellation" span2>
+        <Section icon={CreditCard} title="Subscription" note="plan, billing, and cancellation">
           <div className="rounded-xl p-5" style={{ background: "var(--bg-sunk)" }}>
             <div className="flex flex-wrap items-center justify-between gap-3">
               <div className="flex items-center gap-3">
@@ -229,7 +228,6 @@ export default function SettingsPage() {
             </button>
           </Section>
         )}
-        </div>
 
         <p className="mt-10 text-center text-2xs text-ink-3">Axon Careers · axonservices.dev</p>
       </main>
@@ -252,15 +250,18 @@ function subStatusMeta(sub: Sub | null): { label: string; long: string; color: s
   return { label: s, long: s, color: "var(--ink-2)", bg: "var(--bg-tint)" };
 }
 
-function Section({ icon: Icon, title, note, span2, children }: { icon: typeof User; title: string; note?: string; span2?: boolean; children: React.ReactNode }) {
+/* Stripe-style settings row: a title + description rail on the left, the
+   controls on the right, full-width, separated by a thin top rule. */
+function Section({ icon: Icon, title, note, children }: { icon: typeof User; title: string; note?: string; span2?: boolean; children: React.ReactNode }) {
   return (
-    <section className={cn("mt-8 border-t pt-6", span2 && "lg:col-span-2")} style={{ borderColor: "var(--border)" }}>
-      <div className="mb-4 flex items-baseline gap-2.5">
-        <Icon size={16} className="translate-y-0.5 text-primary" />
-        <h2 className="font-serif text-lg font-semibold text-ink">{title}</h2>
-        {note && <span className="text-xs text-ink-3">{note}</span>}
+    <section className="grid gap-x-10 gap-y-4 border-t py-8 lg:grid-cols-[220px_1fr]" style={{ borderColor: "var(--border)" }}>
+      <div>
+        <h2 className="flex items-center gap-2 font-serif text-base font-semibold text-ink">
+          <Icon size={15} className="text-primary" /> {title}
+        </h2>
+        {note && <p className="mt-1.5 text-sm leading-relaxed text-ink-3">{note}</p>}
       </div>
-      {children}
+      <div className="min-w-0">{children}</div>
     </section>
   );
 }
