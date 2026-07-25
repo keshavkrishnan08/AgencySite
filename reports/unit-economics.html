@@ -1,0 +1,274 @@
+<title>Axon Careers — Unit Economics</title>
+<style>
+  :root {
+    --paper:#eef0f4; --card:#ffffff; --card-2:#f7f8fb;
+    --ink:#131722; --muted:#5c6675; --faint:#8b93a2;
+    --line:#e0e3ea; --line-strong:#cfd4dd;
+    --accent:#2b50e0; --accent-soft:rgba(43,80,224,.10);
+    --good:#12805c; --good-soft:rgba(18,128,92,.12);
+    --warn:#b0690a; --warn-soft:rgba(176,105,10,.13);
+    --bad:#c0392b; --bad-soft:rgba(192,57,43,.12);
+    --shadow:0 1px 2px rgba(19,23,34,.05),0 6px 24px rgba(19,23,34,.06);
+    --sans:system-ui,-apple-system,"Segoe UI",Roboto,Helvetica,Arial,sans-serif;
+    --mono:ui-monospace,"SF Mono",SFMono-Regular,Menlo,Monaco,"Cascadia Mono",Consolas,monospace;
+  }
+  @media (prefers-color-scheme:dark){
+    :root{
+      --paper:#0b0e13; --card:#141922; --card-2:#0f141c;
+      --ink:#e7ebf2; --muted:#8b95a6; --faint:#5e6878;
+      --line:#222a36; --line-strong:#2d3746;
+      --accent:#6c8bff; --accent-soft:rgba(108,139,255,.14);
+      --good:#35c98f; --good-soft:rgba(53,201,143,.15);
+      --warn:#e0a53a; --warn-soft:rgba(224,165,58,.15);
+      --bad:#ff6b6b; --bad-soft:rgba(255,107,107,.15);
+      --shadow:0 1px 2px rgba(0,0,0,.4),0 8px 30px rgba(0,0,0,.35);
+    }
+  }
+  :root[data-theme="light"]{
+    --paper:#eef0f4; --card:#ffffff; --card-2:#f7f8fb;
+    --ink:#131722; --muted:#5c6675; --faint:#8b93a2;
+    --line:#e0e3ea; --line-strong:#cfd4dd;
+    --accent:#2b50e0; --accent-soft:rgba(43,80,224,.10);
+    --good:#12805c; --good-soft:rgba(18,128,92,.12);
+    --warn:#b0690a; --warn-soft:rgba(176,105,10,.13);
+    --bad:#c0392b; --bad-soft:rgba(192,57,43,.12);
+    --shadow:0 1px 2px rgba(19,23,34,.05),0 6px 24px rgba(19,23,34,.06);
+  }
+  :root[data-theme="dark"]{
+    --paper:#0b0e13; --card:#141922; --card-2:#0f141c;
+    --ink:#e7ebf2; --muted:#8b95a6; --faint:#5e6878;
+    --line:#222a36; --line-strong:#2d3746;
+    --accent:#6c8bff; --accent-soft:rgba(108,139,255,.14);
+    --good:#35c98f; --good-soft:rgba(53,201,143,.15);
+    --warn:#e0a53a; --warn-soft:rgba(224,165,58,.15);
+    --bad:#ff6b6b; --bad-soft:rgba(255,107,107,.15);
+    --shadow:0 1px 2px rgba(0,0,0,.4),0 8px 30px rgba(0,0,0,.35);
+  }
+
+  *{box-sizing:border-box}
+  body{margin:0;background:var(--paper);color:var(--ink);font-family:var(--sans);
+    line-height:1.5;-webkit-font-smoothing:antialiased;}
+  .num{font-family:var(--mono);font-variant-numeric:tabular-nums;letter-spacing:-.01em}
+  .wrap{max-width:1140px;margin:0 auto;padding:40px 24px 80px}
+
+  /* ── masthead ── */
+  .mast{display:flex;justify-content:space-between;align-items:flex-start;gap:24px;
+    flex-wrap:wrap;padding-bottom:22px;border-bottom:1px solid var(--line-strong)}
+  .eyebrow{font-family:var(--mono);font-size:11px;letter-spacing:.18em;text-transform:uppercase;
+    color:var(--accent);margin:0 0 10px}
+  h1{font-size:30px;line-height:1.1;margin:0 0 8px;font-weight:680;letter-spacing:-.02em;text-wrap:balance}
+  .sub{color:var(--muted);font-size:14.5px;max-width:52ch;margin:0}
+  .chips{display:flex;gap:8px;flex-wrap:wrap;justify-content:flex-end}
+  .chip{font-family:var(--mono);font-size:11px;letter-spacing:.02em;padding:5px 10px;border-radius:999px;
+    border:1px solid var(--line-strong);color:var(--muted);white-space:nowrap;background:var(--card)}
+  .chip.live{color:var(--good);border-color:color-mix(in srgb,var(--good) 40%,transparent)}
+  .chip.pend{color:var(--warn);border-color:color-mix(in srgb,var(--warn) 40%,transparent)}
+
+  /* ── kpi strip ── */
+  .kpis{display:grid;grid-template-columns:repeat(4,1fr);gap:14px;margin:26px 0 30px}
+  .kpi{background:var(--card);border:1px solid var(--line);border-radius:12px;padding:18px 18px 16px;
+    box-shadow:var(--shadow);position:relative;overflow:hidden}
+  .kpi::before{content:"";position:absolute;left:0;top:0;bottom:0;width:3px;background:var(--accent);opacity:.85}
+  .kpi .label{font-size:11.5px;text-transform:uppercase;letter-spacing:.09em;color:var(--faint);margin:0 0 8px}
+  .kpi .big{font-family:var(--mono);font-size:30px;font-weight:600;letter-spacing:-.03em;line-height:1}
+  .kpi .foot{font-size:12.5px;color:var(--muted);margin-top:8px}
+  .kpi.good::before{background:var(--good)} .kpi.warn::before{background:var(--warn)}
+
+  /* ── section scaffolding ── */
+  section{margin-top:30px}
+  .h{display:flex;align-items:baseline;gap:12px;margin:0 0 14px}
+  .h h2{font-size:15px;font-weight:640;margin:0;letter-spacing:-.01em}
+  .h .k{font-family:var(--mono);font-size:11px;color:var(--faint);letter-spacing:.04em}
+  .h .r{margin-left:auto;font-size:12.5px;color:var(--muted)}
+  .grid2{display:grid;grid-template-columns:1.05fr .95fr;gap:22px}
+  .panel{background:var(--card);border:1px solid var(--line);border-radius:12px;box-shadow:var(--shadow);overflow:hidden}
+  .panel .body{padding:6px 4px 10px}
+
+  /* ── tables ── */
+  .tscroll{overflow-x:auto}
+  table{width:100%;border-collapse:collapse;font-size:13.5px}
+  th,td{padding:11px 16px;text-align:right;white-space:nowrap}
+  th:first-child,td:first-child{text-align:left}
+  thead th{font-size:10.5px;text-transform:uppercase;letter-spacing:.08em;color:var(--faint);font-weight:600;
+    border-bottom:1px solid var(--line-strong)}
+  tbody td{border-bottom:1px solid var(--line)}
+  tbody tr:last-child td{border-bottom:none}
+  tr.total td,.total td{font-weight:600}
+  .total td{background:var(--card-2);border-top:1px solid var(--line-strong)}
+  td .bar{height:5px;border-radius:3px;background:var(--accent);opacity:.55;margin-top:5px}
+  .mono{font-family:var(--mono);font-variant-numeric:tabular-nums}
+
+  /* ── funnel ── */
+  .funnel{padding:16px 18px 8px}
+  .frow{display:grid;grid-template-columns:150px 1fr 66px;align-items:center;gap:12px;padding:9px 0}
+  .frow + .frow{border-top:1px solid var(--line)}
+  .fname{font-size:13px}.fname small{display:block;font-family:var(--mono);font-size:10.5px;color:var(--faint);margin-top:2px}
+  .ftrack{height:22px;background:var(--card-2);border-radius:5px;overflow:hidden;border:1px solid var(--line)}
+  .ffill{height:100%;background:linear-gradient(90deg,var(--accent),color-mix(in srgb,var(--accent) 70%,#9db4ff));
+    border-radius:5px 4px 4px 5px;min-width:2px}
+  .fpct{font-family:var(--mono);font-variant-numeric:tabular-nums;font-size:13.5px;text-align:right;font-weight:600}
+  .fdrop{font-family:var(--mono);font-size:10.5px;color:var(--bad)}
+
+  /* ── verdict pills ── */
+  .pill{display:inline-block;font-family:var(--mono);font-size:11px;font-weight:600;padding:3px 9px;border-radius:6px;letter-spacing:.01em}
+  .pill.good{color:var(--good);background:var(--good-soft)}
+  .pill.warn{color:var(--warn);background:var(--warn-soft)}
+  .pill.bad{color:var(--bad);background:var(--bad-soft)}
+
+  /* ── heatmap ── */
+  .heat{overflow-x:auto}
+  .heat table{font-family:var(--mono)}
+  .heat td.v{text-align:center;font-variant-numeric:tabular-nums;font-weight:600;border:1px solid var(--card)}
+  .heat th{text-align:center}.heat th:first-child{text-align:left}
+  .hi{background:var(--good-soft)} .mid{background:color-mix(in srgb,var(--warn-soft) 55%,transparent)} .lo{background:var(--bad-soft)}
+
+  /* ── levers + notes ── */
+  .cols{display:grid;grid-template-columns:1.1fr .9fr;gap:22px;margin-top:30px}
+  ol.lev{margin:0;padding:0;list-style:none;counter-reset:l}
+  ol.lev li{counter-increment:l;position:relative;padding:12px 0 12px 42px;border-top:1px solid var(--line);font-size:13.5px}
+  ol.lev li:first-child{border-top:none}
+  ol.lev li::before{content:counter(l);position:absolute;left:0;top:11px;width:26px;height:26px;border-radius:7px;
+    background:var(--accent-soft);color:var(--accent);font-family:var(--mono);font-weight:700;font-size:12.5px;
+    display:grid;place-items:center}
+  ol.lev b{font-weight:640}
+  .note{font-size:12.5px;color:var(--muted);line-height:1.65}
+  .note p{margin:0 0 10px}.note b{color:var(--ink);font-weight:600}
+  .foot-line{margin-top:36px;padding-top:16px;border-top:1px solid var(--line-strong);
+    display:flex;justify-content:space-between;gap:16px;flex-wrap:wrap;font-family:var(--mono);font-size:11px;color:var(--faint)}
+
+  @media (max-width:820px){
+    .kpis{grid-template-columns:repeat(2,1fr)}
+    .grid2,.cols{grid-template-columns:1fr}
+    .frow{grid-template-columns:120px 1fr 54px}
+  }
+</style>
+
+<div class="wrap">
+
+  <header class="mast">
+    <div>
+      <p class="eyebrow">Axon Careers · Unit Economics</p>
+      <h1>What one user entering the app is worth</h1>
+      <p class="sub">The paid conversion path — ad&nbsp;→&nbsp;landing&nbsp;→&nbsp;onboarding&nbsp;→&nbsp;account&nbsp;→&nbsp;first&nbsp;scored&nbsp;answer&nbsp;→&nbsp;subscribe. LTV is contribution margin after Stripe and AI cost, not revenue.</p>
+    </div>
+    <div class="chips">
+      <span class="chip">Model v1</span>
+      <span class="chip live">Events wired</span>
+      <span class="chip pend">Stripe: test mode</span>
+    </div>
+  </header>
+
+  <!-- KPI STRIP -->
+  <div class="kpis">
+    <div class="kpi good">
+      <p class="label">Blended LTV</p>
+      <div class="big">$86.09</div>
+      <p class="foot">per subscriber · ~6.9&nbsp;mo paying life</p>
+    </div>
+    <div class="kpi">
+      <p class="label">LTV : CAC</p>
+      <div class="big">1.1–3.3×</div>
+      <p class="foot">cold&nbsp;→&nbsp;tuned channels</p>
+    </div>
+    <div class="kpi good">
+      <p class="label">Day-0 cash recovery</p>
+      <div class="big">74%</div>
+      <p class="foot">of cold CAC, back immediately</p>
+    </div>
+    <div class="kpi">
+      <p class="label">Gross margin</p>
+      <div class="big">88%</div>
+      <p class="foot">after Stripe + Claude API</p>
+    </div>
+  </div>
+
+  <!-- LTV + FUNNEL -->
+  <div class="grid2">
+    <div class="panel">
+      <div class="h" style="padding:16px 18px 0"><h2>LTV per plan</h2><span class="k">contribution margin</span></div>
+      <div class="body tscroll">
+        <table>
+          <thead><tr><th>Plan</th><th>Price</th><th>Net / term</th><th>Life</th><th>LTV</th><th>Mix</th></tr></thead>
+          <tbody>
+            <tr><td>Monthly</td><td class="mono">$18.97</td><td class="mono">$16.68</td><td class="mono">4.5&nbsp;mo</td><td class="mono">$75.82</td><td class="mono">18%</td></tr>
+            <tr><td>3-month</td><td class="mono">$49.97</td><td class="mono">$43.90</td><td class="mono">5.7&nbsp;mo</td><td class="mono">$83.55</td><td class="mono">62%</td></tr>
+            <tr><td>Yearly</td><td class="mono">$119.00</td><td class="mono">$97.97</td><td class="mono">12.6&nbsp;mo</td><td class="mono">$103.20</td><td class="mono">20%</td></tr>
+            <tr class="total"><td>Blended</td><td class="mono">$58.20*</td><td class="mono">—</td><td class="mono">6.9&nbsp;mo</td><td class="mono">$86.09</td><td class="mono">100%</td></tr>
+          </tbody>
+        </table>
+        <p style="font-size:11.5px;color:var(--faint);margin:8px 18px 4px">*avg first charge. 82% of payers pick 3-month or yearly and prepay the whole term.</p>
+      </div>
+    </div>
+
+    <div class="panel">
+      <div class="h" style="padding:16px 18px 0"><h2>Funnel: land → paid</h2><span class="k">% of landing</span></div>
+      <div class="funnel">
+        <div class="frow"><div class="fname">Land on site<small>page:view</small></div><div class="ftrack"><div class="ffill" style="width:100%"></div></div><div class="fpct">100%</div></div>
+        <div class="frow"><div class="fname">Start onboarding<small>onboarding_situation</small></div><div class="ftrack"><div class="ffill" style="width:72.7%"></div></div><div class="fpct">72.7%</div></div>
+        <div class="frow"><div class="fname">Finish onboarding<small>onboarding_complete</small></div><div class="ftrack"><div class="ffill" style="width:39.5%"></div></div><div class="fpct">39.5%</div></div>
+        <div class="frow"><div class="fname">Create account<small>account_created</small></div><div class="ftrack"><div class="ffill" style="width:15.8%"></div></div><div class="fpct">15.8%</div></div>
+        <div class="frow"><div class="fname">First scored answer<small>session_complete</small></div><div class="ftrack"><div class="ffill" style="width:10%"></div></div><div class="fpct">10.0%</div></div>
+        <div class="frow"><div class="fname">Subscribe<small>upgrade_success</small></div><div class="ftrack"><div class="ffill" style="width:1.3%"></div></div><div class="fpct" style="color:var(--accent)">1.3%</div></div>
+      </div>
+      <p style="font-size:11.5px;color:var(--faint);margin:2px 18px 14px">Each step is a live Mixpanel event. 1.3% of landers become payers — the single number CAC is most sensitive to.</p>
+    </div>
+  </div>
+
+  <!-- CAC SCENARIOS -->
+  <section>
+    <div class="h"><h2>CAC by channel maturity</h2><span class="k">CPM $14 · CTR 1.4% · CPC $0.99</span><span class="r">CAC = cost per click ÷ land→paid</span></div>
+    <div class="panel tscroll">
+      <table>
+        <thead><tr><th>Scenario</th><th>Land → paid</th><th>CAC</th><th>LTV : CAC</th><th>Payback</th><th>Verdict</th></tr></thead>
+        <tbody>
+          <tr><td>Cold, single campaign</td><td class="mono">1.3%</td><td class="mono">$76.41</td><td class="mono">1.13×</td><td class="mono">1.6&nbsp;mo</td><td><span class="pill warn">thin</span></td></tr>
+          <tr><td>+ lookalike audiences</td><td class="mono">1.8%</td><td class="mono">$46.39</td><td class="mono">1.86×</td><td class="mono">day&nbsp;0</td><td><span class="pill warn">works, tune</span></td></tr>
+          <tr><td>+ retargeting, tuned</td><td class="mono">2.7%</td><td class="mono">$26.20</td><td class="mono">3.29×</td><td class="mono">day&nbsp;0</td><td><span class="pill good">pour fuel</span></td></tr>
+        </tbody>
+      </table>
+    </div>
+    <p style="font-size:12.5px;color:var(--muted);margin:12px 2px 0">You launch near the cold row and buy your way left as the pixel learns. Break-even on cold traffic needs land→paid above ~1.7% — everything you A/B on the paywall chases that.</p>
+  </section>
+
+  <!-- SENSITIVITY + LEVERS -->
+  <div class="cols">
+    <div>
+      <div class="h"><h2>Blended LTV sensitivity</h2><span class="k">churn × plan mix</span></div>
+      <div class="panel heat"><table>
+        <thead><tr><th>Plan mix</th><th>churn 15%</th><th>churn 22%</th><th>churn 30%</th></tr></thead>
+        <tbody>
+          <tr><td>Monthly-heavy</td><td class="v hi">$112.81</td><td class="v mid">$83.40</td><td class="v lo">$67.21</td></tr>
+          <tr><td>Current 18/62/20</td><td class="v hi">$113.40</td><td class="v mid">$86.09</td><td class="v lo">$71.31</td></tr>
+          <tr><td>Term-heavy</td><td class="v hi">$113.65</td><td class="v mid">$88.67</td><td class="v mid">$75.46</td></tr>
+        </tbody>
+      </table></div>
+      <p style="font-size:12.5px;color:var(--muted);margin:12px 2px 0">Churn moves LTV far more than plan mix. Cutting 22%→15% lifts blended LTV ~32% — which is exactly what the readiness/streak dashboard exists to do.</p>
+    </div>
+    <div>
+      <div class="h"><h2>Levers, by impact</h2><span class="k">where to spend effort</span></div>
+      <ol class="lev">
+        <li><b>Conversion (land→paid).</b> 1.3% → 2.6% halves CAC. Biggest single lever.</li>
+        <li><b>Churn.</b> 22% → 15% lifts LTV ~40%. The metrics page is the tool.</li>
+        <li><b>Plan mix.</b> Every point shifted monthly → yearly raises blended LTV.</li>
+        <li><b>Channel.</b> Retargeting + lookalikes cut CAC 2–3× vs cold prospecting.</li>
+      </ol>
+    </div>
+  </div>
+
+  <!-- NOTES -->
+  <section>
+    <div class="h"><h2>Assumptions &amp; status</h2></div>
+    <div class="note" style="columns:2;column-gap:32px">
+      <p><b>Costs.</b> Stripe 2.9% + $0.30 per charge; Claude API + infra ≈ $1.44 / user / month. Monthly churn 22% (active job-seekers).</p>
+      <p><b>LTV basis.</b> Contribution margin, not revenue. Term plans modelled as renewing while the user is still searching: <span class="num">(1−churn)</span> compounded over the term.</p>
+      <p><b>Funnel.</b> Rates modelled from the 1,000-user Meta-ad ABM. Every step is a wired Mixpanel event (page:view → upgrade_success); the live funnel replaces these estimates the moment ads run.</p>
+      <p><b>Payments.</b> Stripe integration built and verified end-to-end in <b>test mode</b> — idempotent webhook, source-of-truth sync, access enforcement. Live keys + activation pending before real charges.</p>
+    </div>
+  </section>
+
+  <div class="foot-line">
+    <span>AXON CAREERS · axonservices.dev</span>
+    <span>model: scripts/unit-economics.mjs · funnel: scripts/mixpanel-funnel.mjs</span>
+  </div>
+
+</div>
