@@ -164,14 +164,15 @@ h1, h2, h3, h4, h5 {
     border: 1px solid rgba(255, 255, 255, 0.08);
   }
 
-  /* Embedded, not raised: cards are flat regions connected to the page — no
-     border, no shadow, no raised fill. Structure comes from spacing and thin
-     rules, the way the Stripe dashboard reads. */
+  /* Stripe-style cards: a weak hairline border, subtle surface, NO shadow — flat
+     and defined, not raised. Everything lives inside one of these. */
   .card {
-    @apply rounded-xl;
+    @apply rounded-xl border bg-surface;
+    border-color: var(--border);
   }
   .card-elevated {
-    @apply relative rounded-2xl;
+    @apply relative rounded-2xl border bg-surface;
+    border-color: var(--border);
   }
 
   /* Glass premium badge (gold) */

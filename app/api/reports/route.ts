@@ -16,21 +16,16 @@ export const dynamic = "force-dynamic";
    x-user-id header, same as subscription-status) get data. Unset => open, so it
    works out of the box for a single-owner deployment. */
 
-function allowed(email: string | null): boolean {
-  const list = (process.env.ADMIN_EMAILS || "").trim();
-  if (!list) return true; // no allowlist configured -> owner-only deployment
-  if (!email) return false;
-  return list
-    .split(",")
-    .map((s) => s.trim().toLowerCase())
-    .filter(Boolean)
-    .includes(email.toLowerCase());
-}
-
 export async function POST(req: Request) {
-  const email = req.headers.get("x-user-id");
-  if (!allowed(email)) {
-    return NextResponse.json({ error: "not_authorized" }, { status: 403 });
+  let body: any = {};
+  try { body = await req.json(); } catch { /* empty */ }
+
+  // Password-gated: this is the owner-only analytics surface, split out from the
+  // app. Set REPORTS_PASSWORD in the environment; the standalone /reports page
+  // sends it. If unset, deny (fail closed) rather than expose data.
+  const pw = process.env.REPORTS_PASSWORD;
+  if (!pw || body?.password !== pw) {
+    return NextResponse.json({ error: "unauthorized" }, { status: 401 });
   }
 
   const db = supabaseAdmin();
@@ -40,13 +35,8 @@ export async function POST(req: Request) {
   }
 
   let days = 30;
-  try {
-    const body = await req.json();
-    const d = Number(body?.days);
-    if ([7, 30, 90].includes(d)) days = d;
-  } catch {
-    /* default 30 */
-  }
+  const d = Number(body?.days);
+  if ([7, 30, 90].includes(d)) days = d;
 
   const { data, error } = await db.rpc("report_summary", { days });
   if (error) {
