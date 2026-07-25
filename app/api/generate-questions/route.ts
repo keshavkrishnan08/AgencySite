@@ -118,6 +118,9 @@ export async function POST(req: Request) {
     domain = "interview",
     tone = "",
     interviewer = "",
+    seniority = "",
+    stage = "",
+    framework = "",
   } = body ?? {};
 
   // Clamp the requested question count to a sane range.
@@ -166,6 +169,29 @@ export async function POST(req: Request) {
   const toneLine = TONE_LINE[String(tone)] || "";
   const interviewerLine = INTERVIEWER_LINE[String(interviewer)] || "";
 
+  // Seniority: how deep and strategic the questions go.
+  const SENIORITY_LINE: Record<string, string> = {
+    entry: "\nPitch at an entry level: fundamentals, coachability, and potential over deep track record.",
+    mid: "\nPitch at a mid level: proven execution, ownership of real projects, and independent judgment.",
+    senior: "\nPitch at a senior level: strategy, ambiguity, influence across teams, and measurable impact.",
+    exec: "\nPitch at an executive level: vision, org-building, tough trade-offs, and business outcomes.",
+  };
+  // Stage: which interview round this set simulates.
+  const STAGE_LINE: Record<string, string> = {
+    screen: "\nThis is an early phone screen: keep it broad and confidence-building, mostly fit and motivation.",
+    onsite: "\nThis is the onsite/core round: go deep on behavioral and role-specific competencies.",
+    final: "\nThis is the final round: values, vision, and the harder questions a senior leader would ask.",
+  };
+  // Answer framework the tips should coach toward.
+  const FRAMEWORK_LINE: Record<string, string> = {
+    star: "\nCoach every tip toward the STAR structure (Situation, Task, Action, Result with a number).",
+    car: "\nCoach every tip toward the CAR structure (Challenge, Action, Result).",
+    free: "",
+  };
+  const seniorityLine = SENIORITY_LINE[String(seniority)] || "";
+  const stageLine = STAGE_LINE[String(stage)] || "";
+  const frameworkLine = FRAMEWORK_LINE[String(framework)] || "";
+
   if (focusDimension) {
     return NextResponse.json({
       questions: generateFocusQuestions(focusDimension, targetRole, seed),
@@ -185,7 +211,7 @@ export async function POST(req: Request) {
         `\n\nThis is practice session #${(Number(sessionCount) || 0) + 1}. Make this set FRESH: vary the wording, scenarios, and angles so it does not feel like a repeat of earlier sessions.` +
         (avoidList.length ? `\nDo NOT reuse or lightly reword any of these already-asked questions:\n- ${avoidList.join("\n- ")}` : "");
       const system = domainSystem.replace(/\{N\}/g, String(n));
-      const user = `${candidateBlock({ name, situation: situation || "", targetRole, company, interviewGap, posting, weakestDimension })}${variety}${dom === "interview" ? typeLine : ""}${diffLine}${toneLine}${interviewerLine}\n\nWrite their ${n} ${dom === "interview" ? "questions" : "drills"} now.`;
+      const user = `${candidateBlock({ name, situation: situation || "", targetRole, company, interviewGap, posting, weakestDimension })}${variety}${dom === "interview" ? typeLine : ""}${diffLine}${toneLine}${interviewerLine}${seniorityLine}${stageLine}${frameworkLine}\n\nWrite their ${n} ${dom === "interview" ? "questions" : "drills"} now.`;
       // Higher temperature than scoring: for questions, variety matters more than determinism.
       const text = await callClaude({ model: FAST_MODEL, system, user, maxTokens: 1100, temperature: 0.85 });
       const parsed = extractJson<{ questions: Question[] }>(text);

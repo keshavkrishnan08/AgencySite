@@ -18,6 +18,9 @@ const TONES = [["", "Balanced"], ["conversational", "Conversational"], ["formal"
 const INTERVIEWERS = [["", "Default"], ["friendly", "Friendly"], ["neutral", "Neutral"], ["skeptical", "Skeptical"], ["panel", "Panel"]];
 const LENGTHS = [["short", "Short"], ["medium", "Medium"], ["long", "Long"]];
 const COACH = [["gentle", "Gentle"], ["balanced", "Balanced"], ["direct", "Direct"]];
+const SENIORITY = [["", "Any"], ["entry", "Entry"], ["mid", "Mid"], ["senior", "Senior"], ["exec", "Exec"]];
+const STAGES = [["", "Any"], ["screen", "Screen"], ["onsite", "Onsite"], ["final", "Final"]];
+const FRAMEWORKS = [["", "Free"], ["star", "STAR"], ["car", "CAR"]];
 
 export default function PreferencesPage() {
   const [mounted, setMounted] = useState(false);
@@ -57,6 +60,9 @@ export default function PreferencesPage() {
           <Row label="Questions"><Seg options={COUNTS.map((n) => [String(n), String(n)])} value={String(prefs.count)} onPick={(v) => update({ count: Number(v) })} /></Row>
           <Row label="Phrasing"><Seg options={TONES} value={prefs.tone} onPick={(v) => update({ tone: v })} /></Row>
           <Row label="Interviewer"><Seg options={INTERVIEWERS} value={prefs.interviewer} onPick={(v) => update({ interviewer: v })} /></Row>
+          <Row label="Seniority"><Seg options={SENIORITY} value={prefs.seniority} onPick={(v) => update({ seniority: v })} /></Row>
+          <Row label="Interview stage"><Seg options={STAGES} value={prefs.stage} onPick={(v) => update({ stage: v })} /></Row>
+          <Row label="Answer framework"><Seg options={FRAMEWORKS} value={prefs.framework} onPick={(v) => update({ framework: v })} /></Row>
           <Row label="Answer length"><Seg options={LENGTHS} value={prefs.lengthTarget} onPick={(v) => update({ lengthTarget: v })} /></Row>
         </Section>
 
