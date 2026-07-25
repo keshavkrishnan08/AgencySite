@@ -1,11 +1,8 @@
 "use client";
 
-import { useEffect, useState } from "react";
+import { useEffect } from "react";
 import type { ComponentType } from "react";
-import { ArrowRight, Sparkles } from "lucide-react";
 import { AppShell } from "@/components/layout/AppShell";
-import { ButtonLink } from "@/components/ui/Button";
-import { isPremium } from "@/lib/store";
 import { track } from "@/lib/analytics";
 
 export function ToolShell({
@@ -21,11 +18,9 @@ export function ToolShell({
   badge?: string;
   children: React.ReactNode;
 }) {
-  const [mounted, setMounted] = useState(false);
-  const [premium, setPremium] = useState(true);
+  // Access is gated once at the app shell. Inside the tools there's no pay
+  // prompt — anyone here is already a subscriber (or in local/demo mode).
   useEffect(() => {
-    setMounted(true);
-    setPremium(isPremium());
     track("tool_opened", { tool: title });
   }, [title]);
 
@@ -52,20 +47,6 @@ export function ToolShell({
           <h1 className="mt-3 font-serif text-3xl font-semibold text-ink sm:text-4xl">{title}</h1>
           <p className="mx-auto mt-3 max-w-prose text-ink-2">{description}</p>
         </div>
-
-        {mounted && !premium && (
-          <div
-            className="mb-6 flex flex-wrap items-center justify-between gap-3 rounded-xl border-2 px-5 py-3"
-            style={{ borderColor: "var(--gold)", background: "var(--gold-soft)" }}
-          >
-            <p className="flex items-center gap-2 text-sm text-gold-ink">
-              <Sparkles size={15} /> You&apos;re on the free plan. Premium unlocks unlimited use of every tool.
-            </p>
-            <ButtonLink href="/upgrade" variant="gold" size="sm">
-              Upgrade <ArrowRight size={14} />
-            </ButtonLink>
-          </div>
-        )}
 
         {children}
       </main>
