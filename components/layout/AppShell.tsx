@@ -2,11 +2,13 @@
 
 import { useEffect, useRef, useState, type ReactNode } from "react";
 import { usePathname, useRouter } from "next/navigation";
-import { Loader2 } from "lucide-react";
+import { ArrowRight, Loader2, Lock } from "lucide-react";
 import { AppNav } from "./AppNav";
 import { AppSidebar } from "./AppSidebar";
+import { Button } from "@/components/ui/Button";
 import { useAuth } from "@/lib/auth";
 import { getProfile, isPremium, onStoreChange, setProfile, upgradeToPremium } from "@/lib/store";
+import { FROM_PER_DAY } from "@/lib/pricing";
 
 /* Authed app chrome + access gate.
 
@@ -158,11 +160,11 @@ export function AppShell({ children, requirePremium = true }: { children: ReactN
     if (needsAuth) router.replace(`/signin?next=${encodeURIComponent(pathname)}`);
   }, [needsAuth, pathname, router]);
 
-  useEffect(() => {
-    if (needsPay) router.replace("/upgrade");
-  }, [needsPay, router]);
-
-  if (needsAuth || needsPay || checkingSub || verifying) {
+  // Auth is still hard-required (you need an account). But we NO LONGER bounce
+  // unpaid users to /upgrade — the app renders normally and, if they haven't
+  // paid, the content blurs behind a renew overlay instead. So there's nothing
+  // "in front of" the app: paying users land straight in it.
+  if (needsAuth || checkingSub || verifying) {
     return (
       <main className="grid min-h-screen place-items-center gap-3 text-center">
         <Loader2 size={28} className="animate-spin text-primary" />
@@ -176,8 +178,50 @@ export function AppShell({ children, requirePremium = true }: { children: ReactN
       <AppSidebar />
       <div className="lg:pl-[76px]">
         <AppNav minimal />
-        {children}
+        {needsPay ? (
+          <div className="relative min-h-[calc(100vh-3.5rem)]">
+            {/* The real app, rendered but frozen behind a blur — so people see
+                exactly what they're unlocking, not a wall. */}
+            <div className="pointer-events-none select-none blur-[6px] saturate-[0.9]" aria-hidden>
+              {children}
+            </div>
+            <PaywallOverlay onRenew={() => router.push("/upgrade")} onManage={() => router.push("/settings")} />
+          </div>
+        ) : (
+          children
+        )}
       </div>
     </>
+  );
+}
+
+/* Soft paywall. Shown over a blurred app for a signed-in user without an active
+   subscription — never a redirect, never a dead end. They can start/renew, or
+   drop into settings to manage the account. */
+function PaywallOverlay({ onRenew, onManage }: { onRenew: () => void; onManage: () => void }) {
+  return (
+    <div className="absolute inset-0 z-20 grid place-items-center px-5 py-10">
+      <div
+        className="w-full max-w-md rounded-2xl border p-7 text-center shadow-2xl"
+        style={{ borderColor: "var(--border)", background: "var(--surface)" }}
+      >
+        <div
+          className="mx-auto flex h-12 w-12 items-center justify-center rounded-full"
+          style={{ background: "var(--primary-soft)" }}
+        >
+          <Lock size={22} className="text-primary-ink" />
+        </div>
+        <h2 className="mt-4 font-serif text-2xl font-semibold text-ink">Your practice is paused</h2>
+        <p className="mt-2 text-ink-2">
+          Start your plan to unlock scoring, feedback, and your progress. From {FROM_PER_DAY}, cancel anytime.
+        </p>
+        <Button size="lg" className="mt-6 w-full" onClick={onRenew}>
+          Unlock my practice <ArrowRight size={18} />
+        </Button>
+        <button onClick={onManage} className="mt-3 text-sm text-ink-3 transition-colors hover:text-ink-2">
+          Manage account
+        </button>
+      </div>
+    </div>
   );
 }
