@@ -42,7 +42,7 @@ export default function PreferencesPage() {
 
   return (
     <AppShell requirePremium={false}>
-      <main className="mx-auto max-w-5xl px-5 py-8 sm:px-8 sm:py-10">
+      <main className="container-wide py-8 sm:py-10">
         <div className="flex items-center gap-2 text-2xs font-semibold uppercase tracking-[0.14em] text-primary-ink">
           <SlidersHorizontal size={14} /> Preferences
         </div>

@@ -93,7 +93,7 @@ export default function SettingsPage() {
 
   return (
     <AppShell>
-      <main className="mx-auto max-w-4xl px-5 py-8 sm:px-8 sm:py-10">
+      <main className="container-wide py-8 sm:py-10">
         <div className="flex flex-wrap items-center justify-between gap-3">
           <div>
             <h1 className="font-serif text-3xl font-semibold text-ink sm:text-4xl">Settings</h1>
