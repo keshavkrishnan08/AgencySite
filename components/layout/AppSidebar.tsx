@@ -3,7 +3,7 @@
 import { useEffect, useState } from "react";
 import Link from "next/link";
 import { usePathname } from "next/navigation";
-import { LineChart, Mic, Sprout, Wand2, Crown, LogOut, BarChart3, type LucideIcon } from "lucide-react";
+import { LineChart, Mic, Sprout, Wand2, Crown, LogOut, BarChart3, LayoutDashboard, type LucideIcon } from "lucide-react";
 import { useRouter } from "next/navigation";
 import { LogoMark } from "@/components/ui/Logo";
 import { cn } from "@/lib/utils";
@@ -17,8 +17,9 @@ interface Item {
 }
 
 const MAIN: Item[] = [
+  { href: "/dashboard", label: "Dashboard", icon: LayoutDashboard },
   { href: "/practice", label: "Practice", icon: Mic },
-  { href: "/dashboard", label: "Metrics", icon: LineChart },
+  { href: "/analytics", label: "Analytics", icon: LineChart },
   { href: "/reports", label: "Reports", icon: BarChart3 },
 ];
 
