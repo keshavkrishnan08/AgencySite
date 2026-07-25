@@ -24,8 +24,8 @@ export function SiteFooter() {
             <FooterCol
               title="Prep"
               links={[
-                { href: "/tools/question-predictor", label: "Question Predictor" },
-                { href: "/tools/gap-story", label: "Gap Story Builder" },
+                { href: "/prep?tab=predictor", label: "Question Predictor" },
+                { href: "/prep?tab=gap", label: "Gap Story Builder" },
               ]}
             />
             <FooterCol
