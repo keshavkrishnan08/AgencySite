@@ -71,6 +71,29 @@ create table if not exists public.stripe_events (
 );
 alter table public.stripe_events enable row level security;
 
+-- Product analytics: the durable, first-party copy of every tracked event
+-- (page views, funnel steps, clicks). Written only by the server (/api/event)
+-- with the service role, so ad blockers can't bias it the way a pixel-only
+-- funnel is biased. The in-app Reports page reads from here. RLS on with NO
+-- policy => service role only; the anon/public key sees nothing.
+create table if not exists public.events (
+  id bigint generated always as identity primary key,
+  name text not null,                            -- funnel event or area:thing micro-event
+  anon_id text,
+  email text,
+  props jsonb,
+  path text,                                     -- the page it fired on
+  referrer text,
+  utm_source text,
+  utm_campaign text,
+  user_agent text,
+  created_at timestamptz not null default now()
+);
+create index if not exists events_name_idx on public.events (name, created_at desc);
+create index if not exists events_path_idx on public.events (path, created_at desc);
+create index if not exists events_created_idx on public.events (created_at desc);
+alter table public.events enable row level security;
+
 -- Older deployments may predate these columns. Add them in place so re-running
 -- this file upgrades an existing project instead of failing on it.
 alter table public.subscriptions add column if not exists interval text;
@@ -124,3 +147,61 @@ drop trigger if exists on_auth_user_created on auth.users;
 create trigger on_auth_user_created
   after insert on auth.users
   for each row execute function public.handle_new_user();
+
+-- ---------------------------------------------------------------------------
+-- Analytics rollup for the in-app Reports page. One call returns the whole
+-- page-by-page report as JSON: totals, pageviews per path, top events, the
+-- Land -> Subscribe funnel, and a daily series. security definer so it can read
+-- the RLS-protected events table.
+-- ---------------------------------------------------------------------------
+create or replace function public.report_summary(days int default 30)
+returns jsonb
+language sql
+security definer set search_path = public
+as $$
+  with win as (
+    select * from public.events where created_at >= now() - (days || ' days')::interval
+  ),
+  totals as (
+    select count(*) as events,
+           count(distinct anon_id) as visitors,
+           count(*) filter (where name = 'page:view') as pageviews,
+           count(distinct email) filter (where email is not null) as identified
+    from win
+  ),
+  pages as (
+    select coalesce(path, '(none)') as path,
+           count(*) filter (where name = 'page:view') as views,
+           count(distinct anon_id) filter (where name = 'page:view') as visitors
+    from win group by 1
+    having count(*) filter (where name = 'page:view') > 0
+    order by views desc limit 20
+  ),
+  ev as (
+    select name, count(*) as count, count(distinct anon_id) as users
+    from win group by 1 order by count desc limit 25
+  ),
+  funnel as (
+    select count(distinct anon_id) filter (where name = 'page:view') as land,
+           count(distinct anon_id) filter (where name = 'onboarding_situation') as onboard,
+           count(distinct anon_id) filter (where name = 'onboarding_complete') as onboard_done,
+           count(distinct anon_id) filter (where name = 'account_created') as account,
+           count(distinct anon_id) filter (where name = 'session_complete') as scored,
+           count(distinct anon_id) filter (where name = 'upgrade_success') as subscribed
+    from win
+  ),
+  daily as (
+    select to_char(date_trunc('day', created_at), 'MM-DD') as day,
+           count(*) as events,
+           count(*) filter (where name = 'page:view') as views
+    from win group by date_trunc('day', created_at) order by date_trunc('day', created_at)
+  )
+  select jsonb_build_object(
+    'days', days,
+    'totals', (select to_jsonb(totals) from totals),
+    'pages', coalesce((select jsonb_agg(to_jsonb(pages)) from pages), '[]'::jsonb),
+    'events', coalesce((select jsonb_agg(to_jsonb(ev)) from ev), '[]'::jsonb),
+    'funnel', (select to_jsonb(funnel) from funnel),
+    'daily', coalesce((select jsonb_agg(to_jsonb(daily)) from daily), '[]'::jsonb)
+  );
+$$;
