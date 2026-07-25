@@ -53,6 +53,7 @@ export interface ScoredAnswer {
   durationSeconds?: number;
   secondsOnQuestion?: number; // wall-clock time from seeing the question to submitting
   delivery?: DeliveryMetrics;
+  interviewer?: string; // which panelist asked, in panel mode ("Dana · Hiring Manager")
   source: "ai" | "heuristic";
 }
 

@@ -35,6 +35,17 @@ const LENGTH_RANGE: Record<"short" | "medium" | "long", [number, number]> = {
   long: [120, 220],
 };
 
+/* The mock-panel roster. In panel mode each question is attributed to one of
+   these, rotating — so it feels like a real panel and the results can show how
+   each interviewer scored you. */
+const PANELISTS = [
+  { name: "Dana", role: "Hiring Manager", initials: "DM" },
+  { name: "Raj", role: "Team Lead", initials: "RL" },
+  { name: "Sofia", role: "Peer interviewer", initials: "SP" },
+  { name: "Marcus", role: "Skip-level", initials: "MS" },
+];
+const panelistFor = (i: number) => PANELISTS[i % PANELISTS.length];
+
 /* Spaced repetition: the questions you scored lowest on across all history,
    deduped, weakest first — so "redo your hardest" drills exactly those. */
 function weakestQuestions(sessions: Session[], limit: number): { text: string; category: string }[] {
@@ -373,6 +384,10 @@ function PracticeInner() {
     result.secondsOnQuestion = questionStart.current
       ? Math.round((Date.now() - questionStart.current) / 1000)
       : undefined;
+    if (interviewer === "panel") {
+      const p = panelistFor(index);
+      result.interviewer = `${p.name} · ${p.role}`;
+    }
     setScored(result);
     setSubmitting(false);
     track("practice:scored", {
@@ -422,6 +437,10 @@ function PracticeInner() {
       lengthTarget,
     });
     result.delivery = fuDeliveryRef.current ?? undefined;
+    if (interviewer === "panel") {
+      const p = panelistFor(index);
+      result.interviewer = `${p.name} · ${p.role}`;
+    }
     setFollowUpScored(result);
     setSubmittingFollowUp(false);
     track("practice:followup_answered", { index: index + 1, overall: result.scores?.overall ?? 0 });
@@ -606,6 +625,19 @@ function PracticeInner() {
               transition={{ duration: 0.3 }}
             >
               <div className="card-elevated p-7 sm:p-9">
+                {interviewer === "panel" && (() => {
+                  const p = panelistFor(index);
+                  return (
+                    <div className="mb-4 flex items-center gap-2.5">
+                      <span className="grid h-9 w-9 place-items-center rounded-full text-2xs font-bold text-white" style={{ background: "linear-gradient(140deg, var(--primary-bright), var(--primary-ink))" }}>
+                        {p.initials}
+                      </span>
+                      <span className="text-sm text-ink-2">
+                        <strong className="text-ink">{p.name}</strong> · {p.role} asks
+                      </span>
+                    </div>
+                  );
+                })()}
                 <p className="text-2xs font-semibold uppercase tracking-[0.18em] text-primary-ink">
                   {current.category === "warmup"
                     ? "Warm up"
