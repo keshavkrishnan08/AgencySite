@@ -1,7 +1,7 @@
 import { rateLimit } from "@/lib/ratelimit";
 import { recordUsage } from "@/lib/usage";
 import { NextResponse } from "next/server";
-import { callClaude, extractJson, hasAI, FAST_MODEL } from "@/lib/ai";
+import { callClaude, extractJson, hasAI, FAST_MODEL, asStr } from "@/lib/ai";
 
 export const runtime = "nodejs";
 export const dynamic = "force-dynamic";
@@ -16,7 +16,7 @@ export const dynamic = "force-dynamic";
 
 // Minimal system prompt — every token here is paid on every (cache-missed) call.
 const SYSTEM =
-  "You are a concise labor-market analyst for job seekers. Reply with ONLY minified JSON, no prose, no code fences. Never invent news, headlines, dates, or statistics you're unsure of — give evergreen guidance.";
+  "You are a concise labor-market analyst for job seekers. Reply with ONLY minified JSON, no prose, no code fences. String values must be plain text: no markdown, no #, no asterisks, no bullet characters. Never invent news, headlines, dates, or statistics you're unsure of, give evergreen guidance.";
 
 interface Insights {
   market: string;
@@ -86,16 +86,17 @@ export async function POST(req: Request) {
     const text = await callClaude({ model: FAST_MODEL, system: SYSTEM, user, maxTokens: 420, temperature: 0.5 });
     const parsed = extractJson<Insights>(text);
     if (parsed?.market && Array.isArray(parsed.skills)) {
+      // asStr strips markdown and coerces; arr does the same per element.
       const arr = (v: unknown, n: number) =>
-        Array.isArray(v) ? v.slice(0, n).map((s) => String(s).slice(0, 60)) : [];
+        Array.isArray(v) ? v.map((s) => asStr(s, 60)).filter(Boolean).slice(0, n) : [];
       const fb = fallback(role, industry);
       return NextResponse.json({
         insights: {
-          market: String(parsed.market).slice(0, 400),
+          market: asStr(parsed.market, 400),
           skills: arr(parsed.skills, 5),
-          outlook: String(parsed.outlook || "").slice(0, 240),
-          tip: String(parsed.tip || "").slice(0, 240),
-          salary: String(parsed.salary || fb.salary).slice(0, 240),
+          outlook: asStr(parsed.outlook, 240),
+          tip: asStr(parsed.tip, 240),
+          salary: asStr(parsed.salary, 240) || fb.salary,
           channels: arr(parsed.channels, 3).length ? arr(parsed.channels, 3) : fb.channels,
           actions: arr(parsed.actions, 3).length ? arr(parsed.actions, 3) : fb.actions,
         },
