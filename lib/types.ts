@@ -2,7 +2,7 @@ export type Situation = "returning" | "laid_off" | "promotion" | "career_change"
 export type InterviewGap = "<1yr" | "1-3yr" | "3-5yr" | "5+yr";
 export type Plan = "free" | "premium";
 export type BillingInterval = "monthly" | "quarterly";
-export type SessionMode = "practice" | "focus" | "predicted";
+export type SessionMode = "practice" | "focus" | "predicted" | "review";
 
 export type Dimension =
   | "clarity"

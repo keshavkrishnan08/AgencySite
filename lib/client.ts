@@ -75,6 +75,7 @@ export async function apiScoreAnswer(
     interviewGap?: string;
     weakestDimension?: string;
     recentAverage?: number;
+    lengthTarget?: string;
   },
   withExample = false
 ): Promise<ScoredAnswer> {
