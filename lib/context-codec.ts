@@ -47,6 +47,10 @@ export interface UserContext {
   dims?: { clarity: number; relevance: number; specificity: number; confidence: number; conciseness: number };
   anxietyPer100?: number;
 
+  // delivery / speech
+  wpm?: number;
+  avgAnswerSeconds?: number;
+
   // volume
   questionsAnswered?: number;
   wordsSpoken?: number;
@@ -91,6 +95,8 @@ const G = {
   weakest: "弱",
   dims: "维",
   anxiety: "紧",
+  wpm: "语",
+  answerSec: "秒",
   questions: "问",
   words: "词",
   milestone: "里",
@@ -109,7 +115,7 @@ const G = {
 /* The one-time decoder key. Sits in the system prompt (cached). Keep it terse —
    it is itself tokens — but unambiguous. */
 export const CONTEXT_LEGEND = `You are given a compact context line about the candidate. Each glyph labels one field; the value follows it, fields split by " · ". Read it as facts about this exact person and tailor everything to them. Never echo the glyphs back — always speak in plain English.
-KEY: 名 name · 势 situation · 角 target role · 司 employer · 隙 years since last interview · 志 interview date · 试 sessions done · 频 sessions per week · 连 current day streak · 顶 longest streak · 均 readiness score /100 · 始 first score · 巅 best score · 增 net points gained · 速 points gained per session · 强 strongest skill · 弱 weakest skill (coach here hardest) · 维 skill scores as clarity/relevance/specificity/confidence/conciseness · 紧 nervous tells per 100 words · 问 questions answered · 词 words spoken · 里 next milestone · 域 practice domain · 难 difficulty setting · 架 answer framework · 调 coaching tone they prefer · 岗 role family · 能 key competencies for the role · 薪 typical pay band · 预 predicted-question set (company/role/count) · 事 saved gap story (type/length) · 近 recent sessions as role:score.`;
+KEY: 名 name · 势 situation · 角 target role · 司 employer · 隙 years since last interview · 志 interview date · 试 sessions done · 频 sessions per week · 连 current day streak · 顶 longest streak · 均 readiness score /100 · 始 first score · 巅 best score · 增 net points gained · 速 points gained per session · 强 strongest skill · 弱 weakest skill (coach here hardest) · 维 skill scores as clarity/relevance/specificity/confidence/conciseness · 紧 nervous tells per 100 words (fillers, hedges, apologies) · 语 speaking pace in words per minute · 秒 average seconds per answer · 问 questions answered · 词 words spoken · 里 next milestone · 域 practice domain · 难 difficulty setting · 架 answer framework · 调 coaching tone they prefer · 岗 role family · 能 key competencies for the role · 薪 typical pay band · 预 predicted-question set (company/role/count) · 事 saved gap story (type/length) · 近 recent sessions as role:score.`;
 
 function n(v: number | undefined | null, digits = 0): string | null {
   if (v == null || Number.isNaN(v)) return null;
@@ -147,6 +153,8 @@ export function encodeContext(ctx: UserContext): string {
     push(G.dims, `${Math.round(d.clarity)}/${Math.round(d.relevance)}/${Math.round(d.specificity)}/${Math.round(d.confidence)}/${Math.round(d.conciseness)}`);
   }
   push(G.anxiety, n(ctx.anxietyPer100, 1));
+  push(G.wpm, n(ctx.wpm));
+  push(G.answerSec, n(ctx.avgAnswerSeconds));
 
   push(G.questions, n(ctx.questionsAnswered));
   push(G.words, n(ctx.wordsSpoken));

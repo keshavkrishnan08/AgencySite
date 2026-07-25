@@ -131,7 +131,7 @@ export function CoachChat() {
       if (res.status === 429 || data?.rateLimited) {
         setTurns((t) => [
           ...t,
-          { role: "assistant", content: "I need a quick breather — too many messages at once. Try again in a moment." },
+          { role: "assistant", content: "I need a quick breather, too many messages at once. Try again in a moment." },
         ]);
       } else {
         setTurns((t) => [...t, { role: "assistant", content: data?.reply || "Say that again for me?" }]);

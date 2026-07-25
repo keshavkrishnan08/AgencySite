@@ -563,10 +563,10 @@ export default function LandingPage() {
         <Hero />
         <DemoSection />
         <HowItWorks />
+        <OperatingSystem />
         <ProductFeatures />
         <FiveQuestions />
         <Numbers />
-        <OperatingSystem />
         <Comparison />
         <Pricing />
         <FAQ />

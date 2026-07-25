@@ -24,7 +24,11 @@ export interface JobFamily {
 }
 
 // Keyword → family. First match wins; order matters (specific before generic).
+// C-suite goes FIRST and matches only true executive titles — deliberately NOT
+// the bare word "executive", so an IC "Account Executive" or "Sales Executive"
+// still lands in sales, not the C-suite band.
 const RULES: [RegExp, string][] = [
+  [/\b(ceo|cfo|coo|cto|cmo|ciso|cpo|cro|chief|founder|co-?founder|president|managing (director|partner)|vp |vice president|svp|evp)\b/i, "executive"],
   [/nurse|rn |lpn|clinical|medical|health|dental|therapist|physician|caregiver|pharmac/i, "healthcare"],
   [/sales|account executive|business development|bdr|sdr|realtor|broker/i, "sales"],
   [/market|brand|content|seo|social media|growth|communications|pr /i, "marketing"],
@@ -286,6 +290,23 @@ export const FAMILIES: Record<string, JobFamily> = {
     lookFor: ["Specific, structured stories", "Results with numbers", "Ownership of mistakes"],
     redFlags: ["Vague answers", "No metrics", "Rambling"],
     focusTypes: ["behavioral", "situation", "warmup"],
+  },
+  executive: {
+    key: "executive", label: "Executive & Senior Leadership",
+    blurb: "C-suite and VP roles. Interviews test strategy, P&L judgment, and how you lead through people, not tasks.",
+    process: [
+      B("Recruiter / board intro", "Track record, scope, and why this seat", "45 min call"),
+      B("Peer & stakeholder panel", "Cross-functional leadership and influence", "Multiple 1:1s"),
+      B("Strategy / case", "A real business problem, your framing and plan", "Working session"),
+      B("Board / CEO final", "Vision, values fit, and the close", "In person"),
+    ],
+    competencies: ["Strategic vision", "P&L ownership", "Leading leaders", "Stakeholder influence", "Judgment under ambiguity"],
+    hardSkills: ["Financial modeling", "Org design", "Operating cadence", "Board communication"],
+    softSkills: ["Executive presence", "Decisiveness", "Narrative", "Coaching senior talent"],
+    salary: { low: 180000, mid: 320000, high: 650000 },
+    lookFor: ["Owned outcomes at scale", "Numbers tied to the business", "Built and kept strong teams", "Clear point of view"],
+    redFlags: ["Credit without ownership", "No metrics", "Blames the org", "All strategy, no execution"],
+    focusTypes: ["leadership", "situation", "values", "behavioral"],
   },
 };
 
