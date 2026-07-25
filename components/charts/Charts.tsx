@@ -24,7 +24,6 @@ import {
   XAxis,
   YAxis,
 } from "recharts";
-import { scoreColor } from "@/lib/utils";
 
 const ink = "#1b2030";
 const ink2 = "#585e70";
@@ -33,6 +32,25 @@ const primary = "#14808e";
 const primaryBright = "#19a9b8";
 const sage = "#3e9d6e";
 const gold = "#b8893b";
+
+/* Vibrant data-viz palette — chart-only, so the brand teal on buttons and the
+   ivory UI stay calm while the graphs pop. Score-based fills map a score to a
+   saturated red→amber→cyan→green ramp. */
+const VIVID_TEAL = "#06b6d4";   // cyan
+const VIVID_TEAL2 = "#0891b2";  // deep cyan
+const VIVID_GREEN = "#22c55e";
+const VIVID_AMBER = "#f59e0b";
+const VIVID_CORAL = "#f43f5e";
+/** A rotating set for categorical charts (donuts, category bars). */
+export const VIVID_SERIES = ["#06b6d4", "#22c55e", "#f59e0b", "#f43f5e", "#8b5cf6", "#3b82f6", "#ec4899", "#14b8a6"];
+/** Saturated colour for a 0–100 score. */
+export function vividScore(score: number): string {
+  if (score >= 85) return VIVID_GREEN;
+  if (score >= 70) return VIVID_TEAL;
+  if (score >= 55) return "#0ea5e9";
+  if (score >= 40) return VIVID_AMBER;
+  return VIVID_CORAL;
+}
 
 function ChartTooltip({ active, payload, label }: any) {
   if (!active || !payload?.length) return null;
@@ -44,8 +62,8 @@ function ChartTooltip({ active, payload, label }: any) {
       {label && <div className="mb-0.5 text-2xs font-semibold uppercase tracking-wider text-ink-3">{label}</div>}
       {payload.map((p: any, i: number) => (
         <div key={i} className="flex items-center gap-2 font-mono text-sm font-semibold" style={{ color: ink }}>
-          <span className="inline-block h-2 w-2 rounded-full" style={{ background: p.color || primary }} />
-          {p.name}: <span style={{ color: scoreColor(p.value) }}>{p.value}</span>
+          <span className="inline-block h-2 w-2 rounded-full" style={{ background: p.color || VIVID_TEAL }} />
+          {p.name}: <span style={{ color: vividScore(p.value) }}>{p.value}</span>
         </div>
       ))}
     </div>
@@ -70,12 +88,13 @@ export function ProgressLineChart({
       <AreaChart data={data} margin={{ top: 12, right: 12, bottom: 0, left: -4 }}>
         <defs>
           <linearGradient id="progFill" x1="0" y1="0" x2="0" y2="1">
-            <stop offset="0%" stopColor={primaryBright} stopOpacity={0.22} />
-            <stop offset="100%" stopColor={primaryBright} stopOpacity={0} />
+            <stop offset="0%" stopColor={VIVID_TEAL} stopOpacity={0.32} />
+            <stop offset="100%" stopColor={VIVID_TEAL} stopOpacity={0} />
           </linearGradient>
           <linearGradient id="progStroke" x1="0" y1="0" x2="1" y2="0">
-            <stop offset="0%" stopColor={primary} />
-            <stop offset="100%" stopColor={primaryBright} />
+            <stop offset="0%" stopColor={VIVID_TEAL2} />
+            <stop offset="50%" stopColor={VIVID_TEAL} />
+            <stop offset="100%" stopColor={VIVID_GREEN} />
           </linearGradient>
         </defs>
         <CartesianGrid stroke={grid} strokeDasharray="4 6" vertical={false} />
@@ -111,8 +130,8 @@ export function ProgressLineChart({
           stroke="url(#progStroke)"
           strokeWidth={3}
           fill="url(#progFill)"
-          dot={{ fill: "#fff", stroke: primary, strokeWidth: 2.5, r: 4 }}
-          activeDot={{ fill: primary, stroke: "#fff", strokeWidth: 3, r: 6 }}
+          dot={{ fill: "#fff", stroke: VIVID_TEAL, strokeWidth: 2.5, r: 4 }}
+          activeDot={{ fill: VIVID_TEAL, stroke: "#fff", strokeWidth: 3, r: 6 }}
           animationDuration={1100}
         />
       </AreaChart>
@@ -134,8 +153,8 @@ export function RadarScoreChart({
       <RadarChart data={data} outerRadius="72%">
         <defs>
           <linearGradient id="radarFill" x1="0" y1="0" x2="0" y2="1">
-            <stop offset="0%" stopColor={primaryBright} stopOpacity={0.32} />
-            <stop offset="100%" stopColor={primary} stopOpacity={0.14} />
+            <stop offset="0%" stopColor={VIVID_TEAL} stopOpacity={0.42} />
+            <stop offset="100%" stopColor={VIVID_GREEN} stopOpacity={0.16} />
           </linearGradient>
         </defs>
         <PolarGrid stroke={grid} />
@@ -147,10 +166,10 @@ export function RadarScoreChart({
         <Radar
           name="Score"
           dataKey="value"
-          stroke={primary}
+          stroke={VIVID_TEAL}
           strokeWidth={2.5}
           fill="url(#radarFill)"
-          dot={{ fill: primary, stroke: "#fff", strokeWidth: 1.5, r: 3 }}
+          dot={{ fill: VIVID_TEAL, stroke: "#fff", strokeWidth: 1.5, r: 3 }}
           animationDuration={900}
         />
         <Tooltip content={<ChartTooltip />} />
@@ -183,7 +202,7 @@ export function MiniBars({
         <Tooltip content={<ChartTooltip />} cursor={{ fill: "rgba(27,32,48,0.04)" }} />
         <Bar dataKey="value" name="Avg" radius={[6, 6, 0, 0]} maxBarSize={30} animationDuration={900}>
           {data.map((d, i) => (
-            <Cell key={i} fill={scoreColor(100 - d.value * 10)} />
+            <Cell key={i} fill={VIVID_SERIES[i % VIVID_SERIES.length]} />
           ))}
         </Bar>
       </BarChart>
@@ -306,7 +325,7 @@ export function DistributionBars({
         <Tooltip content={<ChartTooltip />} cursor={{ fill: "rgba(27,32,48,0.04)" }} />
         <Bar dataKey="count" name="Answers" radius={[6, 6, 0, 0]} maxBarSize={44} animationDuration={900}>
           {data.map((_, i) => (
-            <Cell key={i} fill={scoreColor(mid[i] ?? 60)} />
+            <Cell key={i} fill={vividScore(mid[i] ?? 60)} />
           ))}
         </Bar>
       </BarChart>
@@ -327,7 +346,7 @@ export function Sparkline({
   color?: string;
 }) {
   const data = values.map((v, i) => ({ i, v }));
-  const stroke = color ?? scoreColor(values[values.length - 1] ?? 0);
+  const stroke = color ?? vividScore(values[values.length - 1] ?? 0);
   return (
     <ResponsiveContainer width={width} height={height}>
       <LineChart data={data} margin={{ top: 4, right: 2, bottom: 4, left: 2 }}>
@@ -430,7 +449,7 @@ export function HBarChart({
         <Tooltip content={<ChartTooltip />} cursor={{ fill: "rgba(27,32,48,0.04)" }} />
         <Bar dataKey="value" name="Score" radius={[0, 6, 6, 0]} maxBarSize={22} animationDuration={900}>
           {data.map((d, i) => (
-            <Cell key={i} fill={scoreColor(d.value)} />
+            <Cell key={i} fill={vividScore(d.value)} />
           ))}
         </Bar>
       </BarChart>
