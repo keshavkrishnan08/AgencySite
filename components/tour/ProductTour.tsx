@@ -33,7 +33,7 @@ const STEPS: Step[] = [
     tone: "var(--primary)",
     where: "Dashboard",
     title: "This is home base",
-    body: "Your streak, readiness, and this week's read on the market for your role — all in one glance. It fills in as you practice.",
+    body: "Your streak, readiness, and this week's read on the market for your role, all in one glance. It fills in as you practice.",
   },
   {
     icon: Mic,
@@ -54,7 +54,7 @@ const STEPS: Step[] = [
     tone: "var(--sage)",
     where: "Job Breakdown",
     title: "Know the role cold",
-    body: "The interview process, the competencies they screen for, and the real pay band — rebuilt for whatever role you're chasing.",
+    body: "The interview process, the competencies they screen for, and the real pay band, rebuilt for whatever role you're chasing.",
   },
   {
     icon: LineChart,
