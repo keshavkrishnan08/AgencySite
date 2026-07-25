@@ -40,8 +40,8 @@ Return ONLY this minified JSON, nothing else:
 {"clarity":N,"relevance":N,"specificity":N,"confidence":N,"conciseness":N,"strength":"...","improve":["...","..."]}
 
 - The five scores are integers 0-100 from the rubric. Do NOT output an overall; it is computed for you.
-- strength: ONE short sentence naming their strongest dimension, quoting their words when it helps.
-- improve: 1 to 2 short, specific fixes, most valuable first, each under 18 words, tied to their role and weak area. No fluff, no preamble.
+- strength: ONE short sentence naming their strongest dimension, and QUOTE the exact words from their answer that earned it.
+- improve: 1 to 2 concrete fixes, most valuable first, each under 18 words. Each fix must reference something specific in THEIR answer (a phrase they said, a missing number, a vague line) so it is actionable, never a generic tip. No fluff, no preamble.
 
 CRITICAL FOR CONSISTENCY: grade the answer purely on its own merits against the rubric. The candidate's recent average, weak area, and session count are context for tailoring your feedback ONLY — never raise or lower the scores because of them. The same answer must always earn the same scores.`;
 
@@ -84,6 +84,8 @@ export async function POST(req: Request) {
     weakestDimension = "",
     recentAverage = 0,
     lengthTarget = "",
+    focusDimension = "",
+    domain = "",
   } = body ?? {};
 
   // The answer length the candidate is aiming for (set in the Session Builder).
@@ -95,6 +97,24 @@ export async function POST(req: Request) {
     long: "\nThey are aiming for a LONGER, detailed answer (about 120-220 words). Don't penalise length here as long as it stays on point.",
   };
   const lengthLine = LENGTH_HINT[String(lengthTarget)] || "";
+
+  // Focus the FEEDBACK (never the scores) on what this specific practice was
+  // about: a dimension drill, or a non-interview domain like storytelling or
+  // public speaking. Scores still come from the same rubric so they stay
+  // comparable; only the one fix and the strength line are re-pointed.
+  const DIM_LABEL: Record<string, string> = {
+    clarity: "Clarity", relevance: "Relevance", specificity: "Specificity",
+    confidence: "Confidence", conciseness: "Conciseness",
+  };
+  const focusLabel = DIM_LABEL[String(focusDimension)] || "";
+  const focusLine = focusLabel
+    ? `\nThis is a FOCUSED DRILL on ${focusLabel}. Make your one fix specifically about ${focusLabel}, and quote the exact words that helped or hurt it.`
+    : "";
+  const DOMAIN_LINE: Record<string, string> = {
+    storytelling: "\nThis is a STORYTELLING practice, not a job interview. Judge it as a story: a clear arc (setup, tension, turn, resolution), vivid concrete detail, and a point that lands. Center the fix on the storytelling craft.",
+    public_speaking: "\nThis is a PUBLIC SPEAKING practice, not a job interview. Judge it as a spoken talk: a strong open, one clear message, signposting, and a memorable close. Center the fix on delivery and structure for an audience.",
+  };
+  const domainLine = DOMAIN_LINE[String(domain)] || "";
 
   if (typeof answer !== "string" || answer.trim().length === 0) {
     return NextResponse.json({ error: "Empty answer" }, { status: 400 });
@@ -109,7 +129,7 @@ export async function POST(req: Request) {
   // category) — NOT on the candidate's history. So the same answer earns the same
   // grade in every session, regardless of their averages. Comparison to past
   // performance is layered on separately (deterministically) by the UI.
-  const cacheKey = hashKey([question, answer, targetRole, situation, category, lengthTarget].join("||"));
+  const cacheKey = hashKey([question, answer, targetRole, situation, category, lengthTarget, focusDimension, domain].join("||"));
   const cached = scoreCache.get(cacheKey);
   if (cached) {
     return NextResponse.json({
@@ -122,7 +142,7 @@ export async function POST(req: Request) {
   if (hasAI()) {
     try {
       const ctx = candidateBlock({ name, situation, targetRole, company, interviewGap, weakestDimension, recentAverage });
-      const user = `${ctx}${lengthLine}\n\nQuestion (${category}): ${question}\n\nTheir answer:\n"""${answer.slice(0, 4000)}"""`;
+      const user = `${ctx}${lengthLine}${focusLine}${domainLine}\n\nQuestion (${category}): ${question}\n\nTheir answer:\n"""${answer.slice(0, 4000)}"""`;
       // Haiku + temperature 0: cheap, and the strict rubric (not the model tier)
       // is what makes the same answer grade the same way every session.
       // maxTokens kept low because the contract is just scores + brief fixes.

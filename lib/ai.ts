@@ -114,6 +114,32 @@ export async function callClaude({
   return block && block.type === "text" ? block.text : "";
 }
 
+/* ---------------------------------------------------------------------------
+ * Output coercion helpers.
+ *
+ * Model output is never trusted as-is. These force whatever came back into the
+ * exact type the UI and the graphs expect, so a missing key or a wrong type can
+ * never propagate downstream. Use them in every route that parses JSON. */
+
+/** A trimmed, length-capped string, or "" for anything non-string. */
+export const asStr = (v: unknown, max = 500): string =>
+  typeof v === "string" ? v.trim().slice(0, max) : "";
+
+/** An array of clean strings, capped in count and length. */
+export const asStrArray = (v: unknown, count = 8, max = 200): string[] =>
+  Array.isArray(v)
+    ? v
+        .filter((x): x is string => typeof x === "string" && x.trim().length > 0)
+        .map((x) => x.trim().slice(0, max))
+        .slice(0, count)
+    : [];
+
+/** A finite integer clamped to [lo, hi]; falls back to `fb` when not a number. */
+export const clampInt = (v: unknown, lo: number, hi: number, fb = lo): number => {
+  const x = Math.round(Number(v));
+  return Number.isFinite(x) ? Math.min(hi, Math.max(lo, x)) : fb;
+};
+
 /** Robustly pull the first JSON object/array out of a model response. */
 export function extractJson<T>(text: string): T | null {
   if (!text) return null;
