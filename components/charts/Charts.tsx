@@ -59,8 +59,11 @@ export function ProgressLineChart({
   height?: number;
   showReady?: boolean;
 }) {
+  // Re-key on the data so the line visibly redraws (animates) whenever a new
+  // score lands or the latest number changes — not just on first mount.
+  const animKey = `${data.length}:${data[data.length - 1]?.score ?? 0}`;
   return (
-    <ResponsiveContainer width="100%" height={height}>
+    <ResponsiveContainer key={animKey} width="100%" height={height}>
       <AreaChart data={data} margin={{ top: 12, right: 12, bottom: 0, left: -4 }}>
         <defs>
           <linearGradient id="progFill" x1="0" y1="0" x2="0" y2="1">
@@ -122,8 +125,9 @@ export function RadarScoreChart({
   data: { dimension: string; value: number }[];
   height?: number;
 }) {
+  const animKey = data.map((d) => Math.round(d.value)).join(",");
   return (
-    <ResponsiveContainer width="100%" height={height}>
+    <ResponsiveContainer key={animKey} width="100%" height={height}>
       <RadarChart data={data} outerRadius="72%">
         <defs>
           <linearGradient id="radarFill" x1="0" y1="0" x2="0" y2="1">
@@ -160,8 +164,9 @@ export function MiniBars({
   data: { label: string; value: number }[];
   height?: number;
 }) {
+  const animKey = data.map((d) => Math.round(d.value)).join(",");
   return (
-    <ResponsiveContainer width="100%" height={height}>
+    <ResponsiveContainer key={animKey} width="100%" height={height}>
       <BarChart data={data} margin={{ top: 10, right: 6, bottom: 0, left: -22 }}>
         <CartesianGrid stroke={grid} strokeDasharray="4 6" vertical={false} />
         <XAxis
@@ -282,8 +287,9 @@ export function DistributionBars({
   // Bucket midpoints drive the color so the histogram reads left-to-right
   // exactly like every score in the app: coral, amber, teal, sage.
   const mid = [20, 47, 62, 75, 85, 95];
+  const animKey = data.map((d) => d.count).join(",");
   return (
-    <ResponsiveContainer width="100%" height={height}>
+    <ResponsiveContainer key={animKey} width="100%" height={height}>
       <BarChart data={data} margin={{ top: 10, right: 6, bottom: 0, left: -26 }}>
         <CartesianGrid stroke={grid} strokeDasharray="4 6" vertical={false} />
         <XAxis
