@@ -26,7 +26,7 @@ export function ToolShell({
 
   return (
     <AppShell>
-      <main className="mx-auto max-w-5xl px-5 py-8 sm:px-8 sm:py-10">
+      <main className="container-wide py-8 sm:py-10">
         <div className="mb-8">
           {badge && (
             <span className="mb-3 inline-flex items-center gap-1 rounded-full bg-gold-soft px-2.5 py-1 text-2xs font-bold uppercase tracking-wider text-gold-ink">

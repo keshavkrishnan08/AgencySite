@@ -31,10 +31,10 @@ export function SiteFooter() {
             <FooterCol
               title="Company"
               links={[
-                { href: "#pricing", label: "Pricing" },
-                { href: "#how", label: "How it works" },
-                { href: "#", label: "Privacy" },
-                { href: "#", label: "Contact" },
+                { href: "/#pricing", label: "Pricing" },
+                { href: "/#how", label: "How it works" },
+                { href: "/privacy", label: "Privacy" },
+                { href: "mailto:keshav@axonservices.dev", label: "Contact" },
               ]}
             />
           </div>
@@ -64,13 +64,19 @@ function FooterCol({
     <div>
       <h4 className="font-sans text-2xs font-semibold uppercase tracking-wider text-ink-3">{title}</h4>
       <ul className="mt-4 space-y-2.5">
-        {links.map((l) => (
-          <li key={l.label}>
-            <Link href={l.href} className="text-sm text-ink-2 transition-colors hover:text-primary-ink">
-              {l.label}
-            </Link>
-          </li>
-        ))}
+        {links.map((l) => {
+          const external = l.href.startsWith("mailto:") || l.href.startsWith("http");
+          const cls = "text-sm text-ink-2 transition-colors hover:text-primary-ink";
+          return (
+            <li key={l.label}>
+              {external ? (
+                <a href={l.href} className={cls}>{l.label}</a>
+              ) : (
+                <Link href={l.href} className={cls}>{l.label}</Link>
+              )}
+            </li>
+          );
+        })}
       </ul>
     </div>
   );

@@ -37,7 +37,7 @@ export default function LibraryPage() {
 
   return (
     <AppShell>
-      <main className="container-content space-y-6 py-8 sm:py-10">
+      <main className="container-wide space-y-6 py-8 sm:py-10">
         <div>
           <Link href="/practice" className="btn-ghost mb-3 text-sm">
             <ChevronLeft size={16} /> Back to practice
