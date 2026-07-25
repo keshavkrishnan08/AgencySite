@@ -63,6 +63,9 @@ try {
   log("4) Dashboard graphs + context banner");
   await page.goto(`${BASE}/dashboard`, { waitUntil: "networkidle" });
   await page.waitForTimeout(3000);
+  // Dismiss the first-run product tour (its scrim blocks clicks by design).
+  const skipTour = page.locator('text=Skip the tour');
+  if (await skipTour.count()) { await skipTour.first().click({ force: true }).catch(() => {}); await page.waitForTimeout(500); }
   const dash = await page.locator("body").innerText();
   check(/Readiness over time/i.test(dash), "dashboard: 'Readiness over time' graph present");
   check(/Daily practice/i.test(dash), "dashboard: 'Daily practice' graph present");
@@ -80,19 +83,24 @@ try {
   log("6) Coach chat (OpenAI reply)");
   await page.goto(`${BASE}/dashboard`, { waitUntil: "networkidle" });
   await page.waitForTimeout(1500);
+  const skip2 = page.locator('text=Skip the tour');
+  if (await skip2.count()) { await skip2.first().click({ force: true }).catch(() => {}); await page.waitForTimeout(400); }
   const launcher = page.locator('button[aria-label="Open coach"]');
   check(await launcher.count() > 0, "coach chat button is present (always hanging)");
   await launcher.first().click();
-  await page.waitForTimeout(600);
+  await page.waitForTimeout(700);
   await page.fill('textarea[placeholder="Ask your coach…"]', "In one sentence, what should I work on first?");
   await page.locator('button[aria-label="Send"]').click();
-  await page.waitForTimeout(9000);
-  const chatText = await page.locator("body").innerText();
-  // The greeting + a real reply should both be present; reply length > greeting alone
-  check(/work on|focus|practice|specific|answer/i.test(chatText), "coach chat returned a reply");
+  await page.waitForTimeout(10000);
+  const bubbles = await page.locator('.max-w-\\[85\\%\\]').count();
+  check(bubbles >= 3, "coach chat returned a reply (greeting + user + assistant bubbles)");
 
-  log("7) Context overview persisted to DB");
+  log("7) Context overview + insights persisted to DB");
   await page.waitForTimeout(1500);
+  const prof = await (await fetch(`${SB}/rest/v1/profiles?email=eq.${encodeURIComponent(email)}&select=id`, { headers: sbHeaders })).json();
+  const uid = prof?.[0]?.id;
+  const ins = uid ? await (await fetch(`${SB}/rest/v1/insights_history?user_id=eq.${uid}&select=id,created_at`, { headers: sbHeaders })).json() : [];
+  check(Array.isArray(ins) && ins.length >= 1, "news/insights persisted to account (insights_history row)");
   const ov = await (await fetch(`${SB}/rest/v1/profiles?email=eq.${encodeURIComponent(email)}&select=overview,overview_updated_at`, { headers: sbHeaders })).json();
   const overview = ov?.[0]?.overview;
   check(!!overview, "profiles.overview written");
