@@ -35,6 +35,25 @@ const LENGTH_RANGE: Record<"short" | "medium" | "long", [number, number]> = {
   long: [120, 220],
 };
 
+/* Spaced repetition: the questions you scored lowest on across all history,
+   deduped, weakest first — so "redo your hardest" drills exactly those. */
+function weakestQuestions(sessions: Session[], limit: number): { text: string; category: string }[] {
+  const seen = new Set<string>();
+  const all: { text: string; category: string; score: number }[] = [];
+  for (const s of sessions) {
+    for (const a of s.answers || []) {
+      const text = a.questionText;
+      if (!text || seen.has(text)) continue;
+      seen.add(text);
+      all.push({ text, category: a.category || "behavioral", score: a.scores?.overall ?? 100 });
+    }
+  }
+  return all
+    .sort((x, y) => x.score - y.score)
+    .slice(0, Math.max(4, Math.min(12, limit)))
+    .map(({ text, category }) => ({ text, category }));
+}
+
 // setup = the practice hub (the precursor). custom = the fine-grained builder.
 // Access is gated once, at the app shell (unpaid = whole app blurred). So there
 // is NO paywall inside a session: everyone who's in the app runs the full thing.
@@ -81,6 +100,9 @@ function PracticeInner() {
   const [voiceFirst, setVoiceFirst] = useState(false);
   const [lengthTarget, setLengthTarget] = useState<"short" | "medium" | "long">("medium");
   const lengthRange = LENGTH_RANGE[lengthTarget];
+  // Review mode: rerun the questions you scored lowest on (spaced repetition).
+  const reviewRef = useRef(false);
+  const [isReview, setIsReview] = useState(false);
   const [questions, setQuestions] = useState<Question[]>([]);
   const [index, setIndex] = useState(0);
   const [answerText, setAnswerText] = useState("");
@@ -156,6 +178,33 @@ function PracticeInner() {
       }
       setFromPredicted(false);
 
+      // Review mode: drill the exact questions this person scored lowest on,
+      // weakest first. Falls through to a normal session if there's no history.
+      if (reviewRef.current) {
+        const weak = weakestQuestions(hist, customRef.current.count || 6);
+        if (weak.length) {
+          setIsReview(true);
+          setQuestions(
+            weak.map((w, i) => ({
+              number: i + 1,
+              text: w.text,
+              category: w.category,
+              tip: "You scored low on this one before. Nail it this time.",
+            }))
+          );
+          setIndex(0);
+          setAnswers([]);
+          setScored(null);
+          setAnswerText("");
+          sessionStart.current = Date.now();
+          track("session_started", { mode: "review", role: r, questions: weak.length });
+          mixpanelIncrement("sessions_started");
+          setPhase("answer");
+          return;
+        }
+      }
+      setIsReview(false);
+
       // Recent questions to steer the generator away from repeats across sessions.
       const recentQuestions = Array.from(
         new Set(hist.flatMap((x) => (x.answers || []).map((a) => a.questionText)).filter(Boolean))
@@ -225,6 +274,7 @@ function PracticeInner() {
       setFocusTypes(types); setDifficulty(cDiff); setCount(cCount);
       setTone(cTone); setInterviewer(cIv); setDomain(cDomain); domainRef.current = cDomain;
       setTimed(params.get("timed") === "1"); setVoiceFirst(params.get("voice") === "1");
+      reviewRef.current = params.get("review") === "1";
       customRef.current = { focusTypes: types, difficulty: cDiff, count: cCount, tone: cTone, interviewer: cIv };
     }
 
@@ -315,6 +365,7 @@ function PracticeInner() {
         interviewGap: perso.current.interviewGap,
         weakestDimension: perso.current.weakestDimension,
         recentAverage: perso.current.recentAverage,
+        lengthTarget,
       },
       false
     );
@@ -368,6 +419,7 @@ function PracticeInner() {
       interviewGap: perso.current.interviewGap,
       weakestDimension: perso.current.weakestDimension,
       recentAverage: perso.current.recentAverage,
+      lengthTarget,
     });
     result.delivery = fuDeliveryRef.current ?? undefined;
     setFollowUpScored(result);
@@ -388,7 +440,7 @@ function PracticeInner() {
       targetRole: role,
       company: company.trim() || undefined,
       situation,
-      mode: focusDim ? "focus" : fromPredicted ? "predicted" : "practice",
+      mode: focusDim ? "focus" : fromPredicted ? "predicted" : isReview ? "review" : "practice",
       overall: computeOverall(dimensions),
       dimensions,
       durationSeconds: Math.round((Date.now() - sessionStart.current) / 1000),
@@ -482,6 +534,7 @@ function PracticeInner() {
             {fromPredicted && (
               <span className="chip bg-gold-soft text-gold-ink">Predicted questions</span>
             )}
+            {isReview && <span className="chip bg-gold-soft text-gold-ink">Review · your hardest</span>}
           </div>
         )}
 
@@ -864,8 +917,12 @@ function PracticeHub({
     situation === "career_change";
 
   const [routines, setRoutines] = useState<PracticeRoutine[]>([]);
+  const [sessionCount, setSessionCount] = useState(0);
   useEffect(() => {
-    const sync = () => setRoutines(getRoutines());
+    const sync = () => {
+      setRoutines(getRoutines());
+      setSessionCount(getSessions().length);
+    };
     sync();
     return onStoreChange(sync);
   }, []);
@@ -896,6 +953,25 @@ function PracticeHub({
         </span>
         <ArrowRight size={22} className="transition-transform group-hover:translate-x-1" />
       </button>
+
+      {/* Redo your hardest — spaced repetition of the questions you scored lowest on */}
+      {sessionCount > 0 && (
+        <Link
+          href="/practice?autostart=1&review=1&count=6"
+          onClick={() => track("practice:review_start", {})}
+          className="group mt-4 flex w-full items-center gap-4 rounded-2xl border-2 border-dashed p-5 transition-all hover:-translate-y-0.5 hover:shadow-sm"
+          style={{ borderColor: "var(--gold)", background: "var(--gold-soft)" }}
+        >
+          <span className="grid h-11 w-11 shrink-0 place-items-center rounded-xl bg-gold-soft text-gold-ink">
+            <Repeat size={20} />
+          </span>
+          <span className="flex-1">
+            <span className="block font-serif text-base font-semibold text-ink">Redo your hardest questions</span>
+            <span className="block text-sm text-ink-2">The six you scored lowest on, weakest first. Beat your old self.</span>
+          </span>
+          <ArrowRight size={18} className="text-gold-ink transition-transform group-hover:translate-x-0.5" />
+        </Link>
+      )}
 
       {/* Your saved routines */}
       {routines.length > 0 && (
