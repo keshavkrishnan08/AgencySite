@@ -19,14 +19,12 @@ interface Item {
 const MAIN: Item[] = [
   { href: "/dashboard", label: "Dashboard", icon: LayoutDashboard },
   { href: "/practice", label: "Practice", icon: Mic },
+  { href: "/job", label: "Job Breakdown", icon: Briefcase },
   { href: "/analytics", label: "Analytics", icon: LineChart },
   { href: "/reports", label: "Reports", icon: BarChart3 },
 ];
 
-/* The two builders that feed Practice: one writes the questions you'll be
-   asked, the other writes the answer people freeze on. */
 const TOOLS: Item[] = [
-  { href: "/job", label: "Job Breakdown", icon: Briefcase },
   { href: "/tools/question-predictor", label: "Question Predictor", icon: Wand2 },
   { href: "/tools/gap-story", label: "Gap Story", icon: Sprout },
 ];
@@ -94,11 +92,7 @@ export function AppSidebar() {
         ))}
       </nav>
 
-      <div className="px-5 pb-1 pt-5">
-        <span className="whitespace-nowrap text-2xs font-semibold uppercase tracking-wider text-ink-3 opacity-0 transition-opacity duration-200 group-hover:opacity-100">
-          Prep
-        </span>
-      </div>
+      <div className="hairline mx-3 my-3" />
 
       <nav className="flex flex-1 flex-col gap-1 overflow-y-auto px-3">
         {TOOLS.map((i) => (

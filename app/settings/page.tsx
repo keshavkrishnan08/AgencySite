@@ -14,7 +14,7 @@ import {
   DEFAULT_PROFILE, getProfile, resetAll, setProfile, getSessions,
 } from "@/lib/store";
 import { useAuth } from "@/lib/auth";
-import { SITUATION_META, formatDate } from "@/lib/utils";
+import { SITUATION_META, formatDate, cn } from "@/lib/utils";
 import { PLANS, type PlanKey } from "@/lib/pricing";
 import { track } from "@/lib/analytics";
 import type { InterviewGap, Situation, UserProfile } from "@/lib/types";
@@ -93,7 +93,7 @@ export default function SettingsPage() {
 
   return (
     <AppShell>
-      <main className="mx-auto max-w-3xl px-5 py-8 sm:px-8 sm:py-10">
+      <main className="mx-auto max-w-5xl px-5 py-8 sm:px-8 sm:py-10">
         <div className="flex flex-wrap items-center justify-between gap-3">
           <div>
             <h1 className="font-serif text-3xl font-semibold text-ink sm:text-4xl">Settings</h1>
@@ -104,6 +104,7 @@ export default function SettingsPage() {
           </span>
         </div>
 
+        <div className="grid items-start gap-x-10 lg:grid-cols-2">
         {/* ── Account ── */}
         <Section icon={User} title="Account" note="who you are on Axon Careers">
           <div className="grid gap-4 sm:grid-cols-2">
@@ -122,7 +123,7 @@ export default function SettingsPage() {
         </Section>
 
         {/* ── Subscription (deep) ── */}
-        <Section icon={CreditCard} title="Subscription" note="plan, billing, and cancellation">
+        <Section icon={CreditCard} title="Subscription" note="plan, billing, and cancellation" span2>
           <div className="rounded-xl border p-5" style={{ borderColor: "var(--border)", background: "var(--surface-2)" }}>
             <div className="flex flex-wrap items-center justify-between gap-3">
               <div className="flex items-center gap-3">
@@ -228,6 +229,7 @@ export default function SettingsPage() {
             </button>
           </Section>
         )}
+        </div>
 
         <p className="mt-10 text-center text-2xs text-ink-3">Axon Careers · axonservices.dev</p>
       </main>
@@ -250,9 +252,9 @@ function subStatusMeta(sub: Sub | null): { label: string; long: string; color: s
   return { label: s, long: s, color: "var(--ink-2)", bg: "var(--bg-tint)" };
 }
 
-function Section({ icon: Icon, title, note, children }: { icon: typeof User; title: string; note?: string; children: React.ReactNode }) {
+function Section({ icon: Icon, title, note, span2, children }: { icon: typeof User; title: string; note?: string; span2?: boolean; children: React.ReactNode }) {
   return (
-    <section className="mt-8 border-t pt-6" style={{ borderColor: "var(--border)" }}>
+    <section className={cn("mt-8 border-t pt-6", span2 && "lg:col-span-2")} style={{ borderColor: "var(--border)" }}>
       <div className="mb-4 flex items-baseline gap-2.5">
         <Icon size={16} className="translate-y-0.5 text-primary" />
         <h2 className="font-serif text-lg font-semibold text-ink">{title}</h2>

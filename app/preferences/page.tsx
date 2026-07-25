@@ -42,7 +42,7 @@ export default function PreferencesPage() {
 
   return (
     <AppShell requirePremium={false}>
-      <main className="mx-auto max-w-3xl px-5 py-8 sm:px-8 sm:py-10">
+      <main className="mx-auto max-w-5xl px-5 py-8 sm:px-8 sm:py-10">
         <div className="flex items-center gap-2 text-2xs font-semibold uppercase tracking-[0.14em] text-primary-ink">
           <SlidersHorizontal size={14} /> Preferences
         </div>
@@ -54,7 +54,8 @@ export default function PreferencesPage() {
         </div>
         <p className="mt-1 text-ink-2">Every practice session starts from these. Change anything — it saves instantly.</p>
 
-        <Section icon={MessageSquare} title="Practice defaults">
+        <div className="grid items-start gap-x-10 lg:grid-cols-2">
+        <Section icon={MessageSquare} title="Practice defaults" span2>
           <Row label="Focus"><Seg options={DOMAINS} value={prefs.domain} onPick={(v) => update({ domain: v })} /></Row>
           <Row label="Difficulty"><Seg options={DIFFS} value={prefs.difficulty} onPick={(v) => update({ difficulty: v })} /></Row>
           <Row label="Questions"><Seg options={COUNTS.map((n) => [String(n), String(n)])} value={String(prefs.count)} onPick={(v) => update({ count: Number(v) })} /></Row>
@@ -81,6 +82,8 @@ export default function PreferencesPage() {
           </p>
         </Section>
 
+        </div>
+
         <div className="mt-8 border-t pt-6" style={{ borderColor: "var(--border)" }}>
           <button onClick={reset} className="btn-ghost text-sm text-ink-2">
             <RotateCcw size={15} /> Reset to defaults
@@ -91,9 +94,9 @@ export default function PreferencesPage() {
   );
 }
 
-function Section({ icon: Icon, title, children }: { icon: typeof MessageSquare; title: string; children: React.ReactNode }) {
+function Section({ icon: Icon, title, span2, children }: { icon: typeof MessageSquare; title: string; span2?: boolean; children: React.ReactNode }) {
   return (
-    <section className="mt-8 border-t pt-6" style={{ borderColor: "var(--border)" }}>
+    <section className={cn("mt-8 border-t pt-6", span2 && "lg:col-span-2")} style={{ borderColor: "var(--border)" }}>
       <h2 className="mb-4 flex items-center gap-2 font-serif text-lg font-semibold text-ink">
         <Icon size={16} className="text-primary" /> {title}
       </h2>
