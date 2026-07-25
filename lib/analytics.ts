@@ -50,6 +50,7 @@ type Namespace =
   | "metrics"     // metrics:view
   | "job"         // job:role_change, job:practice
   | "prefs"       // prefs:update, prefs:reset
+  | "settings"    // settings:export
   | "tool";       // tool:run, tool:handoff
 
 export type MicroEvent = `${Namespace}:${string}`;
