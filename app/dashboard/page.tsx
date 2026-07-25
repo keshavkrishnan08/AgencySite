@@ -5,7 +5,7 @@ import Link from "next/link";
 import {
   ArrowRight, ArrowUpRight, Flame, Gauge, CalendarDays, MessageSquare,
   Sparkles, TrendingUp, Target as TargetIcon, Newspaper, Lightbulb, Loader2,
-  CheckCircle2, Circle, MapPin, Banknote, ListChecks,
+  CheckCircle2, Circle, MapPin, Banknote, ListChecks, Award, Activity, Trophy,
 } from "lucide-react";
 import { AppShell } from "@/components/layout/AppShell";
 import { ButtonLink } from "@/components/ui/Button";
@@ -13,6 +13,7 @@ import { AnimatedNumber } from "@/components/ui/AnimatedNumber";
 import { getOnboarding, getProfile, getSessions, getStreak, onStoreChange } from "@/lib/store";
 import { apiInsights, type CareerInsights } from "@/lib/client";
 import { computeMetrics } from "@/lib/metrics";
+import { contextSummary } from "@/lib/context";
 import { cn, formatDuration, formatDate, scoreColor } from "@/lib/utils";
 import type { Session, Streak } from "@/lib/types";
 
@@ -37,6 +38,7 @@ export default function DashboardPage() {
   const [role, setRole] = useState("");
   const [insights, setInsights] = useState<CareerInsights | null>(null);
   const [loadingInsights, setLoadingInsights] = useState(true);
+  const [summary, setSummary] = useState("");
 
   useEffect(() => {
     setMounted(true);
@@ -47,6 +49,7 @@ export default function DashboardPage() {
       const ob = getOnboarding();
       setName(p.name || "");
       setRole(p.targetRole || ob?.targetRole || "");
+      setSummary(contextSummary());
     };
     sync();
     return onStoreChange(sync);
@@ -133,6 +136,54 @@ export default function DashboardPage() {
             );
           })}
         </section>
+
+        {/* What your coach knows — the mega-context layer, surfaced. */}
+        {summary && (
+          <Link
+            href="/prep?tab=recent"
+            className="group flex items-center gap-3.5 rounded-2xl border p-4 transition-colors hover:border-primary sm:p-5"
+            style={{ borderColor: "var(--border)", background: "var(--primary-soft)" }}
+          >
+            <span className="grid h-10 w-10 shrink-0 place-items-center rounded-xl" style={{ background: "var(--surface)" }}>
+              <Sparkles size={18} className="text-primary-ink" />
+            </span>
+            <div className="min-w-0 flex-1">
+              <p className="text-2xs font-semibold uppercase tracking-wider text-primary-ink">What your coach knows about you</p>
+              <p className="mt-0.5 truncate text-sm text-ink">{summary}</p>
+            </div>
+            <ArrowRight size={17} className="shrink-0 text-primary-ink transition-transform group-hover:translate-x-0.5" />
+          </Link>
+        )}
+
+        {/* More stats — trajectory, consistency, next milestone */}
+        {m.hasData && (
+          <section className="grid gap-6 sm:grid-cols-2 lg:grid-cols-3">
+            <MiniCard icon={TrendingUp} title="Trajectory" tone="var(--primary)">
+              <StatRow label="Best score" value={String(m.bestScore)} />
+              <StatRow label="Net improvement" value={`${m.improvement >= 0 ? "+" : ""}${m.improvement}`} good={m.improvement >= 0} />
+              <StatRow label="Per session" value={`${m.pace >= 0 ? "+" : ""}${m.pace} pts`} sub={m.paceBasis} />
+            </MiniCard>
+            <MiniCard icon={Activity} title="Consistency" tone="var(--sage)">
+              <StatRow label="Show-up rate" value={`${m.consistency}%`} />
+              <StatRow label="Days active" value={String(m.daysActive)} />
+              <StatRow label="Best week" value={`${m.bestWeekSessions} sessions`} />
+            </MiniCard>
+            {m.nextMilestone ? (
+              <MiniCard icon={Trophy} title="Next milestone" tone="var(--amber)">
+                <p className="text-sm font-semibold text-ink">{m.nextMilestone.label}</p>
+                <p className="mt-0.5 text-xs text-ink-3">{m.nextMilestone.detail}</p>
+                <div className="mt-3 h-1.5 w-full overflow-hidden rounded-full" style={{ background: "var(--bg-sunk)" }}>
+                  <div className="h-full rounded-full" style={{ width: `${Math.round(m.nextMilestone.progress * 100)}%`, background: "var(--amber)" }} />
+                </div>
+                <p className="mt-1.5 text-2xs text-ink-3">{Math.round(m.nextMilestone.progress * 100)}% there</p>
+              </MiniCard>
+            ) : (
+              <MiniCard icon={Award} title="Milestones" tone="var(--amber)">
+                <p className="text-sm text-ink-2">Every milestone cleared. You&apos;re in rare company.</p>
+              </MiniCard>
+            )}
+          </section>
+        )}
 
         <div className="grid gap-6 lg:grid-cols-[1.5fr_1fr]">
           {/* Weekly market read */}
@@ -300,6 +351,44 @@ export default function DashboardPage() {
         )}
       </main>
     </AppShell>
+  );
+}
+
+/* A small stat card for the dashboard's secondary metric grid. Flat, weak
+   border, coloured icon chip — same language as the rest of the app. */
+function MiniCard({
+  icon: Icon,
+  title,
+  tone,
+  children,
+}: {
+  icon: typeof Award;
+  title: string;
+  tone: string;
+  children: React.ReactNode;
+}) {
+  return (
+    <section className="card p-6">
+      <div className="mb-3 flex items-center gap-2">
+        <span className="grid h-7 w-7 place-items-center rounded-lg" style={{ background: `color-mix(in srgb, ${tone} 14%, transparent)` }}>
+          <Icon size={15} style={{ color: tone }} />
+        </span>
+        <h3 className="text-sm font-semibold text-ink">{title}</h3>
+      </div>
+      <div className="space-y-2">{children}</div>
+    </section>
+  );
+}
+
+function StatRow({ label, value, sub, good }: { label: string; value: string; sub?: string; good?: boolean }) {
+  return (
+    <div className="flex items-baseline justify-between gap-3">
+      <span className="text-sm text-ink-2">{label}</span>
+      <span className={cn("font-mono text-sm font-semibold tabular-nums", good === undefined ? "text-ink" : good ? "text-sage-ink" : "text-coral-ink")}>
+        {value}
+        {sub && <span className="ml-1 font-sans text-2xs font-normal text-ink-3">{sub}</span>}
+      </span>
+    </div>
   );
 }
 

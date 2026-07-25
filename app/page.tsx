@@ -5,6 +5,7 @@ import { HeroDemo } from "@/components/landing/HeroDemo";
 import { ProductDemo } from "@/components/landing/ProductDemo";
 import { ProductFeatures } from "@/components/landing/features";
 import { FlowDiagram } from "@/components/landing/FlowDiagram";
+import { OperatingSystem } from "@/components/landing/OperatingSystem";
 import { FAQAccordion } from "@/components/landing/FAQAccordion";
 import { StickyCTA } from "@/components/landing/StickyCTA";
 import { Reveal } from "@/components/ui/Reveal";
@@ -565,6 +566,7 @@ export default function LandingPage() {
         <ProductFeatures />
         <FiveQuestions />
         <Numbers />
+        <OperatingSystem />
         <Comparison />
         <Pricing />
         <FAQ />
