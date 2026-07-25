@@ -3,6 +3,7 @@ import { recordUsage } from "@/lib/usage";
 import { NextResponse } from "next/server";
 import { callClaude, FAST_MODEL, hasAI } from "@/lib/ai";
 import { COACH_PERSONA, candidateBlock, EMPLOYER_REALISM, EMPLOYER_VOICE, ANTI_CANNED } from "@/lib/prompt";
+import { CONTEXT_LEGEND } from "@/lib/context-codec";
 
 export const runtime = "nodejs";
 export const dynamic = "force-dynamic";
@@ -14,6 +15,9 @@ Right now you are role-playing a real hiring manager for the candidate's job, mi
 ${EMPLOYER_REALISM}
 
 ${EMPLOYER_VOICE}
+
+${CONTEXT_LEGEND}
+Use it to push where they're weakest and reference where they are in their prep, without ever reading the facts back to them.
 
 ${ANTI_CANNED} If their answer was empty or too vague to follow up on, say (in character) that you didn't quite catch a real example and ask them to give you one specific time it happened.
 
@@ -49,7 +53,7 @@ export async function POST(req: Request) {
   } catch {
     return NextResponse.json({ error: "Bad request" }, { status: 400 });
   }
-  const { question = "", answer = "", targetRole = "", company = "", situation = "", interviewGap = "" } = body ?? {};
+  const { question = "", answer = "", targetRole = "", company = "", situation = "", interviewGap = "", context = "" } = body ?? {};
   if (!answer || answer.trim().length < 10) {
     return NextResponse.json({ followUp: fallback(answer || ""), source: "heuristic" });
   }
@@ -57,7 +61,8 @@ export async function POST(req: Request) {
   if (hasAI()) {
     try {
       const ctx = candidateBlock({ situation, targetRole, company, interviewGap });
-      const user = `${ctx}\n\nQuestion asked: ${question}\nTheir answer: "${answer.slice(0, 2000)}"`;
+      const mega = typeof context === "string" && context.trim() ? `\n\nCandidate context: ${context.slice(0, 1200)}` : "";
+      const user = `${ctx}${mega}\n\nQuestion asked: ${question}\nTheir answer: "${answer.slice(0, 2000)}"`;
       const text = await callClaude({ model: FAST_MODEL, system: SYSTEM, user, maxTokens: 220, temperature: 0.7 });
       const cleaned = text.trim().replace(/^["']|["']$/g, "");
       if (cleaned.length > 8) return NextResponse.json({ followUp: cleaned, source: "ai" });

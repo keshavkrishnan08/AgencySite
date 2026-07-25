@@ -16,6 +16,7 @@ import { AnswerScoreCard } from "@/components/practice/AnswerScoreCard";
 import { VoiceButton } from "@/components/ui/VoiceButton";
 import { InfoTip } from "@/components/ui/Tooltip";
 import { apiFollowUp, apiGenerateExample, apiGenerateQuestions, apiScoreAnswer } from "@/lib/client";
+import { encodedContext } from "@/lib/context";
 import { aggregateDimensions, computeOverall } from "@/lib/scoring";
 import {
   getOnboarding, getPredictedSet, getProfile, getSessions, saveSession,
@@ -443,6 +444,7 @@ function PracticeInner() {
         company: company.trim(),
         situation: situation || "",
         interviewGap: perso.current.interviewGap,
+        context: encodedContext(),
       })
         .then((fu) => {
           setFollowUp(fu);
