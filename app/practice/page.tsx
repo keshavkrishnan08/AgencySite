@@ -604,7 +604,7 @@ function PracticeInner() {
       <main className="pb-24">
       {/* In-session bar (progress + end), sits under the app nav */}
       <div className="sticky top-16 z-30 glass border-b" style={{ borderColor: "var(--border)" }}>
-        <div className="container-content flex h-14 items-center justify-between gap-4">
+        <div className="container-wide flex h-14 items-center justify-between gap-4">
           {(phase === "answer" || phase === "score") ? (
             <div className="flex flex-1 items-center justify-center gap-3">
               <span className="hidden text-sm font-medium text-ink-2 sm:inline">
@@ -636,7 +636,7 @@ function PracticeInner() {
         </div>
       </div>
 
-      <div className={cn(phase === "setup" || phase === "answer" ? "container-wide" : "container-content", "pt-10")}>
+      <div className={cn("container-wide", "pt-10")}>
         {/* role chip */}
         {(phase === "answer" || phase === "score") && (
           <div className="mb-6 flex flex-wrap items-center gap-2">
