@@ -113,19 +113,22 @@ export default function DashboardPage() {
           </ButtonLink>
         </header>
 
-        {/* Usage stats */}
-        <section className="grid gap-3 sm:grid-cols-2 lg:grid-cols-4">
-          {tiles.map((t) => {
+        {/* Usage stats — borderless, flat, segmented (Stripe balance-tile style) */}
+        <section
+          className="grid grid-cols-2 gap-x-6 gap-y-6 border-y py-6 lg:grid-cols-4"
+          style={{ borderColor: "var(--border)" }}
+        >
+          {tiles.map((t, i) => {
             const Icon = t.icon;
             return (
-              <div key={t.label} className="card p-5">
-                <div className="flex items-center gap-2 text-2xs font-semibold uppercase tracking-wider text-ink-3">
-                  <Icon size={14} style={{ color: t.tone }} /> {t.label}
+              <div key={t.label} className={cn(i > 0 && "lg:border-l lg:pl-6")} style={{ borderColor: "var(--border)" }}>
+                <div className="flex items-center gap-1.5 text-2xs font-semibold uppercase tracking-wider text-ink-3">
+                  <Icon size={13} style={{ color: t.tone }} /> {t.label}
                 </div>
-                <p className="mt-2 font-mono text-3xl font-semibold leading-none" style={{ color: t.tone }}>
+                <p className="mt-1.5 font-mono text-[2rem] font-semibold leading-none" style={{ color: t.tone }}>
                   <AnimatedNumber value={t.value} />
                 </p>
-                <p className="mt-2 text-xs text-ink-3">{t.sub}</p>
+                <p className="mt-1.5 text-xs text-ink-3">{t.sub}</p>
               </div>
             );
           })}
