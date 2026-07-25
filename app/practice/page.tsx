@@ -576,7 +576,7 @@ function PracticeInner() {
         </div>
       </div>
 
-      <div className="container-content pt-10">
+      <div className={cn(phase === "setup" ? "container-wide" : "container-content", "pt-10")}>
         {/* role chip */}
         {(phase === "answer" || phase === "score") && (
           <div className="mb-6 flex flex-wrap items-center gap-2">
@@ -999,7 +999,7 @@ function PracticeHub({
   }, []);
 
   return (
-    <div className="mx-auto max-w-4xl">
+    <div className="mx-auto w-full max-w-6xl">
       <div className="text-center">
         <span className="eyebrow">Practice studio</span>
         <h1 className="mt-2 font-serif text-3xl font-semibold text-ink sm:text-4xl">What do you want to work on?</h1>

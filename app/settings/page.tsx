@@ -292,8 +292,8 @@ function ToggleRow({ label, sub, on, onToggle }: { label: string; sub: string; o
         <p className="text-sm font-medium text-ink">{label}</p>
         <p className="mt-0.5 text-2xs leading-relaxed text-ink-3">{sub}</p>
       </div>
-      <button onClick={onToggle} role="switch" aria-checked={on} className="relative mt-0.5 h-6 w-11 shrink-0 rounded-full transition-colors" style={{ background: on ? "var(--primary)" : "var(--border-strong)" }}>
-        <span className={`absolute top-0.5 h-5 w-5 rounded-full bg-white shadow transition-transform ${on ? "translate-x-[22px]" : "translate-x-0.5"}`} />
+      <button onClick={onToggle} role="switch" aria-checked={on} className="relative inline-flex h-5 w-9 shrink-0 items-center rounded-full transition-colors" style={{ background: on ? "var(--primary)" : "var(--border-strong)" }}>
+        <span className="inline-block h-4 w-4 rounded-full bg-white shadow-sm transition-transform" style={{ transform: on ? "translateX(18px)" : "translateX(2px)" }} />
       </button>
     </div>
   );
