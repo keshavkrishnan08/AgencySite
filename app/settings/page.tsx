@@ -85,7 +85,7 @@ export default function SettingsPage() {
 
         <div className="mt-8 space-y-6">
           {/* Account */}
-          <section className="card p-7">
+          <section className="border-t pt-6" style={{ borderColor: "var(--border)" }}>
             <h2 className="mb-5 flex items-center gap-2 font-serif text-lg font-semibold text-ink">
               <User size={18} className="text-primary" /> Account
             </h2>
@@ -100,7 +100,7 @@ export default function SettingsPage() {
           </section>
 
           {/* Preferences */}
-          <section className="card p-7">
+          <section className="border-t pt-6" style={{ borderColor: "var(--border)" }}>
             <h2 className="mb-5 font-serif text-lg font-semibold text-ink">Preferences</h2>
             <div className="grid gap-4 sm:grid-cols-2">
               <Field label="Target role">
@@ -155,7 +155,7 @@ export default function SettingsPage() {
           </div>
 
           {/* Subscription */}
-          <section className="card p-7">
+          <section className="border-t pt-6" style={{ borderColor: "var(--border)" }}>
             <h2 className="mb-5 flex items-center gap-2 font-serif text-lg font-semibold text-ink">
               <CreditCard size={18} className="text-primary" /> Subscription
             </h2>
@@ -184,7 +184,7 @@ export default function SettingsPage() {
           </section>
 
           {/* Danger */}
-          <section className="card p-7" style={{ borderColor: "var(--coral-soft)" }}>
+          <section className="border-t pt-6" style={{ borderColor: "var(--border)" }}>
             <h2 className="mb-2 flex items-center gap-2 font-serif text-lg font-semibold text-coral-ink">
               <Trash2 size={18} /> Delete account
             </h2>
