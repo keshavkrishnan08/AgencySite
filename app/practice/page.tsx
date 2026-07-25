@@ -424,14 +424,37 @@ function PracticeInner() {
     }
     setScored(result);
     setSubmitting(false);
+    // Track the FULL speech + content profile of this answer, so every metric we
+    // capture (delivery + the anxiety tells + all five dimensions) is queryable
+    // in Mixpanel, not just the headline score.
+    const anx = result.anxiety;
+    const dl = result.delivery;
+    const sc = result.scores;
     track("practice:scored", {
       index: index + 1,
-      overall: result.scores?.overall ?? 0,
+      overall: sc?.overall ?? 0,
+      clarity: sc?.clarity ?? 0,
+      relevance: sc?.relevance ?? 0,
+      specificity: sc?.specificity ?? 0,
+      confidence: sc?.confidence ?? 0,
+      conciseness: sc?.conciseness ?? 0,
       words: result.wordCount,
+      wpm: dl?.wpm ?? 0,
+      durationSec: dl?.durationSec ?? 0,
+      pauseCount: dl?.pauseCount ?? 0,
+      longestPauseSec: dl?.longestPauseSec ?? 0,
+      fillers: anx?.fillerCount ?? 0,
+      hedges: anx?.hedgeCount ?? 0,
+      apologies: anx?.apologyCount ?? 0,
+      underminers: anx?.underminerCount ?? 0,
+      tells: anx?.total ?? 0,
+      category: current.category,
       source: result.source,
       spoken: Boolean(result.delivery),
     });
     mixpanelIncrement("answers_scored");
+    if (dl) mixpanelIncrement("spoken_answers");
+    if (anx) mixpanelIncrement("filler_words_total", anx.fillerCount || 0);
     window.scrollTo({ top: 0, behavior: "smooth" });
 
     setPhase("score");
@@ -503,7 +526,38 @@ function PracticeInner() {
       focusDimension: focusDim,
     };
     saveSession(session);
-    track("session_complete", { overall: session.overall, mode: session.mode, role, questions: finalAnswers.length });
+    // Session-level speech rollup: every delivery + tell metric summarised, so a
+    // funnel or profile in Mixpanel can slice on "sessions where fillers dropped".
+    const withDelivery = finalAnswers.filter((a) => a.delivery);
+    const sumBy = (f: (a: ScoredAnswer) => number) => finalAnswers.reduce((s, a) => s + (f(a) || 0), 0);
+    const totalWords = sumBy((a) => a.wordCount);
+    const avgWpm = withDelivery.length
+      ? Math.round(withDelivery.reduce((s, a) => s + (a.delivery?.wpm || 0), 0) / withDelivery.length)
+      : 0;
+    const fillers = sumBy((a) => a.anxiety?.fillerCount ?? 0);
+    const hedges = sumBy((a) => a.anxiety?.hedgeCount ?? 0);
+    const apologies = sumBy((a) => a.anxiety?.apologyCount ?? 0);
+    const underminers = sumBy((a) => a.anxiety?.underminerCount ?? 0);
+    track("session_complete", {
+      overall: session.overall,
+      mode: session.mode,
+      role,
+      questions: finalAnswers.length,
+      clarity: dimensions.clarity,
+      relevance: dimensions.relevance,
+      specificity: dimensions.specificity,
+      confidence: dimensions.confidence,
+      conciseness: dimensions.conciseness,
+      durationSec: session.durationSeconds,
+      words: totalWords,
+      avgWpm,
+      spokenAnswers: withDelivery.length,
+      fillers,
+      hedges,
+      apologies,
+      underminers,
+      tellsPer100: totalWords ? Math.round(((fillers + hedges + apologies + underminers) / totalWords) * 1000) / 10 : 0,
+    });
     mixpanelIncrement("sessions_completed");
     router.push(`/session/${session.id}`);
   };
