@@ -19,6 +19,7 @@ import { getProfile, getSessions, getStreak, getPrefs, getGoal, getLatestPredict
 import { computeMetrics } from "./metrics";
 import { getJobBreakdown, money } from "./job-insights";
 import { encodeContext, humanContextSummary, type UserContext } from "./context-codec";
+import { pushOverview } from "./cloud";
 
 /** Assemble the full, current context for the signed-in person. */
 export function buildContext(): UserContext {
@@ -110,5 +111,87 @@ export function contextSummary(): string {
     return humanContextSummary(buildContext());
   } catch {
     return "";
+  }
+}
+
+/* ---------------------------------------------------------------------------
+ * Standardized account overview.
+ *
+ * A fixed-shape, condensed snapshot saved to the user's account (Supabase). Same
+ * fields for everyone, every time, so it can be read back, compared, or shown
+ * without re-deriving anything. This is the durable, standardized face of the
+ * context layer: "117 questions, biggest weakness specificity, 3/week, ...".
+ * ------------------------------------------------------------------------ */
+
+export interface AccountOverview {
+  updatedAt: string;
+  sessions: number;
+  questionsAnswered: number;
+  readiness: number; // /100
+  percentile: number;
+  biggestWeakness: string | null;
+  topStrength: string | null;
+  avgSessionsPerWeek: number;
+  currentStreak: number;
+  longestStreak: number;
+  avgWpm: number;
+  tellsPer100: number;
+  targetRole: string;
+  company: string;
+  interviewDate: string | null;
+  /** The standardized one-line summary. */
+  line: string;
+}
+
+export function buildOverview(): AccountOverview {
+  const profile = getProfile();
+  const sessions = getSessions();
+  const streak = getStreak();
+  const goal = getGoal();
+  const m = computeMetrics(sessions, streak);
+
+  const weakest = m.weakest?.label ?? null;
+  const strongest = m.strongest?.label ?? null;
+  const readiness = Math.round(m.readiness);
+  const perWeek = m.hasData ? Math.round(m.cadence * 10) / 10 : 0;
+
+  const line = m.hasData
+    ? [
+        `${m.questionsAnswered} question${m.questionsAnswered === 1 ? "" : "s"} over ${m.sessionCount} session${m.sessionCount === 1 ? "" : "s"}`,
+        `readiness ${readiness}/100 (top ${m.topPercent}%)`,
+        weakest ? `biggest weakness ${weakest}` : null,
+        `${perWeek}/week`,
+        streak.current ? `${streak.current}-day streak` : null,
+      ]
+        .filter(Boolean)
+        .join(" · ")
+    : "No sessions yet";
+
+  return {
+    updatedAt: new Date().toISOString(),
+    sessions: m.sessionCount,
+    questionsAnswered: m.questionsAnswered,
+    readiness,
+    percentile: Math.round(m.percentile),
+    biggestWeakness: weakest,
+    topStrength: strongest,
+    avgSessionsPerWeek: perWeek,
+    currentStreak: streak.current,
+    longestStreak: streak.longest,
+    avgWpm: m.avgWpm,
+    tellsPer100: m.anxietyPer100,
+    targetRole: profile.targetRole || "",
+    company: profile.company || "",
+    interviewDate: goal.interviewDate || null,
+    line,
+  };
+}
+
+/** Build the standardized overview and persist it to the user's account. */
+export function persistOverview(): void {
+  try {
+    void pushOverview(buildOverview());
+  } catch {
+    /* never block the app */
   }
 }
