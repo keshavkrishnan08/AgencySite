@@ -31,25 +31,52 @@ export interface SubStatus {
 }
 
 /* Authoritative access for an account, straight from the subscription row.
-   Access if the sub is active/trialing OR still inside the paid period (so a
-   canceled-at-period-end user keeps access until their time runs out, then is
-   kicked). status "none" means no subscription row exists at all. */
+ *
+ * Access ONLY while the subscription is genuinely `active` or `trialing`.
+ *
+ * Why not "still inside current_period_end"? Because Stripe advances the billing
+ * period BEFORE it attempts the renewal charge — so the instant a renewal fails,
+ * `current_period_end` jumps to the next, UNPAID period while status flips to
+ * `past_due`/`canceled`. Trusting that date (the old logic) handed a non-paying
+ * user a full free period. https://docs.stripe.com/billing/subscriptions/overview
+ *
+ * The two "keep access at end of period" cases are still handled correctly:
+ *   - Voluntary cancel: Stripe keeps status = "active" (with cancel_at_period_end)
+ *     until the paid period actually ends, then fires subscription.deleted. So
+ *     the grace is covered by the `active` check — no date-trusting needed.
+ *   - Trial: status = "trialing" → access.
+ *
+ * Involuntary (card fails): the paid period has ended, so access ends — with an
+ * optional short dunning grace so a card that just needs a retry isn't cut mid-
+ * dunning. DUNNING_GRACE_DAYS (default 3) bounds it; set 0 for a hard cut.
+ * status "none" means no subscription row exists at all. */
 export async function subscriptionStatus(email: string): Promise<SubStatus> {
   const db = supabaseAdmin();
   if (!db || !email) return { premium: false, status: "none", until: null, interval: null };
   const { data } = await db
     .from("subscriptions")
-    .select("status, current_period_end, interval")
+    .select("status, current_period_end, interval, updated_at")
     .eq("email", email)
     .order("updated_at", { ascending: false })
     .limit(1)
     .maybeSingle();
   if (!data) return { premium: false, status: "none", until: null, interval: null };
-  const active = data.status === "active" || data.status === "trialing";
-  const withinPeriod = data.current_period_end ? new Date(data.current_period_end) > new Date() : false;
+
+  const status: string = data.status;
+  const active = status === "active" || status === "trialing";
+
+  // Short dunning grace on past_due only (never on canceled/unpaid). Bounded by
+  // the last event time, so it covers Stripe's retry window and cuts once Stripe
+  // gives up (which flips status to canceled/unpaid and drops `active` anyway).
+  const graceDays = Number(process.env.DUNNING_GRACE_DAYS ?? "3");
+  const inGrace =
+    status === "past_due" && graceDays > 0 && data.updated_at
+      ? Date.now() - new Date(data.updated_at as string).getTime() < graceDays * 86400000
+      : false;
+
   return {
-    premium: active || withinPeriod,
-    status: data.status,
+    premium: active || inGrace,
+    status,
     until: data.current_period_end ?? null,
     interval: data.interval ?? null,
   };
