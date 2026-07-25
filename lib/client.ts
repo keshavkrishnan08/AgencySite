@@ -143,3 +143,29 @@ export async function apiGenerateExample(
   }
   return exampleAnswer(question, targetRole, category);
 }
+
+export interface CareerInsights {
+  market: string;
+  skills: string[];
+  outlook: string;
+  tip: string;
+}
+
+/* Weekly career insights for the dashboard. Cheap by design; the dashboard
+   caches the result per ISO week so this runs about once a week per user. */
+export async function apiInsights(args: { role: string; industry?: string }): Promise<CareerInsights | null> {
+  try {
+    const res = await fetch("/api/insights", {
+      method: "POST",
+      headers: aiHeaders(),
+      body: JSON.stringify(args),
+    });
+    if (res.ok) {
+      const data = await res.json();
+      if (data?.insights) return data.insights as CareerInsights;
+    }
+  } catch {
+    /* dashboard renders without insights */
+  }
+  return null;
+}

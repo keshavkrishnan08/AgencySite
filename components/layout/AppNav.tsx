@@ -10,11 +10,12 @@ import { PremiumBadge } from "@/components/ui/PremiumBadge";
 import { cn } from "@/lib/utils";
 import { getProfile, getStreak, isPremium, onStoreChange } from "@/lib/store";
 
-/* Four destinations, no dropdown. One thing to do (Practice), one place to see
-   how it's going (Metrics), and the two builders that feed the practice loop. */
+/* The overview (Dashboard), the one thing to do (Practice), the deep numbers
+   (Analytics), and the two builders that feed the practice loop. */
 const NAV = [
-  { href: "/dashboard", label: "Metrics" },
+  { href: "/dashboard", label: "Dashboard" },
   { href: "/practice", label: "Practice" },
+  { href: "/analytics", label: "Analytics" },
   { href: "/tools/question-predictor", label: "Question Predictor" },
   { href: "/tools/gap-story", label: "Gap Story" },
 ];
