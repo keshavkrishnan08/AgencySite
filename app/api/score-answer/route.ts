@@ -83,7 +83,18 @@ export async function POST(req: Request) {
     interviewGap = "",
     weakestDimension = "",
     recentAverage = 0,
+    lengthTarget = "",
   } = body ?? {};
+
+  // The answer length the candidate is aiming for (set in the Session Builder).
+  // Feeds the conciseness judgment so a deliberately short answer isn't dinged
+  // for being short — and a rambling one is, against the band they chose.
+  const LENGTH_HINT: Record<string, string> = {
+    short: "\nThey are aiming for a SHORT answer (about 40-80 words). Reward tight, punchy answers; only flag conciseness if they ramble well past that.",
+    medium: "\nThey are aiming for a MEDIUM answer (about 60-150 words).",
+    long: "\nThey are aiming for a LONGER, detailed answer (about 120-220 words). Don't penalise length here as long as it stays on point.",
+  };
+  const lengthLine = LENGTH_HINT[String(lengthTarget)] || "";
 
   if (typeof answer !== "string" || answer.trim().length === 0) {
     return NextResponse.json({ error: "Empty answer" }, { status: 400 });
@@ -98,7 +109,7 @@ export async function POST(req: Request) {
   // category) — NOT on the candidate's history. So the same answer earns the same
   // grade in every session, regardless of their averages. Comparison to past
   // performance is layered on separately (deterministically) by the UI.
-  const cacheKey = hashKey([question, answer, targetRole, situation, category].join("||"));
+  const cacheKey = hashKey([question, answer, targetRole, situation, category, lengthTarget].join("||"));
   const cached = scoreCache.get(cacheKey);
   if (cached) {
     return NextResponse.json({
@@ -111,7 +122,7 @@ export async function POST(req: Request) {
   if (hasAI()) {
     try {
       const ctx = candidateBlock({ name, situation, targetRole, company, interviewGap, weakestDimension, recentAverage });
-      const user = `${ctx}\n\nQuestion (${category}): ${question}\n\nTheir answer:\n"""${answer.slice(0, 4000)}"""`;
+      const user = `${ctx}${lengthLine}\n\nQuestion (${category}): ${question}\n\nTheir answer:\n"""${answer.slice(0, 4000)}"""`;
       // Haiku + temperature 0: cheap, and the strict rubric (not the model tier)
       // is what makes the same answer grade the same way every session.
       // maxTokens kept low because the contract is just scores + brief fixes.
