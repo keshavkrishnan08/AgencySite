@@ -27,7 +27,7 @@ import { ButtonLink } from "@/components/ui/Button";
 import { ScoreRing } from "@/components/ui/Score";
 import { InfoTip } from "@/components/ui/Tooltip";
 import { AnimatedNumber } from "@/components/ui/AnimatedNumber";
-import { DistributionBars, ProjectionChart, Sparkline } from "@/components/charts/Charts";
+import { DistributionBars, ProgressLineChart, ProjectionChart, Sparkline } from "@/components/charts/Charts";
 import { getProfile, getSessions, getStreak, onStoreChange } from "@/lib/store";
 import { setContext, track } from "@/lib/analytics";
 import {
@@ -125,6 +125,7 @@ export default function DashboardPage() {
         <Headline m={m} />
         <KpiStrip m={m} />
         <Trajectory m={m} />
+        <VolumeTrend sessions={sessions} m={m} />
 
         <div className="grid gap-6 lg:grid-cols-[1.55fr_1fr]">
           <div className="space-y-6">
@@ -451,6 +452,108 @@ function Trajectory({ m }: { m: Metrics }) {
   );
 }
 
+/* ============================ Practice volume ============================
+   Performance is only half the story — this is the OTHER half: how much you
+   actually show up. Volume (sessions + questions) over the last eight weeks,
+   toggleable, next to the streak/consistency numbers. */
+
+function VolumeTrend({ sessions, m }: { sessions: Session[]; m: Metrics }) {
+  const [metric, setMetric] = useState<"sessions" | "questions">("sessions");
+  const weeks = useMemo(() => {
+    const now = Date.now();
+    const out: { label: string; sessions: number; questions: number }[] = [];
+    for (let w = 7; w >= 0; w--) {
+      const end = now - w * 7 * 86400000;
+      const start = end - 7 * 86400000;
+      const inWeek = sessions.filter((s) => {
+        const t = +new Date(s.createdAt);
+        return t > start && t <= end;
+      });
+      out.push({
+        label: w === 0 ? "Now" : `${w}w`,
+        sessions: inWeek.length,
+        questions: inWeek.reduce((n, s) => n + (s.answers?.length || 0), 0),
+      });
+    }
+    return out;
+  }, [sessions]);
+  const max = Math.max(1, ...weeks.map((w) => w[metric]));
+  const totalThis = weeks.reduce((n, w) => n + w[metric], 0);
+
+  return (
+    <section className="card p-7">
+      <div className="mb-1 flex flex-wrap items-center justify-between gap-3">
+        <div>
+          <h2 className="flex items-center gap-1.5 font-serif text-lg font-semibold text-ink">
+            Practice volume
+            <InfoTip title="Why volume matters">
+              Scores measure how well you answer; volume measures how often you practice. Reps are what move the score.
+              This is your last eight weeks.
+            </InfoTip>
+          </h2>
+          <p className="mt-0.5 text-sm text-ink-2">
+            {totalThis} {metric} in the last 8 weeks · {m.cadence.toFixed(1)}× a week on average.
+          </p>
+        </div>
+        <div className="flex gap-1 rounded-full bg-bg-tint p-1">
+          {(["sessions", "questions"] as const).map((v) => (
+            <button
+              key={v}
+              onClick={() => { setMetric(v); track("ui:click", { label: "volume_metric", value: v }); }}
+              className={cn(
+                "rounded-full px-3 py-1 text-xs font-medium capitalize transition-colors",
+                metric === v ? "bg-white text-ink shadow-xs" : "text-ink-2 hover:text-ink"
+              )}
+            >
+              {v}
+            </button>
+          ))}
+        </div>
+      </div>
+
+      <div className="mt-5 flex h-36 items-end gap-2 sm:gap-3">
+        {weeks.map((w) => {
+          const val = w[metric];
+          return (
+            <div key={w.label} className="flex flex-1 flex-col items-center gap-1.5">
+              <span className="font-mono text-2xs font-semibold text-ink-3">{val || ""}</span>
+              <div
+                className="w-full rounded-t-md transition-all duration-500"
+                style={{
+                  height: `${(val / max) * 100}%`,
+                  minHeight: val ? 6 : 2,
+                  background: val
+                    ? "linear-gradient(180deg, var(--primary-bright), var(--primary))"
+                    : "var(--bg-tint)",
+                }}
+                title={`${val} ${metric} · week of ${w.label}`}
+              />
+              <span className="text-2xs text-ink-3">{w.label}</span>
+            </div>
+          );
+        })}
+      </div>
+
+      <div className="mt-6 grid grid-cols-2 gap-3 sm:grid-cols-4">
+        <VolStat label="Total sessions" value={`${m.sessionCount}`} />
+        <VolStat label="Questions answered" value={`${m.questionsAnswered}`} />
+        <VolStat label="Best week" value={`${m.bestWeekSessions}`} sub="sessions" />
+        <VolStat label="This week" value={`${m.sessionsThisWeek}`} sub={weekHint(m.weekDelta)} />
+      </div>
+    </section>
+  );
+}
+
+function VolStat({ label, value, sub }: { label: string; value: string; sub?: string }) {
+  return (
+    <div className="rounded-xl bg-bg-sunk p-4">
+      <p className="text-2xs font-semibold uppercase tracking-wider text-ink-3">{label}</p>
+      <p className="mt-1 font-mono text-2xl font-semibold text-ink">{value}</p>
+      {sub && <p className="mt-0.5 text-2xs text-ink-3">{sub}</p>}
+    </div>
+  );
+}
+
 /* ============================ Skills ============================ */
 
 function SkillBreakdown({ m }: { m: Metrics }) {
@@ -459,12 +562,13 @@ function SkillBreakdown({ m }: { m: Metrics }) {
       <h2 className="flex items-center gap-1.5 font-serif text-lg font-semibold text-ink">
         Skill breakdown
         <InfoTip title="Your five scores">
-          Every answer is scored on clarity, relevance, specificity, confidence and conciseness. Tap any row to drill
-          that one on its own.
+          Every answer is scored on clarity, relevance, specificity, confidence and conciseness. Tap any row to open its
+          full trend, then drill it on its own.
         </InfoTip>
       </h2>
       <p className="mt-0.5 text-sm text-ink-2">
-        Current score is the average of your last three sessions, so one bad night doesn&apos;t swing it.
+        Current score is the average of your last three sessions, so one bad night doesn&apos;t swing it. Tap a row to
+        expand its history.
       </p>
 
       <div className="mt-5 space-y-2">
@@ -485,14 +589,17 @@ function SkillBreakdown({ m }: { m: Metrics }) {
 }
 
 function SkillRow({ d }: { d: DimensionMetric }) {
+  const [open, setOpen] = useState(false);
+  const series = d.series.length > 1 ? d.series : [d.current, d.current];
   return (
-    <Link
-      href={`/practice?focus=${d.key}`}
-      onClick={() => track("ui:click", { label: "skill_drill", dimension: d.key, score: d.current })}
-      className="group block rounded-xl border p-4 transition-all hover:-translate-y-0.5 hover:shadow-sm"
-      style={{ borderColor: "var(--border)" }}
+    <div
+      className="overflow-hidden rounded-xl border transition-colors"
+      style={{ borderColor: open ? "var(--primary)" : "var(--border)" }}
     >
-      <div className="flex items-center gap-4">
+      <button
+        onClick={() => { setOpen((o) => !o); track("ui:click", { label: "skill_expand", dimension: d.key, open: String(!open) }); }}
+        className="group flex w-full items-center gap-4 p-4 text-left"
+      >
         <span
           className="grid h-9 w-9 shrink-0 place-items-center rounded-full font-mono text-2xs font-bold text-white"
           style={{ background: scoreColor(d.current) }}
@@ -507,7 +614,7 @@ function SkillRow({ d }: { d: DimensionMetric }) {
           <p className="truncate text-xs text-ink-3">{d.blurb}</p>
         </div>
         <div className="hidden sm:block">
-          <Sparkline values={d.series.length > 1 ? d.series : [d.current, d.current]} width={130} height={30} />
+          <Sparkline values={series} width={130} height={30} />
         </div>
         <span
           className={cn(
@@ -519,21 +626,43 @@ function SkillRow({ d }: { d: DimensionMetric }) {
           {d.delta >= 0 ? "+" : ""}
           {d.delta}
         </span>
-        <ChevronRight size={16} className="shrink-0 text-ink-3 transition-transform group-hover:translate-x-0.5" />
-      </div>
-      <div className="mt-3 flex flex-wrap items-center gap-x-5 gap-y-1 pl-13 text-2xs text-ink-3">
-        <span>
-          Top <strong className="font-semibold text-ink-2">{d.topPercent}%</strong>
-        </span>
-        <span>
-          Best <strong className="font-semibold text-ink-2">{d.best}</strong>
-        </span>
-        <span>
-          Pace <strong className="font-semibold text-ink-2">{d.pace >= 0 ? "+" : ""}{d.pace}</strong>/session
-        </span>
-        <span>{projectionLabel(d.toReady)}</span>
-      </div>
-    </Link>
+        <ChevronRight size={16} className={cn("shrink-0 text-ink-3 transition-transform", open && "rotate-90")} />
+      </button>
+
+      {/* Drill-down sub-graph: this one dimension's full history + its stats. */}
+      {open && (
+        <div className="border-t px-4 pb-5 pt-4" style={{ borderColor: "var(--border)" }}>
+          <p className="mb-1 text-2xs font-semibold uppercase tracking-wider text-ink-3">
+            {d.label} · score by session
+          </p>
+          <ProgressLineChart data={series.map((v, i) => ({ label: `#${i + 1}`, score: v }))} height={170} />
+          <div className="mt-3 grid grid-cols-2 gap-3 sm:grid-cols-4">
+            <MiniStat label="Top %" value={`${d.topPercent}%`} />
+            <MiniStat label="Best" value={`${d.best}`} />
+            <MiniStat label="Pace" value={`${d.pace >= 0 ? "+" : ""}${d.pace}/s`} />
+            <MiniStat label="To ready" value={projectionLabel(d.toReady)} />
+          </div>
+          <ButtonLink
+            href={`/practice?focus=${d.key}&autostart=1`}
+            variant="secondary"
+            size="sm"
+            className="mt-4 w-full"
+            onClick={() => track("ui:click", { label: "skill_drill", dimension: d.key, score: d.current })}
+          >
+            Drill {d.label.toLowerCase()} <ArrowRight size={14} />
+          </ButtonLink>
+        </div>
+      )}
+    </div>
+  );
+}
+
+function MiniStat({ label, value }: { label: string; value: string }) {
+  return (
+    <div className="rounded-lg bg-bg-sunk px-3 py-2">
+      <p className="text-2xs font-semibold uppercase tracking-wider text-ink-3">{label}</p>
+      <p className="mt-0.5 font-mono text-sm font-semibold text-ink">{value}</p>
+    </div>
   );
 }
 

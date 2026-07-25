@@ -393,7 +393,11 @@ const CATEGORY_LABEL: Record<string, string> = {
   closer: "Closing",
   focus: "Focus drill",
   situational: "Situational",
+  situation: "Situational",
+  leadership: "Leadership",
   technical: "Role knowledge",
+  story: "Storytelling",
+  speech: "Speaking drill",
 };
 
 /* ---------------------------------------------------------------------------
