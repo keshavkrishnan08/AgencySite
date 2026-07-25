@@ -499,20 +499,22 @@ function DailyUsage({ activity }: { activity: { dateISO: string; count: number; 
   const dow = (iso: string) => new Date(iso + "T00:00:00").toLocaleDateString("en-US", { weekday: "narrow" });
   return (
     <div>
-      <div className="flex h-[180px] items-end gap-1.5">
+      {/* items-stretch + h-full columns so the flex-1 bar area has real height
+          (items-end collapses it, which blanked the chart). */}
+      <div className="flex h-[180px] items-stretch gap-1.5">
         {activity.map((a) => (
-          <div key={a.dateISO} className="flex flex-1 flex-col items-center gap-1.5" title={`${a.dateISO}: ${a.count} session${a.count === 1 ? "" : "s"}`}>
+          <div key={a.dateISO} className="flex h-full flex-1 flex-col items-center gap-1.5" title={`${a.dateISO}: ${a.count} session${a.count === 1 ? "" : "s"}`}>
             <div className="flex w-full flex-1 items-end">
               <div
                 className="w-full rounded-md transition-all"
                 style={{
-                  height: `${a.count ? Math.max(8, (a.count / max) * 100) : 3}%`,
-                  background: a.count ? "var(--primary)" : "var(--bg-sunk)",
-                  opacity: a.count ? 1 : 0.7,
+                  height: `${a.count ? Math.max(8, (a.count / max) * 100) : 4}%`,
+                  background: a.count ? "#06b6d4" : "var(--bg-sunk)",
+                  opacity: a.count ? 1 : 0.8,
                 }}
               />
             </div>
-            <span className="text-[0.6rem] text-ink-3">{dow(a.dateISO)}</span>
+            <span className="shrink-0 text-[0.6rem] text-ink-3">{dow(a.dateISO)}</span>
           </div>
         ))}
       </div>
