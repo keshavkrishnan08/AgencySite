@@ -23,6 +23,11 @@ const DEFAULT_OPENAI = "gpt-4o-mini";
 const minOpenAI = (m?: string | null): string => (!m || !/mini|nano/i.test(m) ? DEFAULT_OPENAI : m);
 const OPENAI_MODEL = minOpenAI(process.env.OPENAI_MODEL);
 
+// Cheapest high-quality OpenAI transcription model. Overridable, but never a
+// pricier tier by default. gpt-4o-mini-transcribe ~= $0.003/min, near-Whisper-large quality.
+export const TRANSCRIBE_MODEL = process.env.OPENAI_TRANSCRIBE_MODEL || "gpt-4o-mini-transcribe";
+export const hasTranscription = (): boolean => Boolean(process.env.OPENAI_API_KEY);
+
 const useOpenAI = () => Boolean(process.env.OPENAI_API_KEY);
 
 export function hasAI(): boolean {
@@ -77,6 +82,8 @@ interface CallOpts {
 
 // Provider-agnostic call. Prefers OpenAI (gpt-4o-mini) when its key is set,
 // else Anthropic (Haiku). Same minimal-model, low-cost policy on both sides.
+// Robustness: if OpenAI is preferred but errors, and an Anthropic key exists,
+// we fall back to Anthropic rather than failing the request.
 export async function callClaude({
   system,
   user,
@@ -86,7 +93,13 @@ export async function callClaude({
   seed,
 }: CallOpts): Promise<string> {
   if (useOpenAI()) {
-    return callOpenAI(system, user, maxTokens, temperature, seed);
+    try {
+      return await callOpenAI(system, user, maxTokens, temperature, seed);
+    } catch (e) {
+      // No Anthropic key to fall back to: surface the original error.
+      if (!process.env.ANTHROPIC_API_KEY) throw e;
+      // Otherwise fall through to the Anthropic path below.
+    }
   }
   const res = await getClient().messages.create({
     model: minModel(model), // never Opus, always at least Haiku

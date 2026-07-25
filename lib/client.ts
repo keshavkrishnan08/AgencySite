@@ -4,6 +4,7 @@ import { scoreAnswer as localScore } from "./scoring";
 import { exampleAnswer } from "./examples";
 import { generateQuestions as localQuestions, generateFocusQuestions } from "./questions";
 import type { Dimension, Question, ScoredAnswer, Situation } from "./types";
+import type { JobFamily } from "./job-insights";
 
 /* Client helpers that call the API routes, with a local fallback so the
    product keeps working even if the network/route is unavailable. */
@@ -100,6 +101,23 @@ export async function apiScoreAnswer(
     ...local,
     exampleAnswer: withExample ? exampleAnswer(args.question, args.targetRole, args.category) : "",
   };
+}
+
+/** Dynamic AI job breakdown for any role. Returns null on failure so the caller
+    can keep the static family it already rendered. */
+export async function apiJobBreakdown(role: string, seniority?: string): Promise<JobFamily | null> {
+  try {
+    const res = await fetch("/api/job-breakdown", {
+      method: "POST",
+      headers: aiHeaders(),
+      body: JSON.stringify({ role, seniority: seniority || "" }),
+    });
+    if (!res.ok) return null;
+    const data = await res.json();
+    return (data?.family as JobFamily) ?? null;
+  } catch {
+    return null;
+  }
 }
 
 export async function apiFollowUp(args: {

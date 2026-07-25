@@ -5,12 +5,20 @@ import { Mic, MicOff, Loader2 } from "lucide-react";
 import { cn } from "@/lib/utils";
 import type { DeliveryMetrics } from "@/lib/types";
 import { whisperSupported, blobToPcm16k, transcribePcm, preloadWhisper } from "@/lib/whisper";
+import { transcribeViaServer } from "@/lib/transcribe";
 
-/* Voice input. Primary engine is on-device Whisper (transformers.js): the audio
-   never leaves the browser and there is no API key. We record with the mic,
-   measure delivery live (volume, pace, pauses), then transcribe on-device. If
-   Whisper can't run (old browser, blocked CDN), we fall back to the browser's
-   Web Speech API so voice still works. */
+/* Voice input. We record with the mic and measure delivery live (volume, pace,
+   pauses), then transcribe with a robust fallback chain:
+     1. OpenAI (gpt-4o-mini-transcribe) via /api/transcribe — best, most
+        consistent quality; used whenever a key is configured.
+     2. On-device Whisper (transformers.js) — free, private, no key.
+     3. Web Speech API — last resort so voice always works.
+   Each step falls through to the next on failure, so voice never hard-fails. */
+
+function mediaRecordSupported(): boolean {
+  if (typeof window === "undefined") return false;
+  return Boolean(navigator.mediaDevices?.getUserMedia) && typeof MediaRecorder !== "undefined";
+}
 
 /* eslint-disable @typescript-eslint/no-explicit-any */
 declare global {
@@ -38,7 +46,7 @@ export function VoiceButton({
   compact?: boolean;
   tone?: "light" | "dark";
 }) {
-  const [engine, setEngine] = useState<"whisper" | "webspeech">("webspeech");
+  const [engine, setEngine] = useState<"record" | "webspeech">("webspeech");
   const [phase, setPhase] = useState<Phase>("idle");
   const [status, setStatus] = useState(""); // e.g. "Loading voice model… 42%"
   const [micBlocked, setMicBlocked] = useState(false);
@@ -63,7 +71,9 @@ export function VoiceButton({
   const wsEmittedRef = useRef(false);
 
   useEffect(() => {
-    if (whisperSupported()) setEngine("whisper");
+    // Prefer the record-then-transcribe path whenever the mic is usable; that
+    // path tries OpenAI first and on-device Whisper second.
+    if (mediaRecordSupported()) setEngine("record");
     setWebSpeechAvailable(Boolean(window.SpeechRecognition || window.webkitSpeechRecognition));
     return () => cleanupWhisper();
     // eslint-disable-next-line react-hooks/exhaustive-deps
@@ -79,7 +89,7 @@ export function VoiceButton({
     audioCtxRef.current = null;
   };
 
-  const startWhisper = async () => {
+  const startRecord = async () => {
     setMicBlocked(false);
     let stream: MediaStream;
     try {
@@ -129,12 +139,14 @@ export function VoiceButton({
     const mr = new MediaRecorder(stream);
     recorderRef.current = mr;
     mr.ondataavailable = (e) => { if (e.data.size) chunksRef.current.push(e.data); };
-    mr.onstop = finishWhisper;
+    mr.onstop = finishRecord;
     mr.start();
     setPhase("rec");
   };
 
-  const finishWhisper = async () => {
+  // Transcribe the recorded answer. Chain: OpenAI (server) -> on-device Whisper.
+  // Whichever returns text first wins; delivery metrics are computed either way.
+  const finishRecord = async () => {
     cancelAnimationFrame(rafRef.current);
     const durationSec = (performance.now() - recStartRef.current) / 1000;
     cleanupWhisper();
@@ -142,38 +154,52 @@ export function VoiceButton({
     const blob = new Blob(chunksRef.current, { type });
     if (!blob.size) { setPhase("idle"); return; }
     setPhase("transcribing");
-    setStatus("");
-    try {
-      const pcm = await blobToPcm16k(blob);
-      const text = await transcribePcm(pcm, (p) => {
-        if (p?.status === "progress" && typeof p.progress === "number") {
-          setStatus(`Loading voice model… ${Math.round(p.progress)}%`);
-        } else {
-          setStatus("Transcribing…");
-        }
+    setStatus("Transcribing…");
+
+    const emit = (clean: string) => {
+      onTranscript(clean);
+      const words = clean.split(/\s+/).filter(Boolean).length;
+      onDelivery?.({
+        durationSec: Math.round(durationSec),
+        wordCount: words,
+        wpm: durationSec > 0 ? Math.round(words / (durationSec / 60)) : 0,
+        pauseCount: pauseCountRef.current,
+        longestPauseSec: Math.round(longestPauseRef.current),
       });
-      const clean = (text || "").trim();
-      if (clean) {
-        onTranscript(clean);
-        const words = clean.split(/\s+/).filter(Boolean).length;
-        onDelivery?.({
-          durationSec: Math.round(durationSec),
-          wordCount: words,
-          wpm: durationSec > 0 ? Math.round(words / (durationSec / 60)) : 0,
-          pauseCount: pauseCountRef.current,
-          longestPauseSec: Math.round(longestPauseRef.current),
-        });
+    };
+
+    try {
+      // 1) OpenAI server transcription (best quality). null => not configured or failed.
+      const server = await transcribeViaServer(blob);
+      if (server && server.trim()) {
+        emit(server.trim());
+        return;
       }
+      // 2) On-device Whisper fallback.
+      if (whisperSupported()) {
+        const pcm = await blobToPcm16k(blob);
+        const text = await transcribePcm(pcm, (p) => {
+          if (p?.status === "progress" && typeof p.progress === "number") {
+            setStatus(`Loading voice model… ${Math.round(p.progress)}%`);
+          } else {
+            setStatus("Transcribing…");
+          }
+        });
+        const clean = (text || "").trim();
+        if (clean) { emit(clean); return; }
+      }
+      // 3) Nothing worked here; use Web Speech next time.
+      setEngine("webspeech");
     } catch {
-      setEngine("webspeech"); // on-device failed; use Web Speech next time
+      setEngine("webspeech");
     } finally {
       setPhase("idle");
       setStatus("");
     }
   };
 
-  const stopWhisper = () => {
-    try { recorderRef.current?.stop(); } catch { /* triggers finishWhisper */ }
+  const stopRecord = () => {
+    try { recorderRef.current?.stop(); } catch { /* triggers finishRecord */ }
   };
 
   /* ---------------- Web Speech (fallback) ---------------- */
@@ -250,7 +276,9 @@ export function VoiceButton({
   // transcription isn't a cold download. Runs once, only for the Whisper engine.
   const preloadedRef = useRef(false);
   const warm = () => {
-    if (preloadedRef.current || engine !== "whisper") return;
+    // Warm the on-device model only as a fallback; harmless if OpenAI ends up
+    // handling the transcription.
+    if (preloadedRef.current || engine !== "record" || !whisperSupported()) return;
     preloadedRef.current = true;
     preloadWhisper().catch(() => {});
   };
@@ -258,10 +286,10 @@ export function VoiceButton({
   const onClick = () => {
     if (phase === "transcribing") return;
     if (phase === "rec") {
-      engine === "whisper" ? stopWhisper() : stopWebSpeech();
+      engine === "record" ? stopRecord() : stopWebSpeech();
       return;
     }
-    engine === "whisper" ? startWhisper() : startWebSpeech();
+    engine === "record" ? startRecord() : startWebSpeech();
   };
 
   if (micBlocked) {

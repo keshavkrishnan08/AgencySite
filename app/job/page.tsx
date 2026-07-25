@@ -4,12 +4,13 @@ import { useEffect, useMemo, useState } from "react";
 import Link from "next/link";
 import {
   Briefcase, Search, ArrowRight, CheckCircle2, AlertTriangle, DollarSign,
-  ListChecks, Layers, Target,
+  ListChecks, Layers, Target, Sparkles, Loader2,
 } from "lucide-react";
 import { AppShell } from "@/components/layout/AppShell";
 import { ButtonLink } from "@/components/ui/Button";
 import { getOnboarding, getProfile, setProfile, getPrefs } from "@/lib/store";
-import { getJobBreakdown, money } from "@/lib/job-insights";
+import { getJobBreakdown, money, type JobFamily } from "@/lib/job-insights";
+import { apiJobBreakdown } from "@/lib/client";
 import { QUESTION_BANK } from "@/lib/question-bank";
 import { ROLES } from "@/lib/roles";
 import { track } from "@/lib/analytics";
@@ -32,7 +33,36 @@ export default function JobPage() {
     setRole(p.targetRole || ob?.targetRole || "Office Manager");
   }, []);
 
-  const { family } = useMemo(() => getJobBreakdown(role, getPrefs().seniority), [role]);
+  // Static family renders instantly; the AI breakdown (dynamic for ANY role,
+  // real pay + real process) replaces it when it arrives, cached per role.
+  const staticFamily = useMemo(() => getJobBreakdown(role, getPrefs().seniority).family, [role]);
+  const [aiFamily, setAiFamily] = useState<JobFamily | null>(null);
+  const [loadingBreakdown, setLoadingBreakdown] = useState(false);
+  const family = aiFamily ?? staticFamily;
+
+  useEffect(() => {
+    if (!role) return;
+    const seniority = getPrefs().seniority || "";
+    const key = `pp:jobai:${role.toLowerCase()}|${seniority}`.slice(0, 160);
+    setAiFamily(null); // show the static family immediately for the new role
+    try {
+      const cached = localStorage.getItem(key);
+      if (cached) { setAiFamily(JSON.parse(cached)); return; }
+    } catch { /* ignore */ }
+    let alive = true;
+    setLoadingBreakdown(true);
+    apiJobBreakdown(role, seniority)
+      .then((fam) => {
+        if (!alive) return;
+        if (fam) {
+          setAiFamily(fam);
+          try { localStorage.setItem(key, JSON.stringify(fam)); } catch { /* quota */ }
+        }
+      })
+      .finally(() => { if (alive) setLoadingBreakdown(false); });
+    return () => { alive = false; };
+  }, [role]);
+
   const suggestions = useMemo(() => {
     const q = query.trim().toLowerCase();
     if (q.length < 2) return [];
@@ -66,7 +96,22 @@ export default function JobPage() {
           <Briefcase size={14} /> Job breakdown
         </div>
         <h1 className="mt-2 font-serif text-3xl font-semibold text-ink sm:text-4xl">{role}</h1>
-        <p className="mt-1 text-ink-2">{family.label} · {family.blurb}</p>
+        <div className="mt-1 flex flex-wrap items-center gap-x-3 gap-y-1">
+          <p className="text-ink-2">{family.label} · {family.blurb}</p>
+          {loadingBreakdown && (
+            <span className="inline-flex items-center gap-1 text-xs text-ink-3">
+              <Loader2 size={12} className="animate-spin" /> tailoring to this role…
+            </span>
+          )}
+          {aiFamily && !loadingBreakdown && (
+            <span
+              className="inline-flex items-center gap-1 rounded-full px-2 py-0.5 text-2xs font-semibold"
+              style={{ background: "var(--primary-soft)", color: "var(--primary-ink)" }}
+            >
+              <Sparkles size={11} /> Tailored to this role
+            </span>
+          )}
+        </div>
 
         {/* Change role — inline, embedded */}
         <div className="relative mt-5 max-w-md">
