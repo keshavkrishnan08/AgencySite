@@ -26,26 +26,20 @@ export function ToolShell({
 
   return (
     <AppShell>
-      <main className="container-content py-10 sm:py-12">
-        <div className="mb-8 text-center">
-          <span
-            className="relative mx-auto grid h-16 w-16 place-items-center overflow-hidden rounded-[22px] text-white shadow-glow ring-1 ring-white/40"
-            style={{
-              background:
-                "radial-gradient(90% 90% at 24% 16%, rgba(255,255,255,0.42), transparent 44%), linear-gradient(145deg, var(--primary-bright), var(--primary-ink))",
-            }}
-          >
-            <span className="absolute -right-3 -top-3 h-9 w-9 rounded-full bg-white/15 blur-sm" aria-hidden />
-            <span className="absolute inset-x-3 top-1.5 h-px bg-white/45" aria-hidden />
-            <Icon size={28} />
-          </span>
+      <main className="mx-auto max-w-5xl px-5 py-8 sm:px-8 sm:py-10">
+        <div className="mb-8">
           {badge && (
-            <span className="mt-4 inline-flex items-center gap-1 rounded-full bg-gold-soft px-2.5 py-1 text-2xs font-bold uppercase tracking-wider text-gold-ink">
+            <span className="mb-3 inline-flex items-center gap-1 rounded-full bg-gold-soft px-2.5 py-1 text-2xs font-bold uppercase tracking-wider text-gold-ink">
               ⭐ {badge}
             </span>
           )}
-          <h1 className="mt-3 font-serif text-3xl font-semibold text-ink sm:text-4xl">{title}</h1>
-          <p className="mx-auto mt-3 max-w-prose text-ink-2">{description}</p>
+          <h1 className="flex items-center gap-3 font-serif text-3xl font-semibold text-ink sm:text-4xl">
+            <span className="grid h-10 w-10 shrink-0 place-items-center rounded-xl" style={{ background: "var(--primary-soft)" }}>
+              <Icon size={20} className="text-primary-ink" />
+            </span>
+            {title}
+          </h1>
+          <p className="mt-2 max-w-prose text-ink-2">{description}</p>
         </div>
 
         {children}
