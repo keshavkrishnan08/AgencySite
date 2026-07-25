@@ -36,7 +36,9 @@ export function AppNav({ minimal = false }: { minimal?: boolean }) {
   }, []);
 
   return (
-    <header className="sticky top-0 z-50 w-full">
+    // In minimal (in-app) mode the sidebar is the desktop nav, so the top bar is
+    // only needed on mobile — hide it on lg+ so nothing hangs above the content.
+    <header className={cn("sticky top-0 z-50 w-full", minimal && "lg:hidden")}>
       <div className="glass border-b shadow-sm" style={{ borderColor: "var(--border)" }}>
         <nav className="container-wide flex h-16 items-center justify-between gap-4">
           <div className="flex items-center gap-3 lg:gap-7">
