@@ -171,18 +171,8 @@ h1, h2, h3, h4, h5 {
     border-color: var(--border);
   }
   .card-elevated {
-    @apply relative rounded-2xl border bg-surface shadow-sm;
+    @apply relative rounded-2xl border bg-surface;
     border-color: var(--border);
-  }
-  /* faint top sheen for a crafted, premium feel */
-  .card-elevated::after {
-    content: "";
-    position: absolute;
-    inset: 0;
-    border-radius: inherit;
-    pointer-events: none;
-    background: linear-gradient(180deg, rgba(255, 255, 255, 0.6), transparent 18%);
-    opacity: 0.7;
   }
 
   /* Glass premium badge (gold) */
