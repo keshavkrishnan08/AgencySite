@@ -15,7 +15,7 @@ import { apiInsights, type CareerInsights } from "@/lib/client";
 import { pushInsight, pullLatestInsight } from "@/lib/cloud";
 import { computeMetrics } from "@/lib/metrics";
 import { contextSummary, persistOverview } from "@/lib/context";
-import { ProgressLineChart, DonutChart, HBarChart } from "@/components/charts/Charts";
+import { ProgressLineChart, DonutChart, HBarChart, vividScore } from "@/components/charts/Charts";
 import { todayKey } from "@/lib/utils";
 import { cn, formatDuration, formatDate, scoreColor } from "@/lib/utils";
 import type { Session, Streak } from "@/lib/types";
@@ -266,7 +266,7 @@ export default function DashboardPage() {
               <DonutChart
                 data={m.distribution
                   .filter((d) => d.count > 0)
-                  .map((d) => ({ name: d.bucket, value: d.count, color: scoreColor(BAND_MID[d.bucket] ?? 60) }))}
+                  .map((d) => ({ name: d.bucket, value: d.count, color: vividScore(BAND_MID[d.bucket] ?? 60) }))}
                 height={220}
                 centerLabel="answers"
                 centerValue={String(m.questionsAnswered)}
