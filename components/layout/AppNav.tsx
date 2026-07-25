@@ -5,10 +5,8 @@ import Link from "next/link";
 import { usePathname } from "next/navigation";
 import { Flame, Menu, X } from "lucide-react";
 import { Logo } from "@/components/ui/Logo";
-import { ButtonLink } from "@/components/ui/Button";
-import { PremiumBadge } from "@/components/ui/PremiumBadge";
 import { cn } from "@/lib/utils";
-import { getProfile, getStreak, isPremium, onStoreChange } from "@/lib/store";
+import { getProfile, getStreak, onStoreChange } from "@/lib/store";
 
 /* The overview (Dashboard), the one thing to do (Practice), the deep numbers
    (Analytics), and the two builders that feed the practice loop. */
@@ -16,14 +14,16 @@ const NAV = [
   { href: "/dashboard", label: "Dashboard" },
   { href: "/practice", label: "Practice" },
   { href: "/analytics", label: "Analytics" },
+  { href: "/reports", label: "Reports" },
+  { href: "/job", label: "Job Breakdown" },
   { href: "/tools/question-predictor", label: "Question Predictor" },
   { href: "/tools/gap-story", label: "Gap Story" },
+  { href: "/preferences", label: "Preferences" },
 ];
 
 export function AppNav({ minimal = false }: { minimal?: boolean }) {
   const pathname = usePathname();
   const [mounted, setMounted] = useState(false);
-  const [premium, setPremium] = useState(false);
   const [name, setName] = useState("");
   const [streak, setStreak] = useState(0);
   const [mobileOpen, setMobileOpen] = useState(false);
@@ -35,7 +35,6 @@ export function AppNav({ minimal = false }: { minimal?: boolean }) {
     setMounted(true);
     const sync = () => {
       const p = getProfile();
-      setPremium(isPremium());
       setName(p.name || p.email || "");
       setStreak(getStreak().current);
     };
@@ -87,12 +86,6 @@ export function AppNav({ minimal = false }: { minimal?: boolean }) {
                 {streak}
               </span>
             )}
-            {mounted && !premium && (
-              <ButtonLink href="/upgrade" variant="gold" size="sm" className="hidden sm:inline-flex">
-                Upgrade
-              </ButtonLink>
-            )}
-            {mounted && premium && <PremiumBadge className="hidden sm:inline-flex" />}
             <Link
               href="/settings"
               className="grid h-9 w-9 place-items-center rounded-full text-sm font-semibold text-white shadow-sm"
@@ -121,11 +114,6 @@ export function AppNav({ minimal = false }: { minimal?: boolean }) {
                   </Link>
                 );
               })}
-              {mounted && !premium && (
-                <ButtonLink href="/upgrade" variant="gold" className="mt-3" onClick={() => setMobileOpen(false)}>
-                  Upgrade to Premium
-                </ButtonLink>
-              )}
             </div>
           </div>
         )}
