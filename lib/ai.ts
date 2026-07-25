@@ -121,9 +121,30 @@ export async function callClaude({
  * exact type the UI and the graphs expect, so a missing key or a wrong type can
  * never propagate downstream. Use them in every route that parses JSON. */
 
-/** A trimmed, length-capped string, or "" for anything non-string. */
+/** Strip markdown so the UI never shows raw #, **, backticks, bullets, etc.
+    Keeps the words and line breaks; removes only the markup characters. */
+export function stripMd(s: string): string {
+  if (!s) return "";
+  return s
+    .replace(/```[\s\S]*?```/g, "")            // fenced code blocks
+    .replace(/`([^`]+)`/g, "$1")               // inline code
+    .replace(/!\[[^\]]*\]\([^)]*\)/g, "")       // images
+    .replace(/\[([^\]]+)\]\([^)]+\)/g, "$1")    // links -> text
+    .replace(/^\s{0,3}#{1,6}\s+/gm, "")         // headings
+    .replace(/\*\*([^*]+)\*\*/g, "$1")          // bold **
+    .replace(/__([^_]+)__/g, "$1")              // bold __
+    .replace(/\*([^*]+)\*/g, "$1")              // italic *
+    .replace(/^\s{0,3}[-*+]\s+/gm, "")          // bullet markers
+    .replace(/^\s{0,3}\d+\.\s+/gm, "")          // numbered markers
+    .replace(/^\s{0,3}>\s?/gm, "")              // blockquotes
+    .replace(/[ \t]{2,}/g, " ")
+    .replace(/\n{3,}/g, "\n\n")
+    .trim();
+}
+
+/** A trimmed, length-capped, markdown-free string, or "" for non-strings. */
 export const asStr = (v: unknown, max = 500): string =>
-  typeof v === "string" ? v.trim().slice(0, max) : "";
+  typeof v === "string" ? stripMd(v).slice(0, max) : "";
 
 /** An array of clean strings, capped in count and length. */
 export const asStrArray = (v: unknown, count = 8, max = 200): string[] =>

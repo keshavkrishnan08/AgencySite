@@ -2,7 +2,7 @@ import { rateLimit } from "@/lib/ratelimit";
 import { recordUsage } from "@/lib/usage";
 import { NextResponse } from "next/server";
 import { exampleAnswer } from "@/lib/examples";
-import { callClaude, FAST_MODEL, hasAI } from "@/lib/ai";
+import { callClaude, FAST_MODEL, hasAI, stripMd } from "@/lib/ai";
 import { COACH_PERSONA, candidateBlock } from "@/lib/prompt";
 
 export const runtime = "nodejs";
@@ -28,8 +28,9 @@ export async function POST(req: Request) {
     try {
       const user = `${candidateBlock({ situation, targetRole, company })}\n\nQuestion: ${question}`;
       const text = await callClaude({ model: FAST_MODEL, system: SYSTEM, user, maxTokens: 360, temperature: 0.6 });
-      if (text.trim().length > 40) {
-        return NextResponse.json({ example: text.trim(), source: "ai" });
+      const clean = stripMd(text.trim());
+      if (clean.length > 40) {
+        return NextResponse.json({ example: clean, source: "ai" });
       }
     } catch {
       /* fall through */
