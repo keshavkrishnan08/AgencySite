@@ -411,6 +411,8 @@ function PracticeInner() {
         weakestDimension: perso.current.weakestDimension,
         recentAverage: perso.current.recentAverage,
         lengthTarget,
+        focusDimension: focusDim || "",
+        domain: domainRef.current,
       },
       false
     );
