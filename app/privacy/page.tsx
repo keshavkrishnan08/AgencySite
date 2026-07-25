@@ -45,16 +45,18 @@ export default function PrivacyPage() {
 
           <Section title="Voice practice">
             <p>
-              When you practice by voice, transcription runs through your browser&apos;s built-in speech
-              recognition. We store the resulting text (your answer), not the audio. Note that some browsers
-              (e.g. Chrome) process speech on their own servers; that&apos;s the browser&apos;s behavior, not ours.
+              When you practice by voice, we transcribe your answer to text and store the text, not the audio.
+              For the best, most consistent quality, the recording is sent to OpenAI for transcription and then
+              discarded. If that isn&apos;t available, transcription falls back to an on-device model (the audio
+              never leaves your browser) or your browser&apos;s built-in speech recognition. We never keep the
+              audio itself.
             </p>
           </Section>
 
           <Section title="Who we share it with">
             <p>We use a small set of trusted providers to run the service. We share only what each one needs:</p>
             <ul className="mt-3 list-disc space-y-2 pl-5">
-              <li><strong className="text-ink">Anthropic</strong> — your answers are sent to Anthropic&apos;s Claude to be scored and coached. They process it to return feedback and don&apos;t use it to train their models under our API terms.</li>
+              <li><strong className="text-ink">Anthropic &amp; OpenAI</strong> — your answers (and, for voice, the recording to transcribe) are sent to Anthropic&apos;s Claude and/or OpenAI to be transcribed, scored, and coached. They process it to return feedback and don&apos;t use it to train their models under our API terms.</li>
               <li><strong className="text-ink">Stripe</strong> — payments and subscription management.</li>
               <li><strong className="text-ink">Supabase</strong> — secure storage of your account and practice history.</li>
               <li><strong className="text-ink">Mixpanel &amp; Vercel</strong> — product analytics, so we can improve the experience.</li>

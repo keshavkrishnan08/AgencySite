@@ -205,8 +205,9 @@ export function AppShell({
           children
         )}
       </div>
-      {/* Always-on coach + first-run tour, gated the same as the app. */}
-      {!needsPay && <CoachChat />}
+      {/* The coach button is always present (floating, bottom-right). The tour is
+          first-run only and never over the paywall. */}
+      <CoachChat />
       {!needsPay && <ProductTour />}
     </>
   );
