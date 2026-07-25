@@ -48,6 +48,8 @@ type Namespace =
   | "form"        // form:field_focus, form:error
   | "account"     // account:signin, account:signup_error
   | "metrics"     // metrics:view
+  | "job"         // job:role_change, job:practice
+  | "prefs"       // prefs:update, prefs:reset
   | "tool";       // tool:run, tool:handoff
 
 export type MicroEvent = `${Namespace}:${string}`;
