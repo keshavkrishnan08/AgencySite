@@ -154,7 +154,7 @@ function PredictorPanel() {
             value={posting}
             onChange={(e) => setPosting(e.target.value)}
             placeholder="Paste the entire job description here. Responsibilities, requirements, the company blurb, everything…"
-            className="field min-h-[200px] resize-y leading-relaxed"
+            className="field min-h-[340px] resize-y leading-relaxed"
           />
         </label>
         <label className="mt-4 block">
