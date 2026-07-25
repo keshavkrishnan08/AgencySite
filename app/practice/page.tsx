@@ -2,8 +2,12 @@
 
 import { Suspense, useCallback, useEffect, useRef, useState } from "react";
 import { useRouter, useSearchParams } from "next/navigation";
+import Link from "next/link";
 import { motion, AnimatePresence } from "framer-motion";
-import { ArrowRight, Sparkles, X, Loader2, Lock, Building2, ChevronDown, Check } from "lucide-react";
+import {
+  ArrowRight, Sparkles, X, Loader2, Building2, ChevronDown,
+  Mic, BookOpen, MessageSquare, Layers, Target, Zap, Flame, ChevronLeft,
+} from "lucide-react";
 import { AppShell } from "@/components/layout/AppShell";
 import { Inline } from "@/components/ui/RichText";
 import { Button, ButtonLink } from "@/components/ui/Button";
@@ -12,14 +16,18 @@ import { VoiceButton } from "@/components/ui/VoiceButton";
 import { InfoTip } from "@/components/ui/Tooltip";
 import { apiFollowUp, apiGenerateExample, apiGenerateQuestions, apiScoreAnswer } from "@/lib/client";
 import { aggregateDimensions, computeOverall } from "@/lib/scoring";
-import { getOnboarding, getPredictedSet, getProfile, getSessions, saveSession, isPremium } from "@/lib/store";
+import { getOnboarding, getPredictedSet, getProfile, getSessions, saveSession } from "@/lib/store";
 import { average, cn, uid } from "@/lib/utils";
 import { track } from "@/lib/analytics";
 import { mixpanelIncrement } from "@/lib/mixpanel";
 import type { Dimension, DeliveryMetrics, Question, ScoredAnswer, Session, Situation } from "@/lib/types";
 
-// After the first answer, free users hit a hard paywall (analyzing -> paywall).
-type Phase = "setup" | "loading" | "answer" | "score" | "analyzing" | "paywall";
+type Domain = "interview" | "storytelling" | "public_speaking";
+
+// setup = the practice hub (the precursor). custom = the fine-grained builder.
+// Access is gated once, at the app shell (unpaid = whole app blurred). So there
+// is NO paywall inside a session: everyone who's in the app runs the full thing.
+type Phase = "setup" | "custom" | "loading" | "answer" | "score";
 
 function PracticeInner() {
   const router = useRouter();
@@ -45,6 +53,12 @@ function PracticeInner() {
   const [count, setCount] = useState(8);
   const customRef = useRef({ focusTypes: [] as string[], difficulty: "standard", count: 8 });
   useEffect(() => { customRef.current = { focusTypes, difficulty, count }; }, [focusTypes, difficulty, count]);
+  // Which practice domain this session is: interview, storytelling, or public
+  // speaking. Threaded through a ref so the mount-time start() reads it fresh.
+  const [domain, setDomain] = useState<Domain>("interview");
+  const domainRef = useRef<Domain>("interview");
+  useEffect(() => { domainRef.current = domain; }, [domain]);
+  const [interviewGap, setInterviewGap] = useState("");
   const [questions, setQuestions] = useState<Question[]>([]);
   const [index, setIndex] = useState(0);
   const [answerText, setAnswerText] = useState("");
@@ -142,6 +156,7 @@ function PracticeInner() {
         focusTypes: customRef.current.focusTypes,
         difficulty: customRef.current.difficulty,
         count: customRef.current.count,
+        domain: domainRef.current,
       });
       setQuestions(questions);
       setIndex(0);
@@ -169,12 +184,15 @@ function PracticeInner() {
     const s = profile.situation || ob?.situation || null;
     setRole(r);
     setSituation(s);
+    setInterviewGap(profile.interviewGap || ob?.interviewGap || "");
     const resolvedCompany = set?.company || profile.company || ob?.company || "";
     companyRef.current = resolvedCompany;
     setCompany(resolvedCompany);
-    // If we already know their role (from onboarding/profile/a predicted set),
-    // go straight into the questions. Only show setup when we have nothing.
-    if (predictedId || autostart || focusDim || r.trim()) {
+    // Deep links (a predicted set, a focus drill, or explicit autostart) drop
+    // straight into a session. Otherwise we land on the practice HUB — the
+    // precursor — even when the role is known, so people pick a track, a phase,
+    // or a focus instead of being thrown into questions.
+    if (predictedId || autostart || focusDim) {
       start(r || "Office Manager", s, predictedId || undefined);
     } else {
       setPhase("setup");
@@ -182,15 +200,22 @@ function PracticeInner() {
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
-  // After the first answer, free users get a brief analysis, then the paywall.
-  useEffect(() => {
-    if (phase !== "analyzing") return;
-    const id = setTimeout(() => {
-      setPhase("paywall");
-      window.scrollTo({ top: 0, behavior: "smooth" });
-    }, 2400);
-    return () => clearTimeout(id);
-  }, [phase]);
+  // Launch a session from a hub choice. Writes the refs synchronously (not just
+  // state) so the immediately-following start() reads the right config.
+  const launch = useCallback(
+    (cfg: { domain?: Domain; focusTypes?: string[]; difficulty?: string; count?: number; label?: string }) => {
+      const d = cfg.domain || "interview";
+      const ft = cfg.focusTypes || [];
+      const diff = cfg.difficulty || "standard";
+      const c = cfg.count || 8;
+      setDomain(d); domainRef.current = d;
+      setFocusTypes(ft); setDifficulty(diff); setCount(c);
+      customRef.current = { focusTypes: ft, difficulty: diff, count: c };
+      track("practice:track_start", { domain: d, difficulty: diff, count: c, label: cfg.label || "" });
+      start(role || "Office Manager", situation);
+    },
+    [role, situation, start]
+  );
 
   // Stamp the clock each time a fresh question is presented, so we can measure
   // how long the candidate spends per question.
@@ -261,15 +286,6 @@ function PracticeInner() {
     });
     mixpanelIncrement("answers_scored");
     window.scrollTo({ top: 0, behavior: "smooth" });
-
-    // Hard paywall: free users answer one question, then must upgrade. Their
-    // real score and coaching are computed (so they're real behind the blur)
-    // but locked. Premium users continue the full session.
-    if (index === 0 && !isPremium()) {
-      track("paywall_hit", { role });
-      setPhase("analyzing");
-      return;
-    }
 
     setPhase("score");
     // Conversational interviewer: probe deeper into what they just said.
@@ -415,8 +431,19 @@ function PracticeInner() {
           </div>
         )}
 
-        {/* SETUP */}
+        {/* HUB — the precursor. Tracks, phases, focus areas, customization. */}
         {phase === "setup" && (
+          <PracticeHub
+            role={role}
+            interviewGap={interviewGap}
+            situation={situation}
+            onLaunch={launch}
+            onCustom={() => setPhase("custom")}
+          />
+        )}
+
+        {/* CUSTOM builder (the fine-grained session builder). */}
+        {phase === "custom" && (
           <SetupCard
             role={role}
             company={company}
@@ -429,16 +456,9 @@ function PracticeInner() {
             setDifficulty={setDifficulty}
             count={count}
             setCount={setCount}
-            onStart={() => start(role || "Office Manager", situation)}
+            onBack={() => setPhase("setup")}
+            onStart={() => { setDomain("interview"); domainRef.current = "interview"; start(role || "Office Manager", situation); }}
           />
-        )}
-
-        {/* ANALYZING (post first answer, before paywall) */}
-        {phase === "analyzing" && <AnalyzingCard />}
-
-        {/* PAYWALL (hard gate after first answer) */}
-        {phase === "paywall" && scored && (
-          <PaywallScore answer={scored} gentle={gentle} role={role} />
         )}
 
         {/* LOADING */}
@@ -464,6 +484,10 @@ function PracticeInner() {
                     ? "Your story"
                     : current.category === "focus"
                     ? "Focus drill"
+                    : current.category === "story"
+                    ? "Storytelling"
+                    : current.category === "speech"
+                    ? "Speaking drill"
                     : "Behavioral"}
                 </p>
                 <h1 className="mt-3 flex items-start gap-2 font-serif text-2xl font-semibold leading-snug text-ink sm:text-3xl">
@@ -623,6 +647,210 @@ function PracticeInner() {
 
 /* ---------------- sub-views ---------------- */
 
+/* ============================ Practice Hub ============================
+   The precursor. Instead of dropping people straight into questions, this is
+   the room they choose from: three practice domains (interview, storytelling,
+   public speaking), a four-phase specialization path for the long haul, single-
+   skill drills, and — only when it's relevant to them — the gap story. It's a
+   deliberate "this is a practice you build over time" surface, not a one-shot. */
+
+type LaunchCfg = { domain?: Domain; focusTypes?: string[]; difficulty?: string; count?: number; label?: string };
+
+const DOMAINS: { key: Domain; icon: typeof MessageSquare; title: string; desc: string; minutes: string; cfg: LaunchCfg }[] = [
+  {
+    key: "interview", icon: MessageSquare, title: "Interview practice", minutes: "~10 min",
+    desc: "A tailored mock for your exact role — behavioral, situational, and the questions this job actually asks.",
+    cfg: { domain: "interview", count: 8, label: "interview" },
+  },
+  {
+    key: "storytelling", icon: BookOpen, title: "Storytelling", minutes: "~8 min",
+    desc: "Build the signature stories interviews turn on — a challenge, a failure, a time you led — and land each in one clean line.",
+    cfg: { domain: "storytelling", count: 6, label: "storytelling" },
+  },
+  {
+    key: "public_speaking", icon: Mic, title: "Public speaking", minutes: "~8 min",
+    desc: "Impromptu topics, persuasion, and delivery drills for a calmer, clearer, more convincing voice — on any stage.",
+    cfg: { domain: "public_speaking", count: 6, label: "public_speaking" },
+  },
+];
+
+const PHASES: { n: number; title: string; tag: string; detail: string; cfg: LaunchCfg }[] = [
+  { n: 1, title: "Foundations", tag: "Structure & STAR", detail: "Learn the shape of a strong answer and get comfortable.", cfg: { difficulty: "easy", count: 5, focusTypes: ["warmup", "behavioral"], label: "phase_foundations" } },
+  { n: 2, title: "Fluency", tag: "Cut filler, tighten", detail: "Say more with fewer words. Kill the ums.", cfg: { difficulty: "standard", count: 8, focusTypes: ["behavioral", "situation"], label: "phase_fluency" } },
+  { n: 3, title: "Pressure", tag: "Tough Qs & follow-ups", detail: "Hold steady when the panel pushes back.", cfg: { difficulty: "hard", count: 8, focusTypes: ["behavioral", "leadership", "situation"], label: "phase_pressure" } },
+  { n: 4, title: "Mastery", tag: "Full mock, curveballs", detail: "A complete panel with no easing in.", cfg: { difficulty: "hard", count: 12, focusTypes: [], label: "phase_mastery" } },
+];
+
+const FOCUS_AREAS: { key: Dimension; label: string; blurb: string }[] = [
+  { key: "clarity", label: "Clarity", blurb: "Lead with the point" },
+  { key: "relevance", label: "Relevance", blurb: "Answer what was asked" },
+  { key: "specificity", label: "Specificity", blurb: "Real details, real numbers" },
+  { key: "confidence", label: "Confidence", blurb: "Drop the hedging" },
+  { key: "conciseness", label: "Conciseness", blurb: "Trim the ramble" },
+];
+
+function PracticeHub({
+  role,
+  interviewGap,
+  situation,
+  onLaunch,
+  onCustom,
+}: {
+  role: string;
+  interviewGap: string;
+  situation: Situation | null;
+  onLaunch: (cfg: LaunchCfg) => void;
+  onCustom: () => void;
+}) {
+  // The gap story is NOT for everyone. Show it only to people whose answers say
+  // they actually have one, and frame it as situational, not a required step.
+  const hasGap =
+    interviewGap === "3-5yr" ||
+    interviewGap === "5+yr" ||
+    situation === "returning" ||
+    situation === "laid_off" ||
+    situation === "career_change";
+
+  return (
+    <div className="mx-auto max-w-4xl">
+      <div className="text-center">
+        <span className="eyebrow">Practice studio</span>
+        <h1 className="mt-2 font-serif text-3xl font-semibold text-ink sm:text-4xl">What do you want to work on?</h1>
+        <p className="mx-auto mt-3 max-w-xl text-ink-2">
+          You&apos;re preparing for <strong className="text-ink">{role || "your role"}</strong>. Pick a track, follow the
+          phases as you improve, or drill one skill. Everything you do is scored and feeds your metrics.
+        </p>
+      </div>
+
+      {/* Quick start */}
+      <button
+        onClick={() => onLaunch({ domain: "interview", count: 8, label: "quick_start" })}
+        className="group mt-8 flex w-full items-center gap-4 rounded-2xl p-6 text-left text-white shadow-lg transition-transform hover:-translate-y-0.5"
+        style={{ background: "linear-gradient(135deg, var(--primary-bright), var(--primary-ink))" }}
+      >
+        <span className="grid h-12 w-12 shrink-0 place-items-center rounded-xl bg-white/15">
+          <Zap size={24} />
+        </span>
+        <span className="flex-1">
+          <span className="block font-serif text-xl font-semibold">Quick start</span>
+          <span className="block text-sm text-white/85">A full tailored interview for {role || "your role"}. About 10 minutes.</span>
+        </span>
+        <ArrowRight size={22} className="transition-transform group-hover:translate-x-1" />
+      </button>
+
+      {/* Tracks / domains */}
+      <SectionLabel icon={Layers} title="Choose a track" sub="Interviews are one skill. These build the others too." />
+      <div className="grid gap-4 sm:grid-cols-3">
+        {DOMAINS.map((d) => {
+          const Icon = d.icon;
+          return (
+            <button
+              key={d.key}
+              onClick={() => onLaunch(d.cfg)}
+              className="group flex flex-col rounded-2xl border bg-surface p-5 text-left transition-all hover:-translate-y-0.5 hover:shadow-md"
+              style={{ borderColor: "var(--border)" }}
+            >
+              <span className="grid h-11 w-11 place-items-center rounded-xl" style={{ background: "var(--primary-soft)" }}>
+                <Icon size={20} className="text-primary-ink" />
+              </span>
+              <span className="mt-3 font-serif text-lg font-semibold text-ink">{d.title}</span>
+              <span className="mt-1 flex-1 text-sm leading-relaxed text-ink-2">{d.desc}</span>
+              <span className="mt-3 flex items-center justify-between text-2xs font-semibold uppercase tracking-wider text-primary-ink">
+                {d.minutes}
+                <ArrowRight size={15} className="transition-transform group-hover:translate-x-0.5" />
+              </span>
+            </button>
+          );
+        })}
+      </div>
+
+      {/* Specialization phases */}
+      <SectionLabel icon={Flame} title="Specialization path" sub="A route from first reps to interview-ready. Move up as you improve." />
+      <div className="grid gap-3 sm:grid-cols-2 lg:grid-cols-4">
+        {PHASES.map((p) => (
+          <button
+            key={p.title}
+            onClick={() => onLaunch(p.cfg)}
+            className="group relative flex flex-col rounded-2xl border p-5 text-left transition-all hover:-translate-y-0.5 hover:shadow-md"
+            style={{ borderColor: "var(--border)" }}
+          >
+            <span className="font-mono text-2xs font-bold text-ink-3">PHASE {p.n}</span>
+            <span className="mt-1.5 font-serif text-lg font-semibold text-ink">{p.title}</span>
+            <span className="mt-0.5 text-2xs font-semibold uppercase tracking-wider text-primary-ink">{p.tag}</span>
+            <span className="mt-2 flex-1 text-sm leading-relaxed text-ink-2">{p.detail}</span>
+            <span className="mt-3 inline-flex items-center gap-1 text-sm font-medium text-primary-ink">
+              Start <ArrowRight size={14} className="transition-transform group-hover:translate-x-0.5" />
+            </span>
+          </button>
+        ))}
+      </div>
+
+      {/* Focus drills */}
+      <SectionLabel icon={Target} title="Drill one skill" sub="Short sets aimed at a single dimension of your score." />
+      <div className="grid gap-3 sm:grid-cols-2 lg:grid-cols-5">
+        {FOCUS_AREAS.map((f) => (
+          <Link
+            key={f.key}
+            href={`/practice?focus=${f.key}&autostart=1`}
+            onClick={() => track("practice:focus_start", { dimension: f.key })}
+            className="rounded-xl border p-4 transition-all hover:-translate-y-0.5 hover:shadow-sm"
+            style={{ borderColor: "var(--border)" }}
+          >
+            <span className="font-medium text-ink">{f.label}</span>
+            <span className="mt-0.5 block text-xs text-ink-3">{f.blurb}</span>
+          </Link>
+        ))}
+      </div>
+
+      {/* Conditional: the gap story — only for people it applies to. */}
+      {hasGap && (
+        <div className="mt-6 rounded-2xl border-2 border-dashed p-6" style={{ borderColor: "var(--amber)" }}>
+          <div className="flex flex-wrap items-center justify-between gap-4">
+            <div className="max-w-xl">
+              <div className="flex items-center gap-2 text-2xs font-semibold uppercase tracking-wider text-amber-ink">
+                <BookOpen size={14} /> If you have a gap to explain
+              </div>
+              <h3 className="mt-1.5 font-serif text-lg font-semibold text-ink">Turn the gap question into your best answer</h3>
+              <p className="mt-1 text-sm text-ink-2">
+                Time away, a layoff, a career switch — the story you tell decides how it lands. Build one you believe, then
+                drill it under pressure. Not everyone needs this; you might.
+              </p>
+            </div>
+            <div className="flex shrink-0 gap-2">
+              <ButtonLink href="/tools/gap-story" variant="secondary" size="sm">Build my story</ButtonLink>
+              <Button size="sm" onClick={() => onLaunch({ focusTypes: ["gap"], difficulty: "standard", count: 6, label: "gap_drill" })}>
+                Drill it <ArrowRight size={14} />
+              </Button>
+            </div>
+          </div>
+        </div>
+      )}
+
+      {/* Custom + change role */}
+      <div className="mt-8 flex flex-wrap items-center justify-center gap-3 border-t pt-6" style={{ borderColor: "var(--border)" }}>
+        <Button variant="secondary" onClick={onCustom}>
+          <Sparkles size={16} /> Build a custom session
+        </Button>
+        <ButtonLink href="/onboarding" variant="ghost" size="sm">Change role or situation</ButtonLink>
+      </div>
+    </div>
+  );
+}
+
+function SectionLabel({ icon: Icon, title, sub }: { icon: typeof MessageSquare; title: string; sub: string }) {
+  return (
+    <div className="mb-4 mt-10 flex items-center gap-2.5">
+      <span className="grid h-8 w-8 place-items-center rounded-lg" style={{ background: "var(--bg-tint)" }}>
+        <Icon size={16} className="text-primary" />
+      </span>
+      <div>
+        <h2 className="font-serif text-lg font-semibold leading-none text-ink">{title}</h2>
+        <p className="mt-1 text-xs text-ink-3">{sub}</p>
+      </div>
+    </div>
+  );
+}
+
 const QUESTION_TYPES: { value: string; label: string; emoji: string }[] = [
   { value: "warmup", label: "Tell me about yourself", emoji: "👋" },
   { value: "behavioral", label: "Behavioral", emoji: "💬" },
@@ -645,6 +873,7 @@ function SetupCard({
   count,
   setCount,
   onStart,
+  onBack,
 }: {
   role: string;
   company: string;
@@ -658,13 +887,19 @@ function SetupCard({
   count: number;
   setCount: (v: number) => void;
   onStart: () => void;
+  onBack?: () => void;
 }) {
   const [showContext, setShowContext] = useState(Boolean(company || posting));
-  const [showCustom, setShowCustom] = useState(false);
+  const [showCustom, setShowCustom] = useState(true);
   const toggleType = (t: string) =>
     setFocusTypes(focusTypes.includes(t) ? focusTypes.filter((x) => x !== t) : [...focusTypes, t]);
   return (
     <div className="mx-auto max-w-xl">
+      {onBack && (
+        <button onClick={onBack} className="btn-ghost mb-3 text-sm">
+          <ChevronLeft size={16} /> Back to practice hub
+        </button>
+      )}
       <motion.div initial={{ opacity: 0, y: 16 }} animate={{ opacity: 1, y: 0 }} className="card-elevated p-8 sm:p-9">
         <div className="text-center">
           <span
@@ -819,123 +1054,6 @@ function SetupCard({
           </ButtonLink>
         </div>
       </motion.div>
-    </div>
-  );
-}
-
-/* Beautiful analysis beat between the first answer and the paywall. */
-const ANALYZE_STEPS = [
-  "Reading your answer",
-  "Scoring clarity and structure",
-  "Listening to your delivery",
-  "Writing your personal coaching",
-];
-function AnalyzingCard() {
-  const [step, setStep] = useState(0);
-  useEffect(() => {
-    const id = setInterval(() => setStep((s) => Math.min(s + 1, ANALYZE_STEPS.length - 1)), 600);
-    return () => clearInterval(id);
-  }, []);
-  return (
-    <div className="mx-auto flex max-w-lg flex-col items-center py-20 text-center">
-      <div className="relative grid h-28 w-28 place-items-center">
-        {[0, 1, 2].map((i) => (
-          <motion.span
-            key={i}
-            className="absolute inset-0 rounded-full border"
-            style={{ borderColor: "var(--primary)" }}
-            initial={{ scale: 0.5, opacity: 0.5 }}
-            animate={{ scale: 1.25, opacity: 0 }}
-            transition={{ duration: 1.8, repeat: Infinity, delay: i * 0.6, ease: "easeOut" }}
-          />
-        ))}
-        <span
-          className="grid h-16 w-16 place-items-center rounded-2xl text-white shadow-lg"
-          style={{ background: "linear-gradient(140deg, var(--primary-bright), var(--primary-ink))" }}
-        >
-          <Sparkles size={26} />
-        </span>
-      </div>
-      <h1 className="mt-8 font-serif text-2xl font-semibold text-ink">Analyzing your answer…</h1>
-      <div className="mt-4 h-6">
-        <AnimatePresence mode="wait">
-          <motion.p
-            key={step}
-            initial={{ opacity: 0, y: 8 }}
-            animate={{ opacity: 1, y: 0 }}
-            exit={{ opacity: 0, y: -8 }}
-            transition={{ duration: 0.3 }}
-            className="text-ink-2"
-          >
-            {ANALYZE_STEPS[step]}
-          </motion.p>
-        </AnimatePresence>
-      </div>
-    </div>
-  );
-}
-
-/* Hard paywall. The real score and coaching render behind a frosted gate so
-   the value is visible but locked. No way forward but Premium. */
-const UNLOCKS = [
-  "Your full score on all five dimensions",
-  "Personal coaching with one clear fix",
-  "The other seven questions in this session",
-  "Your metrics: percentile, pace, and time to top 1%",
-];
-function PaywallScore({ answer, gentle, role }: { answer: ScoredAnswer; gentle: boolean; role: string }) {
-  return (
-    <div className="relative mx-auto max-w-2xl">
-      {/* real, blurred score behind the gate */}
-      <div aria-hidden className="pointer-events-none select-none blur-[7px] saturate-[0.92] opacity-70">
-        <div className="mb-5 rounded-xl border bg-bg-sunk p-5" style={{ borderColor: "var(--border)" }}>
-          <p className="text-2xs font-semibold uppercase tracking-wider text-ink-3">Your answer</p>
-          <p className="mt-1.5 text-sm leading-relaxed text-ink-2">{answer.answerText}</p>
-        </div>
-        <AnswerScoreCard answer={answer} gentle={gentle} loadExample={async () => ""} />
-      </div>
-
-      {/* gate overlay */}
-      <div className="absolute inset-0 flex items-start justify-center p-4 pt-10 sm:pt-16">
-        <motion.div
-          initial={{ opacity: 0, y: 18, scale: 0.98 }}
-          animate={{ opacity: 1, y: 0, scale: 1 }}
-          transition={{ duration: 0.5, ease: [0.22, 1, 0.36, 1] }}
-          className="w-full max-w-md overflow-hidden rounded-2xl border bg-surface/95 p-8 text-center shadow-xl backdrop-blur-xl"
-          style={{ borderColor: "var(--border-strong)" }}
-        >
-          <span className="premium-badge mx-auto"> <Lock size={12} /> Locked</span>
-          <h1 className="mt-5 font-serif text-3xl font-semibold leading-tight text-ink">
-            Your score is ready.
-          </h1>
-          <p className="mt-3 text-ink-2">
-            We scored your answer for <strong className="text-ink">{role || "your role"}</strong> and wrote
-            your personal coaching. Unlock it to see exactly where you stand, and keep going.
-          </p>
-          <ul className="mx-auto mt-6 max-w-xs space-y-2.5 text-left">
-            {UNLOCKS.map((u) => (
-              <li key={u} className="flex items-start gap-2.5 text-sm font-medium text-ink">
-                <span className="mt-0.5 grid h-5 w-5 shrink-0 place-items-center rounded-full bg-sage-soft">
-                  <Check size={12} className="text-sage-ink" />
-                </span>
-                {u}
-              </li>
-            ))}
-          </ul>
-          <ButtonLink
-            href="/upgrade"
-            variant="gold"
-            size="lg"
-            className="mt-7 w-full"
-            onClick={() => track("paywall:cta_click", { role })}
-          >
-            Unlock my score, from 56¢ a day
-          </ButtonLink>
-          <ButtonLink href="/dashboard" variant="ghost" size="sm" className="mt-1">
-            Maybe later
-          </ButtonLink>
-        </motion.div>
-      </div>
     </div>
   );
 }
