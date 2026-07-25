@@ -13,7 +13,7 @@ import { AnimatedNumber } from "@/components/ui/AnimatedNumber";
 import { getOnboarding, getProfile, getSessions, getStreak, onStoreChange } from "@/lib/store";
 import { apiInsights, type CareerInsights } from "@/lib/client";
 import { computeMetrics } from "@/lib/metrics";
-import { contextSummary } from "@/lib/context";
+import { contextSummary, persistOverview } from "@/lib/context";
 import { ProgressLineChart } from "@/components/charts/Charts";
 import { cn, formatDuration, formatDate, scoreColor } from "@/lib/utils";
 import type { Session, Streak } from "@/lib/types";
@@ -53,6 +53,8 @@ export default function DashboardPage() {
       setSummary(contextSummary());
     };
     sync();
+    // Keep the standardized account overview fresh on each dashboard visit.
+    persistOverview();
     return onStoreChange(sync);
   }, []);
 
