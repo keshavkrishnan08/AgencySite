@@ -132,6 +132,9 @@ export async function POST(req: Request) {
     gap: "questions about their résumé gap or career change",
     closer: "closing questions and 'do you have questions for us'",
     leadership: "leadership and conflict questions",
+    technical: "role-knowledge / technical questions specific to the job",
+    values: "values, motivation and culture-fit questions",
+    salary: "salary expectations and negotiation questions",
   };
   const wantedTypes: string[] = Array.isArray(focusTypes)
     ? focusTypes.filter((t: unknown) => typeof t === "string" && TYPE_LABEL[t as string])

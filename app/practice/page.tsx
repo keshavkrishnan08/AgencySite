@@ -28,6 +28,13 @@ import type { Dimension, DeliveryMetrics, Question, ScoredAnswer, Session, Situa
 
 type Domain = "interview" | "storytelling" | "public_speaking";
 
+/* Ideal answer-length bands the length-target customization maps to. */
+const LENGTH_RANGE: Record<"short" | "medium" | "long", [number, number]> = {
+  short: [40, 80],
+  medium: [60, 150],
+  long: [120, 220],
+};
+
 // setup = the practice hub (the precursor). custom = the fine-grained builder.
 // Access is gated once, at the app shell (unpaid = whole app blurred). So there
 // is NO paywall inside a session: everyone who's in the app runs the full thing.
@@ -68,10 +75,12 @@ function PracticeInner() {
   const domainRef = useRef<Domain>("interview");
   useEffect(() => { domainRef.current = domain; }, [domain]);
   const [interviewGap, setInterviewGap] = useState("");
-  // Session UX toggles (not question generation): per-question timer, and
-  // whether we lead with the mic instead of the textarea.
+  // Session UX toggles (not question generation): per-question timer, whether we
+  // lead with the mic, and the answer-length the ideal-length coaching aims for.
   const [timed, setTimed] = useState(false);
   const [voiceFirst, setVoiceFirst] = useState(false);
+  const [lengthTarget, setLengthTarget] = useState<"short" | "medium" | "long">("medium");
+  const lengthRange = LENGTH_RANGE[lengthTarget];
   const [questions, setQuestions] = useState<Question[]>([]);
   const [index, setIndex] = useState(0);
   const [answerText, setAnswerText] = useState("");
@@ -511,6 +520,8 @@ function PracticeInner() {
             setTimed={setTimed}
             voiceFirst={voiceFirst}
             setVoiceFirst={setVoiceFirst}
+            lengthTarget={lengthTarget}
+            setLengthTarget={setLengthTarget}
             onBack={() => setPhase("setup")}
             onSaveRoutine={(name) =>
               saveRoutine({
@@ -597,9 +608,10 @@ function PracticeInner() {
                       : `${wordCount} words`}
                   </span>
                   <span className="flex items-center gap-1 text-xs text-ink-3">
-                    Ideal length
+                    Ideal: {lengthRange[0]}–{lengthRange[1]} words
                     <InfoTip title="How long should it be?">
-                      60 to 150 words is the sweet spot. Long enough to tell a real story, short enough to stay sharp.
+                      {lengthRange[0]} to {lengthRange[1]} words is the target you set. Long enough to tell a real story,
+                      short enough to stay sharp.
                     </InfoTip>
                   </span>
                 </div>
@@ -1078,7 +1090,10 @@ const QUESTION_TYPES: { value: string; label: string; emoji: string }[] = [
   { value: "behavioral", label: "Behavioral", emoji: "💬" },
   { value: "situation", label: "Situational", emoji: "🧩" },
   { value: "leadership", label: "Leadership & conflict", emoji: "🤝" },
+  { value: "technical", label: "Role knowledge", emoji: "🛠️" },
+  { value: "values", label: "Values & culture", emoji: "🌱" },
   { value: "gap", label: "The gap question", emoji: "🕳️" },
+  { value: "salary", label: "Salary & negotiation", emoji: "💰" },
   { value: "closer", label: "Questions to ask them", emoji: "🎯" },
 ];
 
@@ -1204,6 +1219,8 @@ function SetupCard({
   setTimed,
   voiceFirst,
   setVoiceFirst,
+  lengthTarget,
+  setLengthTarget,
   onStart,
   onBack,
   onSaveRoutine,
@@ -1229,6 +1246,8 @@ function SetupCard({
   setTimed: (v: boolean) => void;
   voiceFirst: boolean;
   setVoiceFirst: (v: boolean) => void;
+  lengthTarget: "short" | "medium" | "long";
+  setLengthTarget: (v: "short" | "medium" | "long") => void;
   onStart: () => void;
   onBack?: () => void;
   onSaveRoutine: (name: string) => void;
@@ -1320,6 +1339,23 @@ function SetupCard({
               </div>
             </BuilderSection>
           </div>
+
+          <BuilderSection icon={Clock} title="Answer length" hint="what the coaching aims for">
+            <div className="flex gap-1 rounded-full bg-bg-tint p-1 sm:max-w-xs">
+              {(["short", "medium", "long"] as const).map((v) => (
+                <button
+                  key={v}
+                  onClick={() => setLengthTarget(v)}
+                  className={cn(
+                    "flex-1 rounded-full px-2 py-1.5 text-xs font-medium capitalize transition-colors",
+                    lengthTarget === v ? "bg-white text-ink shadow-xs" : "text-ink-2 hover:text-ink"
+                  )}
+                >
+                  {v}
+                </button>
+              ))}
+            </div>
+          </BuilderSection>
 
           <BuilderSection icon={MessageSquare} title="Phrasing" hint="how the questions read">
             <OptionChips options={TONES} isOn={(v) => tone === v} onPick={setTone} />
