@@ -98,7 +98,24 @@ export function mixpanelIdentify(email: string, props: Record<string, unknown> =
   try {
     // alias links the pre-signup anonymous history to the identified user, so
     // the funnel from first ad click through to payment stays one person.
-    mixpanel.alias(email, anonId());
+    // CRITICAL: alias must fire ONCE, ever — calling it on every identify (e.g.
+    // on each page load for a signed-in user) corrupts Mixpanel's identity
+    // resolution. Guard it with a durable flag so the first sign-in aliases and
+    // every subsequent call just identifies.
+    let aliased = false;
+    try {
+      aliased = window.localStorage.getItem("mp:aliased") === email;
+    } catch {
+      /* private mode */
+    }
+    if (!aliased) {
+      mixpanel.alias(email, anonId());
+      try {
+        window.localStorage.setItem("mp:aliased", email);
+      } catch {
+        /* ignore */
+      }
+    }
     mixpanel.identify(email);
     mixpanel.people.set({ $email: email, ...props });
   } catch {

@@ -5,6 +5,8 @@ import { usePathname, useRouter } from "next/navigation";
 import { ArrowRight, Loader2, Lock } from "lucide-react";
 import { AppNav } from "./AppNav";
 import { AppSidebar } from "./AppSidebar";
+import { CoachChat } from "@/components/chat/CoachChat";
+import { ProductTour } from "@/components/tour/ProductTour";
 import { Button } from "@/components/ui/Button";
 import { useAuth } from "@/lib/auth";
 import { getProfile, isPremium, onStoreChange, setProfile, upgradeToPremium } from "@/lib/store";
@@ -203,6 +205,9 @@ export function AppShell({
           children
         )}
       </div>
+      {/* Always-on coach + first-run tour, gated the same as the app. */}
+      {!needsPay && <CoachChat />}
+      {!needsPay && <ProductTour />}
     </>
   );
 }
