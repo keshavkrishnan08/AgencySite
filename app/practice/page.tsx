@@ -95,10 +95,16 @@ function PracticeInner() {
   // Deep customization that shapes the questions themselves.
   const [tone, setTone] = useState("");           // phrasing style
   const [interviewer, setInterviewer] = useState(""); // persona / demeanour
-  const customRef = useRef({ focusTypes: [] as string[], difficulty: "standard", count: 8, tone: "", interviewer: "" });
+  const [seniority, setSeniority] = useState("");  // entry | mid | senior | exec
+  const [stage, setStage] = useState("");          // screen | onsite | final
+  const [framework, setFramework] = useState("");  // star | car | free
+  const customRef = useRef({
+    focusTypes: [] as string[], difficulty: "standard", count: 8, tone: "", interviewer: "",
+    seniority: "", stage: "", framework: "",
+  });
   useEffect(() => {
-    customRef.current = { focusTypes, difficulty, count, tone, interviewer };
-  }, [focusTypes, difficulty, count, tone, interviewer]);
+    customRef.current = { focusTypes, difficulty, count, tone, interviewer, seniority, stage, framework };
+  }, [focusTypes, difficulty, count, tone, interviewer, seniority, stage, framework]);
   // Which practice domain this session is: interview, storytelling, or public
   // speaking. Threaded through a ref so the mount-time start() reads it fresh.
   const [domain, setDomain] = useState<Domain>("interview");
@@ -241,6 +247,9 @@ function PracticeInner() {
         domain: domainRef.current,
         tone: customRef.current.tone,
         interviewer: customRef.current.interviewer,
+        seniority: customRef.current.seniority,
+        stage: customRef.current.stage,
+        framework: customRef.current.framework,
       });
       setQuestions(questions);
       setIndex(0);
@@ -279,9 +288,13 @@ function PracticeInner() {
     setDomain(prefs.domain as Domain); domainRef.current = prefs.domain as Domain;
     setDifficulty(prefs.difficulty); setCount(prefs.count);
     setTone(prefs.tone); setInterviewer(prefs.interviewer);
+    setSeniority(prefs.seniority); setStage(prefs.stage); setFramework(prefs.framework);
     setTimed(prefs.timed); setVoiceFirst(prefs.voice);
     setLengthTarget((prefs.lengthTarget as "short" | "medium" | "long") || "medium");
-    customRef.current = { focusTypes: [], difficulty: prefs.difficulty, count: prefs.count, tone: prefs.tone, interviewer: prefs.interviewer };
+    customRef.current = {
+      focusTypes: [], difficulty: prefs.difficulty, count: prefs.count, tone: prefs.tone,
+      interviewer: prefs.interviewer, seniority: prefs.seniority, stage: prefs.stage, framework: prefs.framework,
+    };
 
     // A preset card can fully configure a session by URL (?autostart=1 plus any
     // of domain/types/count/difficulty/tone/interviewer/timed/voice). Apply that
@@ -297,7 +310,10 @@ function PracticeInner() {
       setTone(cTone); setInterviewer(cIv); setDomain(cDomain); domainRef.current = cDomain;
       setTimed(params.get("timed") === "1"); setVoiceFirst(params.get("voice") === "1");
       reviewRef.current = params.get("review") === "1";
-      customRef.current = { focusTypes: types, difficulty: cDiff, count: cCount, tone: cTone, interviewer: cIv };
+      customRef.current = {
+        focusTypes: types, difficulty: cDiff, count: cCount, tone: cTone, interviewer: cIv,
+        seniority: params.get("seniority") || "", stage: params.get("stage") || "", framework: params.get("framework") || "",
+      };
     }
 
     // Deep links (a predicted set, a focus drill, or explicit autostart) drop
@@ -329,7 +345,10 @@ function PracticeInner() {
       setDomain(d); domainRef.current = d;
       setFocusTypes(ft); setDifficulty(diff); setCount(c); setTone(tn); setInterviewer(iv);
       setTimed(Boolean(cfg.timed)); setVoiceFirst(Boolean(cfg.voice));
-      customRef.current = { focusTypes: ft, difficulty: diff, count: c, tone: tn, interviewer: iv };
+      customRef.current = {
+        focusTypes: ft, difficulty: diff, count: c, tone: tn, interviewer: iv,
+        seniority: customRef.current.seniority, stage: customRef.current.stage, framework: customRef.current.framework,
+      };
       track("practice:track_start", {
         domain: d, difficulty: diff, count: c, tone: tn, interviewer: iv,
         timed: Boolean(cfg.timed), voice: Boolean(cfg.voice), label: cfg.label || "",
@@ -608,6 +627,12 @@ function PracticeInner() {
             setVoiceFirst={setVoiceFirst}
             lengthTarget={lengthTarget}
             setLengthTarget={setLengthTarget}
+            seniority={seniority}
+            setSeniority={setSeniority}
+            stage={stage}
+            setStage={setStage}
+            framework={framework}
+            setFramework={setFramework}
             onBack={() => setPhase("setup")}
             onSaveRoutine={(name) =>
               saveRoutine({
@@ -618,7 +643,7 @@ function PracticeInner() {
               })
             }
             onStart={() => {
-              customRef.current = { focusTypes, difficulty, count, tone, interviewer };
+              customRef.current = { focusTypes, difficulty, count, tone, interviewer, seniority, stage, framework };
               domainRef.current = domain;
               start(role || "Office Manager", situation);
             }}
@@ -1240,6 +1265,17 @@ const DOMAINS_OPT = [
   { value: "public_speaking", label: "Public speaking", emoji: "🎤" },
 ];
 const COUNTS = [4, 6, 8, 10, 12];
+const SENIORITY_OPT = [
+  { value: "", label: "Any level" }, { value: "entry", label: "Entry" }, { value: "mid", label: "Mid" },
+  { value: "senior", label: "Senior" }, { value: "exec", label: "Executive" },
+];
+const STAGE_OPT = [
+  { value: "", label: "Any stage" }, { value: "screen", label: "Phone screen" },
+  { value: "onsite", label: "Onsite" }, { value: "final", label: "Final round" },
+];
+const FRAMEWORK_OPT = [
+  { value: "", label: "Free-form" }, { value: "star", label: "STAR" }, { value: "car", label: "CAR" },
+];
 
 function OptionChips({
   options,
@@ -1343,6 +1379,12 @@ function SetupCard({
   setVoiceFirst,
   lengthTarget,
   setLengthTarget,
+  seniority,
+  setSeniority,
+  stage,
+  setStage,
+  framework,
+  setFramework,
   onStart,
   onBack,
   onSaveRoutine,
@@ -1370,6 +1412,12 @@ function SetupCard({
   setVoiceFirst: (v: boolean) => void;
   lengthTarget: "short" | "medium" | "long";
   setLengthTarget: (v: "short" | "medium" | "long") => void;
+  seniority: string;
+  setSeniority: (v: string) => void;
+  stage: string;
+  setStage: (v: string) => void;
+  framework: string;
+  setFramework: (v: string) => void;
   onStart: () => void;
   onBack?: () => void;
   onSaveRoutine: (name: string) => void;
@@ -1484,6 +1532,18 @@ function SetupCard({
 
           <BuilderSection icon={Users} title="Interviewer" hint="who's asking">
             <OptionChips options={INTERVIEWERS} isOn={(v) => interviewer === v} onPick={setInterviewer} />
+          </BuilderSection>
+
+          <BuilderSection icon={Gauge} title="Seniority" hint="how deep and strategic the questions go">
+            <OptionChips options={SENIORITY_OPT} isOn={(v) => seniority === v} onPick={setSeniority} />
+          </BuilderSection>
+
+          <BuilderSection icon={Layers} title="Interview stage" hint="which round to simulate">
+            <OptionChips options={STAGE_OPT} isOn={(v) => stage === v} onPick={setStage} />
+          </BuilderSection>
+
+          <BuilderSection icon={MessageSquare} title="Answer framework" hint="what the coaching tips push toward">
+            <OptionChips options={FRAMEWORK_OPT} isOn={(v) => framework === v} onPick={setFramework} />
           </BuilderSection>
 
           <BuilderSection icon={Timer} title="Session options">
