@@ -18,7 +18,7 @@ export default function PrivacyPage() {
         </div>
       </header>
 
-      <main className="container-content py-12 sm:py-16">
+      <main className="container-wide py-12 sm:py-16">
         <p className="eyebrow">Legal</p>
         <h1 className="mt-3 font-serif text-4xl font-semibold text-ink">Privacy Policy</h1>
         <p className="mt-2 text-ink-3">Last updated: July 25, 2026</p>
