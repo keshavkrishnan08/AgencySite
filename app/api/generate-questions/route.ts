@@ -116,6 +116,8 @@ export async function POST(req: Request) {
     difficulty = "standard",
     count = 8,
     domain = "interview",
+    tone = "",
+    interviewer = "",
   } = body ?? {};
 
   // Clamp the requested question count to a sane range.
@@ -144,6 +146,23 @@ export async function POST(req: Request) {
     ? `\nEmphasise these question types: ${wantedTypes.map((t) => TYPE_LABEL[t]).join("; ")}. Weight the set toward them.`
     : "";
 
+  // Phrasing / tone: how the questions read.
+  const TONE_LINE: Record<string, string> = {
+    conversational: "\nPhrase questions warmly and conversationally, the way a friendly manager actually talks.",
+    formal: "\nPhrase questions crisply and formally, the way a structured competency interview is worded.",
+    rapid_fire: "\nMake questions short and punchy — rapid-fire, one clean sentence each, no preamble.",
+    scenario: "\nFrame questions as concrete 'what would you do if…' scenarios rooted in the role.",
+  };
+  // Interviewer persona: the demeanour behind the questions.
+  const INTERVIEWER_LINE: Record<string, string> = {
+    friendly: "\nThe interviewer is warm and encouraging — supportive framing, benefit of the doubt.",
+    neutral: "\nThe interviewer is professional and neutral — no warmth, no hostility, just the questions.",
+    skeptical: "\nThe interviewer is skeptical and probing — press on specifics, ask for proof, don't let vague claims slide.",
+    panel: "\nThis is a panel: vary the voice between questions, and include at least one sharp follow-up-style challenge.",
+  };
+  const toneLine = TONE_LINE[String(tone)] || "";
+  const interviewerLine = INTERVIEWER_LINE[String(interviewer)] || "";
+
   if (focusDimension) {
     return NextResponse.json({
       questions: generateFocusQuestions(focusDimension, targetRole, seed),
@@ -163,7 +182,7 @@ export async function POST(req: Request) {
         `\n\nThis is practice session #${(Number(sessionCount) || 0) + 1}. Make this set FRESH: vary the wording, scenarios, and angles so it does not feel like a repeat of earlier sessions.` +
         (avoidList.length ? `\nDo NOT reuse or lightly reword any of these already-asked questions:\n- ${avoidList.join("\n- ")}` : "");
       const system = domainSystem.replace(/\{N\}/g, String(n));
-      const user = `${candidateBlock({ name, situation: situation || "", targetRole, company, interviewGap, posting, weakestDimension })}${variety}${dom === "interview" ? typeLine : ""}${diffLine}\n\nWrite their ${n} ${dom === "interview" ? "questions" : "drills"} now.`;
+      const user = `${candidateBlock({ name, situation: situation || "", targetRole, company, interviewGap, posting, weakestDimension })}${variety}${dom === "interview" ? typeLine : ""}${diffLine}${toneLine}${interviewerLine}\n\nWrite their ${n} ${dom === "interview" ? "questions" : "drills"} now.`;
       // Higher temperature than scoring: for questions, variety matters more than determinism.
       const text = await callClaude({ model: FAST_MODEL, system, user, maxTokens: 1100, temperature: 0.85 });
       const parsed = extractJson<{ questions: Question[] }>(text);
