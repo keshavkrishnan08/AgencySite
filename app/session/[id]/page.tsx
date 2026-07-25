@@ -170,6 +170,9 @@ export default function SessionPage() {
           <ShareCard session={session} sessionsCount={all.length} />
         )}
 
+        {/* Mock-panel scorecard (only when panelists asked) */}
+        <PanelScorecard answers={session.answers} />
+
         {/* Per-question review */}
         <div className="mt-12">
           <h2 className="mb-4 font-serif text-xl font-semibold text-ink">Review every answer</h2>
@@ -202,6 +205,48 @@ function bestAndWorst(s: Session): { strongest: Dimension; weakest: Dimension } 
   return { strongest, weakest };
 }
 const labelOf = (d: Dimension) => DIMENSIONS.find((x) => x.key === d)?.label ?? d;
+
+/* Per-interviewer scorecard for mock-panel sessions. Groups answers by who
+   asked and shows each panelist's average — the toughest room stands out.
+   Renders nothing unless at least two panelists asked. */
+function PanelScorecard({ answers }: { answers: ScoredAnswer[] }) {
+  const groups = new Map<string, number[]>();
+  for (const a of answers) {
+    if (!a.interviewer) continue;
+    const arr = groups.get(a.interviewer) ?? [];
+    arr.push(a.scores.overall);
+    groups.set(a.interviewer, arr);
+  }
+  if (groups.size < 2) return null;
+  const rows = Array.from(groups.entries())
+    .map(([who, scores]) => ({ who, avg: Math.round(scores.reduce((s: number, n: number) => s + n, 0) / scores.length), n: scores.length }))
+    .sort((a, b) => a.avg - b.avg);
+  return (
+    <div className="mt-12">
+      <h2 className="mb-1 font-serif text-xl font-semibold text-ink">How each interviewer scored you</h2>
+      <p className="mb-4 text-sm text-ink-2">
+        Your mock panel, toughest room first. That&apos;s where the next rep pays off most.
+      </p>
+      <div className="grid gap-3 sm:grid-cols-2 lg:grid-cols-4">
+        {rows.map((r) => {
+          const [nm, rl] = r.who.split(" · ");
+          return (
+            <div key={r.who} className="card p-5 text-center">
+              <span
+                className="mx-auto grid h-11 w-11 place-items-center rounded-full font-mono text-sm font-bold text-white"
+                style={{ background: scoreColor(r.avg) }}
+              >
+                {r.avg}
+              </span>
+              <p className="mt-2.5 font-medium text-ink">{nm}</p>
+              <p className="text-xs text-ink-3">{rl} · {r.n} Q{r.n === 1 ? "" : "s"}</p>
+            </div>
+          );
+        })}
+      </div>
+    </div>
+  );
+}
 const growthOf = (d: Dimension) => `${labelOf(d)} needs the most attention. Add concrete detail to every answer.`;
 
 /* ---------------- account prompt ---------------- */
