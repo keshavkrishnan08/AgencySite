@@ -8,8 +8,11 @@ import {
   CartesianGrid,
   Cell,
   ComposedChart,
+  Legend,
   Line,
   LineChart,
+  Pie,
+  PieChart,
   PolarAngleAxis,
   PolarGrid,
   PolarRadiusAxis,
@@ -338,6 +341,99 @@ export function Sparkline({
           isAnimationActive={false}
         />
       </LineChart>
+    </ResponsiveContainer>
+  );
+}
+
+/* ----------------- Donut (composition / distribution) -----------------
+   A ring, not a full pie, so a total or headline can sit in the hole. Slice
+   colors come from the data so it matches the rest of the palette. */
+export function DonutChart({
+  data,
+  height = 220,
+  centerLabel,
+  centerValue,
+}: {
+  data: { name: string; value: number; color: string }[];
+  height?: number;
+  centerLabel?: string;
+  centerValue?: string;
+}) {
+  const total = data.reduce((s, d) => s + d.value, 0);
+  const animKey = data.map((d) => d.value).join(",");
+  return (
+    <div className="relative" style={{ height }}>
+      <ResponsiveContainer key={animKey} width="100%" height={height}>
+        <PieChart>
+          <Pie
+            data={data}
+            dataKey="value"
+            nameKey="name"
+            cx="50%"
+            cy="50%"
+            innerRadius="58%"
+            outerRadius="82%"
+            paddingAngle={2}
+            stroke="none"
+            animationDuration={900}
+          >
+            {data.map((d, i) => (
+              <Cell key={i} fill={d.color} />
+            ))}
+          </Pie>
+          <Tooltip content={<ChartTooltip />} />
+          <Legend
+            verticalAlign="bottom"
+            height={28}
+            iconType="circle"
+            iconSize={8}
+            formatter={(v: string) => <span style={{ color: ink2, fontSize: 12 }}>{v}</span>}
+          />
+        </PieChart>
+      </ResponsiveContainer>
+      {(centerValue || centerLabel) && (
+        <div className="pointer-events-none absolute inset-x-0 flex flex-col items-center" style={{ top: height / 2 - 34 }}>
+          {centerValue && <span className="font-mono text-2xl font-semibold text-ink">{centerValue}</span>}
+          {centerLabel && <span className="text-2xs uppercase tracking-wider text-ink-3">{centerLabel}</span>}
+          {!centerValue && total > 0 && <span className="font-mono text-2xl font-semibold text-ink">{total}</span>}
+        </div>
+      )}
+    </div>
+  );
+}
+
+/* ----------------- Horizontal bars (ranked breakdown) -----------------
+   Reads top-to-bottom like a leaderboard; each bar colored by its score. */
+export function HBarChart({
+  data,
+  height = 220,
+  max = 100,
+}: {
+  data: { label: string; value: number }[];
+  height?: number;
+  max?: number;
+}) {
+  const animKey = data.map((d) => Math.round(d.value)).join(",");
+  return (
+    <ResponsiveContainer key={animKey} width="100%" height={height}>
+      <BarChart data={data} layout="vertical" margin={{ top: 4, right: 16, bottom: 0, left: 8 }}>
+        <CartesianGrid stroke={grid} strokeDasharray="4 6" horizontal={false} />
+        <XAxis type="number" domain={[0, max]} hide />
+        <YAxis
+          type="category"
+          dataKey="label"
+          tick={{ fill: ink2, fontSize: 12, fontFamily: "var(--font-sans)" }}
+          axisLine={false}
+          tickLine={false}
+          width={92}
+        />
+        <Tooltip content={<ChartTooltip />} cursor={{ fill: "rgba(27,32,48,0.04)" }} />
+        <Bar dataKey="value" name="Score" radius={[0, 6, 6, 0]} maxBarSize={22} animationDuration={900}>
+          {data.map((d, i) => (
+            <Cell key={i} fill={scoreColor(d.value)} />
+          ))}
+        </Bar>
+      </BarChart>
     </ResponsiveContainer>
   );
 }
