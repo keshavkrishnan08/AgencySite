@@ -62,6 +62,25 @@ export async function pullProfile(): Promise<Partial<UserProfile> | null> {
   }
 }
 
+/* ---------------- standardized overview ---------------- */
+
+/** Persist the condensed, standardized account overview onto the profile row.
+    Fire-and-forget; no-ops when auth isn't configured or nobody's signed in. */
+export async function pushOverview(overview: object): Promise<void> {
+  const sb = supabaseBrowser();
+  if (!sb) return;
+  const id = await currentUserId();
+  if (!id) return;
+  try {
+    await sb
+      .from("profiles")
+      .update({ overview, overview_updated_at: new Date().toISOString() })
+      .eq("id", id);
+  } catch {
+    /* ignore */
+  }
+}
+
 /* ---------------- sessions ---------------- */
 
 export async function pushSession(s: Session): Promise<void> {

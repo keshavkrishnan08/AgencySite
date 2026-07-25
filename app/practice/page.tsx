@@ -16,7 +16,7 @@ import { AnswerScoreCard } from "@/components/practice/AnswerScoreCard";
 import { VoiceButton } from "@/components/ui/VoiceButton";
 import { InfoTip } from "@/components/ui/Tooltip";
 import { apiFollowUp, apiGenerateExample, apiGenerateQuestions, apiScoreAnswer } from "@/lib/client";
-import { encodedContext } from "@/lib/context";
+import { encodedContext, persistOverview } from "@/lib/context";
 import { aggregateDimensions, computeOverall } from "@/lib/scoring";
 import {
   getOnboarding, getPredictedSet, getProfile, getSessions, saveSession,
@@ -559,6 +559,8 @@ function PracticeInner() {
       tellsPer100: totalWords ? Math.round(((fillers + hedges + apologies + underminers) / totalWords) * 1000) / 10 : 0,
     });
     mixpanelIncrement("sessions_completed");
+    // Refresh the standardized overview saved to the account.
+    persistOverview();
     router.push(`/session/${session.id}`);
   };
 

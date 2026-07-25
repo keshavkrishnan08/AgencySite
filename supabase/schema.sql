@@ -23,6 +23,8 @@ create table if not exists public.profiles (
   interview_gap text,
   plan text not null default 'free',            -- 'free' | 'premium'
   stripe_customer_id text,
+  overview jsonb,                                -- standardized condensed account overview snapshot
+  overview_updated_at timestamptz,
   created_at timestamptz not null default now()
 );
 
