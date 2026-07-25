@@ -251,6 +251,9 @@ export interface Prefs {
   count: number;         // questions per session
   tone: string;          // phrasing
   interviewer: string;   // persona
+  seniority: string;     // entry | mid | senior | exec
+  stage: string;         // screen | onsite | final
+  framework: string;     // star | car | free
   timed: boolean;
   voice: boolean;        // voice-first
   lengthTarget: string;  // short | medium | long
@@ -259,6 +262,7 @@ export interface Prefs {
 }
 export const DEFAULT_PREFS: Prefs = {
   domain: "interview", difficulty: "standard", count: 8, tone: "", interviewer: "",
+  seniority: "", stage: "", framework: "",
   timed: false, voice: false, lengthTarget: "medium", coachTone: "balanced", autostart: false,
 };
 export function getPrefs(): Prefs {

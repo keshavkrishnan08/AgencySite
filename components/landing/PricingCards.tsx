@@ -3,7 +3,6 @@
 import { Check } from "lucide-react";
 import { Reveal } from "@/components/ui/Reveal";
 import { StartFreeButton } from "@/components/ui/StartFreeButton";
-import { PresaleForm } from "@/components/landing/PresaleForm";
 import { PLANS, PLAN_ORDER, priceParts, type PlanKey } from "@/lib/pricing";
 import { perDayLabel } from "@/lib/roi";
 
@@ -87,17 +86,13 @@ function PlanCard({ plan, presale }: { plan: PlanKey; presale: boolean }) {
       </ul>
 
       <div className="mt-auto !mt-7">
-        {presale ? (
-          <PresaleForm source={`pricing_${plan}`} compact cta="Lock this in" />
-        ) : (
-          <StartFreeButton
-            variant={promoted ? "primary" : "secondary"}
-            size="md"
-            className="w-full"
-            source={`pricing_${plan}`}
-            showArrow={false}
-          />
-        )}
+        <StartFreeButton
+          variant={promoted ? "primary" : "secondary"}
+          size="md"
+          className="w-full"
+          source={`pricing_${plan}`}
+          showArrow={false}
+        />
       </div>
     </div>
   );

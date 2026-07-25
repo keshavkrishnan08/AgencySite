@@ -39,6 +39,9 @@ export async function apiGenerateQuestions(args: {
   domain?: string;
   tone?: string;
   interviewer?: string;
+  seniority?: string;
+  stage?: string;
+  framework?: string;
 }): Promise<{ questions: Question[]; source: string }> {
   try {
     const res = await fetch("/api/generate-questions", {
