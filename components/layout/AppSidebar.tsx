@@ -1,13 +1,10 @@
 "use client";
 
-import { useEffect, useState } from "react";
 import Link from "next/link";
-import { usePathname } from "next/navigation";
-import { LineChart, Mic, Sprout, Wand2, LogOut, BarChart3, LayoutDashboard, Briefcase, SlidersHorizontal, type LucideIcon } from "lucide-react";
-import { useRouter } from "next/navigation";
+import { usePathname, useRouter } from "next/navigation";
+import { LineChart, Mic, Sprout, Wand2, LogOut, BarChart3, LayoutDashboard, Briefcase, SlidersHorizontal, Settings, type LucideIcon } from "lucide-react";
 import { LogoMark } from "@/components/ui/Logo";
 import { cn } from "@/lib/utils";
-import { getProfile, onStoreChange } from "@/lib/store";
 import { useAuth } from "@/lib/auth";
 
 interface Item {
@@ -21,7 +18,6 @@ const MAIN: Item[] = [
   { href: "/practice", label: "Practice", icon: Mic },
   { href: "/job", label: "Job Breakdown", icon: Briefcase },
   { href: "/analytics", label: "Analytics", icon: LineChart },
-  { href: "/reports", label: "Reports", icon: BarChart3 },
 ];
 
 const TOOLS: Item[] = [
@@ -35,18 +31,6 @@ export function AppSidebar() {
   const pathname = usePathname();
   const router = useRouter();
   const { configured, user, signOut } = useAuth();
-  const [name, setName] = useState("");
-
-  useEffect(() => {
-    const sync = () => {
-      const p = getProfile();
-      setName(p.name || p.email || "");
-    };
-    sync();
-    return onStoreChange(sync);
-  }, []);
-
-  const initial = (name || "Y").trim().charAt(0).toUpperCase();
 
   const Row = ({ item }: { item: Item }) => {
     const active = pathname === item.href || pathname.startsWith(item.href + "/");
@@ -103,21 +87,7 @@ export function AppSidebar() {
       {/* footer: preferences + account */}
       <div className="mt-auto flex flex-col gap-1 border-t px-3 py-3" style={{ borderColor: "var(--border)" }}>
         <Row item={{ href: "/preferences", label: "Preferences", icon: SlidersHorizontal }} />
-        <Link
-          href="/settings"
-          title="Account settings"
-          className="flex items-center gap-3 rounded-xl px-2 py-2 text-ink-2 transition-colors hover:bg-bg-tint hover:text-ink"
-        >
-          <span
-            className="grid h-9 w-9 shrink-0 place-items-center rounded-full text-sm font-semibold text-white shadow-sm"
-            style={{ background: "linear-gradient(140deg, var(--primary-bright), var(--primary-ink))" }}
-          >
-            {initial}
-          </span>
-          <span className="whitespace-nowrap text-sm font-medium opacity-0 transition-opacity duration-200 group-hover:opacity-100">
-            Settings
-          </span>
-        </Link>
+        <Row item={{ href: "/settings", label: "Settings", icon: Settings }} />
         {configured && user && (
           <button
             onClick={async () => { await signOut(); router.push("/"); }}

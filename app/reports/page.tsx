@@ -2,14 +2,13 @@
 
 import { useEffect, useMemo, useState } from "react";
 import {
-  BarChart3, Users, Eye, MousePointerClick, UserCheck, Loader2, TrendingDown,
+  BarChart3, Users, Eye, MousePointerClick, UserCheck, Loader2, TrendingDown, Lock,
 } from "lucide-react";
-import { AppShell } from "@/components/layout/AppShell";
-import { getProfile } from "@/lib/store";
 import { cn } from "@/lib/utils";
 
-/* In-app product analytics — page by page, first-party, from our own event log
-   (public.events). No Mixpanel plan and no ad-blocker loss needed to see it. */
+/* Owner-only product analytics, SPLIT OUT of the app — no app chrome, not in any
+   nav, gated by a password (REPORTS_PASSWORD). Page-by-page traffic + the
+   acquisition funnel from our own first-party event log (public.events). */
 
 type Report = {
   days: number;
@@ -33,28 +32,41 @@ const pc = (n: number, d: number) => (d ? `${((n / d) * 100).toFixed(1)}%` : "�
 
 export default function ReportsPage() {
   const [days, setDays] = useState<7 | 30 | 90>(30);
-  const [state, setState] = useState<"loading" | "ready" | "demo" | "error">("loading");
+  const [state, setState] = useState<"idle" | "loading" | "ready" | "demo" | "error">("idle");
   const [report, setReport] = useState<Report | null>(null);
+  const [pw, setPw] = useState("");
+  const [unlocked, setUnlocked] = useState(false);
+  const [authErr, setAuthErr] = useState("");
+
+  // Restore a password unlocked earlier this browser session.
+  useEffect(() => {
+    try {
+      const saved = sessionStorage.getItem("reports_pw");
+      if (saved) { setPw(saved); setUnlocked(true); }
+    } catch { /* ignore */ }
+  }, []);
 
   useEffect(() => {
+    if (!unlocked || !pw) return;
     let alive = true;
     setState("loading");
     fetch("/api/reports", {
       method: "POST",
-      headers: { "Content-Type": "application/json", "x-user-id": getProfile().email || "" },
-      body: JSON.stringify({ days }),
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({ days, password: pw }),
     })
-      .then((r) => r.json())
-      .then((d) => {
+      .then(async (r) => ({ ok: r.ok, status: r.status, d: await r.json() }))
+      .then(({ ok, status, d }) => {
         if (!alive) return;
+        if (status === 401) { setUnlocked(false); setAuthErr("Wrong password."); try { sessionStorage.removeItem("reports_pw"); } catch {} return; }
         if (d.configured === false) return setState("demo");
-        if (d.error || !d.report) return setState("error");
+        if (!ok || d.error || !d.report) return setState("error");
         setReport(d.report as Report);
         setState("ready");
       })
       .catch(() => alive && setState("error"));
     return () => { alive = false; };
-  }, [days]);
+  }, [days, unlocked, pw]);
 
   const maxDaily = useMemo(
     () => Math.max(1, ...(report?.daily || []).map((x) => x.events)),
@@ -63,8 +75,30 @@ export default function ReportsPage() {
   const land = report?.funnel.land || 0;
   const empty = state === "ready" && (report?.totals.events || 0) === 0;
 
+  // ── password gate ──
+  if (!unlocked) {
+    return (
+      <main className="grid min-h-screen place-items-center px-5" style={{ background: "var(--bg)" }}>
+        <form
+          onSubmit={(e) => { e.preventDefault(); if (!pw.trim()) return; setAuthErr(""); try { sessionStorage.setItem("reports_pw", pw.trim()); } catch {} setUnlocked(true); }}
+          className="w-full max-w-xs text-center"
+        >
+          <span className="mx-auto grid h-12 w-12 place-items-center rounded-full" style={{ background: "var(--bg-sunk)" }}><Lock size={20} className="text-ink-2" /></span>
+          <h1 className="mt-4 font-serif text-xl font-semibold text-ink">Analytics</h1>
+          <p className="mt-1 text-sm text-ink-3">Enter the password to continue.</p>
+          <input
+            type="password" autoFocus value={pw} onChange={(e) => setPw(e.target.value)}
+            placeholder="Password" className="field mt-5 text-center"
+          />
+          {authErr && <p className="mt-2 text-sm text-coral-ink">{authErr}</p>}
+          <button type="submit" className="btn-primary mt-4 w-full">Unlock</button>
+        </form>
+      </main>
+    );
+  }
+
   return (
-    <AppShell requirePremium={false}>
+    <>
       <main className="container-wide space-y-6 py-8 sm:py-10">
         <header className="flex flex-wrap items-end justify-between gap-4">
           <div>
@@ -256,7 +290,7 @@ export default function ReportsPage() {
           </>
         )}
       </main>
-    </AppShell>
+    </>
   );
 }
 

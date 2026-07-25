@@ -8,7 +8,7 @@ import {
 } from "lucide-react";
 import { AppShell } from "@/components/layout/AppShell";
 import { ButtonLink } from "@/components/ui/Button";
-import { getOnboarding, getProfile, setProfile } from "@/lib/store";
+import { getOnboarding, getProfile, setProfile, getPrefs } from "@/lib/store";
 import { getJobBreakdown, money } from "@/lib/job-insights";
 import { QUESTION_BANK } from "@/lib/question-bank";
 import { ROLES } from "@/lib/roles";
@@ -32,7 +32,7 @@ export default function JobPage() {
     setRole(p.targetRole || ob?.targetRole || "Office Manager");
   }, []);
 
-  const { family } = useMemo(() => getJobBreakdown(role), [role]);
+  const { family } = useMemo(() => getJobBreakdown(role, getPrefs().seniority), [role]);
   const suggestions = useMemo(() => {
     const q = query.trim().toLowerCase();
     if (q.length < 2) return [];
@@ -183,10 +183,10 @@ export default function JobPage() {
   );
 }
 
-/* Flat, embedded section — a thin top rule + eyebrow, content on the background. */
+/* Embedded card — a recessed panel (no border, no shadow), content inside. */
 function Section({ icon: Icon, title, note, children }: { icon: typeof Briefcase; title: string; note?: string; children: React.ReactNode }) {
   return (
-    <section className="mt-8 border-t pt-6" style={{ borderColor: "var(--border)" }}>
+    <section className="card mt-5 p-6 sm:p-7">
       <div className="mb-4 flex items-baseline gap-2.5">
         <Icon size={16} className="translate-y-0.5 text-primary" />
         <h2 className="font-serif text-lg font-semibold text-ink">{title}</h2>
