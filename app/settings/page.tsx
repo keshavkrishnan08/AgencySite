@@ -124,7 +124,7 @@ export default function SettingsPage() {
 
         {/* ── Subscription (deep) ── */}
         <Section icon={CreditCard} title="Subscription" note="plan, billing, and cancellation" span2>
-          <div className="rounded-xl border p-5" style={{ borderColor: "var(--border)", background: "var(--surface-2)" }}>
+          <div className="rounded-xl p-5" style={{ background: "var(--bg-sunk)" }}>
             <div className="flex flex-wrap items-center justify-between gap-3">
               <div className="flex items-center gap-3">
                 <span className="font-serif text-xl font-semibold text-ink">
