@@ -109,6 +109,7 @@ export async function apiFollowUp(args: {
   company?: string;
   situation?: string;
   interviewGap?: string;
+  context?: string; // compact 符 mega-context line, so the interviewer knows the person
 }): Promise<string> {
   try {
     const res = await fetch("/api/follow-up", {
