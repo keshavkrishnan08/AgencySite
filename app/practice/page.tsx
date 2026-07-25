@@ -632,7 +632,7 @@ function PracticeInner() {
         </div>
       </div>
 
-      <div className={cn(phase === "setup" ? "container-wide" : "container-content", "pt-10")}>
+      <div className={cn(phase === "setup" || phase === "answer" ? "container-wide" : "container-content", "pt-10")}>
         {/* role chip */}
         {(phase === "answer" || phase === "score") && (
           <div className="mb-6 flex flex-wrap items-center gap-2">
@@ -758,43 +758,78 @@ function PracticeInner() {
                 </h1>
               </div>
 
-              <div className="mt-5">
-                {voiceFirst && (
-                  <div
-                    className="mb-3 flex items-center gap-2 rounded-xl border px-4 py-2.5 text-sm"
-                    style={{ borderColor: "var(--primary)", background: "var(--primary-soft)", color: "var(--primary-ink)" }}
-                  >
-                    <Mic size={15} /> Voice-first: tap the mic and just talk. We&apos;ll transcribe and score your delivery.
+              {/* Tall (portrait) answer box on the left, coaching prompts on the right. */}
+              <div className="mt-5 grid gap-5 lg:grid-cols-[1fr_300px] lg:items-start">
+                <div>
+                  {voiceFirst && (
+                    <div
+                      className="mb-3 flex items-center gap-2 rounded-xl border px-4 py-2.5 text-sm"
+                      style={{ borderColor: "var(--primary)", background: "var(--primary-soft)", color: "var(--primary-ink)" }}
+                    >
+                      <Mic size={15} /> Voice-first: tap the mic and just talk. We&apos;ll transcribe and score your delivery.
+                    </div>
+                  )}
+                  <textarea
+                    autoFocus={!voiceFirst}
+                    value={answerText}
+                    onChange={(e) => { noteAnswerStart(); setAnswerText(e.target.value); }}
+                    placeholder="Type your answer here… speak naturally, as if you're in the interview."
+                    className="field min-h-[440px] resize-y leading-relaxed"
+                    style={{ maxHeight: 680 }}
+                  />
+                  {interim && (
+                    <p className="mt-2 flex items-start gap-2 px-1 text-sm italic text-ink-3">
+                      <span className="mt-1.5 h-2 w-2 shrink-0 animate-pulse rounded-full bg-coral" />
+                      {interim}…
+                    </p>
+                  )}
+                  <div className="mt-2 flex items-center justify-between px-1">
+                    <span className="text-xs text-ink-3">
+                      {wordCount < MIN_WORDS
+                        ? `${wordCount} word${wordCount === 1 ? "" : "s"}. A few more to submit (${MIN_WORDS}+)`
+                        : `${wordCount} words`}
+                    </span>
+                    <span className="flex items-center gap-1 text-xs text-ink-3">
+                      Ideal: {lengthRange[0]}–{lengthRange[1]} words
+                      <InfoTip title="How long should it be?">
+                        {lengthRange[0]} to {lengthRange[1]} words is the target you set. Long enough to tell a real story,
+                        short enough to stay sharp.
+                      </InfoTip>
+                    </span>
                   </div>
-                )}
-                <textarea
-                  autoFocus={!voiceFirst}
-                  value={answerText}
-                  onChange={(e) => { noteAnswerStart(); setAnswerText(e.target.value); }}
-                  placeholder="Type your answer here… speak naturally, as if you're in the interview."
-                  className="field min-h-[180px] resize-y leading-relaxed"
-                  style={{ maxHeight: 420 }}
-                />
-                {interim && (
-                  <p className="mt-2 flex items-start gap-2 px-1 text-sm italic text-ink-3">
-                    <span className="mt-1.5 h-2 w-2 shrink-0 animate-pulse rounded-full bg-coral" />
-                    {interim}…
-                  </p>
-                )}
-                <div className="mt-2 flex items-center justify-between px-1">
-                  <span className="text-xs text-ink-3">
-                    {wordCount < MIN_WORDS
-                      ? `${wordCount} word${wordCount === 1 ? "" : "s"}. A few more to submit (${MIN_WORDS}+)`
-                      : `${wordCount} words`}
-                  </span>
-                  <span className="flex items-center gap-1 text-xs text-ink-3">
-                    Ideal: {lengthRange[0]}–{lengthRange[1]} words
-                    <InfoTip title="How long should it be?">
-                      {lengthRange[0]} to {lengthRange[1]} words is the target you set. Long enough to tell a real story,
-                      short enough to stay sharp.
-                    </InfoTip>
-                  </span>
                 </div>
+
+                {/* Prompts rail */}
+                <aside className="card p-5 lg:sticky lg:top-6">
+                  <p className="text-2xs font-semibold uppercase tracking-wider text-ink-3">Prompts</p>
+                  <div className="mt-3 space-y-3">
+                    <div>
+                      <p className="text-xs font-semibold text-ink">Structure it</p>
+                      <ul className="mt-1.5 space-y-1 text-xs leading-relaxed text-ink-2">
+                        <li><strong className="text-ink">S</strong>ituation: set the scene in a line.</li>
+                        <li><strong className="text-ink">T</strong>ask: what were you on the hook for?</li>
+                        <li><strong className="text-ink">A</strong>ction: what did <em>you</em> do?</li>
+                        <li><strong className="text-ink">R</strong>esult: the outcome, with a number.</li>
+                      </ul>
+                    </div>
+                    <div className="hairline" />
+                    <ul className="space-y-1.5 text-xs leading-relaxed text-ink-2">
+                      <li className="flex gap-1.5"><span className="text-primary">•</span> Lead with the point, then the story.</li>
+                      <li className="flex gap-1.5"><span className="text-primary">•</span> Say &ldquo;I&rdquo;, not &ldquo;we&rdquo;. Own your part.</li>
+                      <li className="flex gap-1.5"><span className="text-primary">•</span> One real example beats three vague ones.</li>
+                      <li className="flex gap-1.5"><span className="text-primary">•</span> End on the result. Then stop.</li>
+                    </ul>
+                    {current.tip && (
+                      <>
+                        <div className="hairline" />
+                        <div className="rounded-lg p-3" style={{ background: "var(--primary-soft)" }}>
+                          <p className="text-2xs font-semibold uppercase tracking-wider text-primary-ink">For this question</p>
+                          <p className="mt-1 text-xs leading-relaxed text-ink"><Inline text={current.tip} /></p>
+                        </div>
+                      </>
+                    )}
+                  </div>
+                </aside>
               </div>
 
               <div className="mt-6 flex flex-wrap items-center justify-between gap-3">
