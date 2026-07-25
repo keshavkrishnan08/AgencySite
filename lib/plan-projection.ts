@@ -100,6 +100,30 @@ function milestoneTo(startScore: number, topPercent: number, percentile: number,
 }
 
 /**
+ * Day-by-day readiness curve for a given start + cadence — the data behind the
+ * animated graph on the practice-frequency screen. Same per-session model as
+ * the projection above (BASE_PACE, diminishing returns), so the curve someone
+ * watches climb and the promise they're shown come from one source. A higher
+ * cadence packs more sessions into the window, so the line visibly steepens.
+ */
+export function projectCurve(skill: SkillLevel, cadence: Cadence, days = 28): number[] {
+  const perDay = CADENCE_META[cadence].perWeek / 7;
+  let score = START[skill];
+  let credit = 0;
+  const out: number[] = [score];
+  for (let d = 1; d <= days; d++) {
+    credit += perDay;
+    while (credit >= 1) {
+      const headroom = Math.max(0.2, (100 - score) / 52);
+      score = Math.min(99, score + BASE_PACE * headroom);
+      credit -= 1;
+    }
+    out.push(score);
+  }
+  return out;
+}
+
+/**
  * Build the projection around the two milestones that sell: top 10% (the near
  * win) and top 1% (the destination). Both are computed from the person's own
  * self-rated start and stated cadence on the same percentile curve the
