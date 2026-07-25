@@ -15,7 +15,12 @@ type Mode = "signin" | "signup";
 function SignInInner() {
   const router = useRouter();
   const params = useSearchParams();
-  const next = params.get("next") || "/dashboard";
+  // Returning sign-ins go where they were headed (or the app). A brand-new
+  // account goes to PAYMENT first — never straight into the app — since the
+  // product is paid. The checkout's success_url brings them back into the app.
+  const nextParam = params.get("next");
+  const signinNext = nextParam || "/dashboard";
+  const signupNext = nextParam && nextParam !== "/dashboard" ? nextParam : "/upgrade";
   const { configured, signIn, signUp, signInWithLink } = useAuth();
 
   const [mode, setMode] = useState<Mode>(params.get("mode") === "signup" ? "signup" : "signin");
@@ -41,9 +46,9 @@ function SignInInner() {
         // Join the anonymous pre-signup journey (ads -> onboarding) to the real
         // person. This is the alias moment: everything before now was anon.
         identify(email.trim(), { name: name.trim() || undefined });
-        track("account_created", { next });
+        track("account_created", { next: signupNext });
         if (r.needsConfirm) return setNotice("Check your email to confirm your account, then sign in.");
-        router.push(next);
+        router.push(signupNext);
       } else {
         const r = await signIn(email.trim(), password);
         if (r.error) {
@@ -51,8 +56,8 @@ function SignInInner() {
           return setError(r.error);
         }
         identify(email.trim());
-        track("account:signin", { next });
-        router.push(next);
+        track("account:signin", { next: signinNext });
+        router.push(signinNext);
       }
     } finally {
       setBusy(false);
