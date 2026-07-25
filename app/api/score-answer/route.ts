@@ -3,7 +3,7 @@ import { recordUsage } from "@/lib/usage";
 import { NextResponse } from "next/server";
 import { scoreAnswer, computeOverall } from "@/lib/scoring";
 import { exampleAnswer } from "@/lib/examples";
-import { callClaude, extractJson, hasAI, SCORE_MODEL } from "@/lib/ai";
+import { callClaude, extractJson, hasAI, SCORE_MODEL, stripMd } from "@/lib/ai";
 import { COACH_PERSONA, SCORING_RUBRIC, candidateBlock } from "@/lib/prompt";
 import type { DimensionScores } from "@/lib/types";
 
@@ -162,11 +162,12 @@ export async function POST(req: Request) {
         // Message: the brief fixes, normalized to clean strings.
         const improve = (Array.isArray(parsed.improve) ? parsed.improve : [])
           .filter((s) => typeof s === "string" && s.trim())
-          .map((s) => s.trim())
+          .map((s) => stripMd(s.trim()))
+          .filter((s) => s.length > 0)
           .slice(0, 2);
         const aiResult: AiScored = {
           scores: { ...dims, overall: computeOverall(dims) },
-          strengthSummary: (parsed.strength || "").trim() || heuristic.strengthSummary,
+          strengthSummary: stripMd((parsed.strength || "").trim()) || heuristic.strengthSummary,
           growthSummary: improve.join(" ") || heuristic.growthSummary,
           improve,
         };

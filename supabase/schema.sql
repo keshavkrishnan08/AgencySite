@@ -207,3 +207,21 @@ as $$
     'daily', coalesce((select jsonb_agg(to_jsonb(daily)) from daily), '[]'::jsonb)
   );
 $$;
+
+-- ---------------------------------------------------------------------------
+-- insights_history: persisted "news"/career-insight generations (one row per
+-- generation, kept as history). Latest row = current insight; reused so it does
+-- not regenerate on every load. Applied 2026-07-25 via add_insights_history.
+create table if not exists public.insights_history (
+  id uuid primary key default gen_random_uuid(),
+  user_id uuid not null references auth.users(id) on delete cascade,
+  role text,
+  industry text,
+  data jsonb not null,
+  created_at timestamptz not null default now()
+);
+alter table public.insights_history enable row level security;
+create policy "own insights" on public.insights_history
+  for all using (auth.uid() = user_id) with check (auth.uid() = user_id);
+create index if not exists insights_history_user_created
+  on public.insights_history (user_id, created_at desc);

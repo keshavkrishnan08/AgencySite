@@ -1,7 +1,7 @@
 import { rateLimit } from "@/lib/ratelimit";
 import { recordUsage } from "@/lib/usage";
 import { NextResponse } from "next/server";
-import { callClaude, FAST_MODEL, hasAI } from "@/lib/ai";
+import { callClaude, FAST_MODEL, hasAI, stripMd } from "@/lib/ai";
 import { COACH_PERSONA, candidateBlock, EMPLOYER_REALISM, EMPLOYER_VOICE, ANTI_CANNED } from "@/lib/prompt";
 import { CONTEXT_LEGEND } from "@/lib/context-codec";
 
@@ -64,7 +64,7 @@ export async function POST(req: Request) {
       const mega = typeof context === "string" && context.trim() ? `\n\nCandidate context: ${context.slice(0, 1200)}` : "";
       const user = `${ctx}${mega}\n\nQuestion asked: ${question}\nTheir answer: "${answer.slice(0, 2000)}"`;
       const text = await callClaude({ model: FAST_MODEL, system: SYSTEM, user, maxTokens: 220, temperature: 0.7 });
-      const cleaned = text.trim().replace(/^["']|["']$/g, "");
+      const cleaned = stripMd(text.trim().replace(/^["']|["']$/g, ""));
       if (cleaned.length > 8) return NextResponse.json({ followUp: cleaned, source: "ai" });
     } catch {
       /* fall through */

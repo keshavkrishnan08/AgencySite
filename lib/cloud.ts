@@ -81,6 +81,41 @@ export async function pushOverview(overview: object): Promise<void> {
   }
 }
 
+/* ---------------- insights / news history ---------------- */
+
+/** Append a generated insight to the account history (kept, never overwritten). */
+export async function pushInsight(role: string, industry: string, data: unknown): Promise<void> {
+  const sb = supabaseBrowser();
+  if (!sb) return;
+  const id = await currentUserId();
+  if (!id) return;
+  try {
+    await sb.from("insights_history").insert({ user_id: id, role: role || null, industry: industry || null, data });
+  } catch {
+    /* ignore */
+  }
+}
+
+/** The most recent saved insight for this user, or null. */
+export async function pullLatestInsight(): Promise<{ data: any; created_at: string } | null> {
+  const sb = supabaseBrowser();
+  if (!sb) return null;
+  const id = await currentUserId();
+  if (!id) return null;
+  try {
+    const { data } = await sb
+      .from("insights_history")
+      .select("data,created_at")
+      .eq("user_id", id)
+      .order("created_at", { ascending: false })
+      .limit(1)
+      .maybeSingle();
+    return data ? { data: data.data, created_at: data.created_at as string } : null;
+  } catch {
+    return null;
+  }
+}
+
 /* ---------------- sessions ---------------- */
 
 export async function pushSession(s: Session): Promise<void> {

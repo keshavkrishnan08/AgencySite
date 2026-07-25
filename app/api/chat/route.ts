@@ -1,7 +1,7 @@
 import { rateLimit } from "@/lib/ratelimit";
 import { recordUsage } from "@/lib/usage";
 import { NextResponse } from "next/server";
-import { callClaude, FAST_MODEL, hasAI } from "@/lib/ai";
+import { callClaude, FAST_MODEL, hasAI, stripMd } from "@/lib/ai";
 import { COACH_PERSONA, ANTI_CANNED } from "@/lib/prompt";
 import { CONTEXT_LEGEND } from "@/lib/context-codec";
 
@@ -30,6 +30,8 @@ RULES:
 - If a question is outside interview prep and careers, gently say that's not your lane and steer back.
 
 ${ANTI_CANNED}
+
+Write plain conversational text only. No markdown, no headings, no bold, no asterisks, no backticks, no numbered or bulleted lists. If you list things, write them as a short sentence.
 
 Return only your reply. No preamble, no sign-off, no quotes.`;
 
@@ -86,7 +88,7 @@ export async function POST(req: Request) {
         maxTokens: 320,
         temperature: 0.6,
       });
-      const cleaned = text.trim().replace(/^["']|["']$/g, "");
+      const cleaned = stripMd(text.trim().replace(/^["']|["']$/g, ""));
       if (cleaned.length > 4) return NextResponse.json({ reply: cleaned, source: "ai" });
     } catch {
       /* fall through to heuristic */

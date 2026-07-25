@@ -1,20 +1,22 @@
 "use client";
 
-import { useEffect, useMemo, useState } from "react";
+import { useCallback, useEffect, useMemo, useState } from "react";
 import Link from "next/link";
 import {
   ArrowRight, ArrowUpRight, Flame, Gauge, CalendarDays, MessageSquare,
   Sparkles, TrendingUp, Target as TargetIcon, Newspaper, Lightbulb, Loader2,
-  CheckCircle2, Circle, MapPin, Banknote, ListChecks, Award, Activity, Trophy,
+  CheckCircle2, Circle, MapPin, Banknote, ListChecks, Award, Activity, Trophy, RefreshCw,
 } from "lucide-react";
 import { AppShell } from "@/components/layout/AppShell";
 import { ButtonLink } from "@/components/ui/Button";
 import { AnimatedNumber } from "@/components/ui/AnimatedNumber";
 import { getOnboarding, getProfile, getSessions, getStreak, onStoreChange } from "@/lib/store";
 import { apiInsights, type CareerInsights } from "@/lib/client";
+import { pushInsight, pullLatestInsight } from "@/lib/cloud";
 import { computeMetrics } from "@/lib/metrics";
 import { contextSummary, persistOverview } from "@/lib/context";
 import { ProgressLineChart } from "@/components/charts/Charts";
+import { todayKey } from "@/lib/utils";
 import { cn, formatDuration, formatDate, scoreColor } from "@/lib/utils";
 import type { Session, Streak } from "@/lib/types";
 
@@ -40,6 +42,7 @@ export default function DashboardPage() {
   const [insights, setInsights] = useState<CareerInsights | null>(null);
   const [loadingInsights, setLoadingInsights] = useState(true);
   const [summary, setSummary] = useState("");
+  const [lastInsightAt, setLastInsightAt] = useState<string | null>(null);
 
   useEffect(() => {
     setMounted(true);
@@ -58,35 +61,68 @@ export default function DashboardPage() {
     return onStoreChange(sync);
   }, []);
 
-  // Weekly insights, cached per ISO week per role so the LLM runs ~once a week.
-  useEffect(() => {
-    if (!mounted) return;
+  // Career insights ("news"): saved to the account and reused, so they DON'T
+  // regenerate on every load. A new generation happens at most once per day
+  // (auto when the saved one is older than a day, or via the Refresh button).
+  // Each generation is appended to the account history, never overwritten.
+  const DAY = 86_400_000;
+  const roleIndustry = useCallback(() => {
     const p = getProfile();
     const ob = getOnboarding();
-    const r = p.targetRole || ob?.targetRole || "";
-    const industry = (ob as { industry?: string } | null)?.industry || "";
-    const key = `pp:insights:${isoWeekKey()}:${r}`.slice(0, 120);
-    try {
-      const cached = localStorage.getItem(key);
-      if (cached) {
-        setInsights(JSON.parse(cached));
+    return { r: p.targetRole || ob?.targetRole || "", industry: (ob as { industry?: string } | null)?.industry || "" };
+  }, []);
+
+  const genAndSave = useCallback(async () => {
+    const { r, industry } = roleIndustry();
+    const res = await apiInsights({ role: r, industry });
+    if (res) {
+      setInsights(res);
+      setLastInsightAt(new Date().toISOString());
+      pushInsight(r, industry, res).catch(() => {});
+      try { localStorage.setItem(`pp:insights:day:${todayKey()}:${r}`.slice(0, 120), JSON.stringify(res)); } catch { /* quota */ }
+    }
+    return res;
+  }, [roleIndustry]);
+
+  useEffect(() => {
+    if (!mounted) return;
+    let alive = true;
+    (async () => {
+      setLoadingInsights(true);
+      // 1) The account's most recent saved insight.
+      const saved = await pullLatestInsight();
+      if (!alive) return;
+      if (saved?.data) {
+        setInsights(saved.data);
+        setLastInsightAt(saved.created_at);
         setLoadingInsights(false);
+        // Fresh (under a day old): reuse it, do not regenerate.
+        if (Date.now() - new Date(saved.created_at).getTime() < DAY) return;
+        // Stale: auto-refresh once (the day's single generation).
+        await genAndSave();
         return;
       }
-    } catch {
-      /* ignore */
-    }
-    let alive = true;
-    apiInsights({ role: r, industry }).then((res) => {
-      if (!alive) return;
-      if (res) {
-        setInsights(res);
-        try { localStorage.setItem(key, JSON.stringify(res)); } catch { /* quota */ }
-      }
-      setLoadingInsights(false);
-    });
+      // 2) Not signed in / nothing saved: a local per-day cache still prevents
+      //    regenerating on every load.
+      const { r } = roleIndustry();
+      try {
+        const c = localStorage.getItem(`pp:insights:day:${todayKey()}:${r}`.slice(0, 120));
+        if (c) { setInsights(JSON.parse(c)); setLastInsightAt(new Date().toISOString()); setLoadingInsights(false); return; }
+      } catch { /* ignore */ }
+      // 3) First time today: generate and save.
+      await genAndSave();
+      if (alive) setLoadingInsights(false);
+    })();
     return () => { alive = false; };
-  }, [mounted]);
+  }, [mounted, genAndSave, roleIndustry]);
+
+  const canRefresh = !lastInsightAt || Date.now() - new Date(lastInsightAt).getTime() >= DAY;
+  const refreshInsights = useCallback(async () => {
+    if (!canRefresh || loadingInsights) return;
+    setLoadingInsights(true);
+    await genAndSave();
+    setLoadingInsights(false);
+  }, [canRefresh, loadingInsights, genAndSave]);
 
   const m = useMemo(() => computeMetrics(sessions, streak), [sessions, streak]);
 
@@ -214,7 +250,16 @@ export default function DashboardPage() {
               <h2 className="flex items-center gap-2 font-serif text-lg font-semibold text-ink">
                 <Newspaper size={18} className="text-primary" /> This week&apos;s market read
               </h2>
-              <span className="text-2xs font-medium uppercase tracking-wider text-ink-3">Updated weekly</span>
+              <button
+                onClick={refreshInsights}
+                disabled={!canRefresh || loadingInsights}
+                title={canRefresh ? "Refresh (once a day)" : "Already refreshed today"}
+                className="inline-flex items-center gap-1.5 rounded-full border px-3 py-1 text-2xs font-medium text-ink-2 transition-colors enabled:hover:text-ink disabled:opacity-50"
+                style={{ borderColor: "var(--border-strong)" }}
+              >
+                <RefreshCw size={12} className={loadingInsights ? "animate-spin" : ""} />
+                {canRefresh ? "Refresh" : "Refreshed today"}
+              </button>
             </div>
             <div className="p-7">
               {loadingInsights ? (
