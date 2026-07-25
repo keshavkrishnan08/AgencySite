@@ -14,6 +14,7 @@ import { getOnboarding, getProfile, getSessions, getStreak, onStoreChange } from
 import { apiInsights, type CareerInsights } from "@/lib/client";
 import { computeMetrics } from "@/lib/metrics";
 import { contextSummary } from "@/lib/context";
+import { ProgressLineChart } from "@/components/charts/Charts";
 import { cn, formatDuration, formatDate, scoreColor } from "@/lib/utils";
 import type { Session, Streak } from "@/lib/types";
 
@@ -182,6 +183,25 @@ export default function DashboardPage() {
                 <p className="text-sm text-ink-2">Every milestone cleared. You&apos;re in rare company.</p>
               </MiniCard>
             )}
+          </section>
+        )}
+
+        {/* Graphs — readiness trend + daily practice volume, full width */}
+        {m.hasData && (
+          <section className="grid gap-6 lg:grid-cols-2">
+            <div className="card p-6">
+              <div className="mb-2 flex items-center justify-between">
+                <h2 className="font-serif text-lg font-semibold text-ink">Readiness over time</h2>
+                <Link href="/analytics" className="text-xs font-medium text-primary-ink hover:underline">Details</Link>
+              </div>
+              <p className="mb-3 text-sm text-ink-3">Your session score, every time you practice.</p>
+              <ProgressLineChart data={m.trend.map((t) => ({ label: t.label, score: t.score }))} height={220} showReady />
+            </div>
+            <div className="card p-6">
+              <h2 className="font-serif text-lg font-semibold text-ink">Daily practice</h2>
+              <p className="mb-3 text-sm text-ink-3">Sessions a day over the last two weeks.</p>
+              <DailyUsage activity={m.activity.slice(-14)} />
+            </div>
           </section>
         )}
 
@@ -388,6 +408,38 @@ function StatRow({ label, value, sub, good }: { label: string; value: string; su
         {value}
         {sub && <span className="ml-1 font-sans text-2xs font-normal text-ink-3">{sub}</span>}
       </span>
+    </div>
+  );
+}
+
+/* Daily practice volume for the last two weeks. Div-based bars so it stays light
+   and on-palette; height is relative to the busiest day. */
+function DailyUsage({ activity }: { activity: { dateISO: string; count: number; score: number }[] }) {
+  const max = Math.max(1, ...activity.map((a) => a.count));
+  const total = activity.reduce((s, a) => s + a.count, 0);
+  const dow = (iso: string) => new Date(iso + "T00:00:00").toLocaleDateString("en-US", { weekday: "narrow" });
+  return (
+    <div>
+      <div className="flex h-[180px] items-end gap-1.5">
+        {activity.map((a) => (
+          <div key={a.dateISO} className="flex flex-1 flex-col items-center gap-1.5" title={`${a.dateISO}: ${a.count} session${a.count === 1 ? "" : "s"}`}>
+            <div className="flex w-full flex-1 items-end">
+              <div
+                className="w-full rounded-md transition-all"
+                style={{
+                  height: `${a.count ? Math.max(8, (a.count / max) * 100) : 3}%`,
+                  background: a.count ? "var(--primary)" : "var(--bg-sunk)",
+                  opacity: a.count ? 1 : 0.7,
+                }}
+              />
+            </div>
+            <span className="text-[0.6rem] text-ink-3">{dow(a.dateISO)}</span>
+          </div>
+        ))}
+      </div>
+      <p className="mt-3 text-xs text-ink-3">
+        <span className="font-semibold text-ink">{total}</span> session{total === 1 ? "" : "s"} in 14 days
+      </p>
     </div>
   );
 }

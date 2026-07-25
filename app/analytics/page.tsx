@@ -100,14 +100,6 @@ export default function DashboardPage() {
     );
   }
 
-  if (!m.hasData) {
-    return (
-      <AppShell>
-        <EmptyState />
-      </AppShell>
-    );
-  }
-
   return (
     <AppShell>
       <main className="container-wide space-y-6 py-8 sm:py-10">
@@ -121,6 +113,10 @@ export default function DashboardPage() {
             {formatDuration(m.practiceSeconds)} of practice. Every number here comes from your own answers.
           </p>
         </header>
+
+        {/* No sessions yet: still render the full board, just empty, so people
+            see exactly what they're about to fill in. */}
+        {!m.hasData && <EmptyBanner />}
 
         <Headline m={m} />
         <KpiStrip m={m} />
@@ -1075,25 +1071,30 @@ function RecentSessions({ sessions }: { sessions: Session[] }) {
 
 /* ============================ Empty ============================ */
 
-function EmptyState() {
+/* Slim banner shown ABOVE the (empty) board when there's no data yet, instead of
+   replacing the whole page. The graphs below render empty so the layout is
+   never blank. */
+function EmptyBanner() {
   return (
-    <main className="container-content py-20 text-center">
-      <span
-        className="mx-auto grid h-16 w-16 place-items-center rounded-2xl text-white shadow-sm"
-        style={{ background: "linear-gradient(140deg, var(--primary-bright), var(--primary-ink))" }}
-      >
-        <TrendingUp size={28} />
-      </span>
-      <h1 className="mt-6 font-serif text-3xl font-semibold text-ink">Your metrics start here</h1>
-      <p className="mx-auto mt-3 max-w-md text-ink-2">
-        Run one practice session and this page fills with your readiness score, percentile, pace, streak, and a
-        projected date for reaching the top 1%.
-      </p>
-      <div className="mt-8 flex justify-center">
-        <ButtonLink href="/practice" size="lg">
-          Start a session <ArrowRight size={18} />
-        </ButtonLink>
+    <div
+      className="flex flex-col items-start justify-between gap-4 rounded-2xl border border-dashed p-5 sm:flex-row sm:items-center"
+      style={{ borderColor: "var(--border-strong)", background: "var(--bg-sunk)" }}
+    >
+      <div className="flex items-center gap-3">
+        <span
+          className="grid h-11 w-11 shrink-0 place-items-center rounded-xl text-white"
+          style={{ background: "linear-gradient(140deg, var(--primary-bright), var(--primary-ink))" }}
+        >
+          <TrendingUp size={20} />
+        </span>
+        <div>
+          <p className="font-serif text-lg font-semibold text-ink">Your metrics start here</p>
+          <p className="text-sm text-ink-2">Run one session and every graph below fills with your own numbers.</p>
+        </div>
       </div>
-    </main>
+      <ButtonLink href="/practice" size="md" className="shrink-0">
+        Start a session <ArrowRight size={16} />
+      </ButtonLink>
+    </div>
   );
 }
