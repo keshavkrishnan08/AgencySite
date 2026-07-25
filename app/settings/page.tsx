@@ -50,6 +50,29 @@ export default function SettingsPage() {
     }
   };
 
+  // Open the real Stripe Billing Portal (cancel, update card, invoices). Cancel
+  // happens in Stripe; the webhook syncs the result back — we never fake it here.
+  const goToPortal = async () => {
+    try {
+      const res = await fetch("/api/portal", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ email: profile.email }),
+      });
+      const data = await res.json();
+      if (data?.url) {
+        window.location.href = data.url;
+        return;
+      }
+    } catch {
+      /* fall through */
+    }
+    setExitOpen(false);
+    if (typeof window !== "undefined") {
+      window.alert("We couldn't open the billing portal just now. Email support and we'll sort your subscription out.");
+    }
+  };
+
   if (!mounted) return <AppShell><main className="min-h-screen" /></AppShell>;
 
   const premium = isPremium();
@@ -185,8 +208,9 @@ export default function SettingsPage() {
         <ExitSurvey
           onClose={() => setExitOpen(false)}
           onConfirm={() => {
-            setProfile({ plan: "free" });
-            setExitOpen(false);
+            // Capture the outcome (the survey saves it), then hand off to the
+            // real Stripe portal to actually cancel — no local plan faking.
+            void goToPortal();
           }}
         />
       )}
