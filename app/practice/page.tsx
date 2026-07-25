@@ -1045,12 +1045,15 @@ function PracticeHub({
         </div>
       )}
 
-      {/* Custom + change role */}
+      {/* Custom + browse + change role */}
       <div className="mt-8 flex flex-wrap items-center justify-center gap-3 border-t pt-6" style={{ borderColor: "var(--border)" }}>
         <Button variant="secondary" onClick={onCustom}>
-          <Sparkles size={16} /> Build a custom session
+          <SlidersHorizontal size={16} /> Build a custom session
         </Button>
-        <ButtonLink href="/onboarding" variant="ghost" size="sm">Change role or situation</ButtonLink>
+        <ButtonLink href="/practice/library" variant="secondary">
+          <BookOpen size={16} /> Browse the question bank
+        </ButtonLink>
+        <ButtonLink href="/onboarding" variant="ghost" size="sm">Change role</ButtonLink>
       </div>
     </div>
   );
