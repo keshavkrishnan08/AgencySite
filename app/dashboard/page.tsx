@@ -5,6 +5,7 @@ import Link from "next/link";
 import {
   ArrowRight, ArrowUpRight, Flame, Gauge, CalendarDays, MessageSquare,
   Sparkles, TrendingUp, Target as TargetIcon, Newspaper, Lightbulb, Loader2,
+  CheckCircle2, Circle, MapPin, Banknote, ListChecks,
 } from "lucide-react";
 import { AppShell } from "@/components/layout/AppShell";
 import { ButtonLink } from "@/components/ui/Button";
@@ -12,7 +13,7 @@ import { AnimatedNumber } from "@/components/ui/AnimatedNumber";
 import { getOnboarding, getProfile, getSessions, getStreak, onStoreChange } from "@/lib/store";
 import { apiInsights, type CareerInsights } from "@/lib/client";
 import { computeMetrics } from "@/lib/metrics";
-import { formatDuration, scoreColor } from "@/lib/utils";
+import { cn, formatDuration, scoreColor } from "@/lib/utils";
 import type { Session, Streak } from "@/lib/types";
 
 /* The dashboard HOME: a calm, Attio-style overview. Usage at a glance (streak,
@@ -217,6 +218,40 @@ export default function DashboardPage() {
           </div>
         </div>
 
+        {/* Weekly plan + where to look + salary */}
+        {insights && (insights.actions?.length || insights.channels?.length || insights.salary) && (
+          <div className="grid gap-6 lg:grid-cols-[1.5fr_1fr]">
+            {insights.actions && insights.actions.length > 0 && (
+              <ActionPlan actions={insights.actions} />
+            )}
+            <div className="space-y-6">
+              {insights.channels && insights.channels.length > 0 && (
+                <section className="card p-6">
+                  <div className="mb-3 flex items-center gap-2 text-2xs font-semibold uppercase tracking-wider text-primary-ink">
+                    <MapPin size={14} /> Where to look
+                  </div>
+                  <ul className="space-y-2">
+                    {insights.channels.map((c) => (
+                      <li key={c} className="flex items-start gap-2 text-sm text-ink-2">
+                        <span className="mt-1.5 h-1.5 w-1.5 shrink-0 rounded-full" style={{ background: "var(--primary)" }} />
+                        {c}
+                      </li>
+                    ))}
+                  </ul>
+                </section>
+              )}
+              {insights.salary && (
+                <section className="card p-6">
+                  <div className="mb-2 flex items-center gap-2 text-2xs font-semibold uppercase tracking-wider text-sage-ink">
+                    <Banknote size={14} /> Pay snapshot
+                  </div>
+                  <p className="text-sm leading-relaxed text-ink-2">{insights.salary}</p>
+                </section>
+              )}
+            </div>
+          </div>
+        )}
+
         {!m.hasData && (
           <div className="rounded-2xl border-2 border-dashed p-6 text-center" style={{ borderColor: "var(--border-strong)" }}>
             <p className="font-serif text-lg font-semibold text-ink">Run your first session</p>
@@ -230,5 +265,54 @@ export default function DashboardPage() {
         )}
       </main>
     </AppShell>
+  );
+}
+
+/* This week's job-search checklist. Persists per ISO week so ticking survives a
+   reload; resets naturally when the week (and the insights) roll over. */
+function ActionPlan({ actions }: { actions: string[] }) {
+  const key = `pp:plan:${isoWeekKey()}`;
+  const [done, setDone] = useState<Record<string, boolean>>({});
+  useEffect(() => {
+    try {
+      const raw = localStorage.getItem(key);
+      if (raw) setDone(JSON.parse(raw));
+    } catch {
+      /* ignore */
+    }
+  }, [key]);
+  const toggle = (a: string) =>
+    setDone((prev) => {
+      const next = { ...prev, [a]: !prev[a] };
+      try { localStorage.setItem(key, JSON.stringify(next)); } catch { /* quota */ }
+      return next;
+    });
+  const completed = actions.filter((a) => done[a]).length;
+  return (
+    <section className="card p-7">
+      <div className="mb-1 flex items-center justify-between">
+        <h2 className="flex items-center gap-2 font-serif text-lg font-semibold text-ink">
+          <ListChecks size={18} className="text-primary" /> This week&apos;s plan
+        </h2>
+        <span className="font-mono text-sm font-semibold text-ink-3">{completed}/{actions.length}</span>
+      </div>
+      <p className="mb-4 text-sm text-ink-2">Three moves that keep the search alive. Check them off.</p>
+      <div className="space-y-2">
+        {actions.map((a) => {
+          const on = !!done[a];
+          return (
+            <button
+              key={a}
+              onClick={() => toggle(a)}
+              className="flex w-full items-center gap-3 rounded-xl border p-3.5 text-left transition-colors"
+              style={{ borderColor: on ? "var(--sage)" : "var(--border)", background: on ? "var(--sage-soft)" : "transparent" }}
+            >
+              {on ? <CheckCircle2 size={18} className="shrink-0 text-sage-ink" /> : <Circle size={18} className="shrink-0 text-ink-3" />}
+              <span className={cn("text-sm", on ? "text-ink-2 line-through" : "text-ink")}>{a}</span>
+            </button>
+          );
+        })}
+      </div>
+    </section>
   );
 }
