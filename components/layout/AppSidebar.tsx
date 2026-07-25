@@ -3,7 +3,7 @@
 import { useEffect, useState } from "react";
 import Link from "next/link";
 import { usePathname } from "next/navigation";
-import { LineChart, Mic, Sprout, Wand2, Crown, LogOut, type LucideIcon } from "lucide-react";
+import { LineChart, Mic, Sprout, Wand2, Crown, LogOut, BarChart3, type LucideIcon } from "lucide-react";
 import { useRouter } from "next/navigation";
 import { LogoMark } from "@/components/ui/Logo";
 import { cn } from "@/lib/utils";
@@ -19,6 +19,7 @@ interface Item {
 const MAIN: Item[] = [
   { href: "/practice", label: "Practice", icon: Mic },
   { href: "/dashboard", label: "Metrics", icon: LineChart },
+  { href: "/reports", label: "Reports", icon: BarChart3 },
 ];
 
 /* The two builders that feed Practice: one writes the questions you'll be
