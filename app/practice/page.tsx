@@ -7,6 +7,7 @@ import { motion, AnimatePresence } from "framer-motion";
 import {
   ArrowRight, Sparkles, X, Loader2, Building2, ChevronDown,
   Mic, BookOpen, MessageSquare, Layers, Target, Zap, Flame, ChevronLeft,
+  Timer, SlidersHorizontal, Users, Gauge, Repeat, Clock, Check,
 } from "lucide-react";
 import { AppShell } from "@/components/layout/AppShell";
 import { Inline } from "@/components/ui/RichText";
@@ -51,14 +52,23 @@ function PracticeInner() {
   const [focusTypes, setFocusTypes] = useState<string[]>([]);
   const [difficulty, setDifficulty] = useState("standard");
   const [count, setCount] = useState(8);
-  const customRef = useRef({ focusTypes: [] as string[], difficulty: "standard", count: 8 });
-  useEffect(() => { customRef.current = { focusTypes, difficulty, count }; }, [focusTypes, difficulty, count]);
+  // Deep customization that shapes the questions themselves.
+  const [tone, setTone] = useState("");           // phrasing style
+  const [interviewer, setInterviewer] = useState(""); // persona / demeanour
+  const customRef = useRef({ focusTypes: [] as string[], difficulty: "standard", count: 8, tone: "", interviewer: "" });
+  useEffect(() => {
+    customRef.current = { focusTypes, difficulty, count, tone, interviewer };
+  }, [focusTypes, difficulty, count, tone, interviewer]);
   // Which practice domain this session is: interview, storytelling, or public
   // speaking. Threaded through a ref so the mount-time start() reads it fresh.
   const [domain, setDomain] = useState<Domain>("interview");
   const domainRef = useRef<Domain>("interview");
   useEffect(() => { domainRef.current = domain; }, [domain]);
   const [interviewGap, setInterviewGap] = useState("");
+  // Session UX toggles (not question generation): per-question timer, and
+  // whether we lead with the mic instead of the textarea.
+  const [timed, setTimed] = useState(false);
+  const [voiceFirst, setVoiceFirst] = useState(false);
   const [questions, setQuestions] = useState<Question[]>([]);
   const [index, setIndex] = useState(0);
   const [answerText, setAnswerText] = useState("");
@@ -157,6 +167,8 @@ function PracticeInner() {
         difficulty: customRef.current.difficulty,
         count: customRef.current.count,
         domain: domainRef.current,
+        tone: customRef.current.tone,
+        interviewer: customRef.current.interviewer,
       });
       setQuestions(questions);
       setIndex(0);
@@ -188,6 +200,22 @@ function PracticeInner() {
     const resolvedCompany = set?.company || profile.company || ob?.company || "";
     companyRef.current = resolvedCompany;
     setCompany(resolvedCompany);
+    // A preset card can fully configure a session by URL (?autostart=1 plus any
+    // of domain/types/count/difficulty/tone/interviewer/timed/voice). Apply that
+    // config to the refs before start() reads them.
+    if (autostart && !predictedId && !focusDim) {
+      const types = (params.get("types") || "").split(",").map((x) => x.trim()).filter(Boolean);
+      const cCount = Number(params.get("count")) || 8;
+      const cDiff = params.get("difficulty") || "standard";
+      const cTone = params.get("tone") || "";
+      const cIv = params.get("interviewer") || "";
+      const cDomain = (params.get("domain") as Domain) || "interview";
+      setFocusTypes(types); setDifficulty(cDiff); setCount(cCount);
+      setTone(cTone); setInterviewer(cIv); setDomain(cDomain); domainRef.current = cDomain;
+      setTimed(params.get("timed") === "1"); setVoiceFirst(params.get("voice") === "1");
+      customRef.current = { focusTypes: types, difficulty: cDiff, count: cCount, tone: cTone, interviewer: cIv };
+    }
+
     // Deep links (a predicted set, a focus drill, or explicit autostart) drop
     // straight into a session. Otherwise we land on the practice HUB — the
     // precursor — even when the role is known, so people pick a track, a phase,
@@ -200,18 +228,25 @@ function PracticeInner() {
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
-  // Launch a session from a hub choice. Writes the refs synchronously (not just
-  // state) so the immediately-following start() reads the right config.
+  // Launch a session from any hub choice or preset. Writes the refs
+  // synchronously (not just state) so the immediately-following start() reads
+  // the right config.
   const launch = useCallback(
-    (cfg: { domain?: Domain; focusTypes?: string[]; difficulty?: string; count?: number; label?: string }) => {
+    (cfg: LaunchCfg) => {
       const d = cfg.domain || "interview";
       const ft = cfg.focusTypes || [];
       const diff = cfg.difficulty || "standard";
       const c = cfg.count || 8;
+      const tn = cfg.tone || "";
+      const iv = cfg.interviewer || "";
       setDomain(d); domainRef.current = d;
-      setFocusTypes(ft); setDifficulty(diff); setCount(c);
-      customRef.current = { focusTypes: ft, difficulty: diff, count: c };
-      track("practice:track_start", { domain: d, difficulty: diff, count: c, label: cfg.label || "" });
+      setFocusTypes(ft); setDifficulty(diff); setCount(c); setTone(tn); setInterviewer(iv);
+      setTimed(Boolean(cfg.timed)); setVoiceFirst(Boolean(cfg.voice));
+      customRef.current = { focusTypes: ft, difficulty: diff, count: c, tone: tn, interviewer: iv };
+      track("practice:track_start", {
+        domain: d, difficulty: diff, count: c, tone: tn, interviewer: iv,
+        timed: Boolean(cfg.timed), voice: Boolean(cfg.voice), label: cfg.label || "",
+      });
       start(role || "Office Manager", situation);
     },
     [role, situation, start]
@@ -408,6 +443,13 @@ function PracticeInner() {
                   }}
                 />
               </div>
+              {phase === "answer" && (
+                <QuestionTimer
+                  key={index}
+                  timed={timed}
+                  targetSec={difficulty === "hard" ? 90 : difficulty === "easy" ? 150 : 120}
+                />
+              )}
             </div>
           ) : (
             <span />
@@ -450,14 +492,28 @@ function PracticeInner() {
             posting={posting}
             setCompany={setCompany}
             setPosting={setPosting}
+            domain={domain}
+            setDomain={setDomain}
             focusTypes={focusTypes}
             setFocusTypes={setFocusTypes}
             difficulty={difficulty}
             setDifficulty={setDifficulty}
             count={count}
             setCount={setCount}
+            tone={tone}
+            setTone={setTone}
+            interviewer={interviewer}
+            setInterviewer={setInterviewer}
+            timed={timed}
+            setTimed={setTimed}
+            voiceFirst={voiceFirst}
+            setVoiceFirst={setVoiceFirst}
             onBack={() => setPhase("setup")}
-            onStart={() => { setDomain("interview"); domainRef.current = "interview"; start(role || "Office Manager", situation); }}
+            onStart={() => {
+              customRef.current = { focusTypes, difficulty, count, tone, interviewer };
+              domainRef.current = domain;
+              start(role || "Office Manager", situation);
+            }}
           />
         )}
 
@@ -501,8 +557,16 @@ function PracticeInner() {
               </div>
 
               <div className="mt-5">
+                {voiceFirst && (
+                  <div
+                    className="mb-3 flex items-center gap-2 rounded-xl border px-4 py-2.5 text-sm"
+                    style={{ borderColor: "var(--primary)", background: "var(--primary-soft)", color: "var(--primary-ink)" }}
+                  >
+                    <Mic size={15} /> Voice-first: tap the mic and just talk. We&apos;ll transcribe and score your delivery.
+                  </div>
+                )}
                 <textarea
-                  autoFocus
+                  autoFocus={!voiceFirst}
                   value={answerText}
                   onChange={(e) => { noteAnswerStart(); setAnswerText(e.target.value); }}
                   placeholder="Type your answer here… speak naturally, as if you're in the interview."
@@ -647,6 +711,30 @@ function PracticeInner() {
 
 /* ---------------- sub-views ---------------- */
 
+/* Per-question timer. Counts up; in timed mode it shows the target and turns
+   amber once you go over, so pace is visible without being a hard cutoff. */
+function QuestionTimer({ timed, targetSec }: { timed: boolean; targetSec: number }) {
+  const [sec, setSec] = useState(0);
+  useEffect(() => {
+    const id = window.setInterval(() => setSec((s) => s + 1), 1000);
+    return () => window.clearInterval(id);
+  }, []);
+  const fmt = (s: number) => `${Math.floor(s / 60)}:${String(s % 60).padStart(2, "0")}`;
+  const over = timed && sec > targetSec;
+  return (
+    <span
+      className="hidden items-center gap-1.5 rounded-full px-2.5 py-1 font-mono text-2xs font-semibold sm:inline-flex"
+      style={{
+        background: over ? "var(--amber-soft)" : "var(--bg-tint)",
+        color: over ? "var(--amber-ink)" : "var(--ink-2)",
+      }}
+      title={timed ? `Target ${fmt(targetSec)} per question` : "Time on this question"}
+    >
+      <Timer size={12} /> {fmt(sec)}{timed ? ` / ${fmt(targetSec)}` : ""}
+    </span>
+  );
+}
+
 /* ============================ Practice Hub ============================
    The precursor. Instead of dropping people straight into questions, this is
    the room they choose from: three practice domains (interview, storytelling,
@@ -654,7 +742,17 @@ function PracticeInner() {
    skill drills, and — only when it's relevant to them — the gap story. It's a
    deliberate "this is a practice you build over time" surface, not a one-shot. */
 
-type LaunchCfg = { domain?: Domain; focusTypes?: string[]; difficulty?: string; count?: number; label?: string };
+type LaunchCfg = {
+  domain?: Domain;
+  focusTypes?: string[];
+  difficulty?: string;
+  count?: number;
+  tone?: string;
+  interviewer?: string;
+  timed?: boolean;
+  voice?: boolean;
+  label?: string;
+};
 
 const DOMAINS: { key: Domain; icon: typeof MessageSquare; title: string; desc: string; minutes: string; cfg: LaunchCfg }[] = [
   {
@@ -687,6 +785,17 @@ const FOCUS_AREAS: { key: Dimension; label: string; blurb: string }[] = [
   { key: "specificity", label: "Specificity", blurb: "Real details, real numbers" },
   { key: "confidence", label: "Confidence", blurb: "Drop the hedging" },
   { key: "conciseness", label: "Conciseness", blurb: "Trim the ramble" },
+];
+
+// Ready-made sessions: one tap into a fully-configured session. Each is just a
+// LaunchCfg, so adding a new preset card is a one-line change.
+const PRESETS: { title: string; desc: string; badge: string; cfg: LaunchCfg }[] = [
+  { title: "2-minute warm-up", desc: "Four easy questions to shake off the nerves.", badge: "Warm-up", cfg: { count: 4, difficulty: "easy", focusTypes: ["warmup", "behavioral"], tone: "conversational", label: "preset_warmup" } },
+  { title: "Rapid-fire round", desc: "Ten punchy questions, on the clock.", badge: "Timed", cfg: { count: 10, tone: "rapid_fire", timed: true, label: "preset_rapid" } },
+  { title: "Full mock panel", desc: "Twelve questions, a tough panel, timed. The real thing.", badge: "Hard", cfg: { count: 12, difficulty: "hard", interviewer: "panel", timed: true, label: "preset_panel" } },
+  { title: "The skeptic", desc: "A probing interviewer who wants proof for every claim.", badge: "Pressure", cfg: { difficulty: "hard", interviewer: "skeptical", label: "preset_skeptic" } },
+  { title: "Behavioral deep-dive", desc: "Eight 'tell me about a time' questions, STAR all the way.", badge: "Behavioral", cfg: { focusTypes: ["behavioral"], count: 8, label: "preset_behavioral" } },
+  { title: "Curveballs", desc: "Scenario questions you can't rehearse — think on your feet.", badge: "Scenario", cfg: { tone: "scenario", difficulty: "hard", label: "preset_curveball" } },
 ];
 
 function PracticeHub({
@@ -762,6 +871,28 @@ function PracticeHub({
             </button>
           );
         })}
+      </div>
+
+      {/* Ready-made presets */}
+      <SectionLabel icon={Zap} title="Ready-made sessions" sub="One tap into a fully-configured session." />
+      <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
+        {PRESETS.map((p) => (
+          <button
+            key={p.title}
+            onClick={() => onLaunch(p.cfg)}
+            className="group flex flex-col rounded-2xl border bg-surface p-5 text-left transition-all hover:-translate-y-0.5 hover:shadow-md"
+            style={{ borderColor: "var(--border)" }}
+          >
+            <span className="inline-flex w-fit items-center gap-1 rounded-full bg-primary-soft px-2.5 py-0.5 text-2xs font-bold uppercase tracking-wider text-primary-ink">
+              {p.badge}
+            </span>
+            <span className="mt-2.5 font-serif text-base font-semibold text-ink">{p.title}</span>
+            <span className="mt-1 flex-1 text-sm leading-relaxed text-ink-2">{p.desc}</span>
+            <span className="mt-3 inline-flex items-center gap-1 text-sm font-medium text-primary-ink">
+              Start <ArrowRight size={14} className="transition-transform group-hover:translate-x-0.5" />
+            </span>
+          </button>
+        ))}
       </div>
 
       {/* Specialization phases */}
@@ -860,18 +991,128 @@ const QUESTION_TYPES: { value: string; label: string; emoji: string }[] = [
   { value: "closer", label: "Questions to ask them", emoji: "🎯" },
 ];
 
+/* ---- Session Builder option banks ---- */
+const TONES = [
+  { value: "", label: "Balanced", emoji: "⚖️" },
+  { value: "conversational", label: "Conversational", emoji: "💬" },
+  { value: "formal", label: "Formal", emoji: "🎩" },
+  { value: "rapid_fire", label: "Rapid-fire", emoji: "⚡" },
+  { value: "scenario", label: "Scenario", emoji: "🧭" },
+];
+const INTERVIEWERS = [
+  { value: "", label: "Default", emoji: "🙂" },
+  { value: "friendly", label: "Friendly", emoji: "😊" },
+  { value: "neutral", label: "Neutral", emoji: "😐" },
+  { value: "skeptical", label: "Skeptical", emoji: "🤨" },
+  { value: "panel", label: "Panel", emoji: "👥" },
+];
+const DOMAINS_OPT = [
+  { value: "interview", label: "Interview", emoji: "💬" },
+  { value: "storytelling", label: "Storytelling", emoji: "📖" },
+  { value: "public_speaking", label: "Public speaking", emoji: "🎤" },
+];
+const COUNTS = [4, 6, 8, 10, 12];
+
+function OptionChips({
+  options,
+  isOn,
+  onPick,
+}: {
+  options: { value: string; label: string; emoji?: string }[];
+  isOn: (v: string) => boolean;
+  onPick: (v: string) => void;
+}) {
+  return (
+    <div className="flex flex-wrap gap-2">
+      {options.map((o) => {
+        const on = isOn(o.value);
+        return (
+          <button
+            key={o.value || "none"}
+            onClick={() => onPick(o.value)}
+            className="rounded-full border px-3 py-1.5 text-[0.8rem] font-medium transition-all"
+            style={{
+              borderColor: on ? "var(--primary)" : "var(--border-strong)",
+              background: on ? "var(--primary-soft)" : "var(--surface)",
+              color: on ? "var(--primary-ink)" : "var(--ink-2)",
+            }}
+          >
+            {o.emoji ? `${o.emoji} ` : ""}{o.label}
+          </button>
+        );
+      })}
+    </div>
+  );
+}
+
+function BuilderSection({
+  icon: Icon,
+  title,
+  hint,
+  children,
+}: {
+  icon: typeof MessageSquare;
+  title: string;
+  hint?: string;
+  children: React.ReactNode;
+}) {
+  return (
+    <div>
+      <div className="mb-2 flex items-center gap-2">
+        <Icon size={15} className="text-primary" />
+        <span className="text-sm font-semibold text-ink">{title}</span>
+        {hint && <span className="text-xs font-normal text-ink-3">{hint}</span>}
+      </div>
+      {children}
+    </div>
+  );
+}
+
+function Toggle({ on, onClick, icon: Icon, label }: { on: boolean; onClick: () => void; icon: typeof Mic; label: string }) {
+  return (
+    <button
+      onClick={onClick}
+      className="flex items-center gap-2 rounded-full border px-4 py-2 text-sm font-medium transition-all"
+      style={{
+        borderColor: on ? "var(--primary)" : "var(--border-strong)",
+        background: on ? "var(--primary-soft)" : "var(--surface)",
+        color: on ? "var(--primary-ink)" : "var(--ink-2)",
+      }}
+    >
+      <Icon size={15} /> {label}
+      <span className="ml-1 grid h-4 w-4 place-items-center rounded-full" style={{ background: on ? "var(--primary)" : "var(--border-strong)" }}>
+        {on && <Check size={11} className="text-white" />}
+      </span>
+    </button>
+  );
+}
+
+/* The deep session builder. Every knob that shapes a session: domain, question
+   types, count, difficulty, phrasing, interviewer persona, timing and voice —
+   plus optional job context. Defaults are sensible so it's fast, but nothing is
+   hidden from someone who wants to tune it. */
 function SetupCard({
   role,
   company,
   posting,
   setCompany,
   setPosting,
+  domain,
+  setDomain,
   focusTypes,
   setFocusTypes,
   difficulty,
   setDifficulty,
   count,
   setCount,
+  tone,
+  setTone,
+  interviewer,
+  setInterviewer,
+  timed,
+  setTimed,
+  voiceFirst,
+  setVoiceFirst,
   onStart,
   onBack,
 }: {
@@ -880,173 +1121,149 @@ function SetupCard({
   posting: string;
   setCompany: (v: string) => void;
   setPosting: (v: string) => void;
+  domain: Domain;
+  setDomain: (v: Domain) => void;
   focusTypes: string[];
   setFocusTypes: (v: string[]) => void;
   difficulty: string;
   setDifficulty: (v: string) => void;
   count: number;
   setCount: (v: number) => void;
+  tone: string;
+  setTone: (v: string) => void;
+  interviewer: string;
+  setInterviewer: (v: string) => void;
+  timed: boolean;
+  setTimed: (v: boolean) => void;
+  voiceFirst: boolean;
+  setVoiceFirst: (v: boolean) => void;
   onStart: () => void;
   onBack?: () => void;
 }) {
   const [showContext, setShowContext] = useState(Boolean(company || posting));
-  const [showCustom, setShowCustom] = useState(true);
   const toggleType = (t: string) =>
     setFocusTypes(focusTypes.includes(t) ? focusTypes.filter((x) => x !== t) : [...focusTypes, t]);
+  const domainLabel = DOMAINS_OPT.find((d) => d.value === domain)?.label || "Interview";
+  const summary =
+    `${count} ${domain === "interview" ? "Qs" : "drills"} · ${domainLabel}` +
+    `${difficulty !== "standard" ? ` · ${difficulty}` : ""}${timed ? " · timed" : ""}${voiceFirst ? " · voice" : ""}`;
+
   return (
-    <div className="mx-auto max-w-xl">
+    <div className="mx-auto max-w-2xl">
       {onBack && (
         <button onClick={onBack} className="btn-ghost mb-3 text-sm">
           <ChevronLeft size={16} /> Back to practice hub
         </button>
       )}
-      <motion.div initial={{ opacity: 0, y: 16 }} animate={{ opacity: 1, y: 0 }} className="card-elevated p-8 sm:p-9">
+      <motion.div initial={{ opacity: 0, y: 16 }} animate={{ opacity: 1, y: 0 }} className="card-elevated p-7 sm:p-9">
         <div className="text-center">
           <span
-            className="mx-auto grid h-14 w-14 place-items-center rounded-2xl text-white shadow-sm"
+            className="mx-auto grid h-12 w-12 place-items-center rounded-2xl text-white shadow-sm"
             style={{ background: "linear-gradient(140deg, var(--primary-bright), var(--primary-ink))" }}
           >
-            <Sparkles size={24} />
+            <SlidersHorizontal size={22} />
           </span>
-          <h1 className="mt-6 font-serif text-3xl font-semibold text-ink">Ready to practice?</h1>
-          <p className="mt-3 text-ink-2">
-            A set of tailored questions for <strong className="text-ink">{role || "your role"}</strong>. About 10
-            minutes. Scored as you go.
+          <h1 className="mt-4 font-serif text-2xl font-semibold text-ink sm:text-3xl">Build your session</h1>
+          <p className="mt-2 text-ink-2">
+            Tune every knob for <strong className="text-ink">{role || "your role"}</strong>, or keep the defaults and go.
           </p>
         </div>
 
-        {/* Job context (optional) */}
-        <div className="mt-7 rounded-xl border bg-bg-sunk/60 p-5" style={{ borderColor: "var(--border)" }}>
-          <button
-            onClick={() => setShowContext((v) => !v)}
-            className="flex w-full items-center justify-between text-left"
-          >
-            <span className="flex items-center gap-2 font-medium text-ink">
-              <Building2 size={17} className="text-primary" />
-              Tailor to a specific job
-              <span className="text-sm font-normal text-ink-3">(optional)</span>
-            </span>
-            <ChevronDown size={18} className={cn("text-ink-3 transition-transform", showContext && "rotate-180")} />
-          </button>
+        <div className="mt-7 space-y-6">
+          <BuilderSection icon={Layers} title="Focus">
+            <OptionChips options={DOMAINS_OPT} isOn={(v) => domain === v} onPick={(v) => setDomain(v as Domain)} />
+          </BuilderSection>
 
-          {showContext && (
-            <div className="mt-4 space-y-4">
-              <p className="text-sm text-ink-2">
-                Add the company and paste the posting, and we&apos;ll write questions a real hiring manager
-                for <em>this exact job</em> would ask.
-              </p>
-              <label className="block">
-                <span className="mb-1.5 block text-sm font-medium text-ink-2">Company name</span>
+          {domain === "interview" && (
+            <BuilderSection icon={MessageSquare} title="Question types" hint="leave blank for a balanced mix">
+              <OptionChips
+                options={QUESTION_TYPES.map(({ value, label, emoji }) => ({ value, label, emoji }))}
+                isOn={(v) => focusTypes.includes(v)}
+                onPick={toggleType}
+              />
+            </BuilderSection>
+          )}
+
+          <div className="grid gap-6 sm:grid-cols-2">
+            <BuilderSection icon={Repeat} title="How many">
+              <div className="flex gap-1 rounded-full bg-bg-tint p-1">
+                {COUNTS.map((n) => (
+                  <button
+                    key={n}
+                    onClick={() => setCount(n)}
+                    className={cn(
+                      "flex-1 rounded-full px-2 py-1.5 text-xs font-medium transition-colors",
+                      count === n ? "bg-white text-ink shadow-xs" : "text-ink-2 hover:text-ink"
+                    )}
+                  >
+                    {n}
+                  </button>
+                ))}
+              </div>
+            </BuilderSection>
+            <BuilderSection icon={Gauge} title="Difficulty">
+              <div className="flex gap-1 rounded-full bg-bg-tint p-1">
+                {[["easy", "Gentle"], ["standard", "Standard"], ["hard", "Tough"]].map(([v, label]) => (
+                  <button
+                    key={v}
+                    onClick={() => setDifficulty(v)}
+                    className={cn(
+                      "flex-1 rounded-full px-2 py-1.5 text-xs font-medium transition-colors",
+                      difficulty === v ? "bg-white text-ink shadow-xs" : "text-ink-2 hover:text-ink"
+                    )}
+                  >
+                    {label}
+                  </button>
+                ))}
+              </div>
+            </BuilderSection>
+          </div>
+
+          <BuilderSection icon={MessageSquare} title="Phrasing" hint="how the questions read">
+            <OptionChips options={TONES} isOn={(v) => tone === v} onPick={setTone} />
+          </BuilderSection>
+
+          <BuilderSection icon={Users} title="Interviewer" hint="who's asking">
+            <OptionChips options={INTERVIEWERS} isOn={(v) => interviewer === v} onPick={setInterviewer} />
+          </BuilderSection>
+
+          <BuilderSection icon={Timer} title="Session options">
+            <div className="flex flex-wrap gap-2">
+              <Toggle on={timed} onClick={() => setTimed(!timed)} icon={Clock} label="Timed" />
+              <Toggle on={voiceFirst} onClick={() => setVoiceFirst(!voiceFirst)} icon={Mic} label="Voice-first" />
+            </div>
+          </BuilderSection>
+
+          {/* Job context */}
+          <div className="rounded-xl border bg-bg-sunk/60 p-5" style={{ borderColor: "var(--border)" }}>
+            <button onClick={() => setShowContext((v) => !v)} className="flex w-full items-center justify-between text-left">
+              <span className="flex items-center gap-2 text-sm font-medium text-ink">
+                <Building2 size={16} className="text-primary" /> Tailor to a specific job
+                <span className="text-xs font-normal text-ink-3">{company ? `· ${company}` : "(optional)"}</span>
+              </span>
+              <ChevronDown size={18} className={cn("text-ink-3 transition-transform", showContext && "rotate-180")} />
+            </button>
+            {showContext && (
+              <div className="mt-4 space-y-4">
                 <input
                   value={company}
                   onChange={(e) => setCompany(e.target.value)}
-                  placeholder="e.g., Mercy Hospital"
+                  placeholder="Company (e.g., Mercy Hospital)"
                   className="field"
                 />
-              </label>
-              <label className="block">
-                <span className="mb-1.5 block text-sm font-medium text-ink-2">
-                  Job description / posting
-                </span>
                 <textarea
                   value={posting}
                   onChange={(e) => setPosting(e.target.value)}
-                  placeholder="Paste the responsibilities and requirements here. The more you add, the more specific your questions get."
-                  className="field min-h-[120px] resize-y leading-relaxed text-sm"
+                  placeholder="Paste the job posting for questions a real hiring manager for THIS job would ask."
+                  className="field min-h-[110px] resize-y text-sm leading-relaxed"
                 />
-              </label>
-            </div>
-          )}
+              </div>
+            )}
+          </div>
         </div>
 
-        {/* Customize the session (optional) */}
-        <div className="mt-4 rounded-xl border bg-bg-sunk/60 p-5" style={{ borderColor: "var(--border)" }}>
-          <button
-            onClick={() => setShowCustom((v) => !v)}
-            className="flex w-full items-center justify-between text-left"
-          >
-            <span className="flex items-center gap-2 font-medium text-ink">
-              <Sparkles size={16} className="text-primary" />
-              Customize this session
-              <span className="text-sm font-normal text-ink-3">
-                {focusTypes.length ? `· ${focusTypes.length} type${focusTypes.length === 1 ? "" : "s"}` : "(optional)"}
-              </span>
-            </span>
-            <ChevronDown size={18} className={cn("text-ink-3 transition-transform", showCustom && "rotate-180")} />
-          </button>
-
-          {showCustom && (
-            <div className="mt-4 space-y-5">
-              <div>
-                <p className="mb-2 text-sm font-medium text-ink-2">Focus on these question types</p>
-                <div className="flex flex-wrap gap-2">
-                  {QUESTION_TYPES.map((t) => {
-                    const on = focusTypes.includes(t.value);
-                    return (
-                      <button
-                        key={t.value}
-                        onClick={() => toggleType(t.value)}
-                        className="rounded-full border px-3 py-1.5 text-[0.8rem] font-medium transition-all"
-                        style={{
-                          borderColor: on ? "var(--primary)" : "var(--border-strong)",
-                          background: on ? "var(--primary-soft)" : "var(--surface)",
-                          color: on ? "var(--primary-ink)" : "var(--ink-2)",
-                        }}
-                      >
-                        {t.emoji} {t.label}
-                      </button>
-                    );
-                  })}
-                </div>
-                <p className="mt-1.5 text-xs text-ink-3">Leave blank for a balanced mix.</p>
-              </div>
-
-              <div className="grid gap-4 sm:grid-cols-2">
-                <div>
-                  <p className="mb-2 text-sm font-medium text-ink-2">Difficulty</p>
-                  <div className="flex gap-1 rounded-full bg-bg-tint p-1">
-                    {[
-                      ["easy", "Gentle"],
-                      ["standard", "Standard"],
-                      ["hard", "Tough"],
-                    ].map(([v, label]) => (
-                      <button
-                        key={v}
-                        onClick={() => setDifficulty(v)}
-                        className={cn(
-                          "flex-1 rounded-full px-2 py-1.5 text-xs font-medium transition-colors",
-                          difficulty === v ? "bg-white text-ink shadow-xs" : "text-ink-2 hover:text-ink"
-                        )}
-                      >
-                        {label}
-                      </button>
-                    ))}
-                  </div>
-                </div>
-                <div>
-                  <p className="mb-2 text-sm font-medium text-ink-2">How many questions</p>
-                  <div className="flex gap-1 rounded-full bg-bg-tint p-1">
-                    {[5, 8, 12].map((n) => (
-                      <button
-                        key={n}
-                        onClick={() => setCount(n)}
-                        className={cn(
-                          "flex-1 rounded-full px-2 py-1.5 text-xs font-medium transition-colors",
-                          count === n ? "bg-white text-ink shadow-xs" : "text-ink-2 hover:text-ink"
-                        )}
-                      >
-                        {n}
-                      </button>
-                    ))}
-                  </div>
-                </div>
-              </div>
-            </div>
-          )}
-        </div>
-
-        <Button onClick={onStart} size="lg" className="mt-6 w-full">
-          Start session <ArrowRight size={18} />
+        <Button onClick={onStart} size="lg" className="mt-7 w-full">
+          Start · {summary} <ArrowRight size={18} />
         </Button>
         <div className="text-center">
           <ButtonLink href="/onboarding" variant="ghost" size="sm" className="mt-2">
