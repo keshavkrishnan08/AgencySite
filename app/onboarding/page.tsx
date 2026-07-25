@@ -20,7 +20,8 @@ import { SITUATION_META } from "@/lib/utils";
 import { setOnboarding, setProfile } from "@/lib/store";
 import { identify, setContext, track } from "@/lib/analytics";
 import { anonId, attribution } from "@/lib/attribution";
-import { CADENCE_META, projectPlan, type Cadence, type SkillLevel } from "@/lib/plan-projection";
+import { CADENCE_META, projectCurve, projectPlan, type Cadence, type SkillLevel } from "@/lib/plan-projection";
+import { scoreForPercentile } from "@/lib/metrics";
 import { computeRoi } from "@/lib/roi";
 import { PLANS } from "@/lib/pricing";
 import type { InterviewGap, Situation } from "@/lib/types";
@@ -30,23 +31,41 @@ type Opt = { value: string; label: string; emoji?: string };
 type Field = { key: string; q: string; type?: "role" | "text"; optional?: boolean; options?: Opt[] };
 type Cond = (a: Record<string, string>) => boolean;
 type Screen =
-  | { kind: "form"; fields: Field[]; demo: Demo; when?: Cond }
-  | { kind: "validation"; slot: 1 | 2; demo: Demo; when?: Cond }
+  | { kind: "form"; fields: Field[]; demo: Demo; when?: Cond; hold?: boolean }
+  | { kind: "validation"; slot: 1 | 2 | 3; demo: Demo; when?: Cond }
   | { kind: "email"; demo: Demo; when?: Cond }
   | { kind: "plan"; demo: Demo; when?: Cond }
   | { kind: "roi"; demo: Demo; when?: Cond };
 
+/* We stopped asking "how good are you today?" — it's inferable from how someone
+   says they feel, and Superwall's onboarding research is clear that every extra
+   question you can skip lifts completion. This maps the feeling to the skill
+   level the projection needs, so the graph and plan still personalise. */
+const CONF_TO_SKILL: Record<string, SkillLevel> = {
+  terrified: "novice",
+  rusty: "rusty",
+  shaky: "rusty",
+  out_of_practice: "middling",
+  okay: "middling",
+  confident: "solid",
+};
+const skillFrom = (a: Record<string, string>): SkillLevel => CONF_TO_SKILL[a.confidence] || "rusty";
+
 const SITUATIONS: Situation[] = ["returning", "laid_off", "promotion", "career_change"];
 
 const SCREENS: Screen[] = [
-  // ── One question per screen. A tap advances you, top-app style. Each screen
-  //    carries a single decision, so nothing feels like a form. ──
+  // ── One question per screen, one tap to advance — top-app style. Questions
+  //    are kept short on purpose; Superwall's onboarding data shows terse,
+  //    single-decision screens complete far better than wordy ones. The middle
+  //    of the flow is where we tailor the product to the person: weakness,
+  //    strength, how they like to practice, how often. ──
+
+  // Emotional opener — lowest-friction possible question, high buy-in.
   {
-    kind: "form",
-    demo: "convo",
+    kind: "form", demo: "convo",
     fields: [{
       key: "confidence",
-      q: "How are you feeling about interviewing right now?",
+      q: "How do you feel about interviewing?",
       options: [
         { value: "terrified", label: "Honestly terrified", emoji: "😱" },
         { value: "rusty", label: "Pretty rusty", emoji: "😬" },
@@ -58,28 +77,38 @@ const SCREENS: Screen[] = [
     }],
   },
   {
-    kind: "form",
-    demo: "convo",
+    kind: "form", demo: "skills",
     fields: [{
-      key: "struggle",
-      q: "What trips you up the most?",
-      options: [
-        { value: "nerves", label: "Nerves take over", emoji: "😰" },
-        { value: "blank", label: "My mind goes blank", emoji: "🫥" },
-        { value: "ramble", label: "I ramble", emoji: "🗣️" },
-        { value: "hard_q", label: "The hard questions", emoji: "🧠" },
-        { value: "selling", label: "Selling myself", emoji: "🙈" },
-        { value: "gap", label: "Explaining my gap", emoji: "🕳️" },
-        { value: "filler", label: "Um, like, I just…", emoji: "😬" },
-      ],
+      key: "situation",
+      q: "What brings you here?",
+      options: SITUATIONS.map((s) => ({ value: s, label: SITUATION_META[s].short, emoji: SITUATION_META[s].emoji })),
     }],
   },
   {
-    kind: "form",
-    demo: "skills",
+    // Career changers only: where they're coming from, to frame the pivot.
+    kind: "form", demo: "skills",
+    when: (a) => a.situation === "career_change",
+    fields: [{
+      key: "fromField",
+      q: "Coming from which field?",
+      options: [
+        { value: "education", label: "Education", emoji: "🎓" },
+        { value: "healthcare", label: "Healthcare", emoji: "🩺" },
+        { value: "corporate", label: "Corporate", emoji: "💼" },
+        { value: "service", label: "Service & retail", emoji: "🛍️" },
+        { value: "trades", label: "Trades", emoji: "🔧" },
+        { value: "military", label: "Military", emoji: "🎖️" },
+        { value: "other", label: "Something else", emoji: "✨" },
+      ],
+    }],
+  },
+  // ── Validation 1: name the problem. Single stat, calm. ──
+  { kind: "validation", slot: 1, demo: "convo" },
+  {
+    kind: "form", demo: "skills",
     fields: [{
       key: "industry",
-      q: "What field are you in?",
+      q: "What's your field?",
       options: [
         { value: "healthcare", label: "Healthcare", emoji: "🩺" },
         { value: "education", label: "Education", emoji: "🎓" },
@@ -101,62 +130,63 @@ const SCREENS: Screen[] = [
     }],
   },
   {
-    kind: "form",
-    demo: "skills",
-    fields: [{
-      key: "situation",
-      q: "What brings you here?",
-      options: SITUATIONS.map((s) => ({ value: s, label: SITUATION_META[s].short, emoji: SITUATION_META[s].emoji })),
-    }],
+    kind: "form", demo: "questions",
+    fields: [{ key: "role", type: "role", q: "What role are you preparing for?" }],
   },
+  // ── Validation 2: the odds, made concrete for their field + role. ──
+  { kind: "validation", slot: 2, demo: "questions" },
+  // ── Customization: the weakness we'll aim practice at. ──
   {
-    // Career changers only: where they're coming from, to frame the pivot.
-    kind: "form",
-    demo: "skills",
-    when: (a) => a.situation === "career_change",
+    kind: "form", demo: "skills",
     fields: [{
-      key: "fromField",
-      q: "What field are you coming from?",
+      key: "weakness",
+      q: "Where do you lose the most points?",
       options: [
-        { value: "education", label: "Education", emoji: "🎓" },
-        { value: "healthcare", label: "Healthcare", emoji: "🩺" },
-        { value: "corporate", label: "Corporate", emoji: "💼" },
-        { value: "service", label: "Service & retail", emoji: "🛍️" },
-        { value: "trades", label: "Trades", emoji: "🔧" },
-        { value: "military", label: "Military", emoji: "🎖️" },
-        { value: "other", label: "Something else", emoji: "✨" },
+        { value: "nerves", label: "Nerves take over", emoji: "😰" },
+        { value: "blank", label: "Mind goes blank", emoji: "🫥" },
+        { value: "ramble", label: "I ramble", emoji: "🗣️" },
+        { value: "hard_q", label: "The hard questions", emoji: "🧠" },
+        { value: "selling", label: "Selling myself", emoji: "🙈" },
+        { value: "gap", label: "Explaining my gap", emoji: "🕳️" },
+        { value: "filler", label: "Filler words", emoji: "😬" },
       ],
     }],
   },
-  // ── First validation: name the problem. Single stat, calm. ──
-  { kind: "validation", slot: 1, demo: "convo" },
+  // ── Customization: the strength we'll build answers around. ──
   {
-    // Self-rated skill — sets the projection's starting point.
-    kind: "form",
-    demo: "skills",
+    kind: "form", demo: "skills",
     fields: [{
-      key: "skill",
-      q: "Honestly, how good are you in an interview today?",
+      key: "strength",
+      q: "What's your strongest card?",
       options: [
-        { value: "novice", label: "I freeze up", emoji: "🥶" },
-        { value: "rusty", label: "Rusty, it's been years", emoji: "🕰️" },
-        { value: "middling", label: "Hit or miss", emoji: "🎲" },
-        { value: "solid", label: "Pretty solid", emoji: "👍" },
-        { value: "strong", label: "Strong, I want an edge", emoji: "🎯" },
+        { value: "experience", label: "My experience", emoji: "🏆" },
+        { value: "people", label: "People skills", emoji: "🤝" },
+        { value: "results", label: "My track record", emoji: "📊" },
+        { value: "grit", label: "Work ethic", emoji: "💪" },
+        { value: "adaptable", label: "Adaptability", emoji: "🌊" },
+        { value: "unsure", label: "Still finding it", emoji: "🤔" },
+      ],
+    }],
+  },
+  // ── Customization: how they like to practice — sets the default mode. ──
+  {
+    kind: "form", demo: "delivery",
+    fields: [{
+      key: "practiceStyle",
+      q: "How do you like to practice?",
+      options: [
+        { value: "voice", label: "Out loud, by voice", emoji: "🎤" },
+        { value: "typed", label: "Typed, at my pace", emoji: "⌨️" },
+        { value: "pressure", label: "Realistic pressure", emoji: "🎯" },
+        { value: "coached", label: "Gentle coaching", emoji: "🤝" },
       ],
     }],
   },
   {
-    kind: "form",
-    demo: "questions",
-    fields: [{ key: "role", type: "role", q: "What job are you preparing for?" }],
-  },
-  {
-    kind: "form",
-    demo: "questions",
+    kind: "form", demo: "questions",
     fields: [{
       key: "gap",
-      q: "When did you last interview?",
+      q: "Last time you interviewed?",
       options: [
         { value: "<1yr", label: "Within the last year", emoji: "🗓️" },
         { value: "1-3yr", label: "1–3 years ago", emoji: "⌛" },
@@ -165,24 +195,25 @@ const SCREENS: Screen[] = [
       ],
     }],
   },
+  // ── Cadence, with a live projection graph that steepens as they commit.
+  //    hold:true keeps them on this screen so they can watch it move. ──
   {
-    // Cadence — the other input to the projection.
-    kind: "form",
-    demo: "progress",
+    kind: "form", demo: "progress", hold: true,
     fields: [{
       key: "cadence",
-      q: "How often can you practice?",
+      q: "How often will you practice?",
       options: [
         { value: "light", label: "A couple times a week", emoji: "🌱" },
         { value: "steady", label: "Most weekdays", emoji: "📈" },
         { value: "committed", label: "Almost every day", emoji: "🔥" },
-        { value: "intense", label: "Twice a day, it's soon", emoji: "⚡" },
+        { value: "intense", label: "Twice a day", emoji: "⚡" },
       ],
     }],
   },
+  // ── Validation 3: reflect the commitment back — the consistency nudge. ──
+  { kind: "validation", slot: 3, demo: "progress" },
   {
-    kind: "form",
-    demo: "progress",
+    kind: "form", demo: "progress",
     fields: [{
       key: "timeline",
       q: "When's your next interview?",
@@ -197,11 +228,10 @@ const SCREENS: Screen[] = [
   {
     // Quality lead question: what the job pays. Feeds the ROI card and makes
     // the lead worth far more than an anonymous email.
-    kind: "form",
-    demo: "progress",
+    kind: "form", demo: "progress",
     fields: [{
       key: "salaryBand",
-      q: "What does this role pay, roughly?",
+      q: "What does it pay, roughly?",
       options: [
         { value: "u40", label: "Under $40k", emoji: "🌱" },
         { value: "40_60", label: "$40–60k", emoji: "💵" },
@@ -214,11 +244,10 @@ const SCREENS: Screen[] = [
   },
   {
     // Quality lead question: the stake. Why this matters to them, in their words.
-    kind: "form",
-    demo: "progress",
+    kind: "form", demo: "progress",
     fields: [{
       key: "stakes",
-      q: "What would landing this actually change?",
+      q: "What would landing it change?",
       options: [
         { value: "income", label: "A real pay rise", emoji: "💰" },
         { value: "stability", label: "Stability again", emoji: "🏠" },
@@ -285,7 +314,7 @@ const CONF_NOTE: Record<string, string> = {
   confident: "",
 };
 
-function buildValidation(slot: 1 | 2, a: Record<string, string>, role: string) {
+function buildValidation(slot: 1 | 2 | 3, a: Record<string, string>, role: string) {
   const ind = INDUSTRY[(a.industry as keyof typeof INDUSTRY)] || INDUSTRY.other;
   const seed = `${a.situation || ""}|${a.industry || ""}|${a.confidence || ""}|${(role || "").toLowerCase()}`;
   if (slot === 1) {
@@ -299,6 +328,18 @@ function buildValidation(slot: 1 | 2, a: Record<string, string>, role: string) {
       headline: `Getting hired is about ${harder}% harder than two years ago.`,
       body: `${sit.line}${note ? ` ${note}` : ""}`,
       source: `Based on 2025 ${ind.label} hiring data`,
+    };
+  }
+  if (slot === 3) {
+    // Reflect the commitment they just made back at them — consistency nudge.
+    const cad = CADENCE_META[(a.cadence as Cadence)] || CADENCE_META.steady;
+    return {
+      eyebrow: "This is the whole edge",
+      value: 93,
+      suffix: "%",
+      headline: "93% of people feel interview anxiety. The ones who beat it rehearsed first.",
+      body: `You just chose to practice ${cad.perWeek}× a week. Most people never commit to that — and that single habit is the difference between freezing and walking in calm.`,
+      source: "2025 candidate anxiety survey",
     };
   }
   const apps = ind.apps + seededOffset(seed + "a", 19); // ±19
@@ -364,6 +405,7 @@ export default function OnboardingPage() {
     if (key === "situation") track("onboarding_situation", { situation: value });
     if (
       cur.kind === "form" &&
+      !cur.hold && // hold screens (the cadence graph) wait for an explicit Continue
       cur.fields.every((f) => f.options && !f.optional) &&
       cur.fields.every((f) => Boolean(na[f.key]))
     ) {
@@ -532,6 +574,13 @@ export default function OnboardingPage() {
                             })}
                           </div>
                         )}
+                        {f.key === "cadence" && (
+                          <CadenceChart
+                            skill={skillFrom(answers)}
+                            cadence={(answers.cadence as Cadence) || "steady"}
+                            picked={Boolean(answers.cadence)}
+                          />
+                        )}
                       </div>
                     ))}
                     <div className="flex flex-col gap-2 pt-1">
@@ -639,7 +688,7 @@ export default function OnboardingPage() {
 
                 {cur.kind === "plan" && (() => {
                   const plan = projectPlan(
-                    (answers.skill as SkillLevel) || "rusty",
+                    skillFrom(answers),
                     (answers.cadence as Cadence) || "steady"
                   );
                   const cad = CADENCE_META[(answers.cadence as Cadence) || "steady"];
@@ -671,6 +720,64 @@ export default function OnboardingPage() {
       {/* ============ RIGHT ============ */}
       <ConversionPanel demo={cur.demo} role={role || query} />
     </main>
+  );
+}
+
+/* The live projection graph on the practice-frequency screen. Same per-session
+   model as the plan and the dashboard, so the curve they watch climb here is
+   the exact promise they're held to later. Redraws (steepens) each time the
+   cadence changes — more reps per week, faster climb. */
+function CadenceChart({ skill, cadence, picked }: { skill: SkillLevel; cadence: Cadence; picked: boolean }) {
+  const W = 360, H = 170, padL = 6, padR = 14, padT = 14, padB = 22, days = 28;
+  const yMin = 38, yMax = 100;
+  const curve = projectCurve(skill, cadence, days);
+  const x = (d: number) => padL + (d / days) * (W - padL - padR);
+  const y = (s: number) => padT + (1 - (s - yMin) / (yMax - yMin)) * (H - padT - padB);
+  const line = curve.map((s, i) => `${i === 0 ? "M" : "L"}${x(i).toFixed(1)},${y(s).toFixed(1)}`).join(" ");
+  const area = `${line} L${x(days).toFixed(1)},${y(yMin).toFixed(1)} L${x(0).toFixed(1)},${y(yMin).toFixed(1)} Z`;
+  const top10 = scoreForPercentile(90);
+  const top1 = scoreForPercentile(99);
+  const end = curve[curve.length - 1];
+  const reach = end >= top1 ? "the top 1%" : end >= top10 ? "the top 10%" : `a score of ${Math.round(end)}`;
+  const cad = CADENCE_META[cadence];
+  return (
+    <div className="mt-5 rounded-2xl border p-4" style={{ borderColor: "var(--border)", background: "var(--surface)" }}>
+      <div className="flex items-baseline justify-between">
+        <span className="text-2xs font-semibold uppercase tracking-wider text-ink-3">Your projected readiness</span>
+        <span className="text-2xs font-semibold text-primary-ink">{cad.perWeek}× a week</span>
+      </div>
+      <svg viewBox={`0 0 ${W} ${H}`} className="mt-2 w-full" style={{ overflow: "visible" }} aria-hidden>
+        <defs>
+          <linearGradient id="cadfill" x1="0" y1="0" x2="0" y2="1">
+            <stop offset="0%" stopColor="var(--primary)" stopOpacity="0.20" />
+            <stop offset="100%" stopColor="var(--primary)" stopOpacity="0" />
+          </linearGradient>
+        </defs>
+        {[{ s: top10, label: "Top 10%" }, { s: top1, label: "Top 1%" }].map((t) => (
+          <g key={t.label}>
+            <line x1={padL} x2={W - padR} y1={y(t.s)} y2={y(t.s)} stroke="var(--border-strong)" strokeDasharray="3 4" strokeWidth="1" />
+            <text x={padL + 1} y={y(t.s) - 4} className="fill-ink-3" style={{ fontSize: 9, fontWeight: 600 }}>{t.label}</text>
+          </g>
+        ))}
+        <motion.path key={`a-${cadence}`} d={area} fill="url(#cadfill)" initial={{ opacity: 0 }} animate={{ opacity: 1 }} transition={{ duration: 0.6 }} />
+        <motion.path
+          key={`l-${cadence}`} d={line} fill="none" stroke="var(--primary)" strokeWidth="2.5"
+          strokeLinecap="round" strokeLinejoin="round"
+          initial={{ pathLength: 0 }} animate={{ pathLength: 1 }} transition={{ duration: 0.9, ease: [0.22, 1, 0.36, 1] }}
+        />
+        <motion.circle
+          key={`c-${cadence}`} cx={x(days)} cy={y(end)} r="4.5" fill="var(--primary)" stroke="var(--surface)" strokeWidth="2"
+          initial={{ scale: 0 }} animate={{ scale: 1 }} transition={{ delay: 0.75, type: "spring", stiffness: 300, damping: 18 }}
+        />
+        <text x={padL} y={H - 6} className="fill-ink-3" style={{ fontSize: 9 }}>today</text>
+        <text x={W - padR} y={H - 6} textAnchor="end" className="fill-ink-3" style={{ fontSize: 9 }}>4 weeks</text>
+      </svg>
+      <p className="mt-1.5 text-2xs leading-relaxed text-ink-3">
+        {picked
+          ? <>At <span className="font-semibold text-ink-2">{cad.perWeek}× a week</span> you reach <span className="font-semibold text-primary-ink">{reach}</span> in about four weeks. Try another pace.</>
+          : <>Choose a pace above to watch your climb steepen.</>}
+      </p>
+    </div>
   );
 }
 
