@@ -2,7 +2,7 @@
 
 import Link from "next/link";
 import { usePathname, useRouter } from "next/navigation";
-import { LineChart, Mic, Sprout, Wand2, LogOut, BarChart3, LayoutDashboard, Briefcase, SlidersHorizontal, Settings, type LucideIcon } from "lucide-react";
+import { LineChart, Mic, Wand2, LogOut, LayoutDashboard, Briefcase, SlidersHorizontal, Settings, type LucideIcon } from "lucide-react";
 import { LogoMark } from "@/components/ui/Logo";
 import { cn } from "@/lib/utils";
 import { useAuth } from "@/lib/auth";
@@ -21,8 +21,7 @@ const MAIN: Item[] = [
 ];
 
 const TOOLS: Item[] = [
-  { href: "/tools/question-predictor", label: "Question Predictor", icon: Wand2 },
-  { href: "/tools/gap-story", label: "Gap Story", icon: Sprout },
+  { href: "/prep", label: "Prep tools", icon: Wand2 },
 ];
 
 /* Hover-expand navigation rail. Collapsed to an icon strip; widens on hover to
