@@ -390,6 +390,31 @@ export function scoreAnswer(input: {
   };
 }
 
+/** Regenerate the per-dimension feedback notes so they match a GIVEN set of
+ *  dimension scores (e.g. the AI's), not the heuristic's own. The evidence in
+ *  ctx (numbers, length, hedges) still comes from the real answer, but the
+ *  note's tone (weak / okay / strong branch) is keyed off the score the user
+ *  actually sees — so a 45 never shows a "great length" line. */
+export function feedbackForScores(
+  dims: DimensionScores,
+  input: { answer: string }
+): Record<Dimension, string> {
+  const { answer } = input;
+  const wc = words(answer).length;
+  const anx = analyzeAnxiety(answer);
+  const clarity = scoreClarity(answer);
+  const spec = scoreSpecificity(answer);
+  const ctx = { anx, numbers: spec.numbers, outcomes: spec.outcomes, wc, avgLen: clarity.avgLen };
+  const seed = wc + (answer.charCodeAt(0) || 0);
+  return {
+    clarity: feedbackFor("clarity", dims.clarity, ctx, seed),
+    relevance: feedbackFor("relevance", dims.relevance, ctx, seed + 1),
+    specificity: feedbackFor("specificity", dims.specificity, ctx, seed + 2),
+    confidence: feedbackFor("confidence", dims.confidence, ctx, seed + 3),
+    conciseness: feedbackFor("conciseness", dims.conciseness, ctx, seed + 4),
+  } as Record<Dimension, string>;
+}
+
 /** Aggregate a set of answers into a session's dimension averages. */
 export function aggregateDimensions(answers: { scores: AnswerScores; isFollowUp?: boolean }[]): DimensionScores {
   const keys: Dimension[] = ["clarity", "relevance", "specificity", "confidence", "conciseness"];

@@ -17,18 +17,18 @@ export const SCORING_RUBRIC = `GRADING PROCEDURE. Follow this exact procedure ev
 
 TRANSCRIPTION TOLERANCE (critical): answers are captured by speech-to-text and may be imperfect. IGNORE anything that is clearly a transcription artifact and not something a listener would hear: missing or wrong punctuation, no capitalization, homophones (their/there, to/two/too, your/you're), run-on sentences caused by missing punctuation, dropped short filler words, and stray line breaks. Grade the underlying spoken content and intent. NEVER lower clarity, conciseness, or confidence because of transcription noise. Only penalize problems a human listener would actually notice in the room.
 
-BANDS (apply to every dimension, 0-100):
-- 90-100 Excellent: a hiring manager would be impressed and remember it.
-- 75-89 Strong: clearly passes; only minor polish left.
-- 60-74 Okay: gets the point across but has one real, fixable weakness.
-- 40-59 Weak: would hurt them; a core element is missing or muddled.
-- 20-39 Poor: largely fails this dimension.
-- 0-19 Absent or off-topic.
+BANDS (apply to every dimension, 0-100 — grade to the standard of a competitive company, not a friendly mock):
+- 90-100 Exceptional: top ~5% of answers; a hiring manager would remember it and quote it later. Rare.
+- 78-89 Strong: clearly passes a real bar; only minor polish left.
+- 62-77 Solid but flawed: gets the point across, but a good interviewer would note a real weakness.
+- 45-61 Mediocre: does not stand out; a core element is thin, missing, or muddled. Most practice answers live here.
+- 25-44 Weak: would actively hurt them in the room.
+- 0-24 Poor, absent, or off-topic.
 
 DIMENSION SIGNALS (what raises or lowers each):
 1) CLARITY (structure, easy to follow). Up: leads with the point, logical order (situation then action then result), one idea per sentence. Down: buries the point, jumps around, listener must re-track. (Punctuation from STT does not count.)
 2) RELEVANCE (answers THIS question for THIS role). Up: first sentence answers exactly what was asked; the example fits the question type and the target role. Down: answers an adjacent question, drifts, or tells a generic story that ignores the prompt.
-3) SPECIFICITY (concrete, measurable, real). Up: a real situation, concrete actions, and a result, ideally with a number, timeframe, or named outcome. Down: vague claims with no example, number, or outcome. This is the most common failure. Be strict: no number or concrete result caps this at 65.
+3) SPECIFICITY (concrete, measurable, real). Up: a real situation, concrete actions, and a result, ideally with a number, timeframe, or named outcome. Down: vague claims with no example, number, or outcome. This is the most common failure. Be strict: no number or concrete result caps this at 55, and no specific example at all caps it below 45.
 4) CONFIDENCE (language projects steadiness). Up: declarative ownership ("I led," "I decided," "I cut"). Down: audible hedging and self-undermining: "just," "I think," "kind of," "maybe," "I'm not sure," "probably," apologizing, "does that make sense?". Count them; each cluster lowers the score. (Judge spoken hedging, not written artifacts.)
 5) CONCISENESS (right length, no rambling). Up: roughly 60-150 spoken words for a behavioral answer; tight, lands, and stops. Down: under ~25 words (too thin to judge) or rambling/repeating past the point. Judge by spoken length and repetition, not punctuation.
 
@@ -36,16 +36,17 @@ BEHAVIORAL RED FLAGS (what real hiring managers penalize — apply across dimens
 - "We" with no "I": if the story is all "we did / the team did" with no clear personal action, the candidate hasn't shown ownership. Cap confidence and specificity until they say what THEY did. This is one of the most common reasons a good story scores low.
 - Hypothetical instead of real: "I would..." / "I usually..." instead of a specific time it happened. A real, dated example beats a hypothetical every time; penalize relevance and specificity.
 - Blame-shifting: blaming a coworker, boss, or company ("they were incompetent") instead of showing how THEY handled it. Lower confidence and relevance; the answer should center their response, not others' faults.
-- No measurable result: a story with no outcome, number, timeframe, or named result is incomplete. This caps specificity (no number/result = 65 max) and weakens clarity.
+- No measurable result: a story with no outcome, number, timeframe, or named result is incomplete. This caps specificity (no number/result = 55 max) and weakens clarity.
 - Excessive setup: burning the answer on background before the point. Hurts clarity and conciseness.
 - Inflated role: claiming credit that doesn't fit the story. Erodes credibility; do not reward it.
 - Strong signals to reward: leads with the point, a clear Situation/Task/Action/Result, "I" ownership, a quantified outcome, and a story that would hold up under a follow-up question.
 
-CALIBRATION (critical — do not inflate, do not cluster):
+CALIBRATION (critical — grade HARD, like a demanding hiring manager at a competitive company; when you are torn between two scores, choose the LOWER one):
 - Grade each of the five dimensions INDEPENDENTLY, on its own evidence. A great story can still score low on conciseness. Confident delivery does not raise specificity. A vague answer said smoothly is still vague. Never let one strong dimension pull the others up.
-- Spread your scores. Do not park everything at 70-80. Two clearly different answers must get clearly different scores, and the five dimensions of one answer should rarely all be within a few points of each other.
-- Anchor to reality: the average real practice answer lands about 52-70 overall. An answer with no specific, concrete example is below 55 on specificity, full stop. An answer that never says what THEY personally did is below 55 on confidence. Reserve 85+ for a dimension an experienced hiring manager would actually be impressed by.
-- If it's thin (under ~25 words) or dodges the question, score it low and say why. Do not be generous to be kind — a soft score is a disservice.
+- Spread your scores. Do not park everything at 65-80. Two clearly different answers must get clearly different scores, and the five dimensions of one answer should rarely all be within a few points of each other.
+- Set the bar HIGH. The average real practice answer lands about 42-58 overall, not 70. A genuinely good answer is around 62-74. Reserve 80+ for a dimension an experienced hiring manager would truly be impressed by, and 90+ for the rare answer they would remember and repeat. Most answers should NOT reach 75.
+- Hard caps, applied strictly: no specific concrete example -> specificity below 45. No number, timeframe, or named result -> specificity 55 max. "We" the whole way with no clear personal action -> confidence AND specificity 50 max. A hypothetical ("I would...") instead of a real time it happened -> relevance and specificity 55 max. Hedging in most sentences -> confidence below 55.
+- Do not round up to be kind. A soft score is a disservice that sends them into a real interview unprepared. If it is thin (under ~25 words) or dodges the question, score it in the 20s-30s and say exactly why.
 
 OVERALL = round(clarity*0.20 + relevance*0.20 + specificity*0.25 + confidence*0.20 + conciseness*0.15).
 
