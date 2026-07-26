@@ -214,7 +214,9 @@ export async function POST(req: Request) {
       const system = domainSystem.replace(/\{N\}/g, String(n));
       const user = `${candidateBlock({ name, situation: situation || "", targetRole, company, interviewGap, posting, weakestDimension })}${variety}${dom === "interview" ? typeLine : ""}${diffLine}${toneLine}${interviewerLine}${seniorityLine}${stageLine}${frameworkLine}\n\nWrite their ${n} ${dom === "interview" ? "questions" : "drills"} now.`;
       // Higher temperature than scoring: for questions, variety matters more than determinism.
-      const text = await callClaude({ model: FAST_MODEL, system, user, maxTokens: 1100, temperature: 0.85 });
+      // Questions are the one place quality barely matters (a heuristic bank backs
+      // them up), so route to the cheapest tier.
+      const text = await callClaude({ model: FAST_MODEL, system, user, maxTokens: 1100, temperature: 0.85, cheap: true });
       const parsed = extractJson<{ questions: Partial<Question>[] }>(text);
       if (parsed?.questions?.length) {
         // Coerce every field, drop any question with no text, then renumber so
