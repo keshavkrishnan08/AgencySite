@@ -1790,22 +1790,6 @@ function SetupCard({
             </BuilderSection>
           </div>
 
-          <BuilderSection icon={Clock} title="Answer length" hint="what the coaching aims for">
-            <div className="flex gap-1 rounded-full bg-bg-tint p-1 sm:max-w-xs">
-              {(["short", "medium", "long"] as const).map((v) => (
-                <button
-                  key={v}
-                  onClick={() => setLengthTarget(v)}
-                  className={cn(
-                    "flex-1 rounded-full px-2 py-1.5 text-xs font-medium capitalize transition-colors",
-                    lengthTarget === v ? "bg-white text-ink shadow-xs" : "text-ink-2 hover:text-ink"
-                  )}
-                >
-                  {v}
-                </button>
-              ))}
-            </div>
-          </BuilderSection>
 
           <BuilderSection icon={MessageSquare} title="Phrasing" hint="how the questions read">
             <OptionChips options={TONES} isOn={(v) => tone === v} onPick={setTone} />
