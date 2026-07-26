@@ -56,7 +56,7 @@ export const DIMENSION_HELP: Record<Dimension, { what: string; tip: string }> = 
   relevance: { what: "Whether you answered the real question.", tip: "Make your very first sentence answer it head-on." },
   specificity: { what: "Real details, numbers, and outcomes.", tip: "Add one number or result to every story." },
   confidence: { what: "How sure of yourself you sound.", tip: "Cut 'I just', 'I guess', and 'um'." },
-  conciseness: { what: "The right length. Not too short, not rambling.", tip: "Aim for 60-150 words. Trim the slow start." },
+  conciseness: { what: "The right length. Not too short, not rambling.", tip: "Trim the slow start and cut anything that doesn't serve the point." },
 };
 
 export const SITUATION_META: Record<
