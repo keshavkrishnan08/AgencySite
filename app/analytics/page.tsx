@@ -109,8 +109,7 @@ export default function DashboardPage() {
             {name ? `Welcome back, ${name}.` : "Where you stand"}
           </h1>
           <p className="mt-1 text-ink-2">
-            {m.sessionCount} session{m.sessionCount === 1 ? "" : "s"} · {m.questionsAnswered} questions ·{" "}
-            {formatDuration(m.practiceSeconds)} of practice. Every number here comes from your own answers.
+            Every chart here is built from your own answers, and updates the moment you finish a session.
           </p>
         </header>
 
@@ -118,27 +117,22 @@ export default function DashboardPage() {
             see exactly what they're about to fill in. */}
         {!m.hasData && <EmptyBanner />}
 
+        {/* Graphs only — one visual per idea, organized top to bottom. */}
         <Headline m={m} />
-        <KpiStrip m={m} />
         <Trajectory m={m} />
-        <VolumeTrend sessions={sessions} m={m} />
+
+        <div className="grid gap-6 lg:grid-cols-2">
+          <SkillBreakdown m={m} />
+          <VolumeTrend sessions={sessions} m={m} />
+          <Distribution m={m} />
+          <Categories m={m} />
+          <AnxietyPanel m={m} />
+          <DeliveryPanel m={m} />
+        </div>
 
         <div className="grid gap-6 lg:grid-cols-[1.55fr_1fr]">
+          <MilestoneLadder m={m} />
           <div className="space-y-6">
-            <SkillBreakdown m={m} />
-            <AnxietyPanel m={m} />
-            <div className="grid gap-6 sm:grid-cols-2">
-              <Distribution m={m} />
-              <Categories m={m} />
-            </div>
-            <DeliveryPanel m={m} />
-            <RecentSessions sessions={sessions} />
-          </div>
-
-          <div className="space-y-6">
-            <ConsistencyCard m={m} />
-            <MilestoneLadder m={m} />
-            <PersonalRecords m={m} />
             {m.weakest && <FocusCard dim={m.weakest} />}
             <div className="card p-6">
               <div className="mb-1.5 flex items-center gap-2 text-2xs font-semibold uppercase tracking-wider text-primary-ink">
