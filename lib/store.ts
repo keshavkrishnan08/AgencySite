@@ -25,6 +25,7 @@ const KEYS = {
   goal: "pp:goal",
   routines: "pp:routines",
   prefs: "pp:prefs",
+  phases: "pp:phases",
 } as const;
 
 function read<T>(key: string, fallback: T): T {
@@ -274,6 +275,21 @@ export function setPrefs(patch: Partial<Prefs>): Prefs {
   return next;
 }
 
+
+/* ----------------------- Specialization path progress -----------------------
+   Each phase (Foundations → Mastery) records how many times it's been completed
+   and the best score, so the hub can cross it off and show a real stat. */
+export interface PhaseStat { count: number; best: number; lastAt: string }
+export function getPhaseProgress(): Record<string, PhaseStat> {
+  return read<Record<string, PhaseStat>>(KEYS.phases, {});
+}
+export function recordPhaseDone(label: string, overall: number): void {
+  if (!label) return;
+  const all = getPhaseProgress();
+  const cur = all[label] || { count: 0, best: 0, lastAt: "" };
+  all[label] = { count: cur.count + 1, best: Math.max(cur.best, Math.round(overall)), lastAt: new Date().toISOString() };
+  write(KEYS.phases, all);
+}
 
 /** Subscribe to any store change (used by the dashboard to stay live). */
 export function onStoreChange(cb: () => void): () => void {

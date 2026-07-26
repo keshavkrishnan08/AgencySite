@@ -22,6 +22,7 @@ import { aggregateDimensions, computeOverall } from "@/lib/scoring";
 import {
   getOnboarding, getPredictedSet, getProfile, getSessions, saveSession,
   getRoutines, saveRoutine, deleteRoutine, onStoreChange, getPrefs, type PracticeRoutine,
+  getPhaseProgress, recordPhaseDone, type PhaseStat,
 } from "@/lib/store";
 import { average, cn, uid } from "@/lib/utils";
 import { track } from "@/lib/analytics";
@@ -204,6 +205,9 @@ function PracticeInner() {
     focusTypes: [] as string[], difficulty: "standard", count: 8, tone: "", interviewer: "",
     seniority: "", stage: "", framework: "",
   });
+  // The launch label (e.g. "phase_pressure"), kept separate so the deps-effect
+  // that rewrites customRef can't wipe it before the session finishes.
+  const launchLabelRef = useRef("");
   useEffect(() => {
     customRef.current = { focusTypes, difficulty, count, tone, interviewer, seniority, stage, framework };
   }, [focusTypes, difficulty, count, tone, interviewer, seniority, stage, framework]);
@@ -451,6 +455,7 @@ function PracticeInner() {
         focusTypes: ft, difficulty: diff, count: c, tone: tn, interviewer: iv,
         seniority: customRef.current.seniority, stage: customRef.current.stage, framework: customRef.current.framework,
       };
+      launchLabelRef.current = cfg.label || "";
       track("practice:track_start", {
         domain: d, difficulty: diff, count: c, tone: tn, interviewer: iv,
         timed: Boolean(cfg.timed), voice: Boolean(cfg.voice), label: cfg.label || "",
@@ -663,6 +668,8 @@ function PracticeInner() {
       tellsPer100: totalWords ? Math.round(((fillers + hedges + apologies + underminers) / totalWords) * 1000) / 10 : 0,
     });
     mixpanelIncrement("sessions_completed");
+    // If this session came from a Specialization-path phase, cross it off.
+    if (launchLabelRef.current.startsWith("phase_")) recordPhaseDone(launchLabelRef.current, session.overall);
     // Refresh the standardized overview saved to the account.
     persistOverview();
     router.push(`/session/${session.id}`);
@@ -1227,6 +1234,9 @@ function PracticeHub({
   onLaunch: (cfg: LaunchCfg) => void;
   onCustom: () => void;
 }) {
+  // Specialization-path progress, so completed phases cross off and show a stat.
+  const phaseDone: Record<string, PhaseStat> = getPhaseProgress();
+  const phasesCleared = PHASES.filter((p) => p.cfg.label && phaseDone[p.cfg.label]).length;
   // The gap story is NOT for everyone. Show it only to people whose answers say
   // they actually have one, and frame it as situational, not a required step.
   const hasGap =
@@ -1373,24 +1383,46 @@ function PracticeHub({
       </div>
 
       {/* Specialization phases */}
-      <SectionLabel icon={Flame} title="Specialization path" sub="A route from first reps to interview-ready. Move up as you improve." />
+      <SectionLabel
+        icon={Flame}
+        title="Specialization path"
+        sub={`A route from first reps to interview-ready. ${phasesCleared}/${PHASES.length} phases cleared.`}
+      />
       <div className="grid gap-3 sm:grid-cols-2 lg:grid-cols-4">
-        {PHASES.map((p) => (
-          <button
-            key={p.title}
-            onClick={() => onLaunch(p.cfg)}
-            className="group relative flex flex-col rounded-2xl border p-5 text-left transition-all hover:-translate-y-0.5 hover:shadow-md"
-            style={{ borderColor: "var(--border)" }}
-          >
-            <span className="font-mono text-2xs font-bold text-ink-3">PHASE {p.n}</span>
-            <span className="mt-1.5 font-serif text-lg font-semibold text-ink">{p.title}</span>
-            <span className="mt-0.5 text-2xs font-semibold uppercase tracking-wider text-primary-ink">{p.tag}</span>
-            <span className="mt-2 flex-1 text-sm leading-relaxed text-ink-2">{p.detail}</span>
-            <span className="mt-3 inline-flex items-center gap-1 text-sm font-medium text-primary-ink">
-              Start <ArrowRight size={14} className="transition-transform group-hover:translate-x-0.5" />
-            </span>
-          </button>
-        ))}
+        {PHASES.map((p) => {
+          const stat = p.cfg.label ? phaseDone[p.cfg.label] : undefined;
+          const done = !!stat;
+          return (
+            <button
+              key={p.title}
+              onClick={() => onLaunch(p.cfg)}
+              className="group relative flex flex-col rounded-2xl border p-5 text-left transition-all hover:-translate-y-0.5 hover:shadow-md"
+              style={{ borderColor: done ? "var(--sage)" : "var(--border)", background: done ? "var(--sage-soft)" : undefined }}
+            >
+              <span className="flex items-center justify-between">
+                <span className="font-mono text-2xs font-bold text-ink-3">PHASE {p.n}</span>
+                {done && <Check size={16} className="text-sage-ink" />}
+              </span>
+              <span className={cn("mt-1.5 font-serif text-lg font-semibold", done ? "text-ink-2 line-through decoration-sage/60" : "text-ink")}>{p.title}</span>
+              <span className="mt-0.5 text-2xs font-semibold uppercase tracking-wider text-primary-ink">{p.tag}</span>
+              <span className="mt-2 flex-1 text-sm leading-relaxed text-ink-2">{p.detail}</span>
+              {done ? (
+                <span className="mt-3 text-2xs font-medium text-sage-ink">
+                  Cleared · {stat.count}× · best {stat.best}
+                </span>
+              ) : (
+                <span className="mt-3 inline-flex items-center gap-1 text-sm font-medium text-primary-ink">
+                  Start <ArrowRight size={14} className="transition-transform group-hover:translate-x-0.5" />
+                </span>
+              )}
+              {done && (
+                <span className="mt-2 inline-flex items-center gap-1 text-xs font-medium text-primary-ink opacity-0 transition-opacity group-hover:opacity-100">
+                  Run again <ArrowRight size={13} />
+                </span>
+              )}
+            </button>
+          );
+        })}
       </div>
 
       {/* Focus drills */}
