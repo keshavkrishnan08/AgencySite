@@ -21,11 +21,11 @@ export function deliveryNotes(m: DeliveryMetrics): DeliveryNote[] {
 
   // Length
   if (m.durationSec < 20) {
-    notes.push({ label: "Length", value: fmtDuration(m.durationSec), tone: "warn", text: "That was short. Add the action you took and how it ended. Aim for about 60 to 90 seconds." });
+    notes.push({ label: "Length", value: fmtDuration(m.durationSec), tone: "warn", text: "That was short. Add the action you took and how it ended." });
   } else if (m.durationSec > 150) {
-    notes.push({ label: "Length", value: fmtDuration(m.durationSec), tone: "warn", text: `You spoke for ${fmtDuration(m.durationSec)}. Aim for about 90 seconds. Cut the slow start and land the result.` });
+    notes.push({ label: "Length", value: fmtDuration(m.durationSec), tone: "warn", text: "You ran long. Cut the slow start and land the result sooner." });
   } else {
-    notes.push({ label: "Length", value: fmtDuration(m.durationSec), tone: "good", text: "Good length. Long enough to be complete, short enough to hold attention." });
+    notes.push({ label: "Length", value: fmtDuration(m.durationSec), tone: "good", text: "Well-paced. Long enough to be complete, short enough to hold attention." });
   }
 
   // Pace
