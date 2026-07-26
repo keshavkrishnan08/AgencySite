@@ -113,35 +113,38 @@ export default function DashboardPage() {
           </p>
         </header>
 
-        {/* No sessions yet: still render the full board, just empty, so people
-            see exactly what they're about to fill in. */}
-        {!m.hasData && <EmptyBanner />}
+        {/* No sessions yet: a clean empty state, not a wall of blank charts. */}
+        {!m.hasData ? (
+          <EmptyBanner />
+        ) : (
+          <>
+            {/* Graphs only — no number tiles. One visual per idea, top to bottom.
+                Readiness lives in the trajectory chart, not a big number. */}
+            <Trajectory m={m} />
 
-        {/* Graphs only — no number tiles. One visual per idea, top to bottom.
-            Readiness lives in the trajectory chart, not a big number. */}
-        <Trajectory m={m} />
-
-        <div className="grid gap-6 lg:grid-cols-2">
-          <SkillBreakdown m={m} />
-          <VolumeTrend sessions={sessions} m={m} />
-          <Distribution m={m} />
-          <Categories m={m} />
-          <AnxietyPanel m={m} />
-          <DeliveryPanel m={m} />
-        </div>
-
-        <div className="grid gap-6 lg:grid-cols-[1.55fr_1fr]">
-          <MilestoneLadder m={m} />
-          <div className="space-y-6">
-            {m.weakest && <FocusCard dim={m.weakest} />}
-            <div className="card p-6">
-              <div className="mb-1.5 flex items-center gap-2 text-2xs font-semibold uppercase tracking-wider text-primary-ink">
-                <Lightbulb size={14} /> Today&apos;s tip
-              </div>
-              <p className="text-sm leading-relaxed text-ink-2">{tip}</p>
+            <div className="grid gap-6 lg:grid-cols-2">
+              <SkillBreakdown m={m} />
+              <VolumeTrend sessions={sessions} m={m} />
+              <Distribution m={m} />
+              <Categories m={m} />
+              <AnxietyPanel m={m} />
+              <DeliveryPanel m={m} />
             </div>
-          </div>
-        </div>
+
+            <div className="grid gap-6 lg:grid-cols-[1.55fr_1fr]">
+              <MilestoneLadder m={m} />
+              <div className="space-y-6">
+                {m.weakest && <FocusCard dim={m.weakest} />}
+                <div className="card p-6">
+                  <div className="mb-1.5 flex items-center gap-2 text-2xs font-semibold uppercase tracking-wider text-primary-ink">
+                    <Lightbulb size={14} /> Today&apos;s tip
+                  </div>
+                  <p className="text-sm leading-relaxed text-ink-2">{tip}</p>
+                </div>
+              </div>
+            </div>
+          </>
+        )}
       </main>
     </AppShell>
   );
