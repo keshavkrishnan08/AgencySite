@@ -17,6 +17,7 @@ import { VoiceButton } from "@/components/ui/VoiceButton";
 import { InfoTip } from "@/components/ui/Tooltip";
 import { apiFollowUp, apiGenerateExample, apiGenerateQuestions, apiScoreAnswer } from "@/lib/client";
 import { encodedContext, persistOverview } from "@/lib/context";
+import { sessionBeat, isBeatPoint, type Beat } from "@/lib/coaching";
 import { aggregateDimensions, computeOverall } from "@/lib/scoring";
 import {
   getOnboarding, getPredictedSet, getProfile, getSessions, saveSession,
@@ -69,7 +70,7 @@ function weakestQuestions(sessions: Session[], limit: number): { text: string; c
 // setup = the practice hub (the precursor). custom = the fine-grained builder.
 // Access is gated once, at the app shell (unpaid = whole app blurred). So there
 // is NO paywall inside a session: everyone who's in the app runs the full thing.
-type Phase = "setup" | "custom" | "loading" | "answer" | "score";
+type Phase = "setup" | "custom" | "loading" | "answer" | "score" | "beat";
 
 function PracticeInner() {
   const router = useRouter();
@@ -82,6 +83,7 @@ function PracticeInner() {
   const [fromPredicted, setFromPredicted] = useState(false);
 
   const [phase, setPhase] = useState<Phase>("loading");
+  const [beat, setBeat] = useState<Beat | null>(null);
   const [role, setRole] = useState("");
   const [situation, setSituation] = useState<Situation | null>(null);
   const [company, setCompany] = useState("");
@@ -573,7 +575,8 @@ function PracticeInner() {
     if (!scored) return;
     const updated = collectAnswers();
     setAnswers(updated);
-    if (index + 1 >= total) {
+    const answered = index + 1;
+    if (answered >= total) {
       finishSession(updated);
       return;
     }
@@ -586,6 +589,20 @@ function PracticeInner() {
     setInterim("");
     deliveryRef.current = null;
     fuDeliveryRef.current = null;
+    // A coaching beat between questions at ~1/3 and ~2/3 through, so a session
+    // is coached, not clicked through. The next question is already loaded.
+    if (isBeatPoint(answered, total)) {
+      setBeat(sessionBeat(updated, answered, total));
+      setPhase("beat");
+      track("practice:beat_shown", { after: answered, total });
+    } else {
+      setPhase("answer");
+    }
+    window.scrollTo({ top: 0, behavior: "smooth" });
+  };
+
+  const continueFromBeat = () => {
+    track("practice:beat_continue", { index: index + 1 });
     setPhase("answer");
     window.scrollTo({ top: 0, behavior: "smooth" });
   };
@@ -605,10 +622,10 @@ function PracticeInner() {
       {/* In-session bar (progress + end), sits under the app nav */}
       <div className="sticky top-16 z-30 glass border-b" style={{ borderColor: "var(--border)" }}>
         <div className="container-wide flex h-14 items-center justify-between gap-4">
-          {(phase === "answer" || phase === "score") ? (
+          {(phase === "answer" || phase === "score" || phase === "beat") ? (
             <div className="flex flex-1 items-center justify-center gap-3">
               <span className="hidden text-sm font-medium text-ink-2 sm:inline">
-                Question {index + 1} of {total}
+                {phase === "beat" ? "Coach's note" : `Question ${index + 1} of ${total}`}
               </span>
               <div className="h-1.5 w-32 overflow-hidden rounded-full sm:w-48" style={{ background: "var(--bg-tint)" }}>
                 <div
@@ -857,6 +874,43 @@ function PracticeInner() {
             </motion.div>
           )}
         </AnimatePresence>
+
+        {/* BEAT — a coaching moment between questions (full width, two columns) */}
+        {phase === "beat" && beat && (
+          <motion.div initial={{ opacity: 0, y: 16 }} animate={{ opacity: 1, y: 0 }} transition={{ duration: 0.35 }}>
+            <div className="card p-7 sm:p-9">
+              <div className="grid gap-8 lg:grid-cols-[1.5fr_1fr] lg:items-center">
+                <div>
+                  <div className="flex items-center gap-2 text-2xs font-semibold uppercase tracking-[0.16em] text-primary-ink">
+                    <Sparkles size={14} /> {beat.eyebrow}
+                  </div>
+                  <h2 className="mt-3 font-serif text-2xl font-semibold leading-snug text-ink sm:text-3xl">{beat.title}</h2>
+                  <p className="mt-3 text-[1.02rem] leading-relaxed text-ink-2">{beat.body}</p>
+                </div>
+                <div className="space-y-4">
+                  {beat.focus && (
+                    <div className="rounded-xl border p-4" style={{ borderColor: "var(--border)", background: "var(--bg-sunk)" }}>
+                      <p className="text-2xs font-semibold uppercase tracking-wider text-ink-3">Try this on the next one</p>
+                      <p className="mt-1.5 flex items-start gap-2 text-sm text-ink">
+                        <Target size={15} className="mt-0.5 shrink-0 text-primary" />
+                        <span><strong className="text-ink">{beat.focus.label}:</strong> {beat.focus.drill}</span>
+                      </p>
+                    </div>
+                  )}
+                  <div className="flex items-center justify-between gap-3">
+                    <div className="flex-1">
+                      <div className="h-1.5 w-full overflow-hidden rounded-full" style={{ background: "var(--bg-tint)" }}>
+                        <div className="h-full rounded-full" style={{ width: `${beat.progressPct}%`, background: "linear-gradient(90deg, var(--primary), var(--primary-bright))" }} />
+                      </div>
+                      <p className="mt-1.5 text-2xs text-ink-3">{beat.progressPct}% through this session</p>
+                    </div>
+                    <Button onClick={continueFromBeat} size="lg">Keep going <ArrowRight size={18} /></Button>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </motion.div>
+        )}
 
         {/* SCORE */}
         {phase === "score" && scored && (
