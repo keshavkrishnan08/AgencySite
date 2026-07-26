@@ -16,7 +16,6 @@ const DIFFS = [["easy", "Gentle"], ["standard", "Standard"], ["hard", "Tough"]];
 const COUNTS = [4, 6, 8, 10, 12];
 const TONES = [["", "Balanced"], ["conversational", "Conversational"], ["formal", "Formal"], ["rapid_fire", "Rapid-fire"], ["scenario", "Scenario"]];
 const INTERVIEWERS = [["", "Default"], ["friendly", "Friendly"], ["neutral", "Neutral"], ["skeptical", "Skeptical"], ["panel", "Panel"]];
-const LENGTHS = [["short", "Short"], ["medium", "Medium"], ["long", "Long"]];
 const COACH = [["gentle", "Gentle"], ["balanced", "Balanced"], ["direct", "Direct"]];
 const SENIORITY = [["", "Any"], ["entry", "Entry"], ["mid", "Mid"], ["senior", "Senior"], ["exec", "Exec"]];
 const STAGES = [["", "Any"], ["screen", "Screen"], ["onsite", "Onsite"], ["final", "Final"]];
@@ -64,7 +63,6 @@ export default function PreferencesPage() {
           <Row label="Seniority"><Seg options={SENIORITY} value={prefs.seniority} onPick={(v) => update({ seniority: v })} /></Row>
           <Row label="Interview stage"><Seg options={STAGES} value={prefs.stage} onPick={(v) => update({ stage: v })} /></Row>
           <Row label="Answer framework"><Seg options={FRAMEWORKS} value={prefs.framework} onPick={(v) => update({ framework: v })} /></Row>
-          <Row label="Answer length"><Seg options={LENGTHS} value={prefs.lengthTarget} onPick={(v) => update({ lengthTarget: v })} /></Row>
         </Section>
 
         <Section icon={Timer} title="Session options">

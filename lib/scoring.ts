@@ -294,9 +294,9 @@ function feedbackFor(
 
     case "conciseness":
       if (ctx.wc < 25) return "Too brief. The interviewer is left wanting more. Add the action you took and how it ended.";
-      if (ctx.wc > 260) return `That's ${ctx.wc} words. You're rambling a bit. Aim for 60-150 and cut the setup.`;
-      if (good) return "Great length. Long enough to be complete, short enough to hold attention.";
-      return "Reasonable length. A tighter opening would give your result more room to shine.";
+      if (ctx.wc > 260) return "You're rambling a bit. Cut the setup and get to the action and the result faster.";
+      if (good) return "Well-paced. Long enough to be complete, short enough to hold attention.";
+      return "A tighter opening would give your result more room to shine.";
   }
 }
 
@@ -313,7 +313,7 @@ const GROWTH_LINE: Record<Dimension, string> = {
   relevance: "Relevance: make your first sentence answer the exact question.",
   specificity: "Specificity: add one number or outcome to every answer. This is the fastest way to raise your score.",
   confidence: "Confidence: cut hedging and self-undermining words like 'just' and 'I guess.'",
-  conciseness: "Conciseness: aim for 60-150 words. Trim the setup, keep the result.",
+  conciseness: "Conciseness: trim the setup and keep the result. Land the point and stop.",
 };
 
 export function scoreAnswer(input: {

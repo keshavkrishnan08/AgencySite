@@ -33,6 +33,7 @@ export function SiteFooter() {
               links={[
                 { href: "/#pricing", label: "Pricing" },
                 { href: "/#how", label: "How it works" },
+                { href: "/brand", label: "Brand" },
                 { href: "/privacy", label: "Privacy" },
                 { href: "mailto:keshav@axonservices.dev", label: "Contact" },
               ]}
