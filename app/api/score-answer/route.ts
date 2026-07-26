@@ -2,7 +2,7 @@ import { rateLimit } from "@/lib/ratelimit";
 import { requirePremium } from "@/lib/entitlement";
 import { recordUsage } from "@/lib/usage";
 import { NextResponse } from "next/server";
-import { scoreAnswer, computeOverall } from "@/lib/scoring";
+import { scoreAnswer, computeOverall, feedbackForScores } from "@/lib/scoring";
 import { exampleAnswer } from "@/lib/examples";
 import { callClaude, extractJson, hasAI, SCORE_MODEL, stripMd } from "@/lib/ai";
 import { COACH_PERSONA, SCORING_RUBRIC, candidateBlock } from "@/lib/prompt";
@@ -46,10 +46,12 @@ Return ONLY this minified JSON, nothing else:
 
 CRITICAL FOR CONSISTENCY: grade the answer purely on its own merits against the rubric. The candidate's recent average, weak area, and session count are context for tailoring your feedback ONLY — never raise or lower the scores because of them. The same answer must always earn the same scores.`;
 
-// Coerce whatever the model emits into a graph-safe integer in [0,100].
-const clampScore = (n: unknown): number => {
+// Coerce whatever the model emits into a graph-safe integer in [0,100]. If the
+// value is missing or non-numeric, fall back to `fb` (the heuristic's score for
+// that dimension) rather than silently injecting a 0 that craters the answer.
+const clampScore = (n: unknown, fb = 0): number => {
   const v = Math.round(Number(n));
-  return Number.isFinite(v) ? Math.min(100, Math.max(0, v)) : 0;
+  return Number.isFinite(v) ? Math.min(100, Math.max(0, v)) : fb;
 };
 
 /* Content-addressed cache: identical scoring inputs return the identical result,
@@ -155,12 +157,14 @@ export async function POST(req: Request) {
       if (parsed && parsed.clarity != null) {
         // Numbers: clamped to ints and overall recomputed server-side so the
         // graphs always get a clean, internally-consistent set.
+        // Backfill any missing/non-numeric dimension from the heuristic so a
+        // partial model response can't drop a real answer's dimension to 0.
         const dims: DimensionScores = {
-          clarity: clampScore(parsed.clarity),
-          relevance: clampScore(parsed.relevance),
-          specificity: clampScore(parsed.specificity),
-          confidence: clampScore(parsed.confidence),
-          conciseness: clampScore(parsed.conciseness),
+          clarity: clampScore(parsed.clarity, heuristic.scores.clarity),
+          relevance: clampScore(parsed.relevance, heuristic.scores.relevance),
+          specificity: clampScore(parsed.specificity, heuristic.scores.specificity),
+          confidence: clampScore(parsed.confidence, heuristic.scores.confidence),
+          conciseness: clampScore(parsed.conciseness, heuristic.scores.conciseness),
         };
         // Message: the brief fixes, normalized to clean strings.
         const improve = (Array.isArray(parsed.improve) ? parsed.improve : [])
@@ -180,7 +184,9 @@ export async function POST(req: Request) {
         return NextResponse.json({
           ...heuristic,
           ...aiResult,
-          feedback: heuristic.feedback, // per-dimension notes from the deterministic engine
+          // Per-dimension notes keyed off the AI scores the user sees, so the
+          // note never contradicts the number next to it.
+          feedback: feedbackForScores(dims, { answer }),
           anxiety: heuristic.anxiety,
           exampleAnswer: example,
           source: "ai",
