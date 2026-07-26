@@ -159,6 +159,9 @@ export default function DashboardPage() {
           </ButtonLink>
         </header>
 
+        {/* Until there's real practice history, the dashboard is just a clean
+            welcome and a single prompt to start — no zero-filled tiles or graphs. */}
+        {m.hasData && (<>
         {/* Usage stats — borderless, flat, segmented (Stripe balance-tile style) */}
         <section
           className="grid grid-cols-2 gap-x-6 gap-y-6 border-y py-6 lg:grid-cols-4"
@@ -417,14 +420,15 @@ export default function DashboardPage() {
             </div>
           )}
         </section>
+        </>)}
 
         {!m.hasData && (
-          <div className="rounded-2xl border-2 border-dashed p-6 text-center" style={{ borderColor: "var(--border-strong)" }}>
-            <p className="font-serif text-lg font-semibold text-ink">Run your first session</p>
-            <p className="mx-auto mt-1 max-w-md text-sm text-ink-2">
-              Your streak, volume, and readiness fill in here after one practice. The market read above is ready now.
+          <div className="rounded-2xl border-2 border-dashed p-8 text-center" style={{ borderColor: "var(--border-strong)" }}>
+            <p className="font-serif text-xl font-semibold text-ink">Run your first session</p>
+            <p className="mx-auto mt-1.5 max-w-md text-sm text-ink-2">
+              Your streak, volume, readiness, and every graph fill in here right after your first practice session.
             </p>
-            <ButtonLink href="/practice" size="lg" className="mt-4">
+            <ButtonLink href="/practice" size="lg" className="mt-5">
               Start practicing <ArrowRight size={18} />
             </ButtonLink>
           </div>

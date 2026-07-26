@@ -21,6 +21,7 @@ export function StartFreeButton({
   variant = "primary",
   className,
   label = "Start for free",
+  signedInLabel = "Continue",
   source = "nav",
   showArrow = true,
 }: {
@@ -28,6 +29,7 @@ export function StartFreeButton({
   variant?: "primary" | "secondary" | "ghost" | "gold";
   className?: string;
   label?: string;
+  signedInLabel?: string;
   source?: string;
   showArrow?: boolean;
 }) {
@@ -43,7 +45,7 @@ export function StartFreeButton({
       className={cn("group", className)}
       onClick={() => track("landing_cta_click", { source, signedIn, resolved: !loading })}
     >
-      {signedIn ? "Continue" : label}
+      {signedIn ? signedInLabel : label}
       {showArrow && (
         <ArrowRight size={size === "sm" ? 15 : 18} className="transition-transform group-hover:translate-x-0.5" />
       )}
