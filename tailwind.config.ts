@@ -57,7 +57,9 @@ const config: Config = {
       fontFamily: {
         serif: ["var(--font-fraunces)", "Georgia", "serif"],
         sans: ["var(--font-sans)", "system-ui", "sans-serif"],
-        mono: ["var(--font-mono)", "ui-monospace", "monospace"],
+        // The data typeface (Inter), with tabular figures so numbers align in
+        // columns like a real fintech dashboard.
+        mono: [["var(--font-mono)", "ui-monospace", "monospace"], { fontFeatureSettings: '"tnum", "cv05"' }],
       },
       fontSize: {
         "2xs": ["0.6875rem", { lineHeight: "1.2" }],

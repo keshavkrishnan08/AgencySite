@@ -54,6 +54,7 @@ export interface ScoredAnswer {
   secondsOnQuestion?: number; // wall-clock time from seeing the question to submitting
   delivery?: DeliveryMetrics;
   interviewer?: string; // which panelist asked, in panel mode ("Dana · Hiring Manager")
+  isFollowUp?: boolean; // a probe on the same question; counts at reduced weight in the session score
   source: "ai" | "heuristic";
 }
 

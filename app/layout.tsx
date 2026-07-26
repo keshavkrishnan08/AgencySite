@@ -1,5 +1,5 @@
 import type { Metadata, Viewport } from "next";
-import { Fraunces, Hanken_Grotesk, JetBrains_Mono } from "next/font/google";
+import { Fraunces, Hanken_Grotesk, Inter } from "next/font/google";
 import "./globals.css";
 import { Analytics } from "@vercel/analytics/next";
 import { SpeedInsights } from "@vercel/speed-insights/next";
@@ -21,7 +21,10 @@ const hanken = Hanken_Grotesk({
   display: "swap",
 });
 
-const jetbrains = JetBrains_Mono({
+// The dedicated DATA typeface: numbers, KPIs, chart labels. Inter — a clean
+// grotesque with excellent tabular figures, the Stripe/fintech data look —
+// distinct from the Hanken Grotesk body sans.
+const inter = Inter({
   subsets: ["latin"],
   variable: "--font-mono",
   display: "swap",
@@ -74,7 +77,7 @@ export default function RootLayout({
   return (
     <html
       lang="en"
-      className={`${fraunces.variable} ${hanken.variable} ${jetbrains.variable}`}
+      className={`${fraunces.variable} ${hanken.variable} ${inter.variable}`}
     >
       <body>
         <MetaPixel />
