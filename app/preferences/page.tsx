@@ -7,7 +7,7 @@ import { getPrefs, setPrefs, DEFAULT_PREFS, type Prefs } from "@/lib/store";
 import { cn } from "@/lib/utils";
 import { track } from "@/lib/analytics";
 
-/* Preferences — micro-customizations to the whole experience. Every practice
+/* Preferences, micro-customizations to the whole experience. Every practice
    session starts from these, and coaching feel is set here. Flat/embedded,
    Stripe-style: controls sit on the background under thin rules, no dropdowns. */
 
@@ -52,7 +52,7 @@ export default function PreferencesPage() {
             <Check size={15} /> Saved
           </span>
         </div>
-        <p className="mt-1 text-ink-2">Every practice session starts from these. Change anything — it saves instantly.</p>
+        <p className="mt-1 text-ink-2">Every practice session starts from these. Change anything, it saves instantly.</p>
 
         <div className="grid items-start gap-x-10 lg:grid-cols-2">
         <Section icon={MessageSquare} title="Practice defaults" span2>
@@ -77,7 +77,7 @@ export default function PreferencesPage() {
           <Row label="Feedback tone"><Seg options={COACH} value={prefs.coachTone} onPick={(v) => update({ coachTone: v })} /></Row>
           <p className="mt-2 text-xs text-ink-3">
             {prefs.coachTone === "gentle" ? "Encouraging first, with one gentle fix at a time."
-              : prefs.coachTone === "direct" ? "Blunt and specific — the fastest way to improve."
+              : prefs.coachTone === "direct" ? "Blunt and specific, the fastest way to improve."
               : "Honest and balanced: what worked, then what to fix."}
           </p>
         </Section>

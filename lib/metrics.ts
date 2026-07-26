@@ -412,8 +412,26 @@ export function computeMetrics(sessions: Session[], streak: Streak): Metrics {
   const empty = n === 0;
   const overalls = sorted.map((s) => s.overall || 0);
 
-  /* headline */
-  const readiness = empty ? 0 : average(overalls.slice(-5));
+  /* headline — readiness is a weighted average, not a flat mean of the last 5.
+     Each session is weighted by how many questions it had (an 8-question session
+     is far more signal than a 1-question drill) and by recency (recent sessions
+     count more). So a single question barely nudges it, and the number gets more
+     stable the more you practice. */
+  const readiness = empty
+    ? 0
+    : (() => {
+        const window = sorted.slice(-12);
+        let num = 0;
+        let den = 0;
+        window.forEach((s, i) => {
+          const answerW = Math.min(8, Math.max(1, s.answers?.length || 1));
+          const recencyW = i + 1; // oldest in window = 1, newest = window.length
+          const w = answerW * recencyW;
+          num += (s.overall || 0) * w;
+          den += w;
+        });
+        return den ? round1(num / den) : 0;
+      })();
   const bestScore = empty ? 0 : Math.max(...overalls);
   const firstScore = empty ? 0 : overalls[0];
   const latestScore = empty ? 0 : overalls[n - 1];

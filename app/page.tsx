@@ -335,7 +335,7 @@ function Numbers() {
 
 /* ===================== COMPARISON ===================== */
 const ROWS: [string, string, string][] = [
-  ["Cost", "$150–300 / hour", "$0.33 a day"],
+  ["Cost", "$150-300 / hour", "$0.33 a day"],
   ["Available", "Business hours", "3 a.m., the night before"],
   ["Judgment", "You feel watched", "Completely private"],
   ["Feedback", "A vague gut feel", "Scored on 5 dimensions"],

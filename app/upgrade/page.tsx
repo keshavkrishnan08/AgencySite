@@ -1,14 +1,12 @@
 "use client";
 
 import { useEffect, useState } from "react";
-import { useRouter } from "next/navigation";
-import Link from "next/link";
 import { motion } from "framer-motion";
 import { Check, Lock, ShieldCheck, Loader2, PartyPopper, Star } from "lucide-react";
 import { AppShell } from "@/components/layout/AppShell";
 import { Button } from "@/components/ui/Button";
 import { Logo } from "@/components/ui/Logo";
-import { getOnboarding, getProfile, upgradeToPremium } from "@/lib/store";
+import { getOnboarding, getProfile } from "@/lib/store";
 import { track } from "@/lib/analytics";
 import { PLANS, PLAN_ORDER, type PlanKey } from "@/lib/pricing";
 
@@ -22,7 +20,6 @@ const INCLUDED = [
 ];
 
 export default function UpgradePage() {
-  const router = useRouter();
   const [state, setState] = useState<"idle" | "processing" | "done">("idle");
   const [plan, setPlan] = useState<PlanKey>("quarterly");
   const [pitch, setPitch] = useState<string>("");
@@ -38,14 +35,16 @@ export default function UpgradePage() {
         ? "Your interview is this week. Three months of unlimited practice covers it and the rest of your search."
         : "Your interview is days away. Three months covers this one and whatever comes next.");
     } else if (t === "none") {
-      setPitch("No interview booked yet? That's the time to get ahead — most searches run about three months.");
+      setPitch("No interview booked yet? That's the time to get ahead, most searches run about three months.");
     } else if (ob?.targetRole) {
       setPitch(`Everything you need to walk into your ${ob.targetRole} interview ready.`);
     }
   }, []);
 
+  const [err, setErr] = useState("");
   const subscribe = async () => {
     setState("processing");
+    setErr("");
     track("upgrade_click", { plan });
     try {
       const res = await fetch("/api/checkout", {
@@ -55,19 +54,20 @@ export default function UpgradePage() {
       });
       const data = await res.json();
       if (data?.url) { window.location.href = data.url; return; }
-    } catch { /* fall through to demo */ }
-    setTimeout(() => {
-      upgradeToPremium();
-      track("upgrade_success", { plan, mode: "demo" });
-      setState("done");
-      setTimeout(() => router.push("/dashboard"), 1700);
-    }, 1100);
+      throw new Error(data?.error || "Checkout unavailable");
+    } catch {
+      // No bypass: access is only ever granted by a real, completed payment
+      // (confirmed server-side by the Stripe webhook). On failure, stop and retry.
+      track("form:error", { form: "checkout", reason: "no_session" });
+      setErr("We couldn't start secure checkout. Please try again in a moment.");
+      setState("idle");
+    }
   };
 
   return (
     <AppShell bare requirePremium={false}>
       <main className="min-h-screen bg-surface lg:grid lg:grid-cols-2">
-        {/* LEFT — the pitch, on a calm tinted panel */}
+        {/* LEFT, the pitch, on a calm tinted panel */}
         <aside className="relative hidden flex-col justify-between overflow-hidden px-12 py-14 lg:flex xl:px-16"
           style={{ background: "linear-gradient(165deg, #19a9b8 0%, #14808e 55%, #0c5660 130%)" }}>
           <div className="pointer-events-none absolute -right-24 -top-24 h-80 w-80 rounded-full opacity-30 blur-3xl" style={{ background: "radial-gradient(circle, #ffffff66, transparent)" }} />
@@ -93,7 +93,7 @@ export default function UpgradePage() {
           <p className="relative flex items-center gap-2 text-sm text-white/70"><ShieldCheck size={15} /> Private by design · cancel anytime</p>
         </aside>
 
-        {/* RIGHT — the checkout card */}
+        {/* RIGHT, the checkout card */}
         <div className="flex min-h-screen items-center justify-center px-5 py-12 sm:px-10">
           {state === "done" ? (
             <motion.div initial={{ opacity: 0, scale: 0.96 }} animate={{ opacity: 1, scale: 1 }} className="text-center">
@@ -107,7 +107,7 @@ export default function UpgradePage() {
               <h1 className="mt-6 font-serif text-3xl font-semibold text-ink lg:mt-0">Choose your plan</h1>
               <p className="mt-1.5 text-ink-2">Unlimited practice. Cancel anytime.</p>
 
-              {/* plan options — stacked, selectable rows (Stripe-style) */}
+              {/* plan options, stacked, selectable rows (Stripe-style) */}
               <div className="mt-7 space-y-2.5">
                 {PLAN_ORDER.map((key) => {
                   const pl = PLANS[key];
@@ -152,11 +152,8 @@ export default function UpgradePage() {
               <Button onClick={subscribe} disabled={state === "processing"} size="lg" className="mt-6 w-full">
                 {state === "processing" ? <><Loader2 size={18} className="animate-spin" /> Redirecting to secure checkout…</> : <><Lock size={16} /> Subscribe · {p.price}</>}
               </Button>
+              {err && <p className="mt-3 text-center text-sm text-coral-ink">{err}</p>}
               <p className="mt-3 flex items-center justify-center gap-1.5 text-xs text-ink-3"><ShieldCheck size={13} /> Secure checkout, powered by Stripe · cancel anytime</p>
-
-              <div className="mt-5 text-center">
-                <Link href="/dashboard" className="text-sm text-ink-3 transition-colors hover:text-ink-2">Maybe later</Link>
-              </div>
             </div>
           )}
         </div>
