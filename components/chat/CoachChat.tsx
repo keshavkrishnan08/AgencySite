@@ -280,7 +280,7 @@ function Bubble({ role, children }: { role: "user" | "assistant"; children: Reac
   return (
     <div className={cn("flex", me ? "justify-end" : "justify-start")}>
       <div
-        className={cn("max-w-[85%] rounded-2xl px-3.5 py-2 text-sm leading-relaxed", me ? "text-white" : "text-ink")}
+        className={cn("max-w-[85%] whitespace-pre-wrap break-words rounded-2xl px-3.5 py-2 text-sm leading-relaxed", me ? "text-white" : "text-ink")}
         style={
           me
             ? { background: "var(--primary)", borderBottomRightRadius: 6 }
