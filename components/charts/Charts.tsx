@@ -104,6 +104,9 @@ export function ProgressLineChart({
           axisLine={false}
           tickLine={false}
           dy={8}
+          // Thin the date labels so many sessions don't crowd/overlap the axis.
+          interval="preserveStartEnd"
+          minTickGap={28}
         />
         <YAxis
           domain={[0, 100]}
