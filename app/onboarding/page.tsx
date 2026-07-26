@@ -133,8 +133,6 @@ const SCREENS: Screen[] = [
     kind: "form", demo: "questions",
     fields: [{ key: "role", type: "role", q: "What role are you preparing for?" }],
   },
-  // ── Validation 2: the odds, made concrete for their field + role. ──
-  { kind: "validation", slot: 2, demo: "questions" },
   // ── Customization: the weakness we'll aim practice at. ──
   {
     kind: "form", demo: "skills",
@@ -242,25 +240,6 @@ const SCREENS: Screen[] = [
       ],
     }],
   },
-  {
-    // Quality lead question: the stake. Why this matters to them, in their words.
-    kind: "form", demo: "progress",
-    fields: [{
-      key: "stakes",
-      q: "What would landing it change?",
-      options: [
-        { value: "income", label: "A real pay rise", emoji: "💰" },
-        { value: "stability", label: "Stability again", emoji: "🏠" },
-        { value: "out", label: "Getting out of where I am", emoji: "🚪" },
-        { value: "restart", label: "Restarting my career", emoji: "🌅" },
-        { value: "growth", label: "A bigger role", emoji: "📊" },
-      ],
-    }],
-  },
-  // ── Email gate, right before the payoff. Captures the lead (with every quiz
-  //    answer) even if they never finish signup, and the plan reveal is the
-  //    peak-value moment people trade an email for. ──
-  { kind: "email", demo: "progress" },
   // ── The plan: interview-ready in about two weeks. ──
   { kind: "plan", demo: "progress" },
   // ── The payoff: a simple animated return card. ──

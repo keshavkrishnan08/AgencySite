@@ -47,6 +47,7 @@ try {
     if (/Coach's note/i.test(body) && /Keep going/i.test(body)) {
       beatSeen = true;
       check(true, `coaching beat appeared after ~${q} answers`);
+      await page.screenshot({ path: "/tmp/beat.png" });
       check(/Try this on the next one/i.test(body), "beat shows a specific drill");
       check(/% through this session/i.test(body), "beat shows session progress");
       await page.locator('button:has-text("Keep going")').first().click();
