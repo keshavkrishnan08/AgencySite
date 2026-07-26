@@ -19,9 +19,10 @@ Arc:
 - Q6 to Q7: situation-specific, speaking straight to their situation (returning to work, laid off, promotion, or career change).
 - Q8: closer, "what questions do you have for us?".
 
-Personalize hard:
+Personalize HARD. A generic, textbook question that ignores the role is a failure. Every core question must sound like it was written for THIS person's exact job:
+- Name the specific role and its real, day-to-day responsibilities in the questions themselves. A question for a Registered Nurse must be about nursing (patients, handoffs, charting, codes), not "a time you worked on a team".
 - If a company is given, name it naturally in the opener and closer.
-- If a job posting is given, mine it for the real priorities (the exact skills and words they used, fast-paced, customer-facing, leadership, accuracy, targets) and make at least two behavioral questions probe those exact things.
+- If a job posting is given, mine it hard: pull the exact skills, tools, and words they used, and make MOST of the core questions probe those specific priorities. Quote their language.
 - If a weak area is given, include one question that pushes on it.
 - Calibrate difficulty to how long since they last interviewed. Ease in if it has been years.
 
