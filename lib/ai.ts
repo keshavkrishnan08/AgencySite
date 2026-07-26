@@ -22,6 +22,11 @@ export const SCORE_MODEL = minModel(process.env.ANTHROPIC_MODEL_SCORING);
 const DEFAULT_OPENAI = "gpt-4o-mini";
 const minOpenAI = (m?: string | null): string => (!m || !/mini|nano/i.test(m) ? DEFAULT_OPENAI : m);
 const OPENAI_MODEL = minOpenAI(process.env.OPENAI_MODEL);
+// Even-cheaper tier for throwaway generation (interview questions/drills) where
+// quality barely matters and a heuristic bank backs it up. Defaults to the same
+// gpt-4o-mini so nothing silently degrades; set OPENAI_MODEL_CHEAP=gpt-4.1-nano
+// to shave cost further. Still clamped to a mini/nano tier only.
+const CHEAP_OPENAI = minOpenAI(process.env.OPENAI_MODEL_CHEAP);
 
 // Cheapest high-quality OpenAI transcription model. Overridable, but never a
 // pricier tier by default. gpt-4o-mini-transcribe ~= $0.003/min, near-Whisper-large quality.
@@ -43,7 +48,7 @@ function getClient(): Anthropic {
   return client;
 }
 
-async function callOpenAI(system: string, user: string, maxTokens: number, temperature: number, seed?: number): Promise<string> {
+async function callOpenAI(system: string, user: string, maxTokens: number, temperature: number, seed?: number, openaiModel: string = OPENAI_MODEL): Promise<string> {
   const res = await fetch("https://api.openai.com/v1/chat/completions", {
     method: "POST",
     headers: {
@@ -51,7 +56,7 @@ async function callOpenAI(system: string, user: string, maxTokens: number, tempe
       "Content-Type": "application/json",
     },
     body: JSON.stringify({
-      model: OPENAI_MODEL,
+      model: openaiModel,
       max_tokens: maxTokens,
       temperature,
       // A fixed seed makes the same prompt reproducible (used for scoring, so the
@@ -78,6 +83,7 @@ interface CallOpts {
   temperature?: number;
   model?: string;
   seed?: number; // set for reproducible output (e.g. deterministic scoring)
+  cheap?: boolean; // route to the cheapest tier (questions/drills); quality not critical
 }
 
 // Provider-agnostic call. Prefers OpenAI (gpt-4o-mini) when its key is set,
@@ -91,10 +97,11 @@ export async function callClaude({
   temperature = 0.4,
   model = MODEL,
   seed,
+  cheap = false,
 }: CallOpts): Promise<string> {
   if (useOpenAI()) {
     try {
-      return await callOpenAI(system, user, maxTokens, temperature, seed);
+      return await callOpenAI(system, user, maxTokens, temperature, seed, cheap ? CHEAP_OPENAI : OPENAI_MODEL);
     } catch (e) {
       // No Anthropic key to fall back to: surface the original error.
       if (!process.env.ANTHROPIC_API_KEY) throw e;
