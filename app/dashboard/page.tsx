@@ -14,7 +14,7 @@ import { getOnboarding, getProfile, getSessions, getStreak, onStoreChange } from
 import { apiInsights, type CareerInsights } from "@/lib/client";
 import { pushInsight, pullLatestInsight } from "@/lib/cloud";
 import { computeMetrics } from "@/lib/metrics";
-import { contextSummary, persistOverview } from "@/lib/context";
+import { persistOverview } from "@/lib/context";
 import { ProgressLineChart, DonutChart, HBarChart, vividScore } from "@/components/charts/Charts";
 import { todayKey } from "@/lib/utils";
 import { cn, formatDuration, formatDate, scoreColor } from "@/lib/utils";
@@ -47,7 +47,6 @@ export default function DashboardPage() {
   const [role, setRole] = useState("");
   const [insights, setInsights] = useState<CareerInsights | null>(null);
   const [loadingInsights, setLoadingInsights] = useState(true);
-  const [summary, setSummary] = useState("");
   const [lastInsightAt, setLastInsightAt] = useState<string | null>(null);
 
   useEffect(() => {
@@ -59,7 +58,6 @@ export default function DashboardPage() {
       const ob = getOnboarding();
       setName(p.name || "");
       setRole(p.targetRole || ob?.targetRole || "");
-      setSummary(contextSummary());
     };
     sync();
     // Keep the standardized account overview fresh on each dashboard visit.
@@ -182,23 +180,6 @@ export default function DashboardPage() {
           })}
         </section>
 
-        {/* What your coach knows — the mega-context layer, surfaced. */}
-        {summary && (
-          <Link
-            href="/prep?tab=recent"
-            className="group flex items-center gap-3.5 rounded-2xl border p-4 transition-colors hover:border-primary sm:p-5"
-            style={{ borderColor: "var(--border)", background: "var(--primary-soft)" }}
-          >
-            <span className="grid h-10 w-10 shrink-0 place-items-center rounded-xl" style={{ background: "var(--surface)" }}>
-              <Sparkles size={18} className="text-primary-ink" />
-            </span>
-            <div className="min-w-0 flex-1">
-              <p className="text-2xs font-semibold uppercase tracking-wider text-primary-ink">What your coach knows about you</p>
-              <p className="mt-0.5 truncate text-sm text-ink">{summary}</p>
-            </div>
-            <ArrowRight size={17} className="shrink-0 text-primary-ink transition-transform group-hover:translate-x-0.5" />
-          </Link>
-        )}
 
         {/* More stats — trajectory, consistency, next milestone */}
         {m.hasData && (
