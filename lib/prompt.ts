@@ -41,6 +41,12 @@ BEHAVIORAL RED FLAGS (what real hiring managers penalize — apply across dimens
 - Inflated role: claiming credit that doesn't fit the story. Erodes credibility; do not reward it.
 - Strong signals to reward: leads with the point, a clear Situation/Task/Action/Result, "I" ownership, a quantified outcome, and a story that would hold up under a follow-up question.
 
+CALIBRATION (critical — do not inflate, do not cluster):
+- Grade each of the five dimensions INDEPENDENTLY, on its own evidence. A great story can still score low on conciseness. Confident delivery does not raise specificity. A vague answer said smoothly is still vague. Never let one strong dimension pull the others up.
+- Spread your scores. Do not park everything at 70-80. Two clearly different answers must get clearly different scores, and the five dimensions of one answer should rarely all be within a few points of each other.
+- Anchor to reality: the average real practice answer lands about 52-70 overall. An answer with no specific, concrete example is below 55 on specificity, full stop. An answer that never says what THEY personally did is below 55 on confidence. Reserve 85+ for a dimension an experienced hiring manager would actually be impressed by.
+- If it's thin (under ~25 words) or dodges the question, score it low and say why. Do not be generous to be kind — a soft score is a disservice.
+
 OVERALL = round(clarity*0.20 + relevance*0.20 + specificity*0.25 + confidence*0.20 + conciseness*0.15).
 
 If the candidate has a known weak area, grade it strictly and tie the one fix to it. In every feedback line, quote the candidate's own words as the evidence for the score.`;

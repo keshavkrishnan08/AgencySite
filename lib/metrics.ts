@@ -634,7 +634,13 @@ export function computeMetrics(sessions: Session[], streak: Streak): Metrics {
       : null,
     bestWeekSessions,
     milestones,
-    nextMilestone: milestones.find((m) => !m.achieved) ?? null,
+    // "Up next" = the unachieved milestone you're CLOSEST to, not the first in a
+    // fixed list. Milestones are earned in any order (you might break 60 before
+    // your 5th session), so the next target is the most reachable one.
+    nextMilestone:
+      milestones
+        .filter((mi) => !mi.achieved)
+        .sort((a, b) => b.progress - a.progress)[0] ?? null,
   };
 }
 
