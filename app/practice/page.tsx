@@ -598,6 +598,7 @@ function PracticeInner() {
       lengthTarget,
     });
     result.delivery = fuDeliveryRef.current ?? undefined;
+    result.isFollowUp = true; // counts at reduced weight, so it can't fully remediate a weak answer
     if (interviewer === "panel") {
       const p = panelistFor(index);
       result.interviewer = `${p.name} · ${p.role}`;
@@ -719,7 +720,9 @@ function PracticeInner() {
     <AppShell>
       <main className="pb-24">
       {/* In-session bar (progress + end), sits under the app nav */}
-      <div className="sticky top-16 z-30 glass border-b" style={{ borderColor: "var(--border)" }}>
+      {/* Mobile keeps the top nav (h-16), so sit below it; desktop hides the nav,
+          so pin to the very top. */}
+      <div className="sticky top-16 z-30 glass border-b lg:top-0" style={{ borderColor: "var(--border)" }}>
         <div className="container-wide flex h-14 items-center justify-between gap-4">
           {(phase === "answer" || phase === "score" || phase === "beat") ? (
             <div className="flex flex-1 items-center justify-center gap-3">

@@ -117,8 +117,8 @@ export default function DashboardPage() {
             see exactly what they're about to fill in. */}
         {!m.hasData && <EmptyBanner />}
 
-        {/* Graphs only — one visual per idea, organized top to bottom. */}
-        <Headline m={m} />
+        {/* Graphs only — no number tiles. One visual per idea, top to bottom.
+            Readiness lives in the trajectory chart, not a big number. */}
         <Trajectory m={m} />
 
         <div className="grid gap-6 lg:grid-cols-2">
@@ -976,7 +976,7 @@ function MilestoneLadder({ m }: { m: Metrics }) {
                 <Lock size={10} className="text-ink-3" />
               )}
             </span>
-            <span className={x.achieved ? "text-ink" : "text-ink-3"}>{x.label}</span>
+            <span className={x.achieved ? "text-ink-3 line-through decoration-sage/60" : "text-ink"}>{x.label}</span>
           </li>
         ))}
       </ul>
