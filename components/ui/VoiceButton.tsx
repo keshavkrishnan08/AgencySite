@@ -71,10 +71,13 @@ export function VoiceButton({
   const wsEmittedRef = useRef(false);
 
   useEffect(() => {
-    // Prefer the record-then-transcribe path whenever the mic is usable; that
-    // path tries OpenAI first and on-device Whisper second.
-    if (mediaRecordSupported()) setEngine("record");
-    setWebSpeechAvailable(Boolean(window.SpeechRecognition || window.webkitSpeechRecognition));
+    const hasWS = Boolean(window.SpeechRecognition || window.webkitSpeechRecognition);
+    setWebSpeechAvailable(hasWS);
+    // Prefer Web Speech: it streams your words into the box live as you talk and
+    // is the most reliable "speak and see it" path (Chrome, Edge, Safari). Fall
+    // back to record-then-transcribe (OpenAI) only when it isn't available.
+    if (hasWS) setEngine("webspeech");
+    else if (mediaRecordSupported()) setEngine("record");
     return () => cleanupWhisper();
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
