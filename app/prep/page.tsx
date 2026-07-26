@@ -441,16 +441,6 @@ function RecentPanel({ onJump }: { onJump: (t: Tab) => void }) {
 
   return (
     <div className="space-y-6">
-      {data.summary && (
-        <div className="card flex items-start gap-3 p-5" style={{ background: "var(--primary-soft)", borderColor: "var(--primary)" }}>
-          <Sparkles size={18} className="mt-0.5 shrink-0 text-primary-ink" />
-          <div>
-            <p className="text-2xs font-semibold uppercase tracking-wider text-primary-ink">What your coach knows</p>
-            <p className="mt-1 text-sm text-ink">{data.summary}</p>
-          </div>
-        </div>
-      )}
-
       {empty && (
         <div className="card grid min-h-[220px] place-items-center p-8 text-center">
           <div>
