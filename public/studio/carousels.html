@@ -34,6 +34,10 @@
   .cell .cap{display:flex;justify-content:space-between;align-items:center;font-size:11px;color:var(--dim)}
   .cell .dl{cursor:pointer;color:var(--muted);background:transparent;border:1px solid var(--line);border-radius:7px;padding:3px 8px;font-size:11px;font-family:inherit}
   .cell .dl:hover{color:var(--ink);border-color:var(--teal)}
+  .status{font-size:11px;color:var(--dim)}
+  .status.ready{color:var(--teal-deep);font-weight:600}
+  .allbtn{cursor:pointer;font-family:inherit;color:var(--teal-deep);background:rgba(15,148,136,.10);border:1px solid rgba(15,148,136,.32);border-radius:8px;padding:5px 11px;font-size:12px;font-weight:600}
+  .allbtn:hover{background:rgba(15,148,136,.17)}
 
   /* ---- SLIDE: designed at 432x540 (4:5). Exported at 2.5x = 1080x1350. ---- */
   .slide{
@@ -88,7 +92,7 @@
     <h1>Viral carousels: advice first, product last.</h1>
     <p>Three top of funnel carousels. Slides 1 through 8 are pure, save worthy advice on the things people already lie awake about, like pressure, first impressions, and telling a story that lands. The product only shows up on the very last slide, and even then as a soft landing. Built to the 2026 playbook: a short 5 to 8 word hook that cracks open a curiosity gap, one clean idea per slide, a payoff that actually earns the swipe, and a real reason to hit save.</p>
     <div class="note">
-      <b>How to use:</b> each slide is designed at Instagram's 4:5 ratio and exports to a post ready <b>1080×1350 PNG</b>. Click <b>Download</b> under any slide, or <b>Download all</b> to grab a whole carousel at once. Post it as an Instagram or TikTok carousel, and use the hook screenshot as the cover image. Caption tip: restate the hook in your own words, then close with <i>"Save this for the next time it happens to you."</i>
+      <b>On your phone:</b> tap <b>Save all to Photos</b> — the share sheet opens, then <b>Save Images</b> drops all the slides straight into your camera roll (or share them right to Instagram). Each slide is a post-ready <b>1080×1350 PNG</b> at Instagram's 4:5 ratio. <b>On a computer</b> the same buttons download the files. Post as a carousel with the hook as the cover, and end your caption with <i>"Save this for the next time it happens to you."</i>
     </div>
   </header>
   <div id="app"></div>
@@ -180,48 +184,100 @@ const app = document.getElementById("app");
 CAROUSELS.forEach((c, ci)=>{
   const sec = document.createElement("section");
   sec.className = "carousel";
+  sec.dataset.ci = ci;
   sec.innerHTML = `
     <h2>${c.title} <span class="tag">${c.tag}</span></h2>
-    <p class="meta">${c.slides.length} slides · ${c.note} &nbsp; <a href="#" data-all="${ci}">Download all ↓</a></p>
+    <p class="meta">${c.slides.length} slides · <span data-status class="status">tap a slide to save</span> &nbsp; <button class="allbtn" data-all="${ci}">Save all to Photos ↓</button></p>
     <div class="row" id="row-${ci}"></div>`;
   app.appendChild(sec);
   const row = sec.querySelector(`#row-${ci}`);
   c.slides.forEach((s, si)=>{
     const cell = document.createElement("div");
     cell.className = "cell";
-    cell.innerHTML = `<div class="cap"><span>Slide ${si+1}</span><button class="dl" data-c="${ci}" data-s="${si}">Download ↓</button></div>${slideHTML(s, si, c.slides.length)}`;
+    cell.dataset.ci = ci; cell.dataset.si = si;
+    cell.innerHTML = `<div class="cap"><span>Slide ${si+1}</span><button class="dl" data-save="1">Save ↓</button></div>${slideHTML(s, si, c.slides.length)}`;
     row.appendChild(cell);
   });
 });
 
-async function exportSlide(cellEl, name){
-  const slide = cellEl.querySelector(".slide");
+/* Phones don't save link-downloads well — they open the image instead. So we
+   render each slide to a real PNG File and hand it to the native share sheet:
+   "Save to Photos" drops it in the camera roll, or share straight to Instagram.
+   Desktop (no file-share) falls back to a normal download. */
+const H2C = { scale: 2.5, backgroundColor: "#ffffff", useCORS: true, logging: false };
+const fileCache = new Map(); // cell element -> File
+
+async function renderSlideFile(cell){
+  const slide = cell.querySelector(".slide");
   await document.fonts.ready;
-  const canvas = await html2canvas(slide, { scale: 2.5, backgroundColor: "#ffffff", useCORS: true, logging:false });
+  const canvas = await html2canvas(slide, H2C);
+  const blob = await new Promise(r => canvas.toBlob(r, "image/png"));
+  return new File([blob], `axon-c${+cell.dataset.ci+1}-slide${+cell.dataset.si+1}.png`, { type: "image/png" });
+}
+async function fileFor(cell){
+  let f = fileCache.get(cell);
+  if (!f){ f = await renderSlideFile(cell); fileCache.set(cell, f); }
+  return f;
+}
+function downloadFile(file){
+  const url = URL.createObjectURL(file);
   const a = document.createElement("a");
-  a.href = canvas.toDataURL("image/png");
-  a.download = name;
-  a.click();
+  a.href = url; a.download = file.name; document.body.appendChild(a); a.click(); a.remove();
+  setTimeout(() => URL.revokeObjectURL(url), 4000);
+}
+async function saveOrShare(files, title){
+  if (navigator.canShare && navigator.canShare({ files })) {
+    try { await navigator.share({ files, title }); return; }
+    catch (err) { if (err && err.name === "AbortError") return; } // user cancelled
+  }
+  files.forEach(downloadFile); // desktop / unsupported
 }
 
+/* Pre-render a carousel's slides once it scrolls near, so "Save all" can fire
+   instantly inside the tap — iOS only permits share() during the user gesture,
+   so the files must already be ready. */
+const io = new IntersectionObserver((entries)=>{
+  entries.forEach(async (en)=>{
+    if (!en.isIntersecting) return;
+    io.unobserve(en.target);
+    const sec = en.target;
+    const cells = [...sec.querySelectorAll(".cell")];
+    const status = sec.querySelector("[data-status]");
+    let done = 0;
+    for (const cell of cells){
+      try { await fileFor(cell); } catch {}
+      if (status) status.textContent = `preparing ${++done}/${cells.length}`;
+      await new Promise(r => setTimeout(r, 20));
+    }
+    if (status){ status.textContent = "ready to save"; status.classList.add("ready"); }
+  });
+}, { rootMargin: "300px" });
+document.querySelectorAll(".carousel").forEach(sec => io.observe(sec));
+
 document.addEventListener("click", async (e)=>{
-  const btn = e.target.closest(".dl");
-  if(btn){
-    const ci = +btn.dataset.c, si = +btn.dataset.s;
-    const cell = btn.closest(".cell");
-    btn.textContent = "…";
-    await exportSlide(cell, `axon-carousel${ci+1}-slide${si+1}.png`);
-    btn.textContent = "Download ↓";
+  const saveBtn = e.target.closest("[data-save]");
+  if (saveBtn){
+    const cell = saveBtn.closest(".cell");
+    const prev = saveBtn.textContent; saveBtn.textContent = "…";
+    try { await saveOrShare([await fileFor(cell)], "Axon slide"); } finally { saveBtn.textContent = prev; }
     return;
   }
-  const all = e.target.closest("[data-all]");
-  if(all){
+  const allBtn = e.target.closest("[data-all]");
+  if (allBtn){
     e.preventDefault();
-    const ci = +all.dataset.all;
-    const cells = document.querySelectorAll(`#row-${ci} .cell`);
-    all.textContent = "Exporting…";
-    for(let i=0;i<cells.length;i++){ await exportSlide(cells[i], `axon-carousel${ci+1}-slide${i+1}.png`); await new Promise(r=>setTimeout(r,250)); }
-    all.textContent = "Download all ↓";
+    const ci = allBtn.dataset.all;
+    const cells = [...document.querySelectorAll(`.cell[data-ci="${ci}"]`)];
+    const prev = allBtn.textContent;
+    // If every slide is already rendered, share synchronously (keeps the iOS
+    // gesture). Otherwise render first, then share (may fall back to download).
+    if (cells.every(c => fileCache.has(c))){
+      await saveOrShare(cells.map(c => fileCache.get(c)), "Axon carousel");
+    } else {
+      allBtn.textContent = "preparing…";
+      const files = []; for (const c of cells) files.push(await fileFor(c));
+      allBtn.textContent = prev;
+      await saveOrShare(files, "Axon carousel");
+    }
   }
 });
 </script>
