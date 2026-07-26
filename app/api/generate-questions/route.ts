@@ -1,4 +1,5 @@
 import { rateLimit } from "@/lib/ratelimit";
+import { requirePremium } from "@/lib/entitlement";
 import { recordUsage } from "@/lib/usage";
 import { NextResponse } from "next/server";
 import { generateQuestions, generateFocusQuestions } from "@/lib/questions";
@@ -94,6 +95,8 @@ const SPEECH_BANK: { text: string; tip: string }[] = [
 export async function POST(req: Request) {
   const limited = await rateLimit(req);
   if (limited) return limited;
+  const gate = await requirePremium(req);
+  if (gate) return gate;
   recordUsage(req);
   let body: any;
   try {

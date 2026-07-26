@@ -1,4 +1,5 @@
 import { rateLimit } from "@/lib/ratelimit";
+import { requirePremium } from "@/lib/entitlement";
 import { recordUsage } from "@/lib/usage";
 import { NextResponse } from "next/server";
 import { scoreAnswer, computeOverall } from "@/lib/scoring";
@@ -62,6 +63,8 @@ const hashKey = (s: string): string => { let h = 5381; for (let i = 0; i < s.len
 export async function POST(req: Request) {
   const limited = await rateLimit(req);
   if (limited) return limited;
+  const gate = await requirePremium(req);
+  if (gate) return gate;
   recordUsage(req);
   let body: any;
   try {

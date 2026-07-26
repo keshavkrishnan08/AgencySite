@@ -23,6 +23,10 @@ export async function POST(req: Request) {
     /* default body */
   }
   const requested: unknown = body?.plan;
+  // Reject an unknown plan rather than silently charging a default price.
+  if (requested != null && !isPlanKey(requested)) {
+    return NextResponse.json({ configured: true, error: "Unknown plan" }, { status: 400 });
+  }
   const plan = isPlanKey(requested) ? requested : "monthly";
   const email: string | undefined = body?.email || undefined;
 
