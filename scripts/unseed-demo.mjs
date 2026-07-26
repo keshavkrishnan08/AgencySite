@@ -14,11 +14,20 @@ const prof = await (await fetch(`${SB}/rest/v1/profiles?email=eq.${encodeURIComp
 if (!prof?.[0]?.id) { console.log("no profile for", EMAIL); process.exit(1); }
 const uid = prof[0].id;
 
-// 1) delete seeded sessions (client_id like 'demo%')
+// small helper: authoritative row count via the count=exact header
+async function countDemo() {
+  const r = await fetch(`${SB}/rest/v1/sessions?client_id=like.demo*&select=client_id`, {
+    method: "HEAD", headers: { ...H, Prefer: "count=exact" },
+  });
+  const cr = r.headers.get("content-range") || "*/?"; // e.g. "*/0"
+  return cr.split("/")[1];
+}
+
+// 1) delete seeded sessions (client_id like 'demo%'). return=minimal + a real
+//    re-count afterward, since a representation length can mislead.
 const delSessions = await fetch(`${SB}/rest/v1/sessions?client_id=like.demo*`, {
-  method: "DELETE", headers: { ...H, Prefer: "return=representation" },
+  method: "DELETE", headers: { ...H, Prefer: "return=minimal" },
 });
-const deleted = delSessions.ok ? (await delSessions.json()).length : `ERR ${delSessions.status}`;
 
 // 2) clear the standardized overview built from that data
 const patch = await fetch(`${SB}/rest/v1/profiles?id=eq.${uid}`, {
@@ -31,7 +40,8 @@ const delInsights = await fetch(`${SB}/rest/v1/insights_history?user_id=eq.${uid
   method: "DELETE", headers: { ...H, Prefer: "return=minimal" },
 });
 
-// 4) verify
-const left = await (await fetch(`${SB}/rest/v1/sessions?user_id=eq.${uid}&select=client_id`, { headers: H })).json();
-console.log(`unseeded ${EMAIL}: deleted ${deleted} sessions, overview cleared (${patch.status}), insights cleared (${delInsights.status})`);
-console.log(`sessions remaining for account: ${Array.isArray(left) ? left.length : left}`);
+// 4) verify by authoritative count
+const remaining = await countDemo();
+console.log(`unseeded ${EMAIL}: delete HTTP ${delSessions.status}, overview cleared (${patch.status}), insights cleared (${delInsights.status})`);
+console.log(`demo sessions remaining in DB: ${remaining}`);
+if (remaining !== "0") { console.log("WARNING: demo rows still present"); process.exit(1); }
