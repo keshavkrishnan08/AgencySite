@@ -142,8 +142,8 @@ export function OperatingSystem() {
                 <Brain size={17} className="text-primary-ink" />
               </span>
               <div>
-                <p className="text-sm font-semibold text-ink">What your coach remembers</p>
-                <p className="text-2xs text-ink-3">Updated after every session</p>
+                <p className="text-sm font-semibold text-ink">It&apos;s learning you</p>
+                <p className="text-2xs text-ink-3">A little more after every session</p>
               </div>
               <span className="ml-auto flex items-center gap-1.5 rounded-full px-2.5 py-1 text-2xs font-semibold" style={{ background: "var(--sage-soft)", color: "var(--sage-ink)" }}>
                 <span className="h-1.5 w-1.5 rounded-full" style={{ background: "var(--sage)" }} /> Live
