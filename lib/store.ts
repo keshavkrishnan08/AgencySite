@@ -84,8 +84,22 @@ export function isPremium(): boolean {
 
 /* ----------------------- Sessions ----------------------- */
 
+// Seeded demo sessions (from scripts/seed-demo.mjs) all carry a "demo_" id.
+// Real sessions never do. Cloud hydration only ever merges, so once a browser
+// has cached seeded rows they'd linger after the DB is cleared. Strip them on
+// read and rewrite storage once, so stock data can never resurface.
+let seededPurged = false;
+function dropSeeded(list: Session[]): Session[] {
+  const clean = list.filter((s) => !String(s.id).startsWith("demo_"));
+  if (!seededPurged && clean.length !== list.length && typeof window !== "undefined") {
+    seededPurged = true;
+    try { window.localStorage.setItem(KEYS.sessions, JSON.stringify(clean)); } catch { /* quota */ }
+  }
+  return clean;
+}
+
 export function getSessions(): Session[] {
-  return read<Session[]>(KEYS.sessions, []).sort(
+  return dropSeeded(read<Session[]>(KEYS.sessions, [])).sort(
     (a, b) => +new Date(a.createdAt) - +new Date(b.createdAt)
   );
 }
