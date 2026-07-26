@@ -10,6 +10,7 @@
       <stop stop-color="#dd8b3d"/><stop offset="1" stop-color="#b8893b"/>
     </linearGradient>
   </defs>
+  <rect width="40" height="40" fill="#f7f3e9"/>
   <path d="M6.7 32.2C10.6 24.7 14.1 15.8 20 6.7C25.9 15.8 29.4 24.7 33.3 32.2" stroke="url(#axonPath)" stroke-width="3.35" stroke-linecap="round" stroke-linejoin="round"/>
   <path d="M12.6 24.1C16.9 20.5 22.9 19.9 28.2 23.8" stroke="url(#axonAccent)" stroke-width="2.55" stroke-linecap="round" stroke-linejoin="round"/>
   <circle cx="20" cy="6.7" r="2.7" fill="url(#axonNode)"/>
