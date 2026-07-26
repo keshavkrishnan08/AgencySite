@@ -391,12 +391,18 @@ export function scoreAnswer(input: {
 }
 
 /** Aggregate a set of answers into a session's dimension averages. */
-export function aggregateDimensions(answers: { scores: AnswerScores }[]): DimensionScores {
+export function aggregateDimensions(answers: { scores: AnswerScores; isFollowUp?: boolean }[]): DimensionScores {
   const keys: Dimension[] = ["clarity", "relevance", "specificity", "confidence", "conciseness"];
   const out = {} as DimensionScores;
+  // A follow-up is a probe on the SAME question — it should nudge the score, not
+  // rewrite it. Weighting it at 0.4 means a strong follow-up helps a little but
+  // can't fully remediate a weak main answer.
+  const W_FOLLOWUP = 0.4;
+  const w = (a: { isFollowUp?: boolean }) => (a.isFollowUp ? W_FOLLOWUP : 1);
+  const totalW = answers.reduce((s, a) => s + w(a), 0);
   for (const k of keys) {
-    out[k] = answers.length
-      ? Math.round(answers.reduce((s, a) => s + a.scores[k], 0) / answers.length)
+    out[k] = totalW
+      ? Math.round(answers.reduce((s, a) => s + a.scores[k] * w(a), 0) / totalW)
       : 0;
   }
   return out;
