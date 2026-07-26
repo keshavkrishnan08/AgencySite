@@ -2,8 +2,8 @@
 
 import { useEffect, useRef, useState } from "react";
 import { AnimatePresence, motion } from "framer-motion";
-import { MessageSquare, X, ArrowUp, Loader2, Sparkles } from "lucide-react";
-import { encodedContext, contextSummary } from "@/lib/context";
+import { Sparkles, X, ArrowUp, Loader2 } from "lucide-react";
+import { encodedContext } from "@/lib/context";
 import { getProfile } from "@/lib/store";
 import { track } from "@/lib/analytics";
 import { cn } from "@/lib/utils";
@@ -59,14 +59,12 @@ export function CoachChat() {
   const [input, setInput] = useState("");
   const [busy, setBusy] = useState(false);
   const [remaining, setRemaining] = useState(HOURLY_CAP);
-  const [summary, setSummary] = useState("");
   const scrollRef = useRef<HTMLDivElement>(null);
   const inputRef = useRef<HTMLTextAreaElement>(null);
 
   useEffect(() => {
     setTurns(loadTurns());
     setRemaining(Math.max(0, HOURLY_CAP - recentSends().length));
-    setSummary(contextSummary());
   }, []);
 
   useEffect(() => {
@@ -82,7 +80,6 @@ export function CoachChat() {
     if (open) {
       scrollRef.current?.scrollTo({ top: scrollRef.current.scrollHeight, behavior: "smooth" });
       setTimeout(() => inputRef.current?.focus(), 250);
-      setSummary(contextSummary());
     }
   }, [open, turns, busy]);
 
@@ -172,7 +169,7 @@ export function CoachChat() {
             </motion.span>
           ) : (
             <motion.span key="m" initial={{ rotate: 90, opacity: 0 }} animate={{ rotate: 0, opacity: 1 }} exit={{ rotate: -90, opacity: 0 }}>
-              <MessageSquare size={22} />
+              <Sparkles size={22} />
             </motion.span>
           )}
         </AnimatePresence>
@@ -201,7 +198,7 @@ export function CoachChat() {
                 </span>
                 <div className="leading-tight">
                   <p className="text-sm font-semibold text-ink">Your coach</p>
-                  <p className="text-2xs text-ink-3">{summary ? summary : "Knows your prep"}</p>
+                  <p className="text-2xs text-ink-3">Ask me anything</p>
                 </div>
               </div>
               <button onClick={() => setOpen(false)} className="rounded-lg p-1.5 text-ink-3 transition-colors hover:bg-bg-sunk hover:text-ink" aria-label="Close">
