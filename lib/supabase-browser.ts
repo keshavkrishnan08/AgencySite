@@ -14,6 +14,13 @@ export function authConfigured(): boolean {
   return Boolean(URL && ANON);
 }
 
+/* The current session's access token, cached so synchronous callers (the AI
+   request headers) can attach it without awaiting getSession() each time. */
+let cachedToken: string | null = null;
+export function cachedAccessToken(): string | null {
+  return cachedToken;
+}
+
 let client: SupabaseClient | null = null;
 export function supabaseBrowser(): SupabaseClient | null {
   if (!authConfigured()) return null;
@@ -21,6 +28,9 @@ export function supabaseBrowser(): SupabaseClient | null {
     client = createClient(URL as string, ANON as string, {
       auth: { persistSession: true, autoRefreshToken: true, detectSessionInUrl: true },
     });
+    // Prime and keep the cached token fresh (initial load, refresh, sign in/out).
+    client.auth.getSession().then(({ data }) => { cachedToken = data.session?.access_token ?? null; }).catch(() => {});
+    client.auth.onAuthStateChange((_e, session) => { cachedToken = session?.access_token ?? null; });
   }
   return client;
 }

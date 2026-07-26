@@ -1,5 +1,6 @@
 "use client";
 
+import { supabaseBrowser, cachedAccessToken } from "./supabase-browser";
 import { scoreAnswer as localScore } from "./scoring";
 import { exampleAnswer } from "./examples";
 import { generateQuestions as localQuestions, generateFocusQuestions } from "./questions";
@@ -10,7 +11,9 @@ import type { JobFamily } from "./job-insights";
    product keeps working even if the network/route is unavailable. */
 
 /* Identify the account so the server can rate-limit per user (in addition to
-   per IP). Spoofable, which is fine: the IP cap is the real ceiling. */
+   per IP). The x-user-id header is spoofable, which is fine for rate-limiting.
+   Entitlement, by contrast, is verified server-side from the Bearer token below
+   (a real Supabase JWT), which cannot be forged. */
 function aiHeaders(): Record<string, string> {
   const h: Record<string, string> = { "Content-Type": "application/json" };
   try {
@@ -18,6 +21,13 @@ function aiHeaders(): Record<string, string> {
     if (email) h["x-user-id"] = String(email);
   } catch {
     /* ignore */
+  }
+  try {
+    supabaseBrowser(); // ensure the client is initialised so the token is cached
+    const token = cachedAccessToken();
+    if (token) h["Authorization"] = `Bearer ${token}`;
+  } catch {
+    /* not signed in / auth not configured */
   }
   return h;
 }

@@ -88,7 +88,9 @@ export async function syncSubscription(customerId: string): Promise<SyncResult |
     stripe_customer_id: customerId,
     stripe_subscription_id: sub.id,
     status,
-    plan: "premium",
+    // Reflect real entitlement: only active/trialing (etc.) is "premium"; a
+    // canceled/unpaid row must not read as premium if anything keys off plan.
+    plan,
     interval,
     current_period_end: periodEndUnix ? new Date(periodEndUnix * 1000).toISOString() : null,
     cancel_at_period_end: Boolean(sub.cancel_at_period_end),
