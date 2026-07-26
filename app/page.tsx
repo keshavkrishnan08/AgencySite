@@ -474,19 +474,9 @@ function FinalCTA() {
             Walk in ready.
           </h2>
         </Reveal>
-        <Reveal delay={0.08}>
-          <p className="mx-auto mt-7 max-w-prose text-lg leading-loose text-ink-2">
-            Not one you settled for because the interview scared you. The job where you walk in Monday and think:{" "}
-            <em className="text-ink">I earned this.</em> Axon Careers won&apos;t get it for you. You will. We just
-            help you stop fearing the conversation in the way.
-          </p>
-        </Reveal>
         <Reveal delay={0.16}>
           <div className="mt-10 flex flex-col items-center gap-3">
-<StartFreeButton size="lg" source="final_cta" />
-            <span className="text-sm text-ink-3">
-              From {FROM_PER_DAY}. Cancel anytime. You&apos;ve already spent more time thinking about it than it takes to try.
-            </span>
+            <StartFreeButton size="lg" source="final_cta" label="Get started" signedInLabel="Get started" />
           </div>
         </Reveal>
       </div>
