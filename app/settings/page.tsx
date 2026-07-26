@@ -21,8 +21,8 @@ import type { InterviewGap, Situation, UserProfile } from "@/lib/types";
 
 const GAP_OPTS: [InterviewGap, string][] = [
   ["<1yr", "Less than a year ago"],
-  ["1-3yr", "1–3 years ago"],
-  ["3-5yr", "3–5 years ago"],
+  ["1-3yr", "1-3 years ago"],
+  ["3-5yr", "3-5 years ago"],
   ["5+yr", "5+ years ago"],
 ];
 
@@ -143,7 +143,7 @@ export default function SettingsPage() {
               {planInfo && <DetailRow label="Price" value={`${planInfo.price} ${planInfo.cadence} · ${planInfo.perMonth}`} />}
               <DetailRow
                 label={sub?.status === "canceled" || sub?.until && new Date(sub.until) < new Date() ? "Ended" : sub?.premium ? "Renews" : "Status"}
-                value={sub?.until ? formatDate(sub.until) : sub?.premium ? "—" : "No active subscription"}
+                value={sub?.until ? formatDate(sub.until) : sub?.premium ? "Active" : "No active subscription"}
                 icon={sub?.until ? Calendar : undefined}
               />
               {sub?.status && <DetailRow label="Billing status" value={statusMeta.long} />}
@@ -166,7 +166,7 @@ export default function SettingsPage() {
             </div>
             <p className="mt-3 text-2xs leading-relaxed text-ink-3">
               {sub?.premium
-                ? "Billing, payment method, invoices and cancellation are all handled securely in Stripe. Cancel anytime — you keep access until the end of your current billing period."
+                ? "Billing, payment method, invoices and cancellation are all handled securely in Stripe. Cancel anytime, you keep access until the end of your current billing period."
                 : "You don't have an active subscription. Access unlocks the moment you start a plan."}
             </p>
           </div>
@@ -210,7 +210,7 @@ export default function SettingsPage() {
 
         {/* ── Privacy & data ── */}
         <Section icon={ShieldCheck} title="Privacy & data" note="you own your data">
-          <LinkRow onClick={exportData} title="Export your data" sub="Download everything we store about you — profile and every practice session — as JSON." icon={Download} />
+          <LinkRow onClick={exportData} title="Export your data" sub="Download everything we store about you, profile and every practice session, as JSON." icon={Download} />
           <div className="mt-4 border-t pt-4" style={{ borderColor: "var(--border)" }}>
             <p className="flex items-center gap-2 text-sm font-medium text-coral-ink"><Trash2 size={15} /> Delete account</p>
             <p className="mt-1 text-2xs leading-relaxed text-ink-3">Permanently deletes your account and all practice history. This can't be undone.</p>
@@ -245,7 +245,7 @@ function subStatusMeta(sub: Sub | null): { label: string; long: string; color: s
   if (!sub || s === "none" || !s) return { label: "Free", long: "No subscription on file.", color: "var(--ink-2)", bg: "var(--bg-tint)" };
   if (s === "active") return { label: "Active", long: "Active and billing normally.", color: "var(--sage-ink)", bg: "var(--sage-soft)" };
   if (s === "trialing") return { label: "Trial", long: "In a trial period.", color: "var(--primary-ink)", bg: "var(--primary-soft)" };
-  if (s === "past_due") return { label: "Past due", long: "A payment failed — we're retrying. Update your card to avoid losing access.", color: "var(--amber-ink)", bg: "var(--amber-soft)" };
+  if (s === "past_due") return { label: "Past due", long: "A payment failed, we're retrying. Update your card to avoid losing access.", color: "var(--amber-ink)", bg: "var(--amber-soft)" };
   if (s === "canceled") return { label: "Canceled", long: "Canceled. Access ends at the period shown.", color: "var(--ink-2)", bg: "var(--bg-tint)" };
   return { label: s, long: s, color: "var(--ink-2)", bg: "var(--bg-tint)" };
 }
