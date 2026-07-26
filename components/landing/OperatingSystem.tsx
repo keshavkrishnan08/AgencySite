@@ -95,8 +95,9 @@ export function OperatingSystem() {
           </Reveal>
           <Reveal delay={0.1}>
             <p className="mt-5 max-w-md text-lg leading-relaxed text-ink-2">
-              Every answer, every session, every gap you talk through becomes context your coach never forgets.
-              The more you practice, the more it sounds like it was built for you. Because by then, it was.
+              It doesn't just take a snapshot on day one. Every answer you give and every session you run adds
+              another line to a picture that keeps filling in. Week two knows you better than week one. Month two,
+              better than that. The longer you use it, the more it sounds like it was built for you.
             </p>
           </Reveal>
 
