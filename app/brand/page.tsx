@@ -4,7 +4,6 @@ import { useCallback } from "react";
 import { Download } from "lucide-react";
 import { SiteNav } from "@/components/layout/SiteNav";
 import { SiteFooter } from "@/components/layout/SiteFooter";
-import { LogoMark } from "@/components/ui/Logo";
 import { Button } from "@/components/ui/Button";
 
 /* Brand / press kit: the Axon Careers mark, downloadable as SVG or PNG. The SVG
@@ -58,8 +57,8 @@ export default function BrandPage() {
           <p className="eyebrow mb-3">Brand</p>
           <h1 className="font-serif text-display font-semibold text-ink">The Axon Careers mark.</h1>
           <p className="mt-4 text-lg text-ink-2">
-            Download the logo for press, partnerships, or slides. SVG stays crisp at any size; the PNG is a
-            1024px transparent export. Please keep the proportions and colors as they are.
+            Download the logo for press, partnerships, or slides. Each comes on its background, ready to drop in.
+            SVG stays crisp at any size; the PNG is a 1024px export. Please keep the proportions and colors as they are.
           </p>
         </header>
 
@@ -70,15 +69,16 @@ export default function BrandPage() {
                 className="grid h-56 place-items-center border-b p-8"
                 style={{
                   borderColor: "var(--border)",
-                  background: a.darkPreview ? "#0c1114" : "var(--bg-sunk)",
+                  background: a.darkPreview ? "#0c1114" : "#f7f3e9",
                 }}
               >
-                {a.key === "logo" ? (
-                  // eslint-disable-next-line @next/next/no-img-element
-                  <img src={a.file} alt="Axon Careers logo" className="max-h-16 w-auto" />
-                ) : (
-                  <LogoMark size={92} dark={a.darkPreview} />
-                )}
+                {/* Preview the exact downloadable file (background baked in). */}
+                {/* eslint-disable-next-line @next/next/no-img-element */}
+                <img
+                  src={a.file}
+                  alt="Axon Careers logo"
+                  className={a.key === "logo" ? "max-h-20 w-auto" : "h-28 w-28 rounded-xl"}
+                />
               </div>
               <div className="flex items-center justify-between gap-3 p-5">
                 <span className="font-medium text-ink">{a.label}</span>
