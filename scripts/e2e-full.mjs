@@ -69,7 +69,9 @@ try {
   const dash = await page.locator("body").innerText();
   check(/Readiness over time/i.test(dash), "dashboard: 'Readiness over time' graph present");
   check(/Daily practice/i.test(dash), "dashboard: 'Daily practice' graph present");
-  check(/What your coach knows/i.test(dash), "dashboard: 'what your coach knows' context banner present");
+  // Context is now implicit by design — the old "what your coach knows" banner
+  // was removed, so assert it is ABSENT.
+  check(!/What your coach knows/i.test(dash), "dashboard: context is implicit (no 'coach knows' banner)");
   check(await page.locator("svg").count() > 0, "dashboard: chart SVG rendered");
   check(/Skill breakdown/i.test(dash), "dashboard: skill-breakdown bar chart present");
   check(/Answer scores/i.test(dash), "dashboard: answer-scores donut present");
