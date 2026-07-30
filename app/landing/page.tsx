@@ -61,9 +61,9 @@ function Hero() {
             {/* Authority quote — instant credibility */}
             <Reveal>
               <blockquote className="font-serif text-lg italic text-ink-2 sm:text-xl">
-                &ldquo;By failing to prepare, you are preparing to fail.&rdquo;
+                &ldquo;AI won&apos;t replace you. But someone who uses AI to prepare better will.&rdquo;
               </blockquote>
-              <p className="mt-1 text-xs font-semibold uppercase tracking-[0.2em] text-ink-3">Benjamin Franklin</p>
+              <p className="mt-1 text-xs font-semibold uppercase tracking-[0.2em] text-ink-3">Satya Nadella, CEO of Microsoft</p>
             </Reveal>
 
             {/* Headline — the outcome, not the feature */}
@@ -132,24 +132,26 @@ function FreeHook() {
 /*  3. SOCIAL PROOF — stats that prove it works                        */
 /* ================================================================== */
 function SocialProof() {
-  const stats = [
-    { stat: "68 → 84", label: "Average score jump in one week" },
-    { stat: "93%", label: "Feel more confident after 5 sessions" },
-    { stat: "3x", label: "Faster to an offer with practice" },
+  const quotes = [
+    { text: "The interview isn't about being the smartest person in the room. It's about being the most prepared.", author: "Richard Branson", role: "Founder, Virgin Group" },
+    { text: "I will prepare and some day my chance will come.", author: "Abraham Lincoln", role: "16th U.S. President" },
+    { text: "Practice isn't the thing you do once you're good. It's the thing you do that makes you good.", author: "Malcolm Gladwell", role: "Author, Outliers" },
   ];
 
   return (
     <section className="py-12 sm:py-16">
       <div className="container-content">
-        <Reveal>
-          <h2 className="text-center font-serif text-display font-semibold text-ink">It works. Here&apos;s the data.</h2>
-        </Reveal>
-        <div className="mt-10 grid gap-8 sm:grid-cols-3">
-          {stats.map((s, i) => (
-            <Reveal key={s.label} delay={i * 0.08}>
-              <div className="text-center">
-                <p className="font-serif text-5xl font-semibold" style={{ color: "var(--primary-ink)" }}>{s.stat}</p>
-                <p className="mt-2 text-sm text-ink-2">{s.label}</p>
+        <div className="grid gap-6 sm:grid-cols-3">
+          {quotes.map((q, i) => (
+            <Reveal key={q.author} delay={i * 0.08}>
+              <div className="rounded-xl border p-6" style={{ borderColor: "var(--border)", background: "var(--surface)" }}>
+                <blockquote className="font-serif text-base italic leading-relaxed text-ink">
+                  &ldquo;{q.text}&rdquo;
+                </blockquote>
+                <div className="mt-4">
+                  <p className="text-sm font-semibold text-ink">{q.author}</p>
+                  <p className="text-xs text-ink-3">{q.role}</p>
+                </div>
               </div>
             </Reveal>
           ))}
