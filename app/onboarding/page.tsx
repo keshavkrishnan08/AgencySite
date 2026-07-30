@@ -146,8 +146,8 @@ export default function OnboardingPage() {
     );
     setContext(answerProps);
     track("onboarding_complete", { situation, role: finalRole, ...answerProps });
-    // Flow: three questions -> validation -> create account -> payment -> app.
-    router.push("/signin?mode=signup&next=%2Fupgrade");
+    // Flow: three questions -> FREE trial (3 Qs, half-and-half layout) -> see score -> signup -> payment -> app.
+    router.push("/trial");
   };
 
   const variants = {
