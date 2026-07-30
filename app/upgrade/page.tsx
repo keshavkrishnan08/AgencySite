@@ -116,13 +116,18 @@ export default function UpgradePage() {
                     <button
                       key={key}
                       onClick={() => { setPlan(key); track("ui:click", { label: "plan_select", plan: key }); }}
-                      className="flex w-full items-center gap-3 rounded-xl border p-4 text-left transition-all"
+                      className="relative flex w-full items-center gap-3 rounded-xl border p-4 text-left transition-all"
                       style={{
                         borderColor: on ? "var(--primary)" : "var(--border-strong)",
                         background: on ? "var(--primary-soft)" : "var(--surface)",
                         boxShadow: on ? "0 0 0 1px var(--primary)" : "none",
                       }}
                     >
+                      {key === "quarterly" && (
+                        <span className="absolute -top-2.5 right-4 rounded-full px-2.5 py-0.5 text-2xs font-bold text-white" style={{ background: "linear-gradient(90deg, var(--primary-bright), var(--primary-ink))" }}>
+                          1-day free trial
+                        </span>
+                      )}
                       <span className="grid h-5 w-5 shrink-0 place-items-center rounded-full border-2" style={{ borderColor: on ? "var(--primary)" : "var(--border-strong)" }}>
                         {on && <span className="h-2.5 w-2.5 rounded-full" style={{ background: "var(--primary)" }} />}
                       </span>
@@ -146,11 +151,24 @@ export default function UpgradePage() {
               <div className="mt-6 space-y-2 border-t pt-5 text-sm" style={{ borderColor: "var(--border)" }}>
                 <div className="flex items-center justify-between"><span className="text-ink-2">Premium · {p.toggle}</span><span className="font-mono text-ink">{p.was ?? p.price}</span></div>
                 {p.saveAmount && <div className="flex items-center justify-between text-sage-ink"><span>You save {p.savePct}%</span><span className="font-mono">−{p.saveAmount}</span></div>}
-                <div className="flex items-center justify-between border-t pt-2 font-semibold" style={{ borderColor: "var(--border)" }}><span className="text-ink">Due today</span><span className="font-mono text-ink">{p.price}</span></div>
+                {plan === "quarterly" ? (
+                  <>
+                    <div className="flex items-center justify-between border-t pt-2" style={{ borderColor: "var(--border)" }}><span className="text-ink-2">1-day free trial</span><span className="font-mono font-semibold text-sage-ink">$0.00</span></div>
+                    <div className="flex items-center justify-between text-xs text-ink-3"><span>Then {p.price} after trial</span></div>
+                  </>
+                ) : (
+                  <div className="flex items-center justify-between border-t pt-2 font-semibold" style={{ borderColor: "var(--border)" }}><span className="text-ink">Due today</span><span className="font-mono text-ink">{p.price}</span></div>
+                )}
               </div>
 
               <Button onClick={subscribe} disabled={state === "processing"} size="lg" className="mt-6 w-full">
-                {state === "processing" ? <><Loader2 size={18} className="animate-spin" /> Redirecting to secure checkout…</> : <>Start free trial · then {p.price}</>}
+                {state === "processing" ? (
+                  <><Loader2 size={18} className="animate-spin" /> Redirecting to checkout…</>
+                ) : plan === "quarterly" ? (
+                  <>Start free trial</>
+                ) : (
+                  <>Subscribe · {p.price}</>
+                )}
               </Button>
               {err && <p className="mt-3 text-center text-sm text-coral-ink">{err}</p>}
               <p className="mt-3 flex items-center justify-center gap-1.5 text-xs text-ink-3"><ShieldCheck size={13} /> Secure checkout, powered by Stripe · cancel anytime</p>

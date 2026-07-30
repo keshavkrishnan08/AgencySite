@@ -41,7 +41,8 @@ export async function POST(req: Request) {
       line_items: [{ price: PRICES[plan](), quantity: 1 }],
       customer_email: email,
       allow_promotion_codes: true,
-      subscription_data: TRIAL_DAYS > 0 ? { trial_period_days: TRIAL_DAYS } : undefined,
+      // Free trial only on the quarterly (recommended) plan
+      subscription_data: TRIAL_DAYS > 0 && plan === "quarterly" ? { trial_period_days: TRIAL_DAYS } : undefined,
       success_url: `${origin}/dashboard?upgraded=1&session_id={CHECKOUT_SESSION_ID}`,
       cancel_url: `${origin}/upgrade?canceled=1`,
       metadata: { product: "axon_premium", plan },
