@@ -133,24 +133,52 @@ function FreeHook() {
 /* ================================================================== */
 function SocialProof() {
   const quotes = [
-    { text: "The interview isn't about being the smartest person in the room. It's about being the most prepared.", author: "Richard Branson", role: "Founder, Virgin Group" },
-    { text: "I will prepare and some day my chance will come.", author: "Abraham Lincoln", role: "16th U.S. President" },
-    { text: "Practice isn't the thing you do once you're good. It's the thing you do that makes you good.", author: "Malcolm Gladwell", role: "Author, Outliers" },
+    {
+      text: "The interview isn't about being the smartest person in the room. It's about being the most prepared.",
+      author: "Richard Branson",
+      role: "Founder, Virgin Group · Net worth $3B",
+      img: "https://upload.wikimedia.org/wikipedia/commons/thumb/e/e9/Sir_Richard_Branson_%28cropped%29.jpg/440px-Sir_Richard_Branson_%28cropped%29.jpg",
+      detail: "Branson has said he hires based on personality and preparation, not credentials. He famously dropped out at 16 and built an empire by outpreparing everyone in the room.",
+    },
+    {
+      text: "I will prepare and some day my chance will come.",
+      author: "Abraham Lincoln",
+      role: "16th U.S. President · 1809–1865",
+      img: "https://upload.wikimedia.org/wikipedia/commons/thumb/a/ab/Abraham_Lincoln_O-77_matte_collodion_print.jpg/440px-Abraham_Lincoln_O-77_matte_collodion_print.jpg",
+      detail: "Lincoln lost 8 elections before becoming president. He prepared obsessively for the Lincoln-Douglas debates, practicing his arguments out loud until they were sharp.",
+    },
+    {
+      text: "Practice isn't the thing you do once you're good. It's the thing you do that makes you good.",
+      author: "Malcolm Gladwell",
+      role: "Author, Outliers · 10,000 Hour Rule",
+      img: "https://upload.wikimedia.org/wikipedia/commons/thumb/5/5f/Malcolm_Gladwell_2014_%28cropped%29.jpg/440px-Malcolm_Gladwell_2014_%28cropped%29.jpg",
+      detail: "Gladwell's research showed that world-class performers across every field share one thing: deliberate, repeated practice with feedback. Not talent. Practice.",
+    },
   ];
 
   return (
     <section className="py-12 sm:py-16">
-      <div className="container-content">
+      <div className="container-wide">
         <div className="grid gap-6 sm:grid-cols-3">
           {quotes.map((q, i) => (
             <Reveal key={q.author} delay={i * 0.08}>
-              <div className="rounded-xl border p-6" style={{ borderColor: "var(--border)", background: "var(--surface)" }}>
-                <blockquote className="font-serif text-base italic leading-relaxed text-ink">
-                  &ldquo;{q.text}&rdquo;
-                </blockquote>
-                <div className="mt-4">
-                  <p className="text-sm font-semibold text-ink">{q.author}</p>
-                  <p className="text-xs text-ink-3">{q.role}</p>
+              <div className="overflow-hidden rounded-2xl border" style={{ borderColor: "var(--border)", background: "var(--surface)" }}>
+                {/* Photo */}
+                <div className="relative h-52 overflow-hidden bg-ink">
+                  {/* eslint-disable-next-line @next/next/no-img-element */}
+                  <img src={q.img} alt={q.author} className="h-full w-full object-cover object-top" />
+                  <div className="absolute inset-0" style={{ background: "linear-gradient(180deg, transparent 40%, rgba(0,0,0,0.7) 100%)" }} />
+                  <div className="absolute bottom-0 left-0 p-5">
+                    <p className="font-serif text-lg font-semibold text-white">{q.author}</p>
+                    <p className="text-xs font-semibold uppercase tracking-wider text-white/60">{q.role}</p>
+                  </div>
+                </div>
+                {/* Quote + detail */}
+                <div className="p-6">
+                  <blockquote className="font-serif text-lg italic leading-relaxed text-ink">
+                    &ldquo;{q.text}&rdquo;
+                  </blockquote>
+                  <p className="mt-4 text-sm leading-relaxed text-ink-2">{q.detail}</p>
                 </div>
               </div>
             </Reveal>

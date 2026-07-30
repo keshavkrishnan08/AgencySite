@@ -7,6 +7,7 @@ import { AppNav } from "./AppNav";
 import { AppSidebar } from "./AppSidebar";
 import { CoachChat } from "@/components/chat/CoachChat";
 import { ProductTour } from "@/components/tour/ProductTour";
+import { NudgeToasts } from "@/components/nudge/Nudges";
 import { Button } from "@/components/ui/Button";
 import { useAuth } from "@/lib/auth";
 import { getProfile, getSessions, isPremium, onStoreChange, setProfile, upgradeToPremium } from "@/lib/store";
@@ -214,6 +215,7 @@ export function AppShell({
       {/* The coach button is always present (floating, bottom-right). The tour is
           first-run only and never over the paywall. */}
       <CoachChat />
+      <NudgeToasts />
       {!needsPay && <ProductTour />}
     </>
   );
