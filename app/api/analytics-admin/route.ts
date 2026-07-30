@@ -28,12 +28,15 @@ export async function POST(req: Request) {
   if (!db) return NextResponse.json({ configured: false });
 
   const days = [1, 7, 30, 90].includes(Number(body?.days)) ? Number(body.days) : 7;
-  const since = new Date(Date.now() - days * 86400000).toISOString();
+  // Floor: never show data before 2026-07-29 (pre-launch testing)
+  const cutoff = "2026-07-29T00:00:00Z";
+  const daysAgo = new Date(Date.now() - days * 86400000).toISOString();
+  const since = daysAgo > cutoff ? daysAgo : cutoff;
 
   try {
     // Run all queries in parallel using the events table directly
     const eventsQuery = db.from("events").select("*").gte("created_at", since);
-    const leadsQuery = db.from("leads").select("*").order("created_at", { ascending: false }).limit(20);
+    const leadsQuery = db.from("leads").select("*").gte("created_at", cutoff).order("created_at", { ascending: false }).limit(20);
     const subsQuery = db.from("subscriptions").select("*").order("updated_at", { ascending: false }).limit(10);
 
     const [eventsRes, leadsRes, subsRes] = await Promise.all([
