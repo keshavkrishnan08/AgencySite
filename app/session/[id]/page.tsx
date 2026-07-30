@@ -1,7 +1,7 @@
 "use client";
 
-import { useEffect, useMemo, useRef, useState } from "react";
-import { useParams } from "next/navigation";
+import { Suspense, useEffect, useMemo, useRef, useState } from "react";
+import { useParams, useSearchParams } from "next/navigation";
 import Link from "next/link";
 import { motion } from "framer-motion";
 import {
@@ -33,8 +33,10 @@ import { track } from "@/lib/analytics";
 import { drawShareCard } from "@/lib/share";
 import type { Dimension, ScoredAnswer, Session } from "@/lib/types";
 
-export default function SessionPage() {
+function SessionInner() {
   const params = useParams();
+  const searchParams = useSearchParams();
+  const isTrial = searchParams.get("trial") === "1";
   const id = String(params.id);
   const [session, setSession] = useState<Session | null>(null);
   const [all, setAll] = useState<Session[]>([]);
@@ -85,8 +87,7 @@ export default function SessionPage() {
 
   const { strongest, weakest } = bestAndWorst(session);
 
-  return (
-    <AppShell>
+  const content = (
       <main className="container-wide py-10 sm:py-12">
         {/* Hero score card */}
         <motion.div
@@ -164,7 +165,9 @@ export default function SessionPage() {
         </div>
 
         {/* Account capture / share */}
-        {mounted && !signed ? (
+        {isTrial ? (
+          <TrialSignupCTA score={session.overall} />
+        ) : mounted && !signed ? (
           <AccountPrompt onDone={() => setSigned(true)} />
         ) : (
           <ShareCard session={session} sessionsCount={all.length} />
@@ -183,16 +186,36 @@ export default function SessionPage() {
           </div>
         </div>
 
-        <div className="mt-12 flex flex-col items-center gap-3 text-center">
-          <ButtonLink href="/practice" size="lg">
-            Practice again <ArrowRight size={18} />
-          </ButtonLink>
-          <Link href="/dashboard" className="text-sm text-ink-2 hover:text-ink">
-            Go to dashboard
-          </Link>
-        </div>
+        {isTrial ? (
+          <div className="mt-12 flex flex-col items-center gap-3 text-center">
+            <ButtonLink href="/signin?mode=signup&next=%2Fupgrade" size="lg">
+              Sign up to keep practicing <ArrowRight size={18} />
+            </ButtonLink>
+            <p className="text-sm text-ink-3">Your score is saved. Sign up to track your progress.</p>
+          </div>
+        ) : (
+          <div className="mt-12 flex flex-col items-center gap-3 text-center">
+            <ButtonLink href="/practice" size="lg">
+              Practice again <ArrowRight size={18} />
+            </ButtonLink>
+            <Link href="/dashboard" className="text-sm text-ink-2 hover:text-ink">
+              Go to dashboard
+            </Link>
+          </div>
+        )}
       </main>
-    </AppShell>
+  );
+
+  // Trial mode: render without auth gate so unauthenticated users see their score.
+  if (isTrial) return content;
+  return <AppShell>{content}</AppShell>;
+}
+
+export default function SessionPage() {
+  return (
+    <Suspense fallback={<main className="min-h-screen" />}>
+      <SessionInner />
+    </Suspense>
   );
 }
 
@@ -248,6 +271,25 @@ function PanelScorecard({ answers }: { answers: ScoredAnswer[] }) {
   );
 }
 const growthOf = (d: Dimension) => `${labelOf(d)} needs the most attention. Add concrete detail to every answer.`;
+
+/* ---------------- trial signup CTA ---------------- */
+
+function TrialSignupCTA({ score }: { score: number }) {
+  const msg = score >= 75
+    ? "Great start. Sign up to keep improving and track every session."
+    : score >= 50
+    ? `You scored ${score}. Most people reach 80+ within a week of practice. Sign up to keep going.`
+    : `You scored ${score}. That's your starting point — it goes up fast with practice. Sign up to watch it climb.`;
+  return (
+    <div className="card mt-8 p-8 text-center" style={{ borderTop: "4px solid var(--primary)" }}>
+      <h2 className="font-serif text-2xl font-semibold text-ink">Your score: {score}/100</h2>
+      <p className="mt-3 max-w-md mx-auto text-ink-2">{msg}</p>
+      <ButtonLink href="/signin?mode=signup&next=%2Fupgrade" size="lg" className="mt-6">
+        Sign up to keep practicing <ArrowRight size={18} />
+      </ButtonLink>
+    </div>
+  );
+}
 
 /* ---------------- account prompt ---------------- */
 
