@@ -150,7 +150,7 @@ export default function UpgradePage() {
               </div>
 
               <Button onClick={subscribe} disabled={state === "processing"} size="lg" className="mt-6 w-full">
-                {state === "processing" ? <><Loader2 size={18} className="animate-spin" /> Redirecting to secure checkout…</> : <><Lock size={16} /> Subscribe · {p.price}</>}
+                {state === "processing" ? <><Loader2 size={18} className="animate-spin" /> Redirecting to secure checkout…</> : <>Start free trial · then {p.price}</>}
               </Button>
               {err && <p className="mt-3 text-center text-sm text-coral-ink">{err}</p>}
               <p className="mt-3 flex items-center justify-center gap-1.5 text-xs text-ink-3"><ShieldCheck size={13} /> Secure checkout, powered by Stripe · cancel anytime</p>
