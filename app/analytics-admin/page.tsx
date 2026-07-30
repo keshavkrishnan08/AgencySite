@@ -30,18 +30,18 @@ type Report = {
 };
 
 const FUNNEL_STEPS = [
-  { key: "land", label: "Landed", color: "var(--primary-bright)" },
-  { key: "cta_click", label: "Clicked CTA", color: "var(--primary)" },
-  { key: "onboard_start", label: "Started onboarding", color: "var(--primary)" },
-  { key: "onboard_answer", label: "Answered a question", color: "var(--primary-ink)" },
-  { key: "onboard_done", label: "Finished onboarding", color: "var(--primary-ink)" },
-  { key: "account_created", label: "Created account", color: "var(--sage)" },
-  { key: "session_started", label: "Started practice", color: "var(--sage)" },
-  { key: "first_scored", label: "Got first score", color: "var(--sage-ink)" },
-  { key: "session_complete", label: "Completed session", color: "var(--sage-ink)" },
-  { key: "upgrade_view", label: "Saw pricing", color: "var(--amber)" },
-  { key: "upgrade_click", label: "Clicked subscribe", color: "var(--amber-ink)" },
-  { key: "upgrade_success", label: "Paid", color: "var(--gold)" },
+  { key: "land", label: "Landed", color: "var(--primary-bright)", benchmark: "100%" },
+  { key: "cta_click", label: "Clicked CTA", color: "var(--primary)", benchmark: "3-8%" },
+  { key: "onboard_start", label: "Started onboarding", color: "var(--primary)", benchmark: "2-5%" },
+  { key: "onboard_answer", label: "Answered a question", color: "var(--primary-ink)", benchmark: "1.5-4%" },
+  { key: "onboard_done", label: "Finished onboarding", color: "var(--primary-ink)", benchmark: "1-3%" },
+  { key: "account_created", label: "Created account", color: "var(--sage)", benchmark: "0.8-2.5%" },
+  { key: "session_started", label: "Started practice", color: "var(--sage)", benchmark: "0.5-2%" },
+  { key: "first_scored", label: "Got first score", color: "var(--sage-ink)", benchmark: "0.4-1.5%" },
+  { key: "session_complete", label: "Completed session", color: "var(--sage-ink)", benchmark: "0.3-1.2%" },
+  { key: "upgrade_view", label: "Saw pricing", color: "var(--amber)", benchmark: "0.2-1%" },
+  { key: "upgrade_click", label: "Clicked subscribe", color: "var(--amber-ink)", benchmark: "0.1-0.5%" },
+  { key: "upgrade_success", label: "Paid", color: "var(--gold)", benchmark: "0.05-0.3%" },
 ];
 
 const pc = (n: number, d: number) => d ? `${((n / d) * 100).toFixed(1)}%` : "—";
@@ -143,9 +143,10 @@ export default function AnalyticsAdmin() {
                   const prev = i === 0 ? val : Number(report.funnel[FUNNEL_STEPS[i - 1].key]) || 0;
                   const stepRate = prev ? ((val / prev) * 100).toFixed(1) : "—";
                   return (
-                    <div key={s.key} className="grid grid-cols-[180px_1fr_120px] items-center gap-3">
+                    <div key={s.key} className="grid grid-cols-[180px_1fr_160px] items-center gap-3">
                       <div>
                         <p className="text-sm font-medium text-slate-200">{s.label}</p>
+                        <p className="text-[10px] text-slate-500">benchmark: {s.benchmark}</p>
                       </div>
                       <div className="h-8 overflow-hidden rounded-md bg-slate-900">
                         <div className="flex h-full items-center rounded-md px-3 text-xs font-bold text-white transition-all duration-700" style={{ width: `${land ? Math.max((val / land) * 100, val ? 3 : 0) : 0}%`, background: s.color, minWidth: val ? 40 : 0 }}>
