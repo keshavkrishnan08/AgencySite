@@ -36,6 +36,13 @@ export async function requirePremium(req: Request): Promise<Response | null> {
 
   const auth = req.headers.get("authorization") || "";
   const token = auth.slice(0, 7).toLowerCase() === "bearer " ? auth.slice(7).trim() : "";
+
+  // Trial mode: allow unauthenticated users to generate/score up to 3 questions.
+  // The x-trial header is set by the client in trial mode. Rate limiting (already
+  // applied before this gate) prevents abuse; the 3-question cap is enforced
+  // client-side and the heuristic engine handles scoring without API keys anyway.
+  if (!token && req.headers.get("x-trial") === "1") return null;
+
   if (!token) return deny("auth");
 
   try {
