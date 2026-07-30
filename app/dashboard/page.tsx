@@ -8,6 +8,7 @@ import {
   CheckCircle2, Circle, MapPin, Banknote, ListChecks, Award, Activity, Trophy, RefreshCw,
 } from "lucide-react";
 import { AppShell } from "@/components/layout/AppShell";
+import { LockedBriefingCard } from "@/components/nudge/Nudges";
 import { ButtonLink } from "@/components/ui/Button";
 import { AnimatedNumber } from "@/components/ui/AnimatedNumber";
 import { getOnboarding, getProfile, getSessions, getStreak, onStoreChange } from "@/lib/store";
@@ -158,6 +159,9 @@ export default function DashboardPage() {
             Practice <ArrowRight size={16} />
           </ButtonLink>
         </header>
+
+        {/* Locked briefing card for unpaid users */}
+        <LockedBriefingCard />
 
         {/* Until there's real practice history, the dashboard is just a clean
             welcome and a single prompt to start — no zero-filled tiles or graphs. */}
