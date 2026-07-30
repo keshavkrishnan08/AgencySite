@@ -37,10 +37,10 @@ export default function PreferencesPage() {
   };
   const reset = () => { setPrefs(DEFAULT_PREFS); setLocal(DEFAULT_PREFS); track("prefs:reset", {}); };
 
-  if (!mounted) return <AppShell requirePremium={false}><main className="min-h-screen" /></AppShell>;
+  if (!mounted) return <AppShell requirePremium><main className="min-h-screen" /></AppShell>;
 
   return (
-    <AppShell requirePremium={false}>
+    <AppShell requirePremium>
       <main className="container-wide py-8 sm:py-10">
         <div className="flex items-center gap-2 text-2xs font-semibold uppercase tracking-[0.14em] text-primary-ink">
           <SlidersHorizontal size={14} /> Preferences
