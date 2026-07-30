@@ -9,34 +9,23 @@ import { supabaseAdmin, supabaseConfigured, subscriptionStatus } from "./supabas
  * a REAL Supabase session (the JWT, not the spoofable x-user-id header) and checks
  * the un-forgeable `subscriptions` table.
  *
- * Trust model:
- *  - Fails OPEN only when there's no backend to check against (local dev / before
- *    go-live) or on a genuine infra error talking to Supabase, so a transient
- *    outage never locks a paying customer out.
- *  - Fails CLOSED (402) on a missing/invalid token or a definitively-unpaid
- *    account. A bad token makes getUser() return an error object (handled), not
- *    throw, so attackers can't trip the fail-open path.
+ * Free first session: authenticated users without a subscription get 6 API calls
+ * (1 generate-questions + 3 score-answer + 2 follow-ups) so they can complete
+ * one practice session before the paywall kicks in. Rate-limited per-email per-day.
  *
  * Kill switch: set ENTITLEMENT_ENFORCED=0 to disable without a code change. */
-
-/* In-memory trial rate-limit store (fallback when Supabase is unavailable). */
-const trialStore = new Map<string, { count: number; reset: number }>();
 
 function deny(kind: "auth" | "pay"): Response {
   return NextResponse.json(
     kind === "auth"
       ? { error: "Please sign in to use this.", needsAuth: true }
-      : { error: "This is a premium feature. Subscribe to continue.", needsPay: true },
+      : { error: "Start your free trial to continue practicing.", needsPay: true },
     { status: 402 }
   );
 }
 
-function trialExhausted(): Response {
-  return NextResponse.json(
-    { error: "Trial limit reached. Sign up to continue practicing.", needsAuth: true },
-    { status: 402 }
-  );
-}
+/* In-memory fallback for the free-session rate limit (dev only). */
+const freeSessionStore = new Map<string, { count: number; reset: number }>();
 
 export async function requirePremium(req: Request): Promise<Response | null> {
   if (process.env.ENTITLEMENT_ENFORCED === "0") return null; // manual kill switch
@@ -46,36 +35,6 @@ export async function requirePremium(req: Request): Promise<Response | null> {
 
   const auth = req.headers.get("authorization") || "";
   const token = auth.slice(0, 7).toLowerCase() === "bearer " ? auth.slice(7).trim() : "";
-
-  // Trial mode: allow unauthenticated users to generate/score up to 3 questions.
-  // Tight per-IP cap: 6 calls/day (1 generate + 3 scores + 2 follow-ups max).
-  // Uses the same rl_hit RPC as the main rate limiter for atomic counting.
-  if (!token && req.headers.get("x-trial") === "1") {
-    const ip = (req.headers.get("x-forwarded-for") || "").split(",")[0].trim()
-      || req.headers.get("x-real-ip") || "unknown";
-    const TRIAL_LIMIT = 6;
-    const db = supabaseAdmin();
-    if (db) {
-      try {
-        const { data } = await db.rpc("rl_hit", {
-          p_key: `trial:day:${ip}`, p_limit: TRIAL_LIMIT, p_window: 86400,
-        });
-        if (data === false) return trialExhausted();
-      } catch { /* fail open on DB error */ }
-    } else {
-      const now = Date.now();
-      const key = `trial:${ip}`;
-      const existing = trialStore.get(key);
-      if (existing && now < existing.reset) {
-        existing.count++;
-        if (existing.count > TRIAL_LIMIT) return trialExhausted();
-      } else {
-        trialStore.set(key, { count: 1, reset: now + 86400000 });
-      }
-    }
-    return null;
-  }
-
   if (!token) return deny("auth");
 
   try {
@@ -83,10 +42,23 @@ export async function requirePremium(req: Request): Promise<Response | null> {
     const email = data?.user?.email || "";
     if (error || !email) return deny("auth");
     const sub = await subscriptionStatus(email);
-    return sub.premium ? null : deny("pay");
+    if (sub.premium) return null; // paying user — allow everything
+
+    // Non-premium authenticated user: allow a limited free session (6 API calls/day)
+    // so they can experience the product before paying.
+    const FREE_SESSION_LIMIT = 6;
+    const limitKey = `free:day:${email}`;
+    try {
+      const { data: allowed } = await admin.rpc("rl_hit", {
+        p_key: limitKey, p_limit: FREE_SESSION_LIMIT, p_window: 86400,
+      });
+      if (allowed === false) return deny("pay");
+    } catch {
+      // Fail open on rate-limit error — never block a potential customer
+      // over a transient DB issue. The 6-call cap is a soft guard anyway.
+    }
+    return null;
   } catch {
-    // Genuine infra error verifying the token / reading the subscription: fail
-    // open so we never lock out a paying customer over a transient hiccup.
     return null;
   }
 }
