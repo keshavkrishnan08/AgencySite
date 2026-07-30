@@ -54,7 +54,7 @@ function Hero() {
       <div className="container-wide">
         <div className="mb-6 flex items-center justify-between">
           <Logo />
-          <StartFreeButton size="sm" source="landing_nav" label="First interview free →" signedInLabel="First interview free →" />
+          <StartFreeButton size="sm" source="landing_nav" label="First interview free" signedInLabel="First interview free" />
         </div>
 
         <div className="mx-auto max-w-2xl text-center lg:text-left lg:mx-0 lg:grid lg:max-w-none lg:grid-cols-[1.1fr_0.9fr] lg:items-center lg:gap-10">
@@ -80,7 +80,7 @@ function Hero() {
             {/* CTA — the CTA IS the free hook */}
             <Reveal delay={0.18}>
               <div className="mt-7">
-                <StartFreeButton size="lg" source="landing_hero" label="First interview free →" signedInLabel="First interview free →" />
+                <StartFreeButton size="lg" source="landing_hero" label="First interview free" signedInLabel="First interview free" />
                 <p className="mt-2.5 text-xs font-semibold uppercase tracking-wider text-ink-3">Takes 60 seconds · No card required</p>
               </div>
             </Reveal>
@@ -204,7 +204,7 @@ function SocialProof() {
         </div>
         <Reveal delay={0.15}>
           <div className="mt-10 text-center">
-            <StartFreeButton size="lg" source="landing_proof" label="First interview free →" signedInLabel="First interview free →" />
+            <StartFreeButton size="lg" source="landing_proof" label="First interview free" signedInLabel="First interview free" />
           </div>
         </Reveal>
       </div>
@@ -246,7 +246,7 @@ function HowItWorks() {
         </div>
         <Reveal delay={0.15}>
           <div className="mt-10 text-center">
-            <StartFreeButton size="lg" source="landing_how" label="First interview free →" signedInLabel="First interview free →" />
+            <StartFreeButton size="lg" source="landing_how" label="First interview free" signedInLabel="First interview free" />
           </div>
         </Reveal>
       </div>
@@ -308,27 +308,34 @@ function WhatYouGet() {
             You don&apos;t fail interviews because you&apos;re not smart enough. You fail on things you can&apos;t see yourself doing. We measure all five.
           </p>
         </Reveal>
-        <div className="mx-auto mt-12 max-w-lg space-y-4">
+        <div className="mt-14 space-y-16">
           {dimensions.map((d, i) => (
             <Reveal key={d.label} delay={i * 0.06}>
-              <div className="rounded-xl border p-5" style={{ borderColor: "var(--border)", background: "var(--surface)" }}>
-                <div className="flex items-center justify-between">
-                  <h3 className="font-serif text-lg font-semibold text-ink">{d.label}</h3>
-                  <div className="flex items-center gap-2">
-                    <div className="h-2 w-24 overflow-hidden rounded-full" style={{ background: "var(--bg-tint)" }}>
-                      <div className="h-full rounded-full" style={{ width: `${d.score}%`, background: d.score >= 80 ? "var(--sage)" : d.score >= 65 ? "var(--amber)" : "var(--coral)" }} />
-                    </div>
-                    <span className="font-mono text-sm font-semibold" style={{ color: d.score >= 80 ? "var(--sage-ink)" : d.score >= 65 ? "var(--amber-ink)" : "var(--coral-ink)" }}>{d.score}</span>
+              <div className={cn("grid items-center gap-8 sm:grid-cols-2", i % 2 === 1 && "sm:direction-rtl")}>
+                {/* Score side */}
+                <div className={cn("flex flex-col items-center text-center", i % 2 === 1 && "sm:order-2")}>
+                  <div className="relative flex h-28 w-28 items-center justify-center rounded-full" style={{ background: "var(--bg-sunk)" }}>
+                    <span className="font-serif text-4xl font-semibold" style={{ color: d.score >= 80 ? "var(--sage-ink)" : d.score >= 65 ? "var(--amber-ink)" : "var(--coral-ink)" }}>{d.score}</span>
+                    <svg className="absolute inset-0" viewBox="0 0 112 112">
+                      <circle cx="56" cy="56" r="50" fill="none" stroke="var(--bg-tint)" strokeWidth="6" />
+                      <circle cx="56" cy="56" r="50" fill="none" strokeWidth="6" strokeLinecap="round"
+                        stroke={d.score >= 80 ? "var(--sage)" : d.score >= 65 ? "var(--amber)" : "var(--coral)"}
+                        strokeDasharray={`${d.score * 3.14} 314`} transform="rotate(-90 56 56)" />
+                    </svg>
                   </div>
                 </div>
-                <p className="mt-2 text-sm leading-relaxed text-ink-2">{d.desc}</p>
+                {/* Text side */}
+                <div className={cn(i % 2 === 1 && "sm:order-1 sm:text-right")}>
+                  <h3 className="font-serif text-2xl font-semibold text-ink">{d.label}</h3>
+                  <p className="mt-3 text-base leading-relaxed text-ink-2">{d.desc}</p>
+                </div>
               </div>
             </Reveal>
           ))}
         </div>
         <Reveal delay={0.25}>
           <div className="mt-10 text-center">
-            <StartFreeButton size="lg" source="landing_dimensions" label="Find out your scores →" signedInLabel="Find out your scores →" />
+            <StartFreeButton size="lg" source="landing_dimensions" label="Find out your scores" signedInLabel="Find out your scores" />
             <p className="mt-2.5 text-xs font-semibold uppercase tracking-wider text-ink-3">Takes 60 seconds · No card required</p>
           </div>
         </Reveal>
@@ -342,9 +349,12 @@ function WhatYouGet() {
 /* ================================================================== */
 const FAQS: [string, string][] = [
   ["Does this actually work?", "It scores the five things hiring managers weigh: clarity, relevance, specificity, confidence, and conciseness. It catches vague answers, filler words, and missing examples — then tells you exactly what to fix. The score goes up every session."],
-  ["I haven't interviewed in years.", "That's who this is for. Career changers, parents going back to work, people who got laid off. Not 22-year-old engineers."],
+  ["What's the ROI on this?", "A single interview can change your salary by $20,000+ a year. If practicing for a week helps you land one better offer — or avoid one rejection — it pays for itself hundreds of times over. The question isn't whether you can afford it. It's whether you can afford to walk in unprepared."],
+  ["How is this different from practicing with a friend?", "Your friend will say 'that sounded great.' A hiring manager will say no. The difference is honesty. AI catches every filler word, every vague answer, every time you didn't actually answer the question — and tells you exactly what to fix. No feelings to spare."],
+  ["I haven't interviewed in years.", "That's exactly who this is for. Career changers, parents going back to work, people who got laid off. Not 22-year-old engineers. The questions adjust to your experience level and situation."],
+  ["How much will my score actually improve?", "Most users see a 15-20 point improvement in their first week. The people who practice daily for a week go from 'nervous and hoping for the best' to 'I know exactly what I'm going to say.' That's not a feeling — it's a number you can see."],
   ["Is my data private?", "Completely. No profiles, no leaderboards, no social. Just you and your screen. Cancel anytime in two clicks."],
-  ["How fast is my reading?", "Your first practice session takes about 5 minutes. You get scored instantly after each answer. Most people see a real improvement after 3-5 sessions."],
+  ["Can AI really replace a human interview coach?", "A good coach charges $150-300 per hour and you get one session. Axon gives you unlimited practice, available at 3am the night before, and scores every answer the same way every time. It's not a replacement for human chemistry in the room — it's the reps that make you ready for it."],
   ["Can I cancel anytime?", "Yes. Two clicks from settings. No contracts, no phone calls, no retention tricks."],
 ];
 
@@ -381,7 +391,7 @@ function FinalCTA() {
         </Reveal>
         <Reveal delay={0.16}>
           <div className="mt-7">
-            <StartFreeButton size="lg" source="landing_final" label="First interview free →" signedInLabel="First interview free →" />
+            <StartFreeButton size="lg" source="landing_final" label="First interview free" signedInLabel="First interview free" />
           </div>
         </Reveal>
       </div>
