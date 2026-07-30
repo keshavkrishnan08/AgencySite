@@ -92,6 +92,8 @@ function PlanCard({ plan, presale }: { plan: PlanKey; presale: boolean }) {
           className="w-full"
           source={`pricing_${plan}`}
           showArrow={false}
+          label="Practice free"
+          signedInLabel="Practice free"
         />
       </div>
     </div>

@@ -30,9 +30,9 @@ export function StickyCTA() {
             <p className="font-serif text-base font-semibold text-ink">Your next interview is coming.</p>
             <p className="text-xs text-ink-2">From {FROM_PER_DAY} · cancel anytime.</p>
           </div>
-          <p className="text-sm font-medium text-ink sm:hidden">Start for free</p>
+          <p className="text-sm font-medium text-ink sm:hidden">Practice free</p>
           <div className="flex items-center gap-1">
-<StartFreeButton size="sm" source="sticky" className="whitespace-nowrap" />
+<StartFreeButton size="sm" source="sticky" className="whitespace-nowrap" label="Practice free" signedInLabel="Practice free" />
             <button
               onClick={() => setDismissed(true)}
               className="rounded-full p-2 text-ink-3 transition-colors hover:bg-bg-tint hover:text-ink"
