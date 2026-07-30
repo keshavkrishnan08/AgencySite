@@ -563,6 +563,9 @@ function PracticeInner() {
     mixpanelIncrement("answers_scored");
     if (dl) mixpanelIncrement("spoken_answers");
     if (anx) mixpanelIncrement("filler_words_total", anx.fillerCount || 0);
+    // Mark that the user has seen a scored answer — the free hook is proven.
+    // AppShell reads this to blur after the first answer instead of after a full session.
+    try { localStorage.setItem("pp:free_scored", "1"); } catch {}
     window.scrollTo({ top: 0, behavior: "smooth" });
 
     setPhase("score");

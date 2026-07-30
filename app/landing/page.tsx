@@ -300,12 +300,12 @@ function WhatYouGet() {
       <div className="container-content">
         <Reveal>
           <h2 className="text-center font-serif text-display font-semibold text-ink">
-            Five things hiring managers<br />score you on.
+            We coach you on what<br />hiring managers look for.
           </h2>
         </Reveal>
         <Reveal delay={0.05}>
           <p className="mx-auto mt-4 max-w-md text-center text-ink-2">
-            You don&apos;t fail interviews because you&apos;re not smart enough. You fail because of things you can&apos;t see. We measure all five.
+            You don&apos;t fail interviews because you&apos;re not smart enough. You fail on things you can&apos;t see yourself doing. We measure all five.
           </p>
         </Reveal>
         <div className="mx-auto mt-12 max-w-lg space-y-4">
