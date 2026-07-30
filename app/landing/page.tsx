@@ -80,7 +80,7 @@ function Hero() {
             <Reveal delay={0.18}>
               <div className="mt-7">
                 <StartFreeButton size="lg" source="landing_hero" label="First interview free →" signedInLabel="First interview free →" />
-                <p className="mt-2.5 text-xs font-semibold uppercase tracking-wider text-ink-3">Takes 5 minutes · No card required</p>
+                <p className="mt-2.5 text-xs font-semibold uppercase tracking-wider text-ink-3">Takes 60 seconds · No card required</p>
               </div>
             </Reveal>
           </div>
