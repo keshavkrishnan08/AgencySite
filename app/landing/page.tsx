@@ -53,7 +53,7 @@ function Hero() {
       <div className="container-wide">
         <div className="mb-6 flex items-center justify-between">
           <Logo />
-          <StartFreeButton size="sm" source="landing_nav" label="Start free →" />
+          <StartFreeButton size="sm" source="landing_nav" label="First interview free →" signedInLabel="First interview free →" />
         </div>
 
         <div className="mx-auto max-w-2xl text-center lg:text-left lg:mx-0 lg:grid lg:max-w-none lg:grid-cols-[1.1fr_0.9fr] lg:items-center lg:gap-10">
@@ -87,7 +87,7 @@ function Hero() {
             {/* CTA — the CTA IS the free hook */}
             <Reveal delay={0.18}>
               <div className="mt-7">
-                <StartFreeButton size="lg" source="landing_hero" label="Get My Free Practice Session →" />
+                <StartFreeButton size="lg" source="landing_hero" label="First interview free →" signedInLabel="First interview free →" />
                 <p className="mt-2.5 text-xs font-semibold uppercase tracking-wider text-ink-3">Takes 5 minutes · No card required</p>
               </div>
             </Reveal>
@@ -137,21 +137,21 @@ function SocialProof() {
       text: "The interview isn't about being the smartest person in the room. It's about being the most prepared.",
       author: "Richard Branson",
       role: "Founder, Virgin Group · Net worth $3B",
-      img: "https://upload.wikimedia.org/wikipedia/commons/thumb/e/e9/Sir_Richard_Branson_%28cropped%29.jpg/440px-Sir_Richard_Branson_%28cropped%29.jpg",
+      img: "https://d8j0ntlcm91z4.cloudfront.net/user_3Fb0RH7Bsw4Pg0NMgWhyP870t3z/hf_20260730_200810_28a49d98-d597-4b6e-9866-bab035294b46.png",
       detail: "Branson has said he hires based on personality and preparation, not credentials. He famously dropped out at 16 and built an empire by outpreparing everyone in the room.",
     },
     {
       text: "I will prepare and some day my chance will come.",
       author: "Abraham Lincoln",
       role: "16th U.S. President · 1809–1865",
-      img: "https://upload.wikimedia.org/wikipedia/commons/thumb/a/ab/Abraham_Lincoln_O-77_matte_collodion_print.jpg/440px-Abraham_Lincoln_O-77_matte_collodion_print.jpg",
+      img: "https://d8j0ntlcm91z4.cloudfront.net/user_3Fb0RH7Bsw4Pg0NMgWhyP870t3z/hf_20260730_200811_c7576c85-8889-47f8-bfed-ef9461b18131.png",
       detail: "Lincoln lost 8 elections before becoming president. He prepared obsessively for the Lincoln-Douglas debates, practicing his arguments out loud until they were sharp.",
     },
     {
       text: "Practice isn't the thing you do once you're good. It's the thing you do that makes you good.",
       author: "Malcolm Gladwell",
       role: "Author, Outliers · 10,000 Hour Rule",
-      img: "https://upload.wikimedia.org/wikipedia/commons/thumb/5/5f/Malcolm_Gladwell_2014_%28cropped%29.jpg/440px-Malcolm_Gladwell_2014_%28cropped%29.jpg",
+      img: "https://d8j0ntlcm91z4.cloudfront.net/user_3Fb0RH7Bsw4Pg0NMgWhyP870t3z/hf_20260730_200813_889048b9-28dd-4a1e-b0f4-b5bc5d5163e7.png",
       detail: "Gladwell's research showed that world-class performers across every field share one thing: deliberate, repeated practice with feedback. Not talent. Practice.",
     },
   ];
@@ -164,7 +164,7 @@ function SocialProof() {
             <Reveal key={q.author} delay={i * 0.08}>
               <div className="overflow-hidden rounded-2xl border" style={{ borderColor: "var(--border)", background: "var(--surface)" }}>
                 {/* Photo */}
-                <div className="relative h-52 overflow-hidden bg-ink">
+                <div className="relative h-72 sm:h-80 overflow-hidden bg-ink">
                   {/* eslint-disable-next-line @next/next/no-img-element */}
                   <img src={q.img} alt={q.author} className="h-full w-full object-cover object-top" />
                   <div className="absolute inset-0" style={{ background: "linear-gradient(180deg, transparent 40%, rgba(0,0,0,0.7) 100%)" }} />
@@ -186,7 +186,7 @@ function SocialProof() {
         </div>
         <Reveal delay={0.15}>
           <div className="mt-10 text-center">
-            <StartFreeButton size="lg" source="landing_proof" label="Get My Free Practice Session →" />
+            <StartFreeButton size="lg" source="landing_proof" label="First interview free →" signedInLabel="First interview free →" />
           </div>
         </Reveal>
       </div>
@@ -228,7 +228,7 @@ function HowItWorks() {
         </div>
         <Reveal delay={0.15}>
           <div className="mt-10 text-center">
-            <StartFreeButton size="lg" source="landing_how" label="Start free →" />
+            <StartFreeButton size="lg" source="landing_how" label="First interview free →" signedInLabel="First interview free →" />
           </div>
         </Reveal>
       </div>
@@ -309,7 +309,7 @@ function FinalCTA() {
         </Reveal>
         <Reveal delay={0.16}>
           <div className="mt-7">
-            <StartFreeButton size="lg" source="landing_final" label="Get My Free Practice Session →" signedInLabel="Start free" />
+            <StartFreeButton size="lg" source="landing_final" label="First interview free →" signedInLabel="First interview free →" />
           </div>
         </Reveal>
       </div>
