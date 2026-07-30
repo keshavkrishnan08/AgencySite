@@ -84,12 +84,12 @@ export default function JobPage() {
     track("job:role_change", { role: v, family: family.key });
   };
 
-  if (!mounted) return <AppShell requirePremium={false}><main className="min-h-screen" /></AppShell>;
+  if (!mounted) return <AppShell requirePremium><main className="min-h-screen" /></AppShell>;
 
   const practiceHref = `/practice?autostart=1&types=${family.focusTypes.join(",")}&count=8`;
 
   return (
-    <AppShell requirePremium={false}>
+    <AppShell requirePremium>
       <main className="container-wide py-8 sm:py-10">
         {/* Header */}
         <div className="flex items-center gap-2 text-2xs font-semibold uppercase tracking-[0.14em] text-primary-ink">
