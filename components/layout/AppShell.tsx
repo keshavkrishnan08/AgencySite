@@ -198,10 +198,10 @@ export function AppShell({
       <div className="lg:pl-[76px]">
         <AppNav minimal />
         {needsPay ? (
-          <div className="relative min-h-[calc(100vh-3.5rem)]">
+          <div className="relative h-[calc(100vh-3.5rem)] overflow-hidden">
             {/* The real app, rendered but frozen behind a blur — so people see
-                exactly what they're unlocking, not a wall. */}
-            <div className="pointer-events-none select-none blur-[6px] saturate-[0.9]" aria-hidden>
+                exactly what they're unlocking, not a wall. No scroll. */}
+            <div className="pointer-events-none select-none blur-[6px] saturate-[0.9] h-full overflow-hidden" aria-hidden>
               {children}
             </div>
             <PaywallOverlay onRenew={() => router.push("/upgrade")} onManage={() => router.push("/settings")} />
@@ -223,27 +223,27 @@ export function AppShell({
    drop into settings to manage the account. */
 function PaywallOverlay({ onRenew, onManage }: { onRenew: () => void; onManage: () => void }) {
   return (
-    <div className="absolute inset-0 z-20 overflow-hidden">
-      {/* Stock photo background above the blur */}
-      {/* eslint-disable-next-line @next/next/no-img-element */}
-      <img
-        src="https://images.unsplash.com/photo-1522202176988-66273c2fd55f?auto=format&fit=crop&w=1900&q=80"
-        alt="" className="absolute inset-0 h-full w-full object-cover"
-      />
-      <div className="absolute inset-0" style={{ background: "linear-gradient(180deg, rgba(12,86,96,0.85) 0%, rgba(20,128,142,0.75) 50%, rgba(25,169,184,0.65) 100%)" }} />
-
-      <div className="relative flex min-h-full items-center justify-center px-5">
-        <div className="w-full max-w-md text-center">
-          <h2 className="font-serif text-4xl font-semibold text-white sm:text-5xl">
-            Keep going.
-          </h2>
-          <p className="mx-auto mt-4 max-w-xs text-lg text-white/80">
-            Your score is waiting to climb.
-          </p>
-          <Button size="lg" className="mt-8 w-full !py-4 !text-lg !bg-white !text-[#0c5660] hover:!bg-white/90" onClick={onRenew}>
+    <div className="absolute inset-0 z-20 flex items-center justify-center px-5">
+      <div className="w-full max-w-lg overflow-hidden rounded-3xl shadow-2xl">
+        {/* Stock image hero — contained in the card, not full screen */}
+        <div className="relative h-48 sm:h-56 overflow-hidden">
+          {/* eslint-disable-next-line @next/next/no-img-element */}
+          <img
+            src="https://images.unsplash.com/photo-1522202176988-66273c2fd55f?auto=format&fit=crop&w=1200&q=80"
+            alt="" className="h-full w-full object-cover"
+          />
+          <div className="absolute inset-0" style={{ background: "linear-gradient(180deg, rgba(12,86,96,0.4) 0%, rgba(12,86,96,0.85) 100%)" }} />
+          <div className="absolute inset-0 flex items-end justify-center pb-6">
+            <h2 className="font-serif text-3xl font-semibold text-white sm:text-4xl">Keep going.</h2>
+          </div>
+        </div>
+        {/* CTA area */}
+        <div className="p-8 text-center" style={{ background: "var(--surface)" }}>
+          <p className="text-ink-2">Your score is waiting to climb.</p>
+          <Button size="lg" className="mt-5 w-full !py-4 !text-lg" onClick={onRenew}>
             Start free <ArrowRight size={20} />
           </Button>
-          <button onClick={onManage} className="mt-5 text-sm text-white/50 transition-colors hover:text-white/80">
+          <button onClick={onManage} className="mt-4 text-sm text-ink-3 transition-colors hover:text-ink-2">
             Manage account
           </button>
         </div>
