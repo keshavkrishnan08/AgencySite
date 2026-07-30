@@ -288,11 +288,11 @@ function Pricing() {
 /* ================================================================== */
 function WhatYouGet() {
   const dimensions = [
-    { label: "Clarity", score: 84, desc: "Did you get to the point? Or did you ramble for 90 seconds before saying anything?" },
-    { label: "Relevance", score: 78, desc: "Did you answer the question they actually asked? 41% of candidates don't." },
-    { label: "Specificity", score: 62, desc: "Did you give a real example with numbers? Or say 'I improved the process' and leave it there?" },
-    { label: "Confidence", score: 71, desc: "How many times did you say 'I think,' 'maybe,' 'just,' or 'sorry'? We count them." },
-    { label: "Conciseness", score: 89, desc: "Did you land the answer in 60 seconds? Or lose them at minute three?" },
+    { label: "Clarity", score: 84, desc: "Did you get to the point?" },
+    { label: "Relevance", score: 78, desc: "Did you answer what they asked?" },
+    { label: "Specificity", score: 62, desc: "Did you give real examples?" },
+    { label: "Confidence", score: 71, desc: "Filler words, hedging, apologies." },
+    { label: "Conciseness", score: 89, desc: "Did you land it in 60 seconds?" },
   ];
 
   return (
@@ -311,21 +311,21 @@ function WhatYouGet() {
         </Reveal>
 
         {/* Compact card with all 5 dimensions */}
-        <div className="mt-10 rounded-2xl border p-6 sm:p-8" style={{ borderColor: "var(--border)", background: "var(--surface)" }}>
-          <div className="grid gap-6 sm:grid-cols-5">
+        <div className="mt-10 rounded-2xl border px-6 py-10 sm:px-10 sm:py-14" style={{ borderColor: "var(--border)", background: "var(--surface)" }}>
+          <div className="grid grid-cols-3 gap-8 sm:grid-cols-5 sm:gap-6">
             {dimensions.map((d) => (
               <div key={d.label} className="text-center">
-                <div className="relative mx-auto flex h-16 w-16 items-center justify-center">
-                  <span className="font-mono text-lg font-bold" style={{ color: d.score >= 80 ? "var(--sage-ink)" : d.score >= 65 ? "var(--amber-ink)" : "var(--coral-ink)" }}>{d.score}</span>
-                  <svg className="absolute inset-0" viewBox="0 0 64 64">
-                    <circle cx="32" cy="32" r="28" fill="none" stroke="var(--bg-tint)" strokeWidth="4" />
-                    <circle cx="32" cy="32" r="28" fill="none" strokeWidth="4" strokeLinecap="round"
+                <div className="relative mx-auto flex h-20 w-20 items-center justify-center sm:h-24 sm:w-24">
+                  <span className="font-mono text-xl font-bold sm:text-2xl" style={{ color: d.score >= 80 ? "var(--sage-ink)" : d.score >= 65 ? "var(--amber-ink)" : "var(--coral-ink)" }}>{d.score}</span>
+                  <svg className="absolute inset-0" viewBox="0 0 96 96">
+                    <circle cx="48" cy="48" r="42" fill="none" stroke="var(--bg-tint)" strokeWidth="5" />
+                    <circle cx="48" cy="48" r="42" fill="none" strokeWidth="5" strokeLinecap="round"
                       stroke={d.score >= 80 ? "var(--sage)" : d.score >= 65 ? "var(--amber)" : "var(--coral)"}
-                      strokeDasharray={`${d.score * 1.759} 175.9`} transform="rotate(-90 32 32)" />
+                      strokeDasharray={`${d.score * 2.639} 263.9`} transform="rotate(-90 48 48)" />
                   </svg>
                 </div>
-                <h3 className="mt-3 text-sm font-semibold text-ink">{d.label}</h3>
-                <p className="mt-1 text-xs leading-snug text-ink-2">{d.desc}</p>
+                <h3 className="mt-4 font-serif text-base font-semibold text-ink">{d.label}</h3>
+                <p className="mt-1 text-xs text-ink-3">{d.desc}</p>
               </div>
             ))}
           </div>
