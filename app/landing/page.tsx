@@ -115,11 +115,6 @@ function AuthorityQuote() {
             <p className="mt-1 text-xs font-semibold uppercase tracking-[0.2em] text-ink-3">
               CEO of Microsoft · The world&apos;s most valuable company
             </p>
-            <p className="mx-auto mt-5 max-w-md text-sm leading-relaxed text-ink-2">
-              Under Nadella, Microsoft invested $13 billion in OpenAI and embedded AI across every product.
-              His message to job seekers is clear: the people who learn to use AI as a tool — not fear it — are
-              the ones who will thrive. That includes interview prep.
-            </p>
           </div>
         </Reveal>
       </div>
