@@ -9,7 +9,7 @@ import { CoachChat } from "@/components/chat/CoachChat";
 import { ProductTour } from "@/components/tour/ProductTour";
 import { Button } from "@/components/ui/Button";
 import { useAuth } from "@/lib/auth";
-import { getProfile, isPremium, onStoreChange, setProfile, upgradeToPremium } from "@/lib/store";
+import { getProfile, getSessions, isPremium, onStoreChange, setProfile, upgradeToPremium } from "@/lib/store";
 import { FROM_PER_DAY } from "@/lib/pricing";
 
 /* Authed app chrome + access gate.
@@ -164,7 +164,12 @@ export function AppShell({
   // Don't judge "not paying" until the subscription check has returned.
   const checkingSub = ready && !!user && !subChecked && !exemptFromPay;
   // Never judge "not paying" while a checkout return is still being verified.
-  const needsPay = ready && !!user && subChecked && !premium && !exemptFromPay && !verifying;
+  // Free hook: let signed-in users who haven't completed any session yet use
+  // the app unblurred — they get one full practice session to experience the
+  // product. After saveSession() fires, getSessions().length becomes 1 and
+  // the blur kicks in on next render via the onStoreChange listener.
+  const hasTrialSession = typeof window !== "undefined" && getSessions().length > 0;
+  const needsPay = ready && !!user && subChecked && !premium && !exemptFromPay && !verifying && hasTrialSession;
 
   useEffect(() => {
     if (needsAuth) router.replace(`/signin?next=${encodeURIComponent(pathname)}`);
@@ -229,12 +234,12 @@ function PaywallOverlay({ onRenew, onManage }: { onRenew: () => void; onManage: 
         >
           <Lock size={22} className="text-primary-ink" />
         </div>
-        <h2 className="mt-4 font-serif text-2xl font-semibold text-ink">Your practice is paused</h2>
+        <h2 className="mt-4 font-serif text-2xl font-semibold text-ink">You just saw what Axon can do.</h2>
         <p className="mt-2 text-ink-2">
-          Start your plan to unlock scoring, feedback, and your progress. From {FROM_PER_DAY}, cancel anytime.
+          Start your free trial to keep practicing, track your progress, and watch your score climb. Cancel anytime.
         </p>
         <Button size="lg" className="mt-6 w-full" onClick={onRenew}>
-          Unlock my practice <ArrowRight size={18} />
+          Start free trial <ArrowRight size={18} />
         </Button>
         <button onClick={onManage} className="mt-3 text-sm text-ink-3 transition-colors hover:text-ink-2">
           Manage account

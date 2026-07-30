@@ -57,19 +57,26 @@ function TrialInner() {
     const ob = getOnboarding();
     const r = profile.targetRole || ob?.targetRole || "Office Manager";
     const s = profile.situation || ob?.situation || null;
+    const gap = profile.interviewGap || ob?.interviewGap || null;
+    const company = profile.company || ob?.company || "";
     setRole(r);
     setSituation(s);
 
     (async () => {
       try {
         const { questions: qs } = await apiGenerateQuestions({
-          situation: s, targetRole: r, count: 3, difficulty: "standard",
+          situation: s,
+          targetRole: r,
+          interviewGap: gap,
+          company: company || undefined,
+          count: 3,
+          difficulty: "standard",
+          domain: "interview",
         });
         setQuestions(qs);
         setPhase("answer");
-        track("session_started", { mode: "trial", role: r, count: 3 });
+        track("session_started", { mode: "trial", role: r, situation: s, count: 3 });
       } catch {
-        // Heuristic fallback happens inside apiGenerateQuestions
         setPhase("answer");
       }
     })();

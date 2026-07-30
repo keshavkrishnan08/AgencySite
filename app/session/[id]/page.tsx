@@ -36,7 +36,7 @@ import type { Dimension, ScoredAnswer, Session } from "@/lib/types";
 function SessionInner() {
   const params = useParams();
   const searchParams = useSearchParams();
-  const isTrial = searchParams.get("trial") === "1";
+  const isTrial = false;
   const id = String(params.id);
   const [session, setSession] = useState<Session | null>(null);
   const [all, setAll] = useState<Session[]>([]);
