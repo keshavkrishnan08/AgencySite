@@ -4,7 +4,7 @@ import { useEffect, useRef, useState } from "react";
 import { AnimatePresence, motion } from "framer-motion";
 import { Sparkles, X, ArrowUp, Loader2 } from "lucide-react";
 import { encodedContext } from "@/lib/context";
-import { getProfile } from "@/lib/store";
+import { getProfile, isPremium } from "@/lib/store";
 import { track } from "@/lib/analytics";
 import { cn } from "@/lib/utils";
 
@@ -106,6 +106,19 @@ export function CoachChat() {
     const next = [...turns, { role: "user" as const, content: msg }];
     setTurns(next);
     setInput("");
+
+    // Non-premium users get a stock nudge instead of AI coaching
+    if (!isPremium()) {
+      setTurns((t) => [
+        ...t,
+        {
+          role: "assistant",
+          content: "I'd love to help — coaching is available with your subscription. It's less than a glass of water per day. Start your free trial to unlock unlimited coaching, scored practice, and your full progress dashboard.",
+        },
+      ]);
+      return;
+    }
+
     setBusy(true);
     try {
       localStorage.setItem(LOG_KEY, JSON.stringify([...sends, Date.now()]));
