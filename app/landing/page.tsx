@@ -59,25 +59,28 @@ function Hero() {
               </div>
             </Reveal>
 
-            {/* Headline — message-matched to ads */}
+            {/* Headline — outcome-focused, message-matched to ads */}
             <Reveal delay={0.06}>
               <h1 className="mt-5 text-balance font-serif text-hero font-semibold text-ink">
-                Practice job interviews.
+                Walk into your next
                 <br />
-                <span style={{ color: "var(--primary-ink)" }}>Get scored.</span>
+                interview{" "}
+                <span className="relative italic" style={{ color: "var(--primary-ink)" }}>
+                  ready.
+                </span>
               </h1>
             </Reveal>
 
             <Reveal delay={0.12}>
               <p className="mt-6 max-w-prose text-lg leading-relaxed text-ink-2">
-                Answer real interview questions out loud or by typing. AI scores every answer and tells you exactly what to fix. Watch your readiness score climb, session after session.
+                Practice real interview questions. Get a readiness score. Know exactly what to fix — before the real thing. Five minutes a day is all it takes.
               </p>
             </Reveal>
 
             <Reveal delay={0.18}>
               <div className="mt-8 flex flex-col items-start gap-3 sm:flex-row sm:items-center">
-                <StartFreeButton size="lg" source="landing_hero" />
-                <span className="text-sm text-ink-3">From {FROM_PER_DAY}. Cancel anytime.</span>
+                <StartFreeButton size="lg" source="landing_hero" label="Start free" />
+                <span className="text-sm text-ink-3">No credit card required.</span>
               </div>
             </Reveal>
           </div>
@@ -106,12 +109,12 @@ function ProblemSection() {
       <div className="container-content">
         <Reveal>
           <h2 className="text-balance text-center font-serif text-display font-semibold text-ink">
-            These five questions<br />break most people.
+            These five questions<br />cost people the job.
           </h2>
         </Reveal>
         <Reveal delay={0.05}>
           <p className="mx-auto mt-4 max-w-prose text-center text-lg text-ink-2">
-            93% of people have felt interview anxiety. 41% say their biggest fear is freezing on a hard question. You&apos;ll rehearse every one until the answer comes naturally.
+            92% of interview rejections come from vague answers to predictable questions. Practice each one until the answer comes naturally — before it counts.
           </p>
         </Reveal>
         <div className="mt-10 grid gap-3 sm:grid-cols-2">
@@ -243,11 +246,11 @@ function Pricing() {
     <section className="border-y py-16 sm:py-20" style={{ background: "var(--bg-sunk)", borderColor: "var(--border)" }}>
       <div className="container-wide">
         <Reveal>
-          <h2 className="text-balance text-center font-serif text-display font-semibold text-ink">Less than a coffee a day.</h2>
+          <h2 className="text-balance text-center font-serif text-display font-semibold text-ink">One better answer could be worth the job.</h2>
         </Reveal>
         <Reveal delay={0.05}>
           <p className="mx-auto mt-4 max-w-prose text-center text-lg text-ink-2">
-            Pick 3 months — that&apos;s about how long a job search runs. Go yearly for the lowest rate, or monthly to land fast.
+            A 30-minute interview can change your salary by $20,000+ a year. Start with a free trial.
           </p>
         </Reveal>
         <PricingCards />
@@ -302,7 +305,7 @@ function FinalCTA() {
         </Reveal>
         <Reveal delay={0.16}>
           <div className="mt-8">
-            <StartFreeButton size="lg" source="landing_final" label="Start practicing" signedInLabel="Start practicing" />
+            <StartFreeButton size="lg" source="landing_final" label="Start free" signedInLabel="Start free" />
           </div>
         </Reveal>
       </div>
