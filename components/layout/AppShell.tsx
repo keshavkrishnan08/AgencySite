@@ -2,7 +2,7 @@
 
 import { useEffect, useRef, useState, type ReactNode } from "react";
 import { usePathname, useRouter } from "next/navigation";
-import { ArrowRight, Loader2, Lock } from "lucide-react";
+import { ArrowRight, Check, Loader2, Lock, ShieldCheck, X } from "lucide-react";
 import { AppNav } from "./AppNav";
 import { AppSidebar } from "./AppSidebar";
 import { CoachChat } from "@/components/chat/CoachChat";
@@ -10,7 +10,8 @@ import { ProductTour } from "@/components/tour/ProductTour";
 import { Button } from "@/components/ui/Button";
 import { useAuth } from "@/lib/auth";
 import { getProfile, getSessions, isPremium, onStoreChange, setProfile, upgradeToPremium } from "@/lib/store";
-import { FROM_PER_DAY } from "@/lib/pricing";
+import { PLANS, PLAN_ORDER, priceParts, type PlanKey } from "@/lib/pricing";
+import { track } from "@/lib/analytics";
 
 /* Authed app chrome + access gate.
 
@@ -222,28 +223,95 @@ export function AppShell({
    subscription — never a redirect, never a dead end. They can start/renew, or
    drop into settings to manage the account. */
 function PaywallOverlay({ onRenew, onManage }: { onRenew: () => void; onManage: () => void }) {
+  const [plan, setPlan] = useState<PlanKey>("quarterly");
+  const [loading, setLoading] = useState(false);
+  const [err, setErr] = useState("");
+  const p = PLANS[plan];
+  const [dollars, cents] = priceParts(plan);
+
+  const subscribe = async () => {
+    setLoading(true);
+    setErr("");
+    track("upgrade_click", { plan, source: "paywall" });
+    try {
+      const res = await fetch("/api/checkout", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ plan, email: getProfile().email || undefined }),
+      });
+      const data = await res.json();
+      if (data?.url) { window.location.href = data.url; return; }
+      throw new Error(data?.error || "Checkout unavailable");
+    } catch {
+      setErr("Couldn't start checkout. Try again.");
+      setLoading(false);
+    }
+  };
+
   return (
-    <div className="absolute inset-0 z-20 flex items-center justify-center px-5">
-      <div className="w-full max-w-lg overflow-hidden rounded-3xl shadow-2xl">
-        {/* Stock image hero — contained in the card, not full screen */}
-        <div className="relative h-48 sm:h-56 overflow-hidden">
-          {/* eslint-disable-next-line @next/next/no-img-element */}
-          <img
-            src="https://images.unsplash.com/photo-1522202176988-66273c2fd55f?auto=format&fit=crop&w=1200&q=80"
-            alt="" className="h-full w-full object-cover"
-          />
-          <div className="absolute inset-0" style={{ background: "linear-gradient(180deg, rgba(12,86,96,0.4) 0%, rgba(12,86,96,0.85) 100%)" }} />
-          <div className="absolute inset-0 flex items-end justify-center pb-6">
-            <h2 className="font-serif text-3xl font-semibold text-white sm:text-4xl">Keep going.</h2>
-          </div>
+    <div className="absolute inset-0 z-20 flex items-start justify-center overflow-y-auto px-4 py-8 sm:items-center sm:py-0">
+      <div className="w-full max-w-md rounded-2xl border shadow-2xl" style={{ borderColor: "var(--border)", background: "var(--surface)" }}>
+        {/* Header */}
+        <div className="rounded-t-2xl px-6 py-5 text-center text-white" style={{ background: "linear-gradient(135deg, #19a9b8 0%, #0c5660 100%)" }}>
+          <h2 className="font-serif text-2xl font-semibold">Unlock unlimited practice</h2>
+          <p className="mt-1 text-sm text-white/75">Your score is ready to climb. Pick a plan.</p>
         </div>
-        {/* CTA area */}
-        <div className="p-8 text-center" style={{ background: "var(--surface)" }}>
-          <p className="text-ink-2">Your score is waiting to climb.</p>
-          <Button size="lg" className="mt-5 w-full !py-4 !text-lg" onClick={onRenew}>
-            Start free <ArrowRight size={20} />
+
+        {/* Plan selector */}
+        <div className="space-y-2 px-5 pt-5">
+          {PLAN_ORDER.map((key) => {
+            const pl = PLANS[key];
+            const on = plan === key;
+            return (
+              <button
+                key={key}
+                onClick={() => setPlan(key)}
+                className="relative flex w-full items-center gap-3 rounded-xl border p-3.5 text-left transition-all"
+                style={{
+                  borderColor: on ? "var(--primary)" : "var(--border-strong)",
+                  background: on ? "var(--primary-soft)" : "transparent",
+                  boxShadow: on ? "0 0 0 1px var(--primary)" : "none",
+                }}
+              >
+                {key === "quarterly" && (
+                  <span className="absolute -top-2 right-3 rounded-full px-2 py-0.5 text-[10px] font-bold text-white" style={{ background: "var(--primary-ink)" }}>
+                    1-day free trial
+                  </span>
+                )}
+                <span className="grid h-4.5 w-4.5 shrink-0 place-items-center rounded-full border-2" style={{ borderColor: on ? "var(--primary)" : "var(--border-strong)", width: 18, height: 18 }}>
+                  {on && <span className="rounded-full" style={{ background: "var(--primary)", width: 10, height: 10 }} />}
+                </span>
+                <span className="min-w-0 flex-1">
+                  <span className="flex items-center gap-2">
+                    <span className="text-sm font-semibold text-ink">{pl.toggle}</span>
+                    {pl.savePct > 0 && <span className="rounded-full bg-sage-soft px-1.5 py-0.5 text-[10px] font-bold text-sage-ink">Save {pl.savePct}%</span>}
+                  </span>
+                  <span className="block text-xs text-ink-3">{pl.perMonth}</span>
+                </span>
+                <span className="shrink-0 text-right">
+                  <span className="font-serif text-base font-semibold text-ink">{pl.price}</span>
+                  {pl.was && <span className="block text-[10px] text-ink-3 line-through">{pl.was}</span>}
+                </span>
+              </button>
+            );
+          })}
+        </div>
+
+        {/* Subscribe button */}
+        <div className="px-5 pb-5 pt-4">
+          {plan === "quarterly" ? (
+            <p className="mb-3 text-center text-xs text-ink-3">Due today: <strong className="text-sage-ink">$0.00</strong> · then {p.price} after trial</p>
+          ) : (
+            <p className="mb-3 text-center text-xs text-ink-3">Due today: <strong>{p.price}</strong></p>
+          )}
+          <Button size="lg" className="w-full !py-3.5" onClick={subscribe} disabled={loading}>
+            {loading ? <><Loader2 size={18} className="animate-spin" /> Redirecting…</> : plan === "quarterly" ? <>Start free trial</> : <>Subscribe · {p.price}</>}
           </Button>
-          <button onClick={onManage} className="mt-4 text-sm text-ink-3 transition-colors hover:text-ink-2">
+          {err && <p className="mt-2 text-center text-xs text-coral-ink">{err}</p>}
+          <p className="mt-3 flex items-center justify-center gap-1.5 text-[11px] text-ink-3">
+            <ShieldCheck size={12} /> Secure checkout · cancel anytime
+          </p>
+          <button onClick={onManage} className="mt-2 block w-full text-center text-xs text-ink-3 transition-colors hover:text-ink-2">
             Manage account
           </button>
         </div>
