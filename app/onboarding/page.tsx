@@ -197,7 +197,7 @@ export default function OnboardingPage() {
                                 value={query}
                                 onChange={(e) => { setQuery(e.target.value); setRole(e.target.value); setRoleFocused(true); }}
                                 onFocus={() => setRoleFocused(true)}
-                                onBlur={() => window.setTimeout(() => setRoleFocused(false), 150)}
+                                onBlur={() => { window.setTimeout(() => setRoleFocused(false), 150); if (role || query) track("onboarding:role_input", { role: role || query }); }}
                                 placeholder="e.g., Office Manager, Registered Nurse…"
                                 className="field !pl-10 !py-3"
                               />

@@ -166,12 +166,16 @@ export function AppShell({
   // Don't judge "not paying" until the subscription check has returned.
   const checkingSub = ready && !!user && !subChecked && !exemptFromPay;
   // Never judge "not paying" while a checkout return is still being verified.
-  // Free hook: only /practice and /session/* are unblurred for users who haven't
-  // completed a session yet. Everything else (dashboard, tools, etc.) stays blurred.
-  const hasCompletedSession = typeof window !== "undefined" && getSessions().length > 0;
-  const isFreePracticePath = pathname === "/practice" || pathname.startsWith("/session/");
-  const freeSessionExempt = !hasCompletedSession && isFreePracticePath;
-  const needsPay = ready && !!user && subChecked && !premium && !exemptFromPay && !verifying && !freeSessionExempt;
+  // Free hook: /practice is unblurred until the user gets their first scored answer.
+  // After that, everything blurs except the /session/ results page (so they can see
+  // their score — that's the "aha" moment that drives the paywall conversion).
+  const hasSeenScore = typeof window !== "undefined" && localStorage.getItem("pp:free_scored") === "1";
+  const isResultsPage = pathname.startsWith("/session/");
+  const isPracticePage = pathname === "/practice";
+  const freeSessionExempt = !hasSeenScore && isPracticePage;
+  // Let them see their score result once — then blur everything after
+  const freeResultExempt = hasSeenScore && isResultsPage && getSessions().length <= 1;
+  const needsPay = ready && !!user && subChecked && !premium && !exemptFromPay && !verifying && !freeSessionExempt && !freeResultExempt;
 
   useEffect(() => {
     if (needsAuth) router.replace(`/signin?next=${encodeURIComponent(pathname)}`);
