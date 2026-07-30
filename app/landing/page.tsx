@@ -58,17 +58,9 @@ function Hero() {
 
         <div className="mx-auto max-w-2xl text-center lg:text-left lg:mx-0 lg:grid lg:max-w-none lg:grid-cols-[1.1fr_0.9fr] lg:items-center lg:gap-10">
           <div>
-            {/* Authority quote — instant credibility */}
-            <Reveal>
-              <blockquote className="font-serif text-lg italic text-ink-2 sm:text-xl">
-                &ldquo;AI won&apos;t replace you. But someone who uses AI to prepare better will.&rdquo;
-              </blockquote>
-              <p className="mt-1 text-xs font-semibold uppercase tracking-[0.2em] text-ink-3">Satya Nadella, CEO of Microsoft</p>
-            </Reveal>
-
             {/* Headline — the outcome, not the feature */}
             <Reveal delay={0.06}>
-              <h1 className="mt-7 font-serif text-[2.6rem] font-semibold leading-[1.08] text-ink sm:text-[3.4rem]">
+              <h1 className="mt-2 font-serif text-[2.6rem] font-semibold leading-[1.08] text-ink sm:text-[3.4rem]">
                 Know your interview
                 <br />
                 score <span className="relative"><span className="relative z-10 italic" style={{ color: "var(--primary-ink)" }}>before</span><span className="absolute -bottom-1 left-0 right-0 h-3 rounded-sm opacity-30" style={{ background: "var(--primary-bright)" }} /></span> you
@@ -100,6 +92,36 @@ function Hero() {
             </div>
           </Reveal>
         </div>
+      </div>
+    </section>
+  );
+}
+
+/* ================================================================== */
+/*  1b. AUTHORITY QUOTE — full aesthetic section below hero             */
+/* ================================================================== */
+function AuthorityQuote() {
+  return (
+    <section className="border-y py-20 sm:py-28" style={{ background: "var(--bg-sunk)", borderColor: "var(--border)" }}>
+      <div className="container-content">
+        <Reveal>
+          <blockquote className="mx-auto max-w-2xl text-center font-serif text-2xl italic leading-relaxed text-ink sm:text-3xl">
+            &ldquo;AI won&apos;t replace you. But someone who uses AI to prepare better will.&rdquo;
+          </blockquote>
+        </Reveal>
+        <Reveal delay={0.1}>
+          <div className="mx-auto mt-8 max-w-lg text-center">
+            <p className="font-serif text-lg font-semibold text-ink">Satya Nadella</p>
+            <p className="mt-1 text-xs font-semibold uppercase tracking-[0.2em] text-ink-3">
+              CEO of Microsoft · The world&apos;s most valuable company
+            </p>
+            <p className="mx-auto mt-5 max-w-md text-sm leading-relaxed text-ink-2">
+              Under Nadella, Microsoft invested $13 billion in OpenAI and embedded AI across every product.
+              His message to job seekers is clear: the people who learn to use AI as a tool — not fear it — are
+              the ones who will thrive. That includes interview prep.
+            </p>
+          </div>
+        </Reveal>
       </div>
     </section>
   );
@@ -138,21 +160,21 @@ function SocialProof() {
       author: "Richard Branson",
       role: "Founder, Virgin Group · Net worth $3B",
       img: "https://d8j0ntlcm91z4.cloudfront.net/user_3Fb0RH7Bsw4Pg0NMgWhyP870t3z/hf_20260730_200810_28a49d98-d597-4b6e-9866-bab035294b46.png",
-      detail: "Branson has said he hires based on personality and preparation, not credentials. He famously dropped out at 16 and built an empire by outpreparing everyone in the room.",
+      detail: "Branson dropped out of school at 16 and built a $3 billion empire. He's said repeatedly that he hires based on personality and preparation, not credentials or degrees. In his words: the person who walks in having done the work always beats the one with the better resume. He interviews every senior hire at Virgin personally — and the ones who win are the ones who practiced.",
     },
     {
       text: "I will prepare and some day my chance will come.",
       author: "Abraham Lincoln",
       role: "16th U.S. President · 1809–1865",
       img: "https://d8j0ntlcm91z4.cloudfront.net/user_3Fb0RH7Bsw4Pg0NMgWhyP870t3z/hf_20260730_200811_c7576c85-8889-47f8-bfed-ef9461b18131.png",
-      detail: "Lincoln lost 8 elections before becoming president. He prepared obsessively for the Lincoln-Douglas debates, practicing his arguments out loud until they were sharp.",
+      detail: "Lincoln lost 8 elections, went bankrupt twice, and suffered a nervous breakdown — before becoming the most consequential president in American history. He prepared obsessively for the Lincoln-Douglas debates, rehearsing his arguments out loud in empty courtrooms until every word landed. The preparation wasn't talent. It was reps.",
     },
     {
       text: "Practice isn't the thing you do once you're good. It's the thing you do that makes you good.",
       author: "Malcolm Gladwell",
       role: "Author, Outliers · 10,000 Hour Rule",
       img: "https://d8j0ntlcm91z4.cloudfront.net/user_3Fb0RH7Bsw4Pg0NMgWhyP870t3z/hf_20260730_200813_889048b9-28dd-4a1e-b0f4-b5bc5d5163e7.png",
-      detail: "Gladwell's research showed that world-class performers across every field share one thing: deliberate, repeated practice with feedback. Not talent. Practice.",
+      detail: "Gladwell studied world-class performers across every field — musicians, athletes, chess masters, surgeons — and found they all share one thing: 10,000 hours of deliberate, repeated practice with feedback. Not talent. Not luck. Practice with someone telling you what to fix. That's exactly what this app does for interviews.",
     },
   ];
 
@@ -324,6 +346,7 @@ export default function LandingPage() {
       <Banner />
       <main>
         <Hero />
+        <AuthorityQuote />
         <FreeHook />
         <SocialProof />
         <HowItWorks />
