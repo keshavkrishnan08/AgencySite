@@ -223,32 +223,30 @@ export function AppShell({
    drop into settings to manage the account. */
 function PaywallOverlay({ onRenew, onManage }: { onRenew: () => void; onManage: () => void }) {
   return (
-    <div className="absolute inset-0 z-20 flex items-start justify-center px-5 pt-16 sm:pt-24">
-      <div
-        className="w-full max-w-lg rounded-3xl border p-10 text-center shadow-2xl sm:p-12"
-        style={{ borderColor: "var(--border)", background: "var(--surface)" }}
-      >
-        <div
-          className="mx-auto flex h-16 w-16 items-center justify-center rounded-full"
-          style={{ background: "linear-gradient(135deg, var(--primary-bright), var(--primary-ink))" }}
-        >
-          <Lock size={28} className="text-white" />
+    <div className="absolute inset-0 z-20 overflow-hidden">
+      {/* Stock photo background above the blur */}
+      {/* eslint-disable-next-line @next/next/no-img-element */}
+      <img
+        src="https://images.unsplash.com/photo-1522202176988-66273c2fd55f?auto=format&fit=crop&w=1900&q=80"
+        alt="" className="absolute inset-0 h-full w-full object-cover"
+      />
+      <div className="absolute inset-0" style={{ background: "linear-gradient(180deg, rgba(12,86,96,0.85) 0%, rgba(20,128,142,0.75) 50%, rgba(25,169,184,0.65) 100%)" }} />
+
+      <div className="relative flex min-h-full items-center justify-center px-5">
+        <div className="w-full max-w-md text-center">
+          <h2 className="font-serif text-4xl font-semibold text-white sm:text-5xl">
+            Keep going.
+          </h2>
+          <p className="mx-auto mt-4 max-w-xs text-lg text-white/80">
+            Your score is waiting to climb.
+          </p>
+          <Button size="lg" className="mt-8 w-full !py-4 !text-lg !bg-white !text-[#0c5660] hover:!bg-white/90" onClick={onRenew}>
+            Start free <ArrowRight size={20} />
+          </Button>
+          <button onClick={onManage} className="mt-5 text-sm text-white/50 transition-colors hover:text-white/80">
+            Manage account
+          </button>
         </div>
-        <h2 className="mt-6 font-serif text-3xl font-semibold text-ink sm:text-4xl">
-          You just saw what Axon can do.
-        </h2>
-        <p className="mx-auto mt-4 max-w-sm text-lg text-ink-2">
-          Start your free trial to keep practicing, track your progress, and watch your score climb.
-        </p>
-        <Button size="lg" className="mt-8 w-full !py-4 !text-lg" onClick={onRenew}>
-          Start free trial <ArrowRight size={20} />
-        </Button>
-        <p className="mt-4 text-sm text-ink-3">
-          1-day free trial · cancel anytime · no charge today
-        </p>
-        <button onClick={onManage} className="mt-4 text-sm text-ink-3 transition-colors hover:text-ink-2">
-          Manage account
-        </button>
       </div>
     </div>
   );
