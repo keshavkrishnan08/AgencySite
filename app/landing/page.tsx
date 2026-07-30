@@ -7,6 +7,7 @@ import { StickyCTA } from "@/components/landing/StickyCTA";
 import { Reveal } from "@/components/ui/Reveal";
 import { StartFreeButton } from "@/components/ui/StartFreeButton";
 import { PricingCards } from "@/components/landing/PricingCards";
+import { cn } from "@/lib/utils";
 import type { Metadata } from "next";
 
 /* Landing page modeled on Brett Malinowski's Monad structure:
@@ -283,6 +284,58 @@ function Pricing() {
 }
 
 /* ================================================================== */
+/*  5b. WHAT YOU GET — blurred premium content teaser                   */
+/* ================================================================== */
+function WhatYouGet() {
+  const features = [
+    { label: "AI-Scored Practice", desc: "Every answer scored on 5 dimensions with specific fixes", unlocked: true },
+    { label: "Readiness Score", desc: "A number that tracks how interview-ready you are", unlocked: true },
+    { label: "Anxiety Detector", desc: "Catches filler words, hedging, and apologies you don't hear", unlocked: false },
+    { label: "Question Predictor", desc: "Paste a job posting, get the 5 questions they'll likely ask", unlocked: false },
+    { label: "Gap Story Builder", desc: "Turn any résumé gap into a confident 30-second answer", unlocked: false },
+    { label: "Progress Dashboard", desc: "Streaks, milestones, percentile, and estimated time to top 1%", unlocked: false },
+  ];
+
+  return (
+    <section className="py-12 sm:py-16">
+      <div className="container-content">
+        <Reveal>
+          <p className="eyebrow mb-3 justify-center text-center">What&apos;s inside</p>
+          <h2 className="text-center font-serif text-display font-semibold text-ink">See what your practice covers.</h2>
+        </Reveal>
+        <div className="mx-auto mt-10 max-w-lg space-y-3">
+          {features.map((f, i) => (
+            <Reveal key={f.label} delay={i * 0.05}>
+              <div
+                className={cn(
+                  "flex items-center gap-4 rounded-xl border p-4",
+                  !f.unlocked && "select-none"
+                )}
+                style={{
+                  borderColor: f.unlocked ? "var(--primary)" : "var(--border)",
+                  background: f.unlocked ? "var(--primary-soft)" : "var(--surface)",
+                }}
+              >
+                <Check size={18} className={f.unlocked ? "shrink-0 text-primary-ink" : "shrink-0 text-ink-3"} />
+                <div className={!f.unlocked ? "blur-[2px]" : ""}>
+                  <p className="text-sm font-semibold text-ink">{f.label}</p>
+                  <p className="text-xs text-ink-2">{f.desc}</p>
+                </div>
+              </div>
+            </Reveal>
+          ))}
+        </div>
+        <Reveal delay={0.2}>
+          <div className="mt-8 text-center">
+            <StartFreeButton size="lg" source="landing_whatyouget" label="Unlock everything free →" signedInLabel="Unlock everything free →" />
+          </div>
+        </Reveal>
+      </div>
+    </section>
+  );
+}
+
+/* ================================================================== */
 /*  6. FAQ                                                             */
 /* ================================================================== */
 const FAQS: [string, string][] = [
@@ -345,6 +398,7 @@ export default function LandingPage() {
         <FreeHook />
         <SocialProof />
         <HowItWorks />
+        <WhatYouGet />
         <FAQ />
         <FinalCTA />
       </main>
