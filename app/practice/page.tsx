@@ -177,6 +177,7 @@ function PracticeInner() {
   const params = useSearchParams();
   const focusDim = (params.get("focus") as Dimension) || undefined;
   const autostart = params.get("autostart") === "1";
+  const isTrial = params.get("trial") === "1";
   // Handoff from the Question Predictor: run this session on the exact
   // questions we predicted for that posting, in likelihood order.
   const predictedId = params.get("predicted") || "";
@@ -672,7 +673,12 @@ function PracticeInner() {
     if (launchLabelRef.current.startsWith("phase_")) recordPhaseDone(launchLabelRef.current, session.overall);
     // Refresh the standardized overview saved to the account.
     persistOverview();
-    router.push(`/session/${session.id}`);
+    // Trial mode: show the score, then send them to sign up.
+    if (isTrial) {
+      router.push(`/session/${session.id}?trial=1`);
+    } else {
+      router.push(`/session/${session.id}`);
+    }
   };
 
   const collectAnswers = () =>
@@ -723,8 +729,7 @@ function PracticeInner() {
 
   /* ---------------- Render ---------------- */
 
-  return (
-    <AppShell>
+  const content = (
       <main className="pb-24">
       {/* In-session bar (progress + end), sits under the app nav */}
       {/* Mobile keeps the top nav (h-16), so sit below it; desktop hides the nav,
@@ -1108,8 +1113,11 @@ function PracticeInner() {
         )}
       </div>
       </main>
-    </AppShell>
   );
+
+  // Trial mode: render without the auth gate so unauthenticated users can practice.
+  if (isTrial) return content;
+  return <AppShell>{content}</AppShell>;
 }
 
 /* ---------------- sub-views ---------------- */
