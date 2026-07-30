@@ -29,6 +29,11 @@ function aiHeaders(): Record<string, string> {
   } catch {
     /* not signed in / auth not configured */
   }
+  // Trial mode: pass the trial header so the server-side entitlement gate
+  // allows unauthenticated API calls for the free 3-question session.
+  if (typeof window !== "undefined" && new URLSearchParams(window.location.search).get("trial") === "1") {
+    h["x-trial"] = "1";
+  }
   return h;
 }
 
