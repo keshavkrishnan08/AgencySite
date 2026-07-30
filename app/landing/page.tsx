@@ -287,47 +287,49 @@ function Pricing() {
 /*  5b. WHAT YOU GET — blurred premium content teaser                   */
 /* ================================================================== */
 function WhatYouGet() {
-  const features = [
-    { label: "AI-Scored Practice", desc: "Every answer scored on 5 dimensions with specific fixes", unlocked: true },
-    { label: "Readiness Score", desc: "A number that tracks how interview-ready you are", unlocked: true },
-    { label: "Anxiety Detector", desc: "Catches filler words, hedging, and apologies you don't hear", unlocked: false },
-    { label: "Question Predictor", desc: "Paste a job posting, get the 5 questions they'll likely ask", unlocked: false },
-    { label: "Gap Story Builder", desc: "Turn any résumé gap into a confident 30-second answer", unlocked: false },
-    { label: "Progress Dashboard", desc: "Streaks, milestones, percentile, and estimated time to top 1%", unlocked: false },
+  const dimensions = [
+    { label: "Clarity", score: 84, desc: "Did you get to the point? Or did you ramble for 90 seconds before saying anything?" },
+    { label: "Relevance", score: 78, desc: "Did you answer the question they actually asked? 41% of candidates don't." },
+    { label: "Specificity", score: 62, desc: "Did you give a real example with numbers? Or say 'I improved the process' and leave it there?" },
+    { label: "Confidence", score: 71, desc: "How many times did you say 'I think,' 'maybe,' 'just,' or 'sorry'? We count them." },
+    { label: "Conciseness", score: 89, desc: "Did you land the answer in 60 seconds? Or lose them at minute three?" },
   ];
 
   return (
-    <section className="py-12 sm:py-16">
+    <section className="py-14 sm:py-20">
       <div className="container-content">
         <Reveal>
-          <p className="eyebrow mb-3 justify-center text-center">What&apos;s inside</p>
-          <h2 className="text-center font-serif text-display font-semibold text-ink">See what your practice covers.</h2>
+          <h2 className="text-center font-serif text-display font-semibold text-ink">
+            Five things hiring managers<br />score you on.
+          </h2>
         </Reveal>
-        <div className="mx-auto mt-10 max-w-lg space-y-3">
-          {features.map((f, i) => (
-            <Reveal key={f.label} delay={i * 0.05}>
-              <div
-                className={cn(
-                  "flex items-center gap-4 rounded-xl border p-4",
-                  !f.unlocked && "select-none"
-                )}
-                style={{
-                  borderColor: f.unlocked ? "var(--primary)" : "var(--border)",
-                  background: f.unlocked ? "var(--primary-soft)" : "var(--surface)",
-                }}
-              >
-                <Check size={18} className={f.unlocked ? "shrink-0 text-primary-ink" : "shrink-0 text-ink-3"} />
-                <div className={!f.unlocked ? "blur-[2px]" : ""}>
-                  <p className="text-sm font-semibold text-ink">{f.label}</p>
-                  <p className="text-xs text-ink-2">{f.desc}</p>
+        <Reveal delay={0.05}>
+          <p className="mx-auto mt-4 max-w-md text-center text-ink-2">
+            You don&apos;t fail interviews because you&apos;re not smart enough. You fail because of things you can&apos;t see. We measure all five.
+          </p>
+        </Reveal>
+        <div className="mx-auto mt-12 max-w-lg space-y-4">
+          {dimensions.map((d, i) => (
+            <Reveal key={d.label} delay={i * 0.06}>
+              <div className="rounded-xl border p-5" style={{ borderColor: "var(--border)", background: "var(--surface)" }}>
+                <div className="flex items-center justify-between">
+                  <h3 className="font-serif text-lg font-semibold text-ink">{d.label}</h3>
+                  <div className="flex items-center gap-2">
+                    <div className="h-2 w-24 overflow-hidden rounded-full" style={{ background: "var(--bg-tint)" }}>
+                      <div className="h-full rounded-full" style={{ width: `${d.score}%`, background: d.score >= 80 ? "var(--sage)" : d.score >= 65 ? "var(--amber)" : "var(--coral)" }} />
+                    </div>
+                    <span className="font-mono text-sm font-semibold" style={{ color: d.score >= 80 ? "var(--sage-ink)" : d.score >= 65 ? "var(--amber-ink)" : "var(--coral-ink)" }}>{d.score}</span>
+                  </div>
                 </div>
+                <p className="mt-2 text-sm leading-relaxed text-ink-2">{d.desc}</p>
               </div>
             </Reveal>
           ))}
         </div>
-        <Reveal delay={0.2}>
-          <div className="mt-8 text-center">
-            <StartFreeButton size="lg" source="landing_whatyouget" label="Unlock everything free →" signedInLabel="Unlock everything free →" />
+        <Reveal delay={0.25}>
+          <div className="mt-10 text-center">
+            <StartFreeButton size="lg" source="landing_dimensions" label="Find out your scores →" signedInLabel="Find out your scores →" />
+            <p className="mt-2.5 text-xs font-semibold uppercase tracking-wider text-ink-3">Takes 60 seconds · No card required</p>
           </div>
         </Reveal>
       </div>
