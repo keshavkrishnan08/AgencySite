@@ -146,8 +146,8 @@ export default function OnboardingPage() {
     );
     setContext(answerProps);
     track("onboarding_complete", { situation, role: finalRole, ...answerProps });
-    // Flow: three questions -> FREE trial practice (3 Qs) -> see score -> signup -> payment -> app.
-    router.push("/practice?trial=1&autostart=1&count=3");
+    // Flow: three questions -> FREE trial (3 Qs, half-and-half layout) -> see score -> signup -> payment -> app.
+    router.push("/trial");
   };
 
   const variants = {
