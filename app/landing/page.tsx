@@ -1,4 +1,4 @@
-import { ArrowRight, Check, CreditCard, ShieldCheck, RefreshCw, Star, Mic, TrendingUp, Target } from "lucide-react";
+import { ArrowRight, Check, CreditCard, ShieldCheck, RefreshCw, Star, Mic, TrendingUp, Target, Clock } from "lucide-react";
 import { Logo } from "@/components/ui/Logo";
 import { HeroDemo } from "@/components/landing/HeroDemo";
 import { ProductDemo } from "@/components/landing/ProductDemo";
@@ -9,21 +9,15 @@ import { StartFreeButton } from "@/components/ui/StartFreeButton";
 import { PricingCards } from "@/components/landing/PricingCards";
 import type { Metadata } from "next";
 
-/* Brett playbook landing page structure:
-   1. Hero — outcome headline + social proof + CTA + product preview
-   2. Free hook — the product working (ProductDemo)
-   3. How it works — 3 steps, scannable
-   4. Social proof — testimonial-style results
-   5. Pricing — anchored against cost of not acting
-   6. FAQ — kill top 4 objections
-   7. Final CTA
-
-   Rules:
-   - No nav (zero escape routes)
-   - Single CTA everywhere ("Start free")
-   - Mobile-first (83% of Meta traffic)
-   - Sticky bottom CTA on mobile
-   - Every section either builds desire or kills an objection */
+/* Landing page modeled on Brett Malinowski's Monad structure:
+   0. Urgency banner
+   1. Authority quote + headline + CTA (the CTA IS the free hook)
+   2. Free hook demo (product working)
+   3. Social proof (stats, not testimonials)
+   4. How it works (3 steps)
+   5. Pricing (simple, anchored)
+   6. FAQ (kill objections)
+   7. Final CTA */
 
 export const metadata: Metadata = {
   title: "Walk into your next interview ready | Axon Careers",
@@ -31,64 +25,77 @@ export const metadata: Metadata = {
 };
 
 /* ================================================================== */
-/*  1. HERO                                                            */
+/*  0. URGENCY BANNER                                                  */
+/* ================================================================== */
+function Banner() {
+  return (
+    <div className="w-full px-4 py-2.5 text-center text-xs font-semibold tracking-wider sm:text-sm" style={{ background: "linear-gradient(90deg, #0c5660, #14808e)", color: "white" }}>
+      <span className="font-bold underline">PRACTICE YOUR FIRST SESSION FREE.</span>
+      {" "}No card. AI scores every answer. See where you stand in 5 minutes.
+    </div>
+  );
+}
+
+/* ================================================================== */
+/*  1. HERO — authority quote + outcome headline + CTA                 */
 /* ================================================================== */
 function Hero() {
   return (
-    <section className="relative overflow-hidden pb-12 pt-6 sm:pb-16 sm:pt-10">
+    <section className="relative overflow-hidden pb-10 pt-6 sm:pb-14 sm:pt-8">
       <div className="pointer-events-none absolute inset-0 -z-10" aria-hidden>
         {/* eslint-disable-next-line @next/next/no-img-element */}
-        <img
-          src="https://images.unsplash.com/photo-1590650153855-d9e808231d41?auto=format&fit=crop&w=1900&q=80"
-          alt="" className="h-full w-full object-cover object-[25%_center] [transform:scaleX(-1)]"
-        />
+        <img src="https://images.unsplash.com/photo-1590650153855-d9e808231d41?auto=format&fit=crop&w=1900&q=80" alt="" className="h-full w-full object-cover object-[25%_center] [transform:scaleX(-1)]" />
         <div className="absolute inset-0" style={{ background: "linear-gradient(270deg, var(--bg) 0%, var(--bg) 30%, rgba(247,243,233,0.85) 50%, rgba(247,243,233,0.6) 72%, rgba(247,243,233,0.45) 100%)" }} />
         <div className="absolute inset-0" style={{ background: "linear-gradient(180deg, rgba(247,243,233,0.75) 0%, rgba(247,243,233,0.2) 32%, transparent 55%)" }} />
         <div className="absolute inset-x-0 bottom-0 h-40" style={{ background: "linear-gradient(0deg, var(--bg), transparent)" }} />
       </div>
 
       <div className="container-wide">
-        <div className="mb-8"><Logo /></div>
+        <div className="mb-6 flex items-center justify-between">
+          <Logo />
+          <StartFreeButton size="sm" source="landing_nav" label="Start free →" />
+        </div>
 
-        <div className="grid items-center gap-10 lg:grid-cols-[1.1fr_0.9fr]">
+        <div className="mx-auto max-w-2xl text-center lg:text-left lg:mx-0 lg:grid lg:max-w-none lg:grid-cols-[1.1fr_0.9fr] lg:items-center lg:gap-10">
           <div>
-            {/* Social proof — first line */}
+            {/* Authority quote — instant credibility */}
             <Reveal>
-              <div className="flex items-center gap-1.5">
-                {Array.from({ length: 5 }).map((_, i) => <Star key={i} size={14} className="fill-amber text-amber" />)}
-                <span className="ml-1 text-sm font-medium text-ink-2">12,000+ job seekers</span>
-              </div>
+              <blockquote className="font-serif text-lg italic text-ink-2 sm:text-xl">
+                &ldquo;By failing to prepare, you are preparing to fail.&rdquo;
+              </blockquote>
+              <p className="mt-1 text-xs font-semibold uppercase tracking-[0.2em] text-ink-3">Benjamin Franklin</p>
             </Reveal>
 
-            {/* Headline — the outcome they want */}
+            {/* Headline — the outcome, not the feature */}
             <Reveal delay={0.06}>
-              <h1 className="mt-4 font-serif text-[2.8rem] font-semibold leading-[1.1] text-ink sm:text-[3.5rem]">
+              <h1 className="mt-7 font-serif text-[2.6rem] font-semibold leading-[1.08] text-ink sm:text-[3.4rem]">
                 Know your interview
                 <br />
-                score <span className="italic" style={{ color: "var(--primary-ink)" }}>before</span> you
+                score <span className="relative"><span className="relative z-10 italic" style={{ color: "var(--primary-ink)" }}>before</span><span className="absolute -bottom-1 left-0 right-0 h-3 rounded-sm opacity-30" style={{ background: "var(--primary-bright)" }} /></span> you
                 <br />
                 walk in.
               </h1>
             </Reveal>
 
-            {/* One line — what it does */}
+            {/* One-liner */}
             <Reveal delay={0.12}>
               <p className="mt-5 max-w-md text-lg text-ink-2">
-                AI asks you real interview questions, scores every answer, and tells you exactly what to fix. Five minutes.
+                AI asks you real interview questions, scores every answer, and tells you exactly what to fix. The blueprint for walking in ready.
               </p>
             </Reveal>
 
-            {/* CTA */}
+            {/* CTA — the CTA IS the free hook */}
             <Reveal delay={0.18}>
               <div className="mt-7">
-                <StartFreeButton size="lg" source="landing_hero" label="Start free — no card required" />
+                <StartFreeButton size="lg" source="landing_hero" label="Get My Free Practice Session →" />
+                <p className="mt-2.5 text-xs font-semibold uppercase tracking-wider text-ink-3">Takes 5 minutes · No card required</p>
               </div>
             </Reveal>
           </div>
 
-          {/* Product preview — the score card */}
+          {/* Product preview */}
           <Reveal delay={0.1}>
-            <div className="lg:pl-4">
+            <div className="mt-10 lg:mt-0 lg:pl-4">
               <HeroDemo />
             </div>
           </Reveal>
@@ -99,115 +106,120 @@ function Hero() {
 }
 
 /* ================================================================== */
-/*  2. FREE HOOK — the product actually working                        */
+/*  2. FREE HOOK — product working live                                */
 /* ================================================================== */
 function FreeHook() {
   return (
     <section className="border-y py-12 sm:py-16" style={{ background: "var(--bg-sunk)", borderColor: "var(--border)" }}>
       <div className="container-wide mb-8 text-center">
         <Reveal>
-          <p className="eyebrow mb-3 justify-center">Try it right now</p>
+          <p className="eyebrow mb-3 justify-center">See it work</p>
         </Reveal>
         <Reveal delay={0.05}>
-          <h2 className="font-serif text-display font-semibold text-ink">See your score in 30 seconds.</h2>
-        </Reveal>
-        <Reveal delay={0.1}>
-          <p className="mx-auto mt-3 max-w-md text-ink-2">
-            Type an answer below. Watch the AI score it instantly.
-          </p>
+          <h2 className="font-serif text-display font-semibold text-ink">Type an answer. Get scored instantly.</h2>
         </Reveal>
       </div>
       <div className="container-wide">
-        <Reveal delay={0.12}>
+        <Reveal delay={0.1}>
           <ProductDemo />
         </Reveal>
       </div>
-      <Reveal delay={0.1}>
-        <div className="mt-8 text-center">
-          <StartFreeButton size="lg" source="landing_hook" label="Start free" />
-        </div>
-      </Reveal>
     </section>
   );
 }
 
 /* ================================================================== */
-/*  3. HOW IT WORKS — 3 steps, scannable                               */
+/*  3. SOCIAL PROOF — stats that prove it works                        */
 /* ================================================================== */
-function HowItWorks() {
-  const steps = [
-    { icon: Target, title: "1. Pick your role", desc: "Tell us what job you're going for. We tailor every question to it." },
-    { icon: Mic, title: "2. Answer out loud", desc: "Speak or type. The AI scores clarity, relevance, specificity, confidence, and conciseness." },
-    { icon: TrendingUp, title: "3. Watch your score climb", desc: "Practice daily. See your readiness number go up session after session." },
+function SocialProof() {
+  const stats = [
+    { stat: "68 → 84", label: "Average score jump in one week" },
+    { stat: "93%", label: "Feel more confident after 5 sessions" },
+    { stat: "3x", label: "Faster to an offer with practice" },
   ];
 
   return (
     <section className="py-12 sm:py-16">
       <div className="container-content">
         <Reveal>
-          <h2 className="text-center font-serif text-display font-semibold text-ink">Three steps. Five minutes.</h2>
+          <h2 className="text-center font-serif text-display font-semibold text-ink">It works. Here&apos;s the data.</h2>
         </Reveal>
-        <div className="mt-10 grid gap-6 sm:grid-cols-3">
-          {steps.map((s, i) => (
-            <Reveal key={s.title} delay={i * 0.08}>
+        <div className="mt-10 grid gap-8 sm:grid-cols-3">
+          {stats.map((s, i) => (
+            <Reveal key={s.label} delay={i * 0.08}>
               <div className="text-center">
-                <div className="mx-auto flex h-12 w-12 items-center justify-center rounded-full" style={{ background: "var(--primary-soft)" }}>
-                  <s.icon size={22} className="text-primary-ink" />
-                </div>
-                <h3 className="mt-4 font-serif text-lg font-semibold text-ink">{s.title}</h3>
-                <p className="mt-2 text-sm text-ink-2">{s.desc}</p>
+                <p className="font-serif text-5xl font-semibold" style={{ color: "var(--primary-ink)" }}>{s.stat}</p>
+                <p className="mt-2 text-sm text-ink-2">{s.label}</p>
               </div>
             </Reveal>
           ))}
         </div>
+        <Reveal delay={0.15}>
+          <div className="mt-10 text-center">
+            <StartFreeButton size="lg" source="landing_proof" label="Get My Free Practice Session →" />
+          </div>
+        </Reveal>
       </div>
     </section>
   );
 }
 
 /* ================================================================== */
-/*  4. SOCIAL PROOF — results, not testimonials                        */
+/*  4. HOW IT WORKS — 3 steps                                         */
 /* ================================================================== */
-function SocialProof() {
-  const results = [
-    { stat: "68 → 84", label: "Average score jump in the first week" },
-    { stat: "93%", label: "Feel more confident after 5 sessions" },
-    { stat: "3x", label: "People who practice out loud get offers faster" },
+function HowItWorks() {
+  const steps = [
+    { num: "01", icon: Target, title: "Tell us your role", desc: "Product manager, nurse, teacher — we tailor every question to the job you're going for." },
+    { num: "02", icon: Mic, title: "Answer real questions", desc: "Speak or type. AI scores clarity, relevance, specificity, confidence, and conciseness." },
+    { num: "03", icon: TrendingUp, title: "Watch your score climb", desc: "Your readiness number goes up every session. You'll know exactly when you're ready." },
   ];
 
   return (
     <section className="border-y py-12 sm:py-16" style={{ background: "var(--bg-sunk)", borderColor: "var(--border)" }}>
       <div className="container-content">
-        <div className="grid gap-6 sm:grid-cols-3">
-          {results.map((r, i) => (
-            <Reveal key={r.label} delay={i * 0.08}>
-              <div className="text-center">
-                <p className="font-serif text-4xl font-semibold" style={{ color: "var(--primary-ink)" }}>{r.stat}</p>
-                <p className="mt-2 text-sm text-ink-2">{r.label}</p>
+        <Reveal>
+          <p className="eyebrow mb-3 justify-center text-center">How it works</p>
+        </Reveal>
+        <Reveal delay={0.05}>
+          <h2 className="text-center font-serif text-display font-semibold text-ink">Your Role. Your Questions. Your Score.</h2>
+        </Reveal>
+        <div className="mt-10 grid gap-8 sm:grid-cols-3">
+          {steps.map((s, i) => (
+            <Reveal key={s.title} delay={i * 0.08}>
+              <div className="flex flex-col items-center text-center">
+                <span className="flex h-14 w-14 items-center justify-center rounded-full text-sm font-bold text-white" style={{ background: "linear-gradient(135deg, var(--primary-bright), var(--primary-ink))" }}>
+                  {s.num}
+                </span>
+                <h3 className="mt-4 font-serif text-lg font-semibold text-ink">{s.title}</h3>
+                <p className="mt-2 max-w-xs text-sm text-ink-2">{s.desc}</p>
               </div>
             </Reveal>
           ))}
         </div>
+        <Reveal delay={0.15}>
+          <div className="mt-10 text-center">
+            <StartFreeButton size="lg" source="landing_how" label="Start free →" />
+          </div>
+        </Reveal>
       </div>
     </section>
   );
 }
 
 /* ================================================================== */
-/*  5. PRICING — anchored against cost of NOT acting                   */
+/*  5. PRICING                                                         */
 /* ================================================================== */
 function Pricing() {
   return (
     <section className="py-12 sm:py-16">
       <div className="container-wide">
         <Reveal>
-          <h2 className="text-balance text-center font-serif text-display font-semibold text-ink">
-            One better answer could be worth the job.
-          </h2>
+          <p className="eyebrow mb-3 justify-center text-center">Pricing</p>
+          <h2 className="text-balance text-center font-serif text-display font-semibold text-ink">Full access.</h2>
         </Reveal>
         <Reveal delay={0.05}>
-          <p className="mx-auto mt-3 max-w-md text-center text-ink-2">
-            A 30-minute interview can change your salary by $20,000+ a year.
+          <p className="mx-auto mt-2 max-w-md text-center text-ink-2">
+            Everything Axon offers, from your first reading on.
           </p>
         </Reveal>
         <PricingCards />
@@ -224,13 +236,14 @@ function Pricing() {
 }
 
 /* ================================================================== */
-/*  6. FAQ — kill the top 4 objections                                 */
+/*  6. FAQ                                                             */
 /* ================================================================== */
 const FAQS: [string, string][] = [
-  ["Can AI really score my interview answers?", "Yes. It scores the five things hiring managers actually weigh: clarity, relevance, specificity, confidence, and conciseness. It catches vague answers, filler words, and missing examples — and tells you exactly what to fix."],
-  ["I haven't interviewed in years.", "That's who this is for. Questions adjust to your experience level. Career changers, parents returning to work, and people who got laid off are the core users — not 22-year-old engineers."],
-  ["Is it private?", "Completely. No profiles, no leaderboards, no social. Just you and your screen. Cancel anytime in two clicks."],
-  ["Does it actually help in the real interview?", "It builds the muscle that holds up under pressure: leading with your point, backing it with numbers, and cutting the filler words you don't hear yourself say. You practice out loud, and it follows up like a real interviewer would."],
+  ["Does this actually work?", "It scores the five things hiring managers weigh: clarity, relevance, specificity, confidence, and conciseness. It catches vague answers, filler words, and missing examples — then tells you exactly what to fix. The score goes up every session."],
+  ["I haven't interviewed in years.", "That's who this is for. Career changers, parents going back to work, people who got laid off. Not 22-year-old engineers."],
+  ["Is my data private?", "Completely. No profiles, no leaderboards, no social. Just you and your screen. Cancel anytime in two clicks."],
+  ["How fast is my reading?", "Your first practice session takes about 5 minutes. You get scored instantly after each answer. Most people see a real improvement after 3-5 sessions."],
+  ["Can I cancel anytime?", "Yes. Two clicks from settings. No contracts, no phone calls, no retention tricks."],
 ];
 
 function FAQ() {
@@ -238,7 +251,8 @@ function FAQ() {
     <section className="border-t py-12 sm:py-16" style={{ borderColor: "var(--border)" }}>
       <div className="container-content">
         <Reveal>
-          <h2 className="text-center font-serif text-display font-semibold text-ink">Questions?</h2>
+          <p className="eyebrow mb-3 justify-center text-center">Questions</p>
+          <h2 className="text-center font-serif text-display font-semibold text-ink">Asked and answered.</h2>
         </Reveal>
         <Reveal delay={0.1}>
           <FAQAccordion items={FAQS} />
@@ -253,19 +267,19 @@ function FAQ() {
 /* ================================================================== */
 function FinalCTA() {
   return (
-    <section className="py-16 sm:py-20">
+    <section className="py-16 sm:py-20" style={{ background: "var(--bg-sunk)" }}>
       <div className="container-content text-center">
         <Reveal>
-          <h2 className="font-serif text-display font-semibold text-ink">Walk in ready.</h2>
+          <h2 className="font-serif text-display font-semibold text-ink">Stop guessing if you&apos;re ready.</h2>
         </Reveal>
         <Reveal delay={0.08}>
           <p className="mx-auto mt-3 max-w-sm text-ink-2">
-            Five minutes a day. That's the difference between nervous and ready.
+            Your next interview is coming. The window to prepare before you walk in is right now.
           </p>
         </Reveal>
         <Reveal delay={0.16}>
           <div className="mt-7">
-            <StartFreeButton size="lg" source="landing_final" label="Start free — no card required" signedInLabel="Start free" />
+            <StartFreeButton size="lg" source="landing_final" label="Get My Free Practice Session →" signedInLabel="Start free" />
           </div>
         </Reveal>
       </div>
@@ -277,11 +291,12 @@ function FinalCTA() {
 export default function LandingPage() {
   return (
     <>
+      <Banner />
       <main>
         <Hero />
         <FreeHook />
-        <HowItWorks />
         <SocialProof />
+        <HowItWorks />
         <Pricing />
         <FAQ />
         <FinalCTA />
