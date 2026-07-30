@@ -164,12 +164,12 @@ export function AppShell({
   // Don't judge "not paying" until the subscription check has returned.
   const checkingSub = ready && !!user && !subChecked && !exemptFromPay;
   // Never judge "not paying" while a checkout return is still being verified.
-  // Free hook: let signed-in users who haven't completed any session yet use
-  // the app unblurred — they get one full practice session to experience the
-  // product. After saveSession() fires, getSessions().length becomes 1 and
-  // the blur kicks in on next render via the onStoreChange listener.
-  const hasTrialSession = typeof window !== "undefined" && getSessions().length > 0;
-  const needsPay = ready && !!user && subChecked && !premium && !exemptFromPay && !verifying && hasTrialSession;
+  // Free hook: only /practice and /session/* are unblurred for users who haven't
+  // completed a session yet. Everything else (dashboard, tools, etc.) stays blurred.
+  const hasCompletedSession = typeof window !== "undefined" && getSessions().length > 0;
+  const isFreePracticePath = pathname === "/practice" || pathname.startsWith("/session/");
+  const freeSessionExempt = !hasCompletedSession && isFreePracticePath;
+  const needsPay = ready && !!user && subChecked && !premium && !exemptFromPay && !verifying && !freeSessionExempt;
 
   useEffect(() => {
     if (needsAuth) router.replace(`/signin?next=${encodeURIComponent(pathname)}`);
@@ -223,25 +223,30 @@ export function AppShell({
    drop into settings to manage the account. */
 function PaywallOverlay({ onRenew, onManage }: { onRenew: () => void; onManage: () => void }) {
   return (
-    <div className="absolute inset-0 z-20 grid place-items-center px-5 py-10">
+    <div className="absolute inset-0 z-20 flex items-start justify-center px-5 pt-16 sm:pt-24">
       <div
-        className="w-full max-w-md rounded-2xl border p-7 text-center shadow-2xl"
+        className="w-full max-w-lg rounded-3xl border p-10 text-center shadow-2xl sm:p-12"
         style={{ borderColor: "var(--border)", background: "var(--surface)" }}
       >
         <div
-          className="mx-auto flex h-12 w-12 items-center justify-center rounded-full"
-          style={{ background: "var(--primary-soft)" }}
+          className="mx-auto flex h-16 w-16 items-center justify-center rounded-full"
+          style={{ background: "linear-gradient(135deg, var(--primary-bright), var(--primary-ink))" }}
         >
-          <Lock size={22} className="text-primary-ink" />
+          <Lock size={28} className="text-white" />
         </div>
-        <h2 className="mt-4 font-serif text-2xl font-semibold text-ink">You just saw what Axon can do.</h2>
-        <p className="mt-2 text-ink-2">
-          Start your free trial to keep practicing, track your progress, and watch your score climb. Cancel anytime.
+        <h2 className="mt-6 font-serif text-3xl font-semibold text-ink sm:text-4xl">
+          You just saw what Axon can do.
+        </h2>
+        <p className="mx-auto mt-4 max-w-sm text-lg text-ink-2">
+          Start your free trial to keep practicing, track your progress, and watch your score climb.
         </p>
-        <Button size="lg" className="mt-6 w-full" onClick={onRenew}>
-          Start free trial <ArrowRight size={18} />
+        <Button size="lg" className="mt-8 w-full !py-4 !text-lg" onClick={onRenew}>
+          Start free trial <ArrowRight size={20} />
         </Button>
-        <button onClick={onManage} className="mt-3 text-sm text-ink-3 transition-colors hover:text-ink-2">
+        <p className="mt-4 text-sm text-ink-3">
+          1-day free trial · cancel anytime · no charge today
+        </p>
+        <button onClick={onManage} className="mt-4 text-sm text-ink-3 transition-colors hover:text-ink-2">
           Manage account
         </button>
       </div>
