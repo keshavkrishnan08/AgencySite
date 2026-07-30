@@ -345,7 +345,6 @@ export default function LandingPage() {
         <FreeHook />
         <SocialProof />
         <HowItWorks />
-        <Pricing />
         <FAQ />
         <FinalCTA />
       </main>
