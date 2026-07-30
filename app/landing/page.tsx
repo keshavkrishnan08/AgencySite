@@ -298,56 +298,42 @@ function WhatYouGet() {
   return (
     <section className="py-14 sm:py-20">
       <div className="container-content">
-        <div className="grid items-start gap-10 lg:grid-cols-[0.9fr_1.1fr] lg:gap-16">
-          {/* Left — text, stacked headline like reference */}
-          <div>
-            <Reveal>
-              <h2 className="font-serif text-[2.4rem] font-semibold leading-[1.1] text-ink sm:text-[3rem]">
-                We coach you
-                <br />on what
-                <br />hiring
-                <br />managers
-                <br />actually look
-                <br />for.
-              </h2>
-            </Reveal>
-            <Reveal delay={0.05}>
-              <p className="mt-6 max-w-sm text-ink-2">
-                You don&apos;t fail interviews because you&apos;re not smart enough. You fail on things you can&apos;t see yourself doing. We measure all five — every answer, every session.
-              </p>
-            </Reveal>
-            <Reveal delay={0.1}>
-              <div className="mt-8">
-                <StartFreeButton size="lg" source="landing_dimensions" label="Find out your scores" signedInLabel="Find out your scores" />
-                <p className="mt-2.5 text-xs font-semibold uppercase tracking-wider text-ink-3">Takes 60 seconds · No card required</p>
-              </div>
-            </Reveal>
-          </div>
+        {/* Full-width heading */}
+        <Reveal>
+          <h2 className="font-serif text-display font-semibold text-ink">
+            We coach you on what hiring managers actually look for.
+          </h2>
+        </Reveal>
+        <Reveal delay={0.05}>
+          <p className="mt-4 max-w-2xl text-lg text-ink-2">
+            You don&apos;t fail interviews because you&apos;re not smart enough. You fail on things you can&apos;t see yourself doing. We measure all five — every answer, every session.
+          </p>
+        </Reveal>
 
-          {/* Right — score cards with label next to ring */}
-          <div className="space-y-3">
-            {dimensions.map((d, i) => (
-              <Reveal key={d.label} delay={i * 0.05}>
-                <div className="flex items-start gap-4 rounded-2xl border p-5" style={{ borderColor: "var(--border)", background: "var(--surface)" }}>
-                  {/* Score ring with number inside */}
-                  <div className="relative flex h-12 w-12 shrink-0 items-center justify-center">
-                    <span className="font-mono text-sm font-bold" style={{ color: d.score >= 80 ? "var(--sage-ink)" : d.score >= 65 ? "var(--amber-ink)" : "var(--coral-ink)" }}>{d.score}</span>
-                    <svg className="absolute inset-0" viewBox="0 0 48 48">
-                      <circle cx="24" cy="24" r="20" fill="none" stroke="var(--bg-tint)" strokeWidth="3.5" />
-                      <circle cx="24" cy="24" r="20" fill="none" strokeWidth="3.5" strokeLinecap="round"
-                        stroke={d.score >= 80 ? "var(--sage)" : d.score >= 65 ? "var(--amber)" : "var(--coral)"}
-                        strokeDasharray={`${d.score * 1.257} 125.7`} transform="rotate(-90 24 24)" />
-                    </svg>
-                  </div>
-                  {/* Label + description */}
-                  <div className="min-w-0 pt-0.5">
-                    <h3 className="font-serif text-base font-semibold text-ink">{d.label}</h3>
-                    <p className="mt-1 text-sm leading-relaxed text-ink-2">{d.desc}</p>
-                  </div>
+        {/* Compact card with all 5 dimensions */}
+        <div className="mt-10 rounded-2xl border p-6 sm:p-8" style={{ borderColor: "var(--border)", background: "var(--surface)" }}>
+          <div className="grid gap-6 sm:grid-cols-5">
+            {dimensions.map((d) => (
+              <div key={d.label} className="text-center">
+                <div className="relative mx-auto flex h-16 w-16 items-center justify-center">
+                  <span className="font-mono text-lg font-bold" style={{ color: d.score >= 80 ? "var(--sage-ink)" : d.score >= 65 ? "var(--amber-ink)" : "var(--coral-ink)" }}>{d.score}</span>
+                  <svg className="absolute inset-0" viewBox="0 0 64 64">
+                    <circle cx="32" cy="32" r="28" fill="none" stroke="var(--bg-tint)" strokeWidth="4" />
+                    <circle cx="32" cy="32" r="28" fill="none" strokeWidth="4" strokeLinecap="round"
+                      stroke={d.score >= 80 ? "var(--sage)" : d.score >= 65 ? "var(--amber)" : "var(--coral)"}
+                      strokeDasharray={`${d.score * 1.759} 175.9`} transform="rotate(-90 32 32)" />
+                  </svg>
                 </div>
-              </Reveal>
+                <h3 className="mt-3 text-sm font-semibold text-ink">{d.label}</h3>
+                <p className="mt-1 text-xs leading-snug text-ink-2">{d.desc}</p>
+              </div>
             ))}
           </div>
+        </div>
+
+        <div className="mt-8">
+          <StartFreeButton size="lg" source="landing_dimensions" label="Find out your scores" signedInLabel="Find out your scores" />
+          <p className="mt-2.5 text-xs font-semibold uppercase tracking-wider text-ink-3">Takes 60 seconds · No card required</p>
         </div>
       </div>
     </section>
