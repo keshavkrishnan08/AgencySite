@@ -87,7 +87,7 @@ export default function SettingsPage() {
 
   if (!mounted) return <AppShell><main className="min-h-screen" /></AppShell>;
 
-  const planInfo = sub?.interval && (["monthly", "quarterly", "annual"] as PlanKey[]).includes(sub.interval as PlanKey)
+  const planInfo = sub?.interval && (["weekly", "monthly", "quarterly"] as PlanKey[]).includes(sub.interval as PlanKey)
     ? PLANS[sub.interval as PlanKey] : null;
   const statusMeta = subStatusMeta(sub);
 
