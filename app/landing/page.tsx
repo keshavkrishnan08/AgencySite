@@ -1,29 +1,21 @@
-import { ArrowRight, Check, CreditCard, ShieldCheck, RefreshCw, Star, Mic, TrendingUp, Target, Clock } from "lucide-react";
+"use client";
+
+import { useState } from "react";
+import { ArrowRight, Check, CreditCard, ShieldCheck, RefreshCw, Star, Mic, TrendingUp, Target, Search } from "lucide-react";
 import { Logo } from "@/components/ui/Logo";
 import { HeroDemo } from "@/components/landing/HeroDemo";
-import { ProductDemo } from "@/components/landing/ProductDemo";
 import { FAQAccordion } from "@/components/landing/FAQAccordion";
 import { StickyCTA } from "@/components/landing/StickyCTA";
 import { Reveal } from "@/components/ui/Reveal";
 import { StartFreeButton } from "@/components/ui/StartFreeButton";
-import { PricingCards } from "@/components/landing/PricingCards";
+import { Button } from "@/components/ui/Button";
 import { cn } from "@/lib/utils";
-import type { Metadata } from "next";
+import { ROLES } from "@/lib/roles";
+import { track } from "@/lib/analytics";
 
-/* Landing page modeled on Brett Malinowski's Monad structure:
-   0. Urgency banner
-   1. Authority quote + headline + CTA (the CTA IS the free hook)
-   2. Free hook demo (product working)
-   3. Social proof (stats, not testimonials)
-   4. How it works (3 steps)
-   5. Pricing (simple, anchored)
-   6. FAQ (kill objections)
-   7. Final CTA */
-
-export const metadata: Metadata = {
-  title: "Walk into your next interview ready | Axon Careers",
-  description: "Practice real interview questions. Get scored. Know exactly what to fix. Start free.",
-};
+/* Landing page for 30-55 career changers.
+   Key insight: give value in 60 seconds. Don't make them work first.
+   The hero IS the free hook — type your role, see your predicted questions. */
 
 /* ================================================================== */
 /*  0. URGENCY BANNER                                                  */
@@ -31,18 +23,86 @@ export const metadata: Metadata = {
 function Banner() {
   return (
     <div className="w-full px-4 py-2.5 text-center text-xs font-semibold tracking-wider sm:text-sm" style={{ background: "linear-gradient(90deg, #0c5660, #14808e)", color: "white" }}>
-      <span className="font-bold underline">HAVEN&apos;T INTERVIEWED IN YEARS?</span>
-      {" "}Practice your first session free. No card. See where you stand.
+      <span className="font-bold underline">INTERVIEW COMING UP?</span>
+      {" "}See the 5 questions they&apos;ll ask you — free.
     </div>
   );
 }
 
 /* ================================================================== */
-/*  1. HERO — authority quote + outcome headline + CTA                 */
+/*  1. HERO — the free hook IS the hero                                */
 /* ================================================================== */
+
+/* Predicted questions by broad role category — instant value */
+const PREDICTIONS: Record<string, string[]> = {
+  default: [
+    "Tell me about yourself.",
+    "Why are you interested in this role?",
+    "Tell me about a time you overcame a challenge.",
+    "What's your biggest professional achievement?",
+    "Where do you see yourself in five years?",
+  ],
+  manager: [
+    "How do you handle underperforming team members?",
+    "Tell me about a time you led a project through a major obstacle.",
+    "How do you prioritize when everything feels urgent?",
+    "Describe your management style.",
+    "What would your direct reports say about you?",
+  ],
+  nurse: [
+    "Tell me about a difficult patient interaction.",
+    "How do you handle high-pressure situations?",
+    "Describe a time you caught a critical error.",
+    "How do you prioritize multiple patients?",
+    "Why are you leaving your current position?",
+  ],
+  teacher: [
+    "Why are you transitioning out of teaching?",
+    "How do your classroom skills translate to this role?",
+    "Tell me about managing difficult stakeholders.",
+    "How do you handle competing priorities?",
+    "What's an example of data-driven decision making in your work?",
+  ],
+  sales: [
+    "Walk me through your biggest deal.",
+    "How do you handle rejection?",
+    "Tell me about a time you turned around a struggling account.",
+    "What's your approach to building a pipeline?",
+    "How do you handle a prospect who ghosts you?",
+  ],
+};
+
+function getQuestions(role: string): string[] {
+  const r = role.toLowerCase();
+  if (r.includes("manager") || r.includes("director") || r.includes("lead") || r.includes("vp") || r.includes("executive")) return PREDICTIONS.manager;
+  if (r.includes("nurse") || r.includes("medical") || r.includes("health") || r.includes("doctor")) return PREDICTIONS.nurse;
+  if (r.includes("teacher") || r.includes("professor") || r.includes("instructor") || r.includes("education")) return PREDICTIONS.teacher;
+  if (r.includes("sales") || r.includes("account") || r.includes("business development") || r.includes("bdr")) return PREDICTIONS.sales;
+  return PREDICTIONS.default;
+}
+
 function Hero() {
+  const [role, setRole] = useState("");
+  const [showQuestions, setShowQuestions] = useState(false);
+  const [query, setQuery] = useState("");
+  const [focused, setFocused] = useState(false);
+
+  const suggestions = query.length >= 2
+    ? ROLES.filter((r) => r.toLowerCase().includes(query.toLowerCase())).slice(0, 5)
+    : [];
+
+  const reveal = (r: string) => {
+    setRole(r);
+    setQuery(r);
+    setShowQuestions(true);
+    setFocused(false);
+    track("ui:click", { label: "landing_role_reveal", role: r });
+  };
+
+  const questions = getQuestions(role);
+
   return (
-    <section className="relative overflow-hidden pb-10 pt-6 sm:pb-14 sm:pt-8">
+    <section className="relative overflow-hidden pb-10 pt-6 sm:pb-16 sm:pt-8">
       <div className="pointer-events-none absolute inset-0 -z-10" aria-hidden>
         {/* eslint-disable-next-line @next/next/no-img-element */}
         <img src="https://images.unsplash.com/photo-1590650153855-d9e808231d41?auto=format&fit=crop&w=1900&q=80" alt="" className="h-full w-full object-cover object-[25%_center] [transform:scaleX(-1)]" />
@@ -54,39 +114,86 @@ function Hero() {
       <div className="container-wide">
         <div className="mb-6 flex items-center justify-between">
           <Logo />
-          <StartFreeButton size="sm" source="landing_nav" label="First interview free" signedInLabel="First interview free" />
+          <StartFreeButton size="sm" source="landing_nav" label="Start free" signedInLabel="Start free" />
         </div>
 
         <div className="mx-auto max-w-2xl text-center lg:text-left lg:mx-0 lg:grid lg:max-w-none lg:grid-cols-[1.1fr_0.9fr] lg:items-center lg:gap-10">
           <div>
-            {/* Headline — speaks to 30-55 career changers */}
-            <Reveal delay={0.06}>
-              <h1 className="mt-2 font-serif text-[2.6rem] font-semibold leading-[1.08] text-ink sm:text-[3.4rem]">
-                It&apos;s been a while
-                <br />
-                since your last
-                <br />
-                <span className="relative"><span className="relative z-10 italic" style={{ color: "var(--primary-ink)" }}>interview.</span><span className="absolute -bottom-1 left-0 right-0 h-3 rounded-sm opacity-30" style={{ background: "var(--primary-bright)" }} /></span>
-              </h1>
-            </Reveal>
+            {!showQuestions ? (
+              <>
+                <Reveal delay={0.06}>
+                  <h1 className="mt-2 font-serif text-[2.6rem] font-semibold leading-[1.08] text-ink sm:text-[3.4rem]">
+                    See the 5 questions
+                    <br />
+                    they&apos;ll ask{" "}
+                    <span className="relative"><span className="relative z-10 italic" style={{ color: "var(--primary-ink)" }}>you.</span><span className="absolute -bottom-1 left-0 right-0 h-3 rounded-sm opacity-30" style={{ background: "var(--primary-bright)" }} /></span>
+                  </h1>
+                </Reveal>
 
-            {/* One-liner — speaks to their specific fear */}
-            <Reveal delay={0.12}>
-              <p className="mt-5 max-w-md text-lg text-ink-2">
-                Going back to work? Switching careers? Got laid off? Practice real interview questions privately with AI — and know exactly where you stand before you walk in.
-              </p>
-            </Reveal>
+                <Reveal delay={0.12}>
+                  <p className="mt-5 max-w-md text-lg text-ink-2">
+                    Type the role you&apos;re interviewing for. We&apos;ll show you exactly what they&apos;ll ask — in 10 seconds.
+                  </p>
+                </Reveal>
 
-            {/* CTA — the CTA IS the free hook */}
-            <Reveal delay={0.18}>
-              <div className="mt-7">
-                <StartFreeButton size="lg" source="landing_hero" label="First interview free" signedInLabel="First interview free" />
-                <p className="mt-2.5 text-xs font-semibold uppercase tracking-wider text-ink-3">Takes 60 seconds · No card required</p>
+                {/* The instant-value input — THIS is the free hook */}
+                <Reveal delay={0.18}>
+                  <div className="relative mt-7 max-w-md">
+                    <div className="relative">
+                      <Search size={18} className="pointer-events-none absolute left-4 top-1/2 -translate-y-1/2 text-ink-3" />
+                      <input
+                        autoFocus
+                        value={query}
+                        onChange={(e) => { setQuery(e.target.value); setFocused(true); }}
+                        onFocus={() => setFocused(true)}
+                        onBlur={() => setTimeout(() => setFocused(false), 150)}
+                        onKeyDown={(e) => { if (e.key === "Enter" && query.trim()) reveal(query.trim()); }}
+                        placeholder="e.g., Product Manager, Registered Nurse, Teacher..."
+                        className="w-full rounded-xl border bg-white py-4 pl-11 pr-4 text-base text-ink shadow-sm outline-none transition-all focus:border-primary focus:ring-2 focus:ring-primary/20"
+                        style={{ borderColor: "var(--border-strong)" }}
+                      />
+                    </div>
+                    {focused && suggestions.length > 0 && (
+                      <div className="absolute z-10 mt-2 w-full overflow-hidden rounded-xl border bg-white shadow-lg" style={{ borderColor: "var(--border)" }}>
+                        {suggestions.map((s) => (
+                          <button key={s} onClick={() => reveal(s)} className="block w-full px-4 py-2.5 text-left text-sm text-ink-2 transition-colors hover:bg-bg-tint hover:text-ink">{s}</button>
+                        ))}
+                      </div>
+                    )}
+                    {query.trim().length >= 2 && (
+                      <Button size="lg" className="mt-3 w-full" onClick={() => reveal(query.trim())}>
+                        Show my questions <ArrowRight size={18} />
+                      </Button>
+                    )}
+                    <p className="mt-2.5 text-xs font-semibold uppercase tracking-wider text-ink-3">Free · No signup · 10 seconds</p>
+                  </div>
+                </Reveal>
+              </>
+            ) : (
+              /* Questions revealed — the "aha" moment */
+              <div>
+                <p className="text-xs font-semibold uppercase tracking-[0.2em] text-primary-ink">Predicted for: {role}</p>
+                <h2 className="mt-3 font-serif text-2xl font-semibold text-ink sm:text-3xl">
+                  Here&apos;s what they&apos;ll ask you.
+                </h2>
+                <div className="mt-6 space-y-3">
+                  {questions.map((q, i) => (
+                    <div key={q} className="flex items-start gap-3 rounded-xl border bg-white p-4 shadow-sm" style={{ borderColor: "var(--border)" }}>
+                      <span className="grid h-7 w-7 shrink-0 place-items-center rounded-full bg-primary-soft font-mono text-xs font-bold text-primary-ink">{i + 1}</span>
+                      <p className="font-medium text-ink">&ldquo;{q}&rdquo;</p>
+                    </div>
+                  ))}
+                </div>
+                <p className="mt-6 text-ink-2">
+                  Want to practice answering these — and get scored on every one?
+                </p>
+                <StartFreeButton size="lg" className="mt-4" source="landing_after_reveal" label="Practice these questions free" signedInLabel="Practice these questions free" />
+                <p className="mt-2 text-xs text-ink-3">No card required. See your score in 5 minutes.</p>
               </div>
-            </Reveal>
+            )}
           </div>
 
-          {/* Product preview */}
+          {/* Right side — product preview or score demo */}
           <Reveal delay={0.1}>
             <div className="mt-10 lg:mt-0 lg:pl-4">
               <HeroDemo />
@@ -99,7 +206,7 @@ function Hero() {
 }
 
 /* ================================================================== */
-/*  1b. AUTHORITY QUOTE — full aesthetic section below hero             */
+/*  1b. AUTHORITY QUOTE                                                */
 /* ================================================================== */
 function AuthorityQuote() {
   return (
@@ -124,102 +231,13 @@ function AuthorityQuote() {
 }
 
 /* ================================================================== */
-/*  2. FREE HOOK — product working live                                */
-/* ================================================================== */
-function FreeHook() {
-  return (
-    <section className="border-y py-12 sm:py-16" style={{ background: "var(--bg-sunk)", borderColor: "var(--border)" }}>
-      <div className="container-wide mb-8 text-center">
-        <Reveal>
-          <p className="eyebrow mb-3 justify-center">See it work</p>
-        </Reveal>
-        <Reveal delay={0.05}>
-          <h2 className="font-serif text-display font-semibold text-ink">Type an answer. Get scored instantly.</h2>
-        </Reveal>
-      </div>
-      <div className="container-wide">
-        <Reveal delay={0.1}>
-          <ProductDemo />
-        </Reveal>
-      </div>
-    </section>
-  );
-}
-
-/* ================================================================== */
-/*  3. SOCIAL PROOF — stats that prove it works                        */
-/* ================================================================== */
-function SocialProof() {
-  const quotes = [
-    {
-      text: "The interview isn't about being the smartest person in the room. It's about being the most prepared.",
-      author: "Richard Branson",
-      role: "Founder, Virgin Group · Net worth $3B",
-      img: "https://d8j0ntlcm91z4.cloudfront.net/user_3Fb0RH7Bsw4Pg0NMgWhyP870t3z/hf_20260730_200810_28a49d98-d597-4b6e-9866-bab035294b46.png",
-      detail: "Branson dropped out of school at 16 and built a $3 billion empire. He's said repeatedly that he hires based on personality and preparation, not credentials or degrees. In his words: the person who walks in having done the work always beats the one with the better resume. He interviews every senior hire at Virgin personally — and the ones who win are the ones who practiced.",
-    },
-    {
-      text: "I will prepare and some day my chance will come.",
-      author: "Abraham Lincoln",
-      role: "16th U.S. President · 1809–1865",
-      img: "https://d8j0ntlcm91z4.cloudfront.net/user_3Fb0RH7Bsw4Pg0NMgWhyP870t3z/hf_20260730_200811_c7576c85-8889-47f8-bfed-ef9461b18131.png",
-      detail: "Lincoln lost 8 elections, went bankrupt twice, and suffered a nervous breakdown — before becoming the most consequential president in American history. He prepared obsessively for the Lincoln-Douglas debates, rehearsing his arguments out loud in empty courtrooms until every word landed. The preparation wasn't talent. It was reps.",
-    },
-    {
-      text: "Practice isn't the thing you do once you're good. It's the thing you do that makes you good.",
-      author: "Malcolm Gladwell",
-      role: "Author, Outliers · 10,000 Hour Rule",
-      img: "https://d8j0ntlcm91z4.cloudfront.net/user_3Fb0RH7Bsw4Pg0NMgWhyP870t3z/hf_20260730_200813_889048b9-28dd-4a1e-b0f4-b5bc5d5163e7.png",
-      detail: "Gladwell studied world-class performers across every field — musicians, athletes, chess masters, surgeons — and found they all share one thing: 10,000 hours of deliberate, repeated practice with feedback. Not talent. Not luck. Practice with someone telling you what to fix. That's exactly what this app does for interviews.",
-    },
-  ];
-
-  return (
-    <section className="py-12 sm:py-16">
-      <div className="container-wide">
-        <div className="grid gap-6 sm:grid-cols-3">
-          {quotes.map((q, i) => (
-            <Reveal key={q.author} delay={i * 0.08}>
-              <div className="overflow-hidden rounded-2xl border" style={{ borderColor: "var(--border)", background: "var(--surface)" }}>
-                {/* Photo */}
-                <div className="relative h-72 sm:h-80 overflow-hidden bg-ink">
-                  {/* eslint-disable-next-line @next/next/no-img-element */}
-                  <img src={q.img} alt={q.author} className="h-full w-full object-cover object-top" />
-                  <div className="absolute inset-0" style={{ background: "linear-gradient(180deg, transparent 40%, rgba(0,0,0,0.7) 100%)" }} />
-                  <div className="absolute bottom-0 left-0 p-5">
-                    <p className="font-serif text-lg font-semibold text-white">{q.author}</p>
-                    <p className="text-xs font-semibold uppercase tracking-wider text-white/60">{q.role}</p>
-                  </div>
-                </div>
-                {/* Quote + detail */}
-                <div className="p-6">
-                  <blockquote className="font-serif text-lg italic leading-relaxed text-ink">
-                    &ldquo;{q.text}&rdquo;
-                  </blockquote>
-                  <p className="mt-4 text-sm leading-relaxed text-ink-2">{q.detail}</p>
-                </div>
-              </div>
-            </Reveal>
-          ))}
-        </div>
-        <Reveal delay={0.15}>
-          <div className="mt-10 text-center">
-            <StartFreeButton size="lg" source="landing_proof" label="First interview free" signedInLabel="First interview free" />
-          </div>
-        </Reveal>
-      </div>
-    </section>
-  );
-}
-
-/* ================================================================== */
-/*  4. HOW IT WORKS — 3 steps                                         */
+/*  2. HOW IT WORKS                                                    */
 /* ================================================================== */
 function HowItWorks() {
   const steps = [
-    { num: "01", icon: Target, title: "Tell us your role", desc: "Product manager, nurse, teacher — we tailor every question to the job you're going for." },
-    { num: "02", icon: Mic, title: "Answer real questions", desc: "Speak or type. AI scores clarity, relevance, specificity, confidence, and conciseness." },
-    { num: "03", icon: TrendingUp, title: "Watch your score climb", desc: "Your readiness number goes up every session. You'll know exactly when you're ready." },
+    { num: "01", icon: Target, title: "Tell us your role", desc: "We tailor every question to the exact job you're going for." },
+    { num: "02", icon: Mic, title: "Answer out loud", desc: "Speak or type — like a real interview. AI scores clarity, relevance, confidence." },
+    { num: "03", icon: TrendingUp, title: "See your score climb", desc: "A readiness number that goes up every session. You'll know when you're ready." },
   ];
 
   return (
@@ -246,7 +264,7 @@ function HowItWorks() {
         </div>
         <Reveal delay={0.15}>
           <div className="mt-10 text-center">
-            <StartFreeButton size="lg" source="landing_how" label="First interview free" signedInLabel="First interview free" />
+            <StartFreeButton size="lg" source="landing_how" label="Start free" signedInLabel="Start free" />
           </div>
         </Reveal>
       </div>
@@ -255,38 +273,9 @@ function HowItWorks() {
 }
 
 /* ================================================================== */
-/*  5. PRICING                                                         */
+/*  3. DIMENSIONS — what we score you on                               */
 /* ================================================================== */
-function Pricing() {
-  return (
-    <section className="py-12 sm:py-16">
-      <div className="container-wide">
-        <Reveal>
-          <p className="eyebrow mb-3 justify-center text-center">Pricing</p>
-          <h2 className="text-balance text-center font-serif text-display font-semibold text-ink">Full access.</h2>
-        </Reveal>
-        <Reveal delay={0.05}>
-          <p className="mx-auto mt-2 max-w-md text-center text-ink-2">
-            Everything Axon offers, from your first reading on.
-          </p>
-        </Reveal>
-        <PricingCards />
-        <Reveal delay={0.1}>
-          <p className="mt-6 flex flex-wrap items-center justify-center gap-x-6 gap-y-2 text-center text-sm text-ink-2">
-            <span className="inline-flex items-center gap-1.5"><ShieldCheck size={15} className="text-sage" /> Private & secure</span>
-            <span className="inline-flex items-center gap-1.5"><CreditCard size={15} className="text-sage" /> Stripe checkout</span>
-            <span className="inline-flex items-center gap-1.5"><RefreshCw size={15} className="text-sage" /> Cancel in two clicks</span>
-          </p>
-        </Reveal>
-      </div>
-    </section>
-  );
-}
-
-/* ================================================================== */
-/*  5b. WHAT YOU GET — blurred premium content teaser                   */
-/* ================================================================== */
-function WhatYouGet() {
+function Dimensions() {
   const dimensions = [
     { label: "Clarity", score: 84, desc: "Did you get to the point?" },
     { label: "Relevance", score: 78, desc: "Did you answer what they asked?" },
@@ -298,7 +287,6 @@ function WhatYouGet() {
   return (
     <section className="py-14 sm:py-20">
       <div className="container-content">
-        {/* Full-width heading */}
         <Reveal>
           <h2 className="font-serif text-display font-semibold text-ink">
             We coach you on what hiring managers actually look for.
@@ -310,7 +298,6 @@ function WhatYouGet() {
           </p>
         </Reveal>
 
-        {/* Compact card with all 5 dimensions */}
         <div className="mt-10 rounded-2xl border px-6 py-10 sm:px-10 sm:py-14" style={{ borderColor: "var(--border)", background: "var(--surface)" }}>
           <div className="grid grid-cols-3 gap-8 sm:grid-cols-5 sm:gap-6">
             {dimensions.map((d) => (
@@ -341,13 +328,72 @@ function WhatYouGet() {
 }
 
 /* ================================================================== */
-/*  6. FAQ                                                             */
+/*  4. SOCIAL PROOF                                                    */
+/* ================================================================== */
+function SocialProof() {
+  const quotes = [
+    {
+      text: "The interview isn't about being the smartest person in the room. It's about being the most prepared.",
+      author: "Richard Branson",
+      role: "Founder, Virgin Group · Net worth $3B",
+      img: "https://d8j0ntlcm91z4.cloudfront.net/user_3Fb0RH7Bsw4Pg0NMgWhyP870t3z/hf_20260730_200810_28a49d98-d597-4b6e-9866-bab035294b46.png",
+      detail: "Branson dropped out of school at 16 and built a $3 billion empire. He's said repeatedly that he hires based on personality and preparation, not credentials or degrees. In his words: the person who walks in having done the work always beats the one with the better resume. He interviews every senior hire at Virgin personally — and the ones who win are the ones who practiced.",
+    },
+    {
+      text: "I will prepare and some day my chance will come.",
+      author: "Abraham Lincoln",
+      role: "16th U.S. President · 1809–1865",
+      img: "https://d8j0ntlcm91z4.cloudfront.net/user_3Fb0RH7Bsw4Pg0NMgWhyP870t3z/hf_20260730_200811_c7576c85-8889-47f8-bfed-ef9461b18131.png",
+      detail: "Lincoln lost 8 elections, went bankrupt twice, and suffered a nervous breakdown — before becoming the most consequential president in American history. He prepared obsessively for the Lincoln-Douglas debates, rehearsing his arguments out loud in empty courtrooms until every word landed. The preparation wasn't talent. It was reps.",
+    },
+    {
+      text: "Practice isn't the thing you do once you're good. It's the thing you do that makes you good.",
+      author: "Malcolm Gladwell",
+      role: "Author, Outliers · 10,000 Hour Rule",
+      img: "https://d8j0ntlcm91z4.cloudfront.net/user_3Fb0RH7Bsw4Pg0NMgWhyP870t3z/hf_20260730_200813_889048b9-28dd-4a1e-b0f4-b5bc5d5163e7.png",
+      detail: "Gladwell studied world-class performers across every field — musicians, athletes, chess masters, surgeons — and found they all share one thing: 10,000 hours of deliberate, repeated practice with feedback. Not talent. Not luck. Practice with someone telling you what to fix. That's exactly what this app does for interviews.",
+    },
+  ];
+
+  return (
+    <section className="border-y py-12 sm:py-16" style={{ background: "var(--bg-sunk)", borderColor: "var(--border)" }}>
+      <div className="container-wide">
+        <div className="grid gap-6 sm:grid-cols-3">
+          {quotes.map((q, i) => (
+            <Reveal key={q.author} delay={i * 0.08}>
+              <div className="overflow-hidden rounded-2xl border" style={{ borderColor: "var(--border)", background: "var(--surface)" }}>
+                <div className="relative h-72 sm:h-80 overflow-hidden bg-ink">
+                  {/* eslint-disable-next-line @next/next/no-img-element */}
+                  <img src={q.img} alt={q.author} className="h-full w-full object-cover object-top" />
+                  <div className="absolute inset-0" style={{ background: "linear-gradient(180deg, transparent 40%, rgba(0,0,0,0.7) 100%)" }} />
+                  <div className="absolute bottom-0 left-0 p-5">
+                    <p className="font-serif text-lg font-semibold text-white">{q.author}</p>
+                    <p className="text-xs font-semibold uppercase tracking-wider text-white/60">{q.role}</p>
+                  </div>
+                </div>
+                <div className="p-6">
+                  <blockquote className="font-serif text-lg italic leading-relaxed text-ink">
+                    &ldquo;{q.text}&rdquo;
+                  </blockquote>
+                  <p className="mt-4 text-sm leading-relaxed text-ink-2">{q.detail}</p>
+                </div>
+              </div>
+            </Reveal>
+          ))}
+        </div>
+      </div>
+    </section>
+  );
+}
+
+/* ================================================================== */
+/*  5. FAQ                                                             */
 /* ================================================================== */
 const FAQS: [string, string][] = [
   ["Does this actually work?", "It scores the five things hiring managers weigh: clarity, relevance, specificity, confidence, and conciseness. It catches vague answers, filler words, and missing examples — then tells you exactly what to fix. The score goes up every session."],
   ["What's the ROI on this?", "A single interview can change your salary by $20,000+ a year. If practicing for a week helps you land one better offer — or avoid one rejection — it pays for itself hundreds of times over. The question isn't whether you can afford it. It's whether you can afford to walk in unprepared."],
   ["How is this different from practicing with a friend?", "Your friend will say 'that sounded great.' A hiring manager will say no. The difference is honesty. AI catches every filler word, every vague answer, every time you didn't actually answer the question — and tells you exactly what to fix. No feelings to spare."],
-  ["I haven't interviewed in years. Is this for me?", "This was built specifically for you. Not for 22-year-old engineers on Reddit. For the 38-year-old going back to work after raising kids. The 52-year-old who got laid off after 15 years. The teacher switching into corporate. The questions adjust to how long it's been and ease you in."],
+  ["I haven't interviewed in years. Is this for me?", "This was built specifically for you. Not for 22-year-old engineers on Reddit. For the 38-year-old going back to work after raising kids. The 52-year-old who got laid off after 15 years. The teacher switching into corporate. The questions adjust to your experience level and situation."],
   ["How much will my score actually improve?", "Most users see a 15-20 point improvement in their first week. The people who practice daily for a week go from 'nervous and hoping for the best' to 'I know exactly what I'm going to say.' That's not a feeling — it's a number you can see."],
   ["Is my data private?", "Completely. No profiles, no leaderboards, no social. Just you and your screen. Cancel anytime in two clicks."],
   ["Can AI really replace a human interview coach?", "A good coach charges $150-300 per hour and you get one session. Axon gives you unlimited practice, available at 3am the night before, and scores every answer the same way every time. It's not a replacement for human chemistry in the room — it's the reps that make you ready for it."],
@@ -356,11 +402,10 @@ const FAQS: [string, string][] = [
 
 function FAQ() {
   return (
-    <section className="border-t py-12 sm:py-16" style={{ borderColor: "var(--border)" }}>
+    <section className="py-12 sm:py-16">
       <div className="container-content">
         <Reveal>
-          <p className="eyebrow mb-3 justify-center text-center">Questions</p>
-          <h2 className="text-center font-serif text-display font-semibold text-ink">Asked and answered.</h2>
+          <h2 className="text-center font-serif text-display font-semibold text-ink">Questions?</h2>
         </Reveal>
         <Reveal delay={0.1}>
           <FAQAccordion items={FAQS} />
@@ -371,11 +416,11 @@ function FAQ() {
 }
 
 /* ================================================================== */
-/*  7. FINAL CTA                                                       */
+/*  6. FINAL CTA                                                       */
 /* ================================================================== */
 function FinalCTA() {
   return (
-    <section className="py-16 sm:py-20" style={{ background: "var(--bg-sunk)" }}>
+    <section className="border-t py-16 sm:py-20" style={{ borderColor: "var(--border)", background: "var(--bg-sunk)" }}>
       <div className="container-content text-center">
         <Reveal>
           <h2 className="font-serif text-display font-semibold text-ink">You&apos;ve done harder things than this.</h2>
@@ -387,7 +432,7 @@ function FinalCTA() {
         </Reveal>
         <Reveal delay={0.16}>
           <div className="mt-7">
-            <StartFreeButton size="lg" source="landing_final" label="First interview free" signedInLabel="First interview free" />
+            <StartFreeButton size="lg" source="landing_final" label="Practice your first interview free" signedInLabel="Practice your first interview free" />
           </div>
         </Reveal>
       </div>
@@ -403,10 +448,9 @@ export default function LandingPage() {
       <main>
         <Hero />
         <AuthorityQuote />
-        <FreeHook />
-        <SocialProof />
         <HowItWorks />
-        <WhatYouGet />
+        <Dimensions />
+        <SocialProof />
         <FAQ />
         <FinalCTA />
       </main>
