@@ -31,8 +31,8 @@ export const metadata: Metadata = {
 function Banner() {
   return (
     <div className="w-full px-4 py-2.5 text-center text-xs font-semibold tracking-wider sm:text-sm" style={{ background: "linear-gradient(90deg, #0c5660, #14808e)", color: "white" }}>
-      <span className="font-bold underline">PRACTICE YOUR FIRST SESSION FREE.</span>
-      {" "}No card. AI scores every answer. See where you stand in 5 minutes.
+      <span className="font-bold underline">HAVEN&apos;T INTERVIEWED IN YEARS?</span>
+      {" "}Practice your first session free. No card. See where you stand.
     </div>
   );
 }
@@ -59,21 +59,21 @@ function Hero() {
 
         <div className="mx-auto max-w-2xl text-center lg:text-left lg:mx-0 lg:grid lg:max-w-none lg:grid-cols-[1.1fr_0.9fr] lg:items-center lg:gap-10">
           <div>
-            {/* Headline — the outcome, not the feature */}
+            {/* Headline — speaks to 30-55 career changers */}
             <Reveal delay={0.06}>
               <h1 className="mt-2 font-serif text-[2.6rem] font-semibold leading-[1.08] text-ink sm:text-[3.4rem]">
-                Know your interview
+                It&apos;s been a while
                 <br />
-                score <span className="relative"><span className="relative z-10 italic" style={{ color: "var(--primary-ink)" }}>before</span><span className="absolute -bottom-1 left-0 right-0 h-3 rounded-sm opacity-30" style={{ background: "var(--primary-bright)" }} /></span> you
+                since your last
                 <br />
-                walk in.
+                <span className="relative"><span className="relative z-10 italic" style={{ color: "var(--primary-ink)" }}>interview.</span><span className="absolute -bottom-1 left-0 right-0 h-3 rounded-sm opacity-30" style={{ background: "var(--primary-bright)" }} /></span>
               </h1>
             </Reveal>
 
-            {/* One-liner */}
+            {/* One-liner — speaks to their specific fear */}
             <Reveal delay={0.12}>
               <p className="mt-5 max-w-md text-lg text-ink-2">
-                AI asks you real interview questions, scores every answer, and tells you exactly what to fix. The blueprint for walking in ready.
+                Going back to work? Switching careers? Got laid off? Practice real interview questions privately with AI — and know exactly where you stand before you walk in.
               </p>
             </Reveal>
 
@@ -107,14 +107,14 @@ function AuthorityQuote() {
       <div className="container-content">
         <Reveal>
           <blockquote className="mx-auto max-w-2xl text-center font-serif text-2xl italic leading-relaxed text-ink sm:text-3xl">
-            &ldquo;AI won&apos;t replace you. But someone who uses AI to prepare better will.&rdquo;
+            &ldquo;It&apos;s never too late to be what you might have been.&rdquo;
           </blockquote>
         </Reveal>
         <Reveal delay={0.1}>
           <div className="mx-auto mt-8 max-w-lg text-center">
-            <p className="font-serif text-lg font-semibold text-ink">Satya Nadella</p>
+            <p className="font-serif text-lg font-semibold text-ink">George Eliot</p>
             <p className="mt-1 text-xs font-semibold uppercase tracking-[0.2em] text-ink-3">
-              CEO of Microsoft · The world&apos;s most valuable company
+              One of the greatest novelists in the English language
             </p>
           </div>
         </Reveal>
@@ -347,7 +347,7 @@ const FAQS: [string, string][] = [
   ["Does this actually work?", "It scores the five things hiring managers weigh: clarity, relevance, specificity, confidence, and conciseness. It catches vague answers, filler words, and missing examples — then tells you exactly what to fix. The score goes up every session."],
   ["What's the ROI on this?", "A single interview can change your salary by $20,000+ a year. If practicing for a week helps you land one better offer — or avoid one rejection — it pays for itself hundreds of times over. The question isn't whether you can afford it. It's whether you can afford to walk in unprepared."],
   ["How is this different from practicing with a friend?", "Your friend will say 'that sounded great.' A hiring manager will say no. The difference is honesty. AI catches every filler word, every vague answer, every time you didn't actually answer the question — and tells you exactly what to fix. No feelings to spare."],
-  ["I haven't interviewed in years.", "That's exactly who this is for. Career changers, parents going back to work, people who got laid off. Not 22-year-old engineers. The questions adjust to your experience level and situation."],
+  ["I haven't interviewed in years. Is this for me?", "This was built specifically for you. Not for 22-year-old engineers on Reddit. For the 38-year-old going back to work after raising kids. The 52-year-old who got laid off after 15 years. The teacher switching into corporate. The questions adjust to how long it's been and ease you in."],
   ["How much will my score actually improve?", "Most users see a 15-20 point improvement in their first week. The people who practice daily for a week go from 'nervous and hoping for the best' to 'I know exactly what I'm going to say.' That's not a feeling — it's a number you can see."],
   ["Is my data private?", "Completely. No profiles, no leaderboards, no social. Just you and your screen. Cancel anytime in two clicks."],
   ["Can AI really replace a human interview coach?", "A good coach charges $150-300 per hour and you get one session. Axon gives you unlimited practice, available at 3am the night before, and scores every answer the same way every time. It's not a replacement for human chemistry in the room — it's the reps that make you ready for it."],
@@ -378,11 +378,11 @@ function FinalCTA() {
     <section className="py-16 sm:py-20" style={{ background: "var(--bg-sunk)" }}>
       <div className="container-content text-center">
         <Reveal>
-          <h2 className="font-serif text-display font-semibold text-ink">Stop guessing if you&apos;re ready.</h2>
+          <h2 className="font-serif text-display font-semibold text-ink">You&apos;ve done harder things than this.</h2>
         </Reveal>
         <Reveal delay={0.08}>
           <p className="mx-auto mt-3 max-w-sm text-ink-2">
-            Your next interview is coming. The window to prepare before you walk in is right now.
+            You raised kids. You built a career. You started over. A job interview? You just need to practice.
           </p>
         </Reveal>
         <Reveal delay={0.16}>
