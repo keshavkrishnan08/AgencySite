@@ -146,8 +146,8 @@ export default function OnboardingPage() {
     );
     setContext(answerProps);
     track("onboarding_complete", { situation, role: finalRole, ...answerProps });
-    // Flow: onboarding -> create account -> into the app (first session free, then paywall).
-    router.push("/signin?mode=signup&next=%2Fpractice");
+    // Flow: onboarding -> create account -> straight into 3 questions (skip the hub).
+    router.push("/signin?mode=signup&next=%2Fpractice%3Fautostart%3D1%26count%3D3");
   };
 
   const variants = {
