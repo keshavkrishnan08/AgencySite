@@ -165,14 +165,14 @@ function AuthorityQuote() {
       <div className="container-content">
         <Reveal>
           <blockquote className="mx-auto max-w-2xl text-center font-serif text-2xl italic leading-relaxed text-ink sm:text-3xl">
-            &ldquo;It&apos;s never too late to be what you might have been.&rdquo;
+            &ldquo;AI won&apos;t replace you. But someone who uses AI to prepare better will.&rdquo;
           </blockquote>
         </Reveal>
         <Reveal delay={0.1}>
           <div className="mx-auto mt-8 max-w-lg text-center">
-            <p className="font-serif text-lg font-semibold text-ink">George Eliot</p>
+            <p className="font-serif text-lg font-semibold text-ink">Satya Nadella</p>
             <p className="mt-1 text-xs font-semibold uppercase tracking-[0.2em] text-ink-3">
-              One of the greatest novelists in the English language
+              CEO of Microsoft
             </p>
           </div>
         </Reveal>
