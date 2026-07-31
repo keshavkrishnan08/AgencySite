@@ -6,14 +6,14 @@
  * these amounts — that pairing is the one thing to check before going live.
  *
  * A good/better/best ladder:
- *   monthly    $18.97/mo   — entry, for a search you expect to be short
+ *   weekly     $7.99/wk    — "I have an interview this week." Impulse buy.
+ *   monthly    $18.97/mo   — standard, covers most searches
  *   3 months   $49.97      — the default; a search runs about three months
- *   yearly     $119/yr     — best value anchor, prepaid and churn-immune
  *
- * The cheapest effective rate (yearly, ~33¢/day) is what "from" copy leads with.
+ * The cheapest effective rate (quarterly, ~$0.55/day) is what "from" copy leads with.
  */
 
-export type PlanKey = "monthly" | "quarterly" | "annual";
+export type PlanKey = "weekly" | "monthly" | "quarterly";
 
 export interface PlanCopy {
   key: PlanKey;
@@ -23,17 +23,17 @@ export interface PlanCopy {
   price: string;
   /** Amount in cents, for anyone who needs the number. */
   amountCents: number;
-  /** Billing period in months. */
+  /** Billing period in months (0.25 for weekly). */
   months: number;
   /** Struck-through anchor price, or null when there's nothing to anchor to. */
   was: string | null;
-  /** "billed monthly" / "billed once every 3 months". */
+  /** "billed weekly" / "billed monthly" / "billed once every 3 months". */
   cadence: string;
-  /** "$16.66 a month" */
+  /** "$7.99 a week" / "$18.97 a month" */
   perMonth: string;
-  /** Percent saved vs paying monthly. 0 for the monthly plan. */
+  /** Percent saved vs paying weekly. 0 for the weekly plan. */
   savePct: number;
-  /** Dollar amount saved vs paying monthly, formatted. */
+  /** Dollar amount saved vs paying weekly, formatted. */
   saveAmount: string | null;
   /** One-line reason this plan exists. */
   pitch: string;
@@ -41,37 +41,48 @@ export interface PlanCopy {
   badge: string | null;
 }
 
+const WEEKLY_CENTS = 799;
 const MONTHLY_CENTS = 1897;
 const QUARTERLY_CENTS = 4997;
-const ANNUAL_CENTS = 11900;
 
-const quarterlyFull = MONTHLY_CENTS * 3; // 5691
-const quarterlySave = quarterlyFull - QUARTERLY_CENTS; // 694
-const annualFull = MONTHLY_CENTS * 12; // 22764
-const annualSave = annualFull - ANNUAL_CENTS; // 10864
+// Compare everything to weekly rate for savings
+const monthlyAtWeeklyRate = WEEKLY_CENTS * 4; // ~3196 per month at weekly rate
+const monthlySave = monthlyAtWeeklyRate - MONTHLY_CENTS; // 1299
+const quarterlyAtWeeklyRate = WEEKLY_CENTS * 13; // ~10387 for 3 months at weekly rate
+const quarterlySave = quarterlyAtWeeklyRate - QUARTERLY_CENTS; // 5390
 
 function usd(cents: number): string {
   const dollars = cents / 100;
   return Number.isInteger(dollars) ? `$${dollars}` : `$${dollars.toFixed(2)}`;
 }
 
-function perMonthLabel(cents: number, months: number): string {
-  return `$${(cents / 100 / months).toFixed(2)} a month`;
-}
-
 export const PLANS: Record<PlanKey, PlanCopy> = {
+  weekly: {
+    key: "weekly",
+    toggle: "Weekly",
+    price: usd(WEEKLY_CENTS),
+    amountCents: WEEKLY_CENTS,
+    months: 0.25,
+    was: null,
+    cadence: "billed weekly · cancel anytime",
+    perMonth: "$7.99 a week",
+    savePct: 0,
+    saveAmount: null,
+    pitch: "Interview this week? Start here.",
+    badge: null,
+  },
   monthly: {
     key: "monthly",
     toggle: "Monthly",
     price: usd(MONTHLY_CENTS),
     amountCents: MONTHLY_CENTS,
     months: 1,
-    was: null,
+    was: usd(monthlyAtWeeklyRate),
     cadence: "billed monthly · cancel anytime",
-    perMonth: perMonthLabel(MONTHLY_CENTS, 1),
-    savePct: 0,
-    saveAmount: null,
-    pitch: "For a search you expect to be short.",
+    perMonth: "$18.97 a month",
+    savePct: Math.round((monthlySave / monthlyAtWeeklyRate) * 100),
+    saveAmount: usd(monthlySave),
+    pitch: "For an active job search.",
     badge: null,
   },
   quarterly: {
@@ -80,52 +91,34 @@ export const PLANS: Record<PlanKey, PlanCopy> = {
     price: usd(QUARTERLY_CENTS),
     amountCents: QUARTERLY_CENTS,
     months: 3,
-    was: usd(quarterlyFull),
+    was: usd(quarterlyAtWeeklyRate),
     cadence: "billed once every 3 months · cancel anytime",
-    perMonth: perMonthLabel(QUARTERLY_CENTS, 3),
-    savePct: Math.round((quarterlySave / quarterlyFull) * 100), // 12
+    perMonth: "$16.66 a month",
+    savePct: Math.round((quarterlySave / quarterlyAtWeeklyRate) * 100),
     saveAmount: usd(quarterlySave),
-    pitch: "Covers the whole search. What most people pick.",
-    badge: "Most popular",
-  },
-  annual: {
-    key: "annual",
-    toggle: "Yearly",
-    price: usd(ANNUAL_CENTS),
-    amountCents: ANNUAL_CENTS,
-    months: 12,
-    was: usd(annualFull),
-    cadence: "billed once a year · cancel anytime",
-    perMonth: perMonthLabel(ANNUAL_CENTS, 12),
-    savePct: Math.round((annualSave / annualFull) * 100), // 48
-    saveAmount: usd(annualSave),
-    pitch: "A whole year at the lowest rate. Best value.",
+    pitch: "Covers the whole search. Best value.",
     badge: "Best value",
   },
 };
 
-/** Display order for the pricing cards, cheapest-effective last so the eye
-    lands on the anchor. */
-export const PLAN_ORDER: PlanKey[] = ["monthly", "quarterly", "annual"];
+/** Display order for the pricing cards. */
+export const PLAN_ORDER: PlanKey[] = ["weekly", "monthly", "quarterly"];
 
 /** The number to lead with in marketing copy: the cheapest effective rate. */
-export const FROM_PRICE = PLANS.annual.perMonth;
-export const HEADLINE_PRICE = `${PLANS.annual.perMonth.replace(" a month", "")}/mo`;
+export const FROM_PRICE = PLANS.quarterly.perMonth;
+export const HEADLINE_PRICE = `${PLANS.quarterly.perMonth.replace(" a month", "")}/mo`;
 
-/** Price split for big-type display: ["49", "97"]. Keeps the pricing cards
-    from hardcoding digits that then drift when the amount changes. */
+/** Price split for big-type display: ["49", "97"]. */
 export function priceParts(plan: PlanKey): [dollars: string, cents: string] {
   const cents = PLANS[plan].amountCents;
   return [String(Math.floor(cents / 100)), String(cents % 100).padStart(2, "0")];
 }
 
-/** Per-day cost, in whole cents, for a plan — the "33¢ a day" framing that
-    makes the price feel like nothing. Derived, so it tracks the amount. */
-export function perDayCents(plan: PlanKey = "annual"): number {
+/** Per-day cost, in whole cents, for a plan. */
+export function perDayCents(plan: PlanKey = "quarterly"): number {
   const p = PLANS[plan];
   return Math.round(p.amountCents / (p.months * 30));
 }
 
-/** "$0.33 a day" — the marketing subtext, from the cheapest plan. Dollar format
-    (not "33¢") for consistency with every other price on the page. */
-export const FROM_PER_DAY = `$${(perDayCents("annual") / 100).toFixed(2)} a day`;
+/** "$0.55 a day" — the marketing subtext, from the cheapest plan. */
+export const FROM_PER_DAY = `$${(perDayCents("quarterly") / 100).toFixed(2)} a day`;

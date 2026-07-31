@@ -17,9 +17,8 @@ import { supabaseAdmin } from "./supabase";
 function intervalLabel(recurring: { interval?: string; interval_count?: number } | undefined): string {
   const unit = recurring?.interval;
   const count = recurring?.interval_count ?? 1;
-  if (unit === "year") return "annual";
+  if (unit === "week") return "weekly";
   if (unit === "month" && count === 3) return "quarterly";
-  if (unit === "month" && count === 12) return "annual";
   return "monthly";
 }
 

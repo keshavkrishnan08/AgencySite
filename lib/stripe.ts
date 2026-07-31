@@ -13,7 +13,6 @@ let client: Stripe | null = null;
 export function getStripe(): Stripe {
   if (!client) {
     client = new Stripe(process.env.STRIPE_SECRET_KEY as string, {
-      // Pinned; cast keeps us compatible across SDK minor versions.
       apiVersion: "2024-06-20" as any,
       typescript: true,
     });
@@ -23,21 +22,20 @@ export function getStripe(): Stripe {
 
 /* Three plans (good/better/best). Amounts live in lib/pricing.ts; these are the
    matching Stripe Price IDs, env-gated.
-   - monthly:   $18.97/mo
-   - quarterly: $49.97 every 3 months ($16.66/mo) — the default
-   - annual:    $119/yr ($9.92/mo) — best value, prepaid */
+   - weekly:    $7.99/wk   — "interview this week" impulse buy
+   - monthly:   $18.97/mo  — standard
+   - quarterly: $49.97/3mo — best value, covers a full search */
 export const PRICES = {
+  weekly: () => process.env.STRIPE_PRICE_ID_WEEKLY || process.env.STRIPE_PRICE_ID || "",
   monthly: () => process.env.STRIPE_PRICE_ID || "",
   quarterly: () => process.env.STRIPE_PRICE_ID_QUARTERLY || process.env.STRIPE_PRICE_ID || "",
-  annual: () => process.env.STRIPE_PRICE_ID_ANNUAL || process.env.STRIPE_PRICE_ID || "",
 };
 
 export type PlanKey = keyof typeof PRICES;
 
 export function isPlanKey(v: unknown): v is PlanKey {
-  return v === "monthly" || v === "quarterly" || v === "annual";
+  return v === "weekly" || v === "monthly" || v === "quarterly";
 }
 
-// No free trial: charge immediately on subscribe. Set STRIPE_TRIAL_DAYS to
-// re-enable one later. checkout/route.ts only adds a trial when this is > 0.
+// Free trial on quarterly plan only. Set STRIPE_TRIAL_DAYS in env.
 export const TRIAL_DAYS = Number(process.env.STRIPE_TRIAL_DAYS || "0");
