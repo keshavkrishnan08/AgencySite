@@ -47,6 +47,15 @@ function SignInInner() {
         // person. This is the alias moment: everything before now was anon.
         identify(email.trim(), { name: name.trim() || undefined });
         track("account_created", { next: signupNext });
+        // Fire welcome email with interview stats
+        try {
+          const ob = typeof window !== "undefined" ? JSON.parse(localStorage.getItem("pp:onboarding") || "{}") : {};
+          fetch("/api/notify", {
+            method: "POST",
+            headers: { "Content-Type": "application/json" },
+            body: JSON.stringify({ type: "welcome", to: email.trim(), name: name.trim(), role: ob?.targetRole || "" }),
+          }).catch(() => {});
+        } catch {}
         if (r.needsConfirm) return setNotice("Check your email to confirm your account, then sign in.");
         router.push(signupNext);
       } else {
