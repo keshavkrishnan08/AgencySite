@@ -183,7 +183,7 @@ export function LockedBriefingCard() {
           Read today&apos;s briefing <ArrowRight size={16} />
         </button>
         <p className="mt-3 text-center text-xs text-white/50">
-          A new one every morning · from {PLANS.annual.perMonth}
+          A new one every morning · from {PLANS.weekly.perMonth}
         </p>
       </div>
     </div>
