@@ -120,89 +120,28 @@ function Hero() {
 
         <div className="mx-auto max-w-2xl text-center lg:text-left lg:mx-0 lg:grid lg:max-w-none lg:grid-cols-[1.1fr_0.9fr] lg:items-center lg:gap-10">
           <div>
-            {!showInput && !showQuestions ? (
-              /* State 1: headline + CTA button */
-              <>
-                <Reveal delay={0.06}>
-                  <h1 className="mt-2 font-serif text-[2.6rem] font-semibold leading-[1.08] text-ink sm:text-[3.4rem]">
-                    It&apos;s been a while
-                    <br />
-                    since your last
-                    <br />
-                    <span className="relative"><span className="relative z-10 italic" style={{ color: "var(--primary-ink)" }}>interview.</span><span className="absolute -bottom-1 left-0 right-0 h-3 rounded-sm opacity-30" style={{ background: "var(--primary-bright)" }} /></span>
-                  </h1>
-                </Reveal>
+            <Reveal delay={0.06}>
+              <h1 className="mt-2 font-serif text-[2.6rem] font-semibold leading-[1.08] text-ink sm:text-[3.4rem]">
+                It&apos;s been a while
+                <br />
+                since your last
+                <br />
+                <span className="relative"><span className="relative z-10 italic" style={{ color: "var(--primary-ink)" }}>interview.</span><span className="absolute -bottom-1 left-0 right-0 h-3 rounded-sm opacity-30" style={{ background: "var(--primary-bright)" }} /></span>
+              </h1>
+            </Reveal>
 
-                <Reveal delay={0.12}>
-                  <p className="mt-5 max-w-md text-lg text-ink-2">
-                    Going back to work? Switching careers? Got laid off? We&apos;ll show you the exact questions they&apos;ll ask — and help you nail every one.
-                  </p>
-                </Reveal>
+            <Reveal delay={0.12}>
+              <p className="mt-5 max-w-md text-lg text-ink-2">
+                Going back to work? Switching careers? Got laid off? We&apos;ll show you the exact questions they&apos;ll ask — and help you nail every one.
+              </p>
+            </Reveal>
 
-                <Reveal delay={0.18}>
-                  <div className="mt-7">
-                    <Button size="lg" onClick={() => setShowInput(true)}>
-                      See the 5 questions they&apos;ll ask you <ArrowRight size={18} />
-                    </Button>
-                    <p className="mt-2.5 text-xs font-semibold uppercase tracking-wider text-ink-3">Free · No signup · 10 seconds</p>
-                  </div>
-                </Reveal>
-              </>
-            ) : showInput && !showQuestions ? (
-              /* State 2: role input */
-              <div>
-                <h2 className="font-serif text-2xl font-semibold text-ink sm:text-3xl">What role are you interviewing for?</h2>
-                <div className="relative mt-5 max-w-md">
-                  <div className="relative">
-                    <Search size={18} className="pointer-events-none absolute left-4 top-1/2 -translate-y-1/2 text-ink-3" />
-                    <input
-                      autoFocus
-                      value={query}
-                      onChange={(e) => { setQuery(e.target.value); setFocused(true); }}
-                      onFocus={() => setFocused(true)}
-                      onBlur={() => setTimeout(() => setFocused(false), 150)}
-                      onKeyDown={(e) => { if (e.key === "Enter" && query.trim()) reveal(query.trim()); }}
-                      placeholder="e.g., Product Manager, Registered Nurse..."
-                      className="w-full rounded-xl border bg-white py-4 pl-11 pr-4 text-base text-ink shadow-sm outline-none transition-all focus:border-primary focus:ring-2 focus:ring-primary/20"
-                      style={{ borderColor: "var(--border-strong)" }}
-                    />
-                  </div>
-                  {focused && suggestions.length > 0 && (
-                    <div className="absolute z-10 mt-2 w-full overflow-hidden rounded-xl border bg-white shadow-lg" style={{ borderColor: "var(--border)" }}>
-                      {suggestions.map((s) => (
-                        <button key={s} onClick={() => reveal(s)} className="block w-full px-4 py-2.5 text-left text-sm text-ink-2 transition-colors hover:bg-bg-tint hover:text-ink">{s}</button>
-                      ))}
-                    </div>
-                  )}
-                  {query.trim().length >= 2 && (
-                    <Button size="lg" className="mt-3 w-full" onClick={() => reveal(query.trim())}>
-                      Show my questions <ArrowRight size={18} />
-                    </Button>
-                  )}
-                </div>
+            <Reveal delay={0.18}>
+              <div className="mt-7">
+                <StartFreeButton size="lg" source="landing_hero" label="See the 5 questions they'll ask you" signedInLabel="See the 5 questions they'll ask you" />
+                <p className="mt-2.5 text-xs font-semibold uppercase tracking-wider text-ink-3">Takes 60 seconds · No card required</p>
               </div>
-            ) : (
-              /* Questions revealed — the "aha" moment */
-              <div>
-                <p className="text-xs font-semibold uppercase tracking-[0.2em] text-primary-ink">Predicted for: {role}</p>
-                <h2 className="mt-3 font-serif text-2xl font-semibold text-ink sm:text-3xl">
-                  Here&apos;s what they&apos;ll ask you.
-                </h2>
-                <div className="mt-6 space-y-3">
-                  {questions.map((q, i) => (
-                    <div key={q} className="flex items-start gap-3 rounded-xl border bg-white p-4 shadow-sm" style={{ borderColor: "var(--border)" }}>
-                      <span className="grid h-7 w-7 shrink-0 place-items-center rounded-full bg-primary-soft font-mono text-xs font-bold text-primary-ink">{i + 1}</span>
-                      <p className="font-medium text-ink">&ldquo;{q}&rdquo;</p>
-                    </div>
-                  ))}
-                </div>
-                <p className="mt-6 text-ink-2">
-                  Want to practice answering these — and get scored on every one?
-                </p>
-                <StartFreeButton size="lg" className="mt-4" source="landing_after_reveal" label="Practice these questions free" signedInLabel="Practice these questions free" />
-                <p className="mt-2 text-xs text-ink-3">No card required. See your score in 5 minutes.</p>
-              </div>
-            )}
+            </Reveal>
           </div>
 
           {/* Right side — product preview or score demo */}
