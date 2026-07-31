@@ -13,11 +13,11 @@ export async function POST(req: Request) {
   } catch {
     return NextResponse.json({ error: "Bad request" }, { status: 400 });
   }
-  const { type = "", to = "", name = "", company = "", dateLong = "" } = body ?? {};
+  const { type = "", to = "", name = "", role = "", company = "", dateLong = "" } = body ?? {};
   if (!to || !to.includes("@")) return NextResponse.json({ sent: false, reason: "no recipient" });
 
   const msg =
-    type === "plan" ? planEmail(company, dateLong) : type === "welcome" ? welcomeEmail(name) : null;
+    type === "plan" ? planEmail(company, dateLong) : type === "welcome" ? welcomeEmail(name, role) : null;
   if (!msg) return NextResponse.json({ sent: false, reason: "unknown type" });
 
   const sent = await sendEmail({ to, subject: msg.subject, html: msg.html });
