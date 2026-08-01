@@ -337,33 +337,28 @@ export function ChartView({
         </p>
         <p className="eyebrow mt-3.5">Your timing</p>
 
-        <div className="mt-3 grid gap-3 sm:grid-cols-3">
+        <div className="mt-3 grid grid-rows-[1fr] gap-3 sm:grid-cols-3">
           {timing.map((t, i) => {
             const locked = !isPaid && i > 0;
             return (
-              <div key={t.span} className="card flex flex-col">
+              <div key={t.span} className="card flex min-h-[320px] flex-col">
                 <p className="eyebrow">{t.span}</p>
                 <h3 className="mt-2 font-serif text-[17px] font-normal leading-[1.3]">
                   {t.headline}
                 </h3>
-                <p className="mt-2 text-[13px] leading-[1.6] text-ink/80">{t.line}</p>
+                <p className="mt-2 flex-1 text-[13px] leading-[1.6] text-ink/80">{t.line}</p>
 
                 {locked ? (
                   <>
                     <LockedZone
                       label={`Unlock your ${t.span.toLowerCase()} window`}
-                      className="relative mt-2 max-h-[130px] flex-1 overflow-hidden"
+                      className="relative mt-2 max-h-[100px] overflow-hidden"
                     >
                       <p aria-hidden className="locked-text text-[13px] leading-[1.6] text-ink">
                         {t.tail}
                       </p>
-                      <div
-                        aria-hidden
-                        className="absolute inset-x-0 bottom-0 h-12"
-                        style={{ background: 'linear-gradient(to bottom, rgba(250,248,240,0), #faf8f0 92%)' }}
-                      />
                     </LockedZone>
-                    <div className="mt-2">
+                    <div className="mt-auto pt-3">
                       <LockedInline label="See my window" />
                     </div>
                   </>

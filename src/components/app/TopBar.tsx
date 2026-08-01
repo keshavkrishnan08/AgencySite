@@ -64,20 +64,7 @@ export function TopBar({
           {label}
         </p>
 
-        <button
-          type="button"
-          onClick={onAsk}
-          className="mx-auto flex h-11 w-full max-w-[420px] items-center gap-2.5 rounded-[8px] border bg-white/60 px-3.5 text-left transition-colors hover:border-ink/25 rule"
-        >
-          <svg width="15" height="15" viewBox="0 0 18 18" fill="none" aria-hidden className="shrink-0 text-brass-deep">
-            <path d="M15.5 8.6c0 3.1-2.9 5.6-6.5 5.6-.85 0-1.66-.14-2.4-.4L3 15l1-2.6C2.4 11.4 1.5 10.1 1.5 8.6 1.5 5.5 4.4 3 8 3s7.5 2.5 7.5 5.6Z"
-                  stroke="currentColor" strokeWidth="1.3" strokeLinejoin="round" />
-          </svg>
-          <span className="flex-1 truncate text-[14.5px] text-ink/40">Ask your chart anything…</span>
-          <kbd className="hidden shrink-0 rounded-[4px] border px-1.5 py-0.5 font-mono text-[10px] text-ink/40 sm:block rule">
-            ⌘K
-          </kbd>
-        </button>
+        <div className="flex-1" />
 
         <p className="hidden shrink-0 font-mono text-[10px] uppercase tracking-label text-ink/40 xl:block">
           Synced · {now}
