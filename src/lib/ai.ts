@@ -61,7 +61,8 @@ const READING_SCHEMA = {
           paragraphs: {
             type: 'array',
             items: { type: 'string' },
-            description: 'Three to five paragraphs, each at most three sentences.',
+            minItems: 3,
+            description: 'Exactly three to five paragraphs. Each paragraph is two to three sentences. Never return fewer than three.',
           },
         },
         required: ['key', 'title', 'standfirst', 'paragraphs'],
