@@ -105,11 +105,11 @@ export function TimingView({
       <header>
         <p className="eyebrow">Timing</p>
         <h1 className="mt-2.5 font-serif text-[27px] font-normal leading-tight sm:text-[33px]">
-          {firstName}, when should you move?
+          {firstName}, when should you make your next big decision?
         </h1>
         <p className="mt-2 max-w-measure text-[14.5px] leading-relaxed text-ink/65">
-          Pick the move. Your next 30 days are scored against your own chart —
-          the same astronomy, not a general calendar.
+          Pick what you are deciding. Your next 30 days are scored against your
+          chart — real transits, not a general horoscope.
         </p>
       </header>
 
@@ -180,7 +180,7 @@ export function TimingView({
                     <LockedInline label="See this window" />
                   </div>
                 </>
-              ) : (
+              ) : isPaid ? (
                 <>
                   {day.quiet ? (
                     <p className="mt-3 text-[13.5px] leading-[1.6] text-ink/75">
@@ -207,6 +207,24 @@ export function TimingView({
                     {copied === day.date ? 'Added to calendar' : 'Add to calendar'}{' '}
                     <span aria-hidden>↓</span>
                   </button>
+                </>
+              ) : (
+                <>
+                  {/* Free users see the date but not why — the reasoning is
+                      the product. Show just enough to prove it's real. */}
+                  <p className="mt-3 text-[13.5px] leading-[1.6] text-ink/75">
+                    {day.reasons.length} transit{day.reasons.length === 1 ? '' : 's'} support this date for your chart.
+                  </p>
+                  <LockedZone label="Unlock the reasoning" className="relative mt-2 h-[60px] overflow-hidden">
+                    <div className="locked-text space-y-2" aria-hidden>
+                      {day.reasons.map((r) => (
+                        <p key={r} className="text-[13.5px] leading-[1.6] text-ink">{r}</p>
+                      ))}
+                    </div>
+                  </LockedZone>
+                  <div className="mt-2">
+                    <LockedInline label="See why this date works" />
+                  </div>
                 </>
               )}
             </article>
