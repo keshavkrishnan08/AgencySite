@@ -163,23 +163,37 @@ export function ChartView({
       <section>
         <p className="eyebrow">The three systems</p>
         <div className="mt-3 grid gap-3 sm:grid-cols-3">
-          {systems.map((s) => {
+          {systems.map((s, i) => {
+            const sysLocked = !isPaid && i > 0;
             const open = openSystem === s.eyebrow;
             return (
               <div key={s.eyebrow} className="card card-interactive flex flex-col">
                 <p className="eyebrow">{s.eyebrow}</p>
                 <p className="mt-2 font-serif text-[20px] leading-tight">{s.title}</p>
-                <p className={`mt-2 flex-1 text-[13.5px] leading-[1.6] text-ink/72 ${open ? '' : 'line-clamp-4'}`}>
-                  {s.body}
-                </p>
-                <button
-                  type="button"
-                  onClick={() => setOpenSystem(open ? null : s.eyebrow)}
-                  aria-expanded={open}
-                  className="mt-2.5 flex min-h-[40px] items-center font-mono text-[9.5px] uppercase tracking-label text-ledger-mid transition-colors hover:text-ledger"
-                >
-                  {open ? 'Show less' : 'Read more'} <span aria-hidden className="ml-1.5">→</span>
-                </button>
+                {sysLocked ? (
+                  <>
+                    <LockedZone label={`Unlock ${s.eyebrow} reading`} className="relative mt-2 h-[80px] overflow-hidden">
+                      <p aria-hidden className="locked-text text-[13.5px] leading-[1.6] text-ink">{s.body}</p>
+                    </LockedZone>
+                    <div className="mt-auto pt-2">
+                      <LockedInline label="Unlock" />
+                    </div>
+                  </>
+                ) : (
+                  <>
+                    <p className={`mt-2 flex-1 text-[13.5px] leading-[1.6] text-ink/72 ${open ? '' : 'line-clamp-4'}`}>
+                      {s.body}
+                    </p>
+                    <button
+                      type="button"
+                      onClick={() => setOpenSystem(open ? null : s.eyebrow)}
+                      aria-expanded={open}
+                      className="mt-2.5 flex min-h-[40px] items-center font-mono text-[9.5px] uppercase tracking-label text-ledger-mid transition-colors hover:text-ledger"
+                    >
+                      {open ? 'Show less' : 'Read more'} <span aria-hidden className="ml-1.5">→</span>
+                    </button>
+                  </>
+                )}
               </div>
             );
           })}
@@ -270,7 +284,7 @@ export function ChartView({
                 <>
                   <p className="mt-6 text-[14px] font-semibold">Recommended roles:</p>
                   <div className="mt-2.5 flex flex-wrap gap-2">
-                    {roles.map((r) => (
+                    {roles.slice(0, isPaid ? roles.length : 2).map((r) => (
                       <span
                         key={r}
                         className="rounded-full border px-3.5 py-1.5 font-mono text-[11px] rule"
@@ -279,22 +293,47 @@ export function ChartView({
                         {r}
                       </span>
                     ))}
+                    {!isPaid && roles.length > 2 && (
+                      <LockedZone label="Unlock all roles" className="flex flex-wrap gap-2">
+                        {roles.slice(2).map((r) => (
+                          <span
+                            key={r}
+                            className="locked-text rounded-full border px-3.5 py-1.5 font-mono text-[11px] rule"
+                          >
+                            {r}
+                          </span>
+                        ))}
+                      </LockedZone>
+                    )}
                   </div>
 
                   <p className="mt-5 text-[14px] font-semibold">Business recommendations:</p>
-                  <p className="mt-2 text-[13.5px] leading-[1.65] text-ink/78">{builtFor}</p>
+                  {isPaid ? (
+                    <p className="mt-2 text-[13.5px] leading-[1.65] text-ink/78">{builtFor}</p>
+                  ) : (
+                    <>
+                      <LockedZone label="Unlock business recommendations" className="relative mt-2 h-[52px] overflow-hidden">
+                        <p aria-hidden className="locked-text text-[13.5px] leading-[1.65] text-ink">{builtFor}</p>
+                      </LockedZone>
+                      <div className="mt-1.5">
+                        <LockedInline label="Unlock" />
+                      </div>
+                    </>
+                  )}
 
                   <div className="mt-5 border-l-2 border-oxblood/60 pl-3.5">
                     <p className="font-mono text-[9.5px] uppercase tracking-label text-oxblood">
                       The seat to refuse
                     </p>
-                    <p className="mt-1 text-[13.5px] leading-[1.65] text-ink/78">{avoid}</p>
+                    {isPaid ? (
+                      <p className="mt-1 text-[13.5px] leading-[1.65] text-ink/78">{avoid}</p>
+                    ) : (
+                      <LockedZone label="Unlock the seat to refuse" className="relative mt-1 h-[46px] overflow-hidden">
+                        <p aria-hidden className="locked-text text-[13.5px] leading-[1.65] text-ink">{avoid}</p>
+                      </LockedZone>
+                    )}
                   </div>
 
-                  {/* Diagnostic copy converts; flattering copy does not. The
-                      roles and the business fit stay free because they prove
-                      the reading is specific — this one names a failure, so it
-                      belongs on the paid side of the wall. */}
                   <div className="mt-5 border-l-2 border-brass-deep/60 pl-3.5">
                     <p className="font-mono text-[9.5px] uppercase tracking-label text-brass-deep">
                       Where you quietly rot
@@ -302,24 +341,9 @@ export function ChartView({
                     {isPaid ? (
                       <p className="mt-1 text-[13.5px] leading-[1.65] text-ink/78">{rot}</p>
                     ) : (
-                      <>
-                        <LockedZone
-                          label="Unlock where you quietly rot"
-                          className="relative mt-1 h-[46px] overflow-hidden"
-                        >
-                          <p aria-hidden className="locked-text text-[13.5px] leading-[1.65] text-ink">
-                            {rot}
-                          </p>
-                          <div
-                            aria-hidden
-                            className="absolute inset-x-0 bottom-0 h-7"
-                            style={{ background: 'linear-gradient(to bottom, rgba(250,248,240,0), #faf8f0 92%)' }}
-                          />
-                        </LockedZone>
-                        <div className="mt-1.5">
-                          <LockedInline label="See where you rot" />
-                        </div>
-                      </>
+                      <LockedZone label="Unlock where you quietly rot" className="relative mt-1 h-[46px] overflow-hidden">
+                        <p aria-hidden className="locked-text text-[13.5px] leading-[1.65] text-ink">{rot}</p>
+                      </LockedZone>
                     )}
                   </div>
                 </>
