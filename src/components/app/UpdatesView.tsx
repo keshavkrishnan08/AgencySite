@@ -106,34 +106,18 @@ export function UpdatesView({
 
   return (
     <div className="mx-auto max-w-[820px] space-y-12 pb-8">
-      {/* -------------------------------------------------------- cadence */}
-      <div className="flex flex-wrap items-center justify-between gap-4">
-        <div className="flex gap-2">
-          {CADENCES.map((c) => (
-            <Link
-              key={c.key}
-              href={c.key === 'daily' ? '/updates' : `/updates?cadence=${c.key}`}
-              scroll={false}
-              className={`flex min-h-[40px] items-center gap-1.5 rounded-full border px-4 font-mono text-[10.5px] uppercase tracking-label transition-colors ${
-                cadence === c.key
-                  ? 'border-ledger bg-ledger text-paper'
-                  : 'bg-white/55 text-ink/60 hover:bg-white rule'
-              }`}
-            >
-              {c.label}
-            </Link>
-          ))}
+      {/* -------------------------------------------------- date navigation */}
+      <div className="flex items-center justify-between gap-4">
+        <h1 className="font-serif text-[23px] font-normal leading-tight sm:text-[29px]">
+          Your daily briefing
+        </h1>
+        <div className="flex items-center gap-1">
+          <ArrowLink href={prevDate ? `/updates?date=${prevDate}` : null} dir="prev" />
+          <span className="min-w-[110px] text-center font-mono text-[11px] uppercase tracking-label text-ink/60">
+            {entry ? stamp(entry.date) : '—'}
+          </span>
+          <ArrowLink href={nextDate ? `/updates?date=${nextDate}` : null} dir="next" />
         </div>
-
-        {cadence === 'daily' && (
-          <div className="flex items-center gap-1">
-            <ArrowLink href={prevDate ? `/updates?date=${prevDate}` : null} dir="prev" />
-            <span className="min-w-[132px] text-center font-mono text-[11px] uppercase tracking-label text-ink/60">
-              {entry ? stamp(entry.date) : '—'}
-            </span>
-            <ArrowLink href={nextDate ? `/updates?date=${nextDate}` : null} dir="next" />
-          </div>
-        )}
       </div>
 
       {/* ------------------------------------------------------ the briefing */}

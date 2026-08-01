@@ -113,21 +113,38 @@ export function TimingView({
         </p>
       </header>
 
-      {/* Intent picker. Horizontal scroll rather than wrap so choosing does not
-          reflow the answer underneath it. */}
-      <div className="-mx-4 overflow-x-auto px-4 sm:mx-0 sm:px-0">
-        <div className="flex gap-2 pb-1">
-          {INTENTS.map((i) => (
-            <button
-              key={i.id}
-              type="button"
-              onClick={() => setIntent(i.id)}
-              aria-pressed={intent === i.id}
-              className={`chip ${intent === i.id ? 'chip-on' : 'bg-transparent'}`}
-            >
-              {i.label}
-            </button>
-          ))}
+      {/* Intent picker with custom input. */}
+      <div className="space-y-3">
+        <div className="-mx-4 overflow-x-auto px-4 sm:mx-0 sm:px-0">
+          <div className="flex gap-2 pb-1">
+            {INTENTS.map((i) => (
+              <button
+                key={i.id}
+                type="button"
+                onClick={() => setIntent(i.id)}
+                aria-pressed={intent === i.id}
+                className={`chip ${intent === i.id ? 'chip-on' : 'bg-transparent'}`}
+              >
+                {i.label}
+              </button>
+            ))}
+          </div>
+        </div>
+        <div className="flex items-center gap-2 rounded-[8px] border bg-white/60 px-3.5 py-2.5 rule">
+          <svg width="14" height="14" viewBox="0 0 18 18" fill="none" aria-hidden className="shrink-0 text-brass-deep">
+            <circle cx="8" cy="8" r="6" stroke="currentColor" strokeWidth="1.3" />
+            <path d="M13 13l3.5 3.5" stroke="currentColor" strokeWidth="1.3" strokeLinecap="round" />
+          </svg>
+          <input
+            type="text"
+            className="w-full bg-transparent text-[14px] outline-none placeholder:text-ink/35"
+            placeholder="Or describe your move — e.g. &quot;raise a seed round&quot;"
+            readOnly
+            onClick={() => {
+              const { ask } = window as unknown as { ask?: (q: string) => void };
+              if (ask) ask('When should I make this move?');
+            }}
+          />
         </div>
       </div>
 
