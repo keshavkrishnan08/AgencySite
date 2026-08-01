@@ -52,6 +52,8 @@ const READING_SCHEMA = {
   properties: {
     sections: {
       type: 'array',
+      minItems: 7,
+      maxItems: 7,
       items: {
         type: 'object',
         properties: {
@@ -60,9 +62,10 @@ const READING_SCHEMA = {
           standfirst: { type: 'string', description: 'One sentence, under 140 characters.' },
           paragraphs: {
             type: 'array',
-            items: { type: 'string' },
             minItems: 3,
-            description: 'Exactly three to five paragraphs. Each paragraph is two to three sentences. Never return fewer than three.',
+            maxItems: 5,
+            items: { type: 'string' },
+            description: 'Exactly three to five paragraphs. Each paragraph is two to three sentences.',
           },
         },
         required: ['key', 'title', 'standfirst', 'paragraphs'],
