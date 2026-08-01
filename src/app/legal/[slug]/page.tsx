@@ -35,7 +35,7 @@ const DOCS: Record<string, Doc> = {
       {
         h: 'Subscriptions and billing',
         p: [
-          'Paid access is billed through Stripe on a recurring basis — weekly at $9.99 or annually at $79 — until cancelled. Where a free trial applies, you will be charged when the trial ends unless you cancel before then.',
+          'Paid access is billed through Stripe on a recurring basis — weekly at $7.99 or annually at $79 — until cancelled. Where a free trial applies, you will be charged when the trial ends unless you cancel before then.',
           'You can cancel at any time from the billing portal in your settings. Cancelling stops future renewals; access continues until the end of the period you have already paid for.',
         ],
       },

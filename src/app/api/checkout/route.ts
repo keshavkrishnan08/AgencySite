@@ -76,8 +76,8 @@ async function createSession(plan: PlanId, chartId: string | null) {
 /**
  * Falls back to the *cheaper* plan, not the dearer one.
  *
- * A dropped or mangled `plan` param previously sent the buyer to a $98/year
- * checkout when they had clicked $8.99/week. A billing default that resolves
+ * A dropped or mangled `plan` param previously sent the buyer to a $79/year
+ * checkout when they had clicked $7.99/week. A billing default that resolves
  * ambiguity in our favour is a refund and a dispute, not a rounding error.
  */
 function parsePlan(value: string | null): PlanId {

@@ -17,7 +17,7 @@ export const PLANS = {
   weekly: {
     id: 'weekly' as const,
     label: 'Weekly',
-    price: '$9.99',
+    price: '$7.99',
     cadence: '/week',
     priceIdEnv: 'STRIPE_PRICE_ID_WEEKLY',
     blurb: 'Full access, billed weekly.',
@@ -29,7 +29,7 @@ export const PLANS = {
     cadence: '/year',
     priceIdEnv: 'STRIPE_PRICE_ID_ANNUAL',
     blurb: 'Full access, billed once a year.',
-    badge: 'SAVE 85%',
+    badge: 'SAVE 81%',
     popular: true,
   },
 } as const;

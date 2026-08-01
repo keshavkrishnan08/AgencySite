@@ -7,7 +7,7 @@ import { PRICING } from '@/lib/brand';
 /**
  * Weekly → annual, offered inside the product rather than at the paywall.
  *
- * At the paywall a $98 charge competes with $8.99 and loses; two weeks in, the
+ * At the paywall a $79 charge competes with $7.99 and loses; two weeks in, the
  * same offer lands on someone who has already decided they want the thing. It
  * is also the safest way to raise ARPU: a subscriber who upgrades knowingly
  * disputes at a fraction of the rate of a trial that converted into a large
