@@ -82,7 +82,7 @@ export async function generateReading(chart: Chart, firstName: string): Promise<
 
   return (
     await p.generate<{ sections: ReadingSection[] }>({
-      maxTokens: 32000,
+      maxTokens: 16000,
       effort: 'high',
       schema: READING_SCHEMA as unknown as Record<string, unknown>,
       schemaName: 'reading',
