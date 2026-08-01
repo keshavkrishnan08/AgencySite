@@ -180,11 +180,8 @@ function StartModal({ open, onClose }: { open: boolean; onClose: () => void }) {
     if (!open) return;
     const prev = document.body.style.overflow;
     document.body.style.overflow = 'hidden';
-    const onKey = (e: KeyboardEvent) => e.key === 'Escape' && onClose();
-    window.addEventListener('keydown', onKey);
     return () => {
       document.body.style.overflow = prev;
-      window.removeEventListener('keydown', onKey);
     };
   }, [open, onClose]);
 
@@ -199,17 +196,7 @@ function StartModal({ open, onClose }: { open: boolean; onClose: () => void }) {
       // The backdrop is a sibling layer rather than a parent with a
       // stopPropagation child: a click that starts inside the card and ends
       // outside it (dragging to select text) otherwise closes the modal.
-      onMouseDown={(e) => { if (e.target === e.currentTarget) onClose(); }}
     >
-      <button
-        type="button"
-        onClick={onClose}
-        aria-label="Close"
-        className="fixed right-3 top-3 z-10 flex h-11 w-11 items-center justify-center rounded-full text-[22px] leading-none text-paper/60 transition-colors hover:bg-paper/10 hover:text-paper"
-      >
-        &times;
-      </button>
-
       <div
         className="flex min-h-full items-start justify-center p-4 sm:items-center"
         onMouseDown={(e) => { if (e.target === e.currentTarget) onClose(); }}
