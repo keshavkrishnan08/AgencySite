@@ -4,7 +4,7 @@ import { notFound } from 'next/navigation';
 import { Footer, Glyph, Wordmark } from '@/components/Chrome';
 import { Paywall } from '@/components/Paywall';
 import { ReadingBody } from '@/components/ReadingBody';
-import { getChart } from '@/lib/charts';
+import { getChartPublic } from '@/lib/charts';
 import { getEntitlement } from '@/lib/entitlement';
 import { supabaseAdminOrNull } from '@/lib/supabase/server';
 import { recallSections } from '@/lib/charts-ephemeral';
@@ -26,7 +26,7 @@ const FREE_SECTIONS = 2;
 
 export default async function ReadingPage({ params }: { params: Promise<{ id: string }> }) {
   const { id } = await params;
-  const chart = await getChart(id);
+  const chart = await getChartPublic(id);
   if (!chart) notFound();
 
   const ent = await getEntitlement();
