@@ -1,3 +1,4 @@
+import Image from 'next/image';
 import { Footer, Nav } from '@/components/Chrome';
 import { Accordion, AnnouncementBar, Cta, Tabs } from '@/components/ui';
 import { BRAND, FEATURES, PRICING } from '@/lib/brand';
@@ -195,14 +196,19 @@ function TitansBand() {
               className="flex flex-col overflow-hidden border bg-[#fbf8f1]"
               style={{ borderColor: 'rgba(154,123,63,0.35)' }}
             >
-              {/* Monogram portrait — a styled initial on a dark field with a
-                  subtle radial brass wash. Intentionally typographic: real
-                  portraits would need licensing; this reads as designed. */}
-              <div className="relative flex aspect-[325/275] w-full items-center justify-center bg-[#1a1a17]">
-                <div className="absolute inset-0 bg-[radial-gradient(circle_at_50%_40%,rgba(194,160,91,0.15),transparent_70%)]" />
-                <span className="relative font-serif text-[72px] font-light leading-none text-brass/40 sm:text-[80px]">
-                  {t.name.split(' ').map((w) => w[0]).join('')}
-                </span>
+              {/* Portrait flush to the card's top edge, square corners. */}
+              <div className="relative aspect-[325/275] w-full">
+                <Image
+                  src={t.img}
+                  alt={t.name}
+                  fill
+                  sizes="(min-width: 640px) 33vw, 100vw"
+                  style={{
+                    objectFit: 'cover',
+                    objectPosition: t.position,
+                    filter: 'grayscale(1) sepia(0.24) contrast(1.05) brightness(0.88)',
+                  }}
+                />
               </div>
 
               <div className="flex flex-1 flex-col px-6 pb-7 pt-6">
