@@ -105,7 +105,7 @@ export function Diagnosis({
           </div>
         ) : (
           blockers.map((b, i) => {
-            const locked = !isPaid && i > 0;
+            const fullyLocked = !isPaid && i > 0;
             return (
               <article key={b.title} className="card card-interactive">
                 <div className="flex flex-wrap items-baseline justify-between gap-2">
@@ -119,7 +119,7 @@ export function Diagnosis({
                   {b.title}
                 </h3>
 
-                {locked ? (
+                {fullyLocked ? (
                   <>
                     <LockedZone
                       label={`Unlock: ${b.title}`}
@@ -131,11 +131,6 @@ export function Diagnosis({
                       <p aria-hidden className="locked-text mt-2 text-[13.5px] leading-[1.65] text-ink">
                         {b.fix}
                       </p>
-                      <div
-                        aria-hidden
-                        className="absolute inset-x-0 bottom-0 h-12"
-                        style={{ background: 'linear-gradient(to bottom, rgba(250,248,240,0), #faf8f0 92%)' }}
-                      />
                     </LockedZone>
                     <div className="mt-2">
                       <LockedInline label="See what this costs you" />
@@ -143,13 +138,30 @@ export function Diagnosis({
                   </>
                 ) : (
                   <>
+                    {/* The costs (the pain) are free — feel the problem.
+                        The fix (the solution) is the product. */}
                     <p className="mt-2.5 text-[13.5px] leading-[1.65] text-ink/80">{b.costs}</p>
-                    <div className="mt-3 border-l-2 border-ledger-mid/50 pl-3.5">
-                      <p className="font-mono text-[9.5px] uppercase tracking-label text-ledger-mid">
-                        The counter-move
-                      </p>
-                      <p className="mt-1 text-[13.5px] leading-[1.65] text-ink/80">{b.fix}</p>
-                    </div>
+
+                    {isPaid ? (
+                      <div className="mt-3 border-l-2 border-ledger-mid/50 pl-3.5">
+                        <p className="font-mono text-[9.5px] uppercase tracking-label text-ledger-mid">
+                          The counter-move
+                        </p>
+                        <p className="mt-1 text-[13.5px] leading-[1.65] text-ink/80">{b.fix}</p>
+                      </div>
+                    ) : (
+                      <div className="mt-3 border-l-2 border-ledger-mid/50 pl-3.5">
+                        <p className="font-mono text-[9.5px] uppercase tracking-label text-ledger-mid">
+                          The counter-move
+                        </p>
+                        <LockedZone label="Unlock the counter-move" className="relative mt-1 h-[46px] overflow-hidden">
+                          <p aria-hidden className="locked-text text-[13.5px] leading-[1.65] text-ink">{b.fix}</p>
+                        </LockedZone>
+                        <div className="mt-1.5">
+                          <LockedInline label="See the fix" />
+                        </div>
+                      </div>
+                    )}
                   </>
                 )}
               </article>
@@ -160,11 +172,26 @@ export function Diagnosis({
 
       <section className="rounded-[10px] border-l-2 border-oxblood bg-oxblood/[0.05] px-5 py-4">
         <p className="eyebrow text-oxblood">Where the pressure sits</p>
-        <p className="mt-1.5 text-[13.5px] leading-[1.65] text-ink/80">
-          Your Saturn is in {pressure}. That is the area of life where the bill
-          arrives last but always arrives — the one you are most tempted to
-          under-resource because the consequences are slow.
-        </p>
+        {isPaid ? (
+          <p className="mt-1.5 text-[13.5px] leading-[1.65] text-ink/80">
+            Your Saturn is in {pressure}. That is the area of life where the bill
+            arrives last but always arrives — the one you are most tempted to
+            under-resource because the consequences are slow.
+          </p>
+        ) : (
+          <>
+            <LockedZone label="Unlock where your pressure sits" className="relative mt-1.5 h-[52px] overflow-hidden">
+              <p aria-hidden className="locked-text text-[13.5px] leading-[1.65] text-ink">
+                Your Saturn is in {pressure}. That is the area of life where the bill
+                arrives last but always arrives — the one you are most tempted to
+                under-resource because the consequences are slow.
+              </p>
+            </LockedZone>
+            <div className="mt-1.5">
+              <LockedInline label="See where your pressure sits" />
+            </div>
+          </>
+        )}
       </section>
 
     </section>
