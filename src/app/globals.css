@@ -1,0 +1,582 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+/* Tokens lifted verbatim from themonad.app. */
+:root {
+  /* The app shell ground. Deliberately a step darker and warmer than --paper:
+     the landing page is a document, the app is a surface with cards on it, and
+     cream-on-cream leaves the cards flat. */
+  --shell: #ece7dd;
+  --shell-panel: #faf8f0;
+  --ink: #0f1215;
+  --midnight: #151c24;
+  --paper: #f2ede3;
+  --bone: #ddd4c3;
+  --brass: #c2a05b;
+  --brass-deep: #9a7b3f;
+  --ledger: #22382d;
+  --oxblood: #57302f;
+  --rule: #c2a05b47;
+  --rule-faint: #c2a05b2e;
+}
+
+@layer base {
+  html {
+    -webkit-text-size-adjust: 100%;
+    scroll-behavior: smooth;
+    /* 1.65, measured off the reference. Tailwind's preflight default of 1.5
+       made every paragraph, button label and card body one step tighter. */
+    line-height: 1.65;
+  }
+
+  body {
+    /* Paper grain over the flat ground. At 0.045 it is invisible as texture
+       and entirely responsible for the page not reading as flat CSS beige. */
+    background-color: var(--paper);
+    background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='240' height='240'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.85' numOctaves='2' stitchTiles='stitch'/%3E%3CfeColorMatrix type='saturate' values='0'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)' opacity='0.045'/%3E%3C/svg%3E");
+    color: var(--ink);
+    font-family: var(--font-sans), Inter, -apple-system, sans-serif;
+    -webkit-font-smoothing: antialiased;
+    overscroll-behavior-y: none;
+  }
+
+  /* iOS zooms any input rendered under 16px on focus. Never go below it. */
+  input,
+  select,
+  textarea {
+    font-size: 16px;
+  }
+
+  /* Astrological glyphs must never resolve to colour emoji. The variation
+     selector in SIGN_GLYPH does the work; this covers fonts that ignore it. */
+  :root {
+    font-variant-emoji: text;
+  }
+
+  /*
+   * Visible focus for keyboard users.
+   *
+   * Tailwind's preflight strips the UA outline, and nothing replaced it — so
+   * tabbing through the site moved focus invisibly. `:focus-visible` keeps it
+   * off mouse clicks, which is why the outline was removed in the first place.
+   */
+  :focus-visible {
+    outline: 2px solid var(--brass-deep);
+    outline-offset: 3px;
+    border-radius: 2px;
+  }
+
+  /* On the dark green surfaces brass has too little contrast; paper reads. */
+  .bg-ledger :focus-visible,
+  .bg-ink :focus-visible,
+  footer :focus-visible {
+    outline-color: var(--paper);
+  }
+
+  /* Skip link — the first tab stop on every page. */
+  .skip-link {
+    @apply sr-only;
+  }
+
+  .skip-link:focus-visible {
+    @apply not-sr-only fixed left-4 top-4 z-[100] rounded-[4px] bg-ledger px-4 py-3
+           text-[15px] font-semibold text-paper no-underline;
+  }
+
+  ::selection {
+    background: var(--brass);
+    color: var(--ink);
+  }
+
+  * {
+    -webkit-tap-highlight-color: transparent;
+  }
+
+  /* Measured off the reference: h1 is weight 300, everything below it is 400.
+     Running h2 at 300 made the section headings look washed out next to
+     Monad's, which is the difference that reads as "wrong font". */
+  h1,
+  h2,
+  h3,
+  h4 {
+    font-family: var(--font-serif), Fraunces, Georgia, serif;
+    font-optical-sizing: auto;
+    font-weight: 400;
+    letter-spacing: -0.01em;
+    line-height: 1.12;
+  }
+
+  h1 {
+    font-weight: 300;
+    line-height: 1.04;
+  }
+}
+
+@layer components {
+  /* 3px double brass rule between sections — the reference's separator. A
+     single hairline reads as a table border; the double rule reads as a
+     printed page. Applied by the class so no section can forget it. */
+  .band {
+    @apply px-5 py-14 sm:px-12 sm:py-20;
+    border-top: 3px double rgba(154, 123, 63, 0.45);
+  }
+
+  .band-inner {
+    @apply mx-auto w-full max-w-[1060px];
+  }
+
+  /* Every section heading. 32px flat on mobile, 44px from sm — the reference
+     runs 32px at its own measure and this is the same optical size. */
+  .band-h {
+    @apply mx-auto text-balance text-[32px] leading-[1.12] tracking-[-0.01em] sm:text-[44px];
+    /* The reference caps its section headings at 720px. Without the auto
+       margins the cap silently left-aligns them inside a centred band. */
+    max-width: 720px !important;
+  }
+
+  /* Long-form body: Fraunces 18.5/1.75 at 80% ink, capped at 680px. */
+  .essay {
+    font-family: var(--font-serif), Fraunces, Georgia, serif;
+    @apply text-[17px] leading-[1.75] text-ink/80 sm:text-[18.5px];
+  }
+
+  /* 10.5px mono, uppercase, heavily tracked, brass-deep. */
+  .eyebrow {
+    font-family: var(--font-mono), 'IBM Plex Mono', monospace;
+    @apply text-[10.5px] uppercase tracking-eyebrow text-brass-deep;
+  }
+
+  .rule {
+    border-color: var(--rule);
+  }
+
+  /* Primary CTA — 2px radius reads as document, never as app chrome.
+     Gradient, outline, inset highlight and the travelling sheen are all lifted
+     from the reference; the sheen is what makes it read as pressed metal. */
+  .cta {
+    @apply relative inline-flex items-center justify-center gap-2 rounded-[2px]
+           border px-8 py-[17px] text-[16.5px] font-semibold tracking-[0.01em]
+           text-paper transition-all duration-200 sm:px-11;
+    border-color: #1b4530;
+    background: linear-gradient(120deg, #3e8862 0%, #245a40 45%, #2f7050 70%, #3e8862 100%)
+      0 0 / 220% 100%;
+    animation: sheen 7s linear infinite;
+    box-shadow:
+      inset 0 1px 0 rgba(255, 255, 255, 0.35),
+      inset 0 -1px 0 rgba(0, 0, 0, 0.18),
+      0 1px 2px rgba(0, 0, 0, 0.5),
+      0 6px 20px rgba(47, 112, 80, 0.22);
+    min-height: 54px;
+  }
+
+  .cta:hover {
+    transform: translateY(-1px);
+    box-shadow:
+      inset 0 1px 0 rgba(255, 255, 255, 0.4),
+      inset 0 -1px 0 rgba(0, 0, 0, 0.18),
+      0 2px 5px rgba(0, 0, 0, 0.5),
+      0 10px 28px rgba(47, 112, 80, 0.3);
+  }
+
+  .cta:active {
+    transform: translateY(0);
+    box-shadow:
+      inset 0 2px 5px rgba(0, 0, 0, 0.3),
+      0 1px 2px rgba(0, 0, 0, 0.4);
+  }
+
+  .cta:disabled {
+    @apply cursor-not-allowed opacity-40;
+    transform: none;
+    animation: none;
+  }
+
+  /* The arrow leans into the direction of travel on hover. */
+  .cta [aria-hidden],
+  .cta-pill [aria-hidden] {
+    @apply inline-block transition-transform duration-200;
+  }
+
+  .cta:hover [aria-hidden],
+  .cta-pill:hover [aria-hidden] {
+    transform: translateX(4px);
+  }
+
+  /* In-app CTA. Same material as .cta, one size down — the landing button is
+     scaled to carry a whole page and reads as oversized inside a card. */
+  .cta-sm {
+    @apply relative inline-flex items-center justify-center gap-2 rounded-[2px]
+           border px-7 py-[11px] text-[14px] font-semibold tracking-[0.01em]
+           text-paper transition-all duration-200;
+    border-color: #1b4530;
+    background: linear-gradient(120deg, #3e8862 0%, #245a40 45%, #2f7050 70%, #3e8862 100%)
+      0 0 / 220% 100%;
+    animation: sheen 7s linear infinite;
+    box-shadow:
+      inset 0 1px 0 rgba(255, 255, 255, 0.3),
+      inset 0 -1px 0 rgba(0, 0, 0, 0.18),
+      0 1px 2px rgba(0, 0, 0, 0.4),
+      0 4px 14px rgba(47, 112, 80, 0.2);
+    min-height: 42px;
+  }
+
+  .cta-sm:hover {
+    transform: translateY(-1px);
+    box-shadow:
+      inset 0 1px 0 rgba(255, 255, 255, 0.36),
+      0 2px 4px rgba(0, 0, 0, 0.4),
+      0 7px 20px rgba(47, 112, 80, 0.28);
+  }
+
+  .cta-sm:active { transform: translateY(0); }
+
+  .cta-sm [aria-hidden] {
+    @apply inline-block transition-transform duration-200;
+  }
+
+  .cta-sm:hover [aria-hidden] { transform: translateX(3px); }
+
+  /* The only rounded element on the site. */
+  .cta-pill {
+    @apply inline-flex items-center gap-2 rounded-full border px-6 py-2.5
+           text-[14px] font-semibold leading-[1.65] text-paper
+           transition-transform duration-150;
+    border-color: #1b4530;
+    background: linear-gradient(120deg, #3e8862, #245a40, #3e8862) 0 0 / 200% 100%;
+    animation: sheen 6s linear infinite, pill-glow 3.5s ease-in-out infinite;
+    min-height: 44px;
+  }
+
+  .cta-pill:hover {
+    transform: translateY(-1px);
+  }
+
+  .cta-pill:active {
+    transform: scale(0.98);
+  }
+
+  .cta-ghost {
+    @apply inline-flex items-center justify-center gap-2 rounded-[2px] border
+           border-ink/20 px-8 py-4 text-base font-semibold text-ink
+           transition-colors hover:border-ink/45 hover:bg-ink/[.03];
+    min-height: 52px;
+  }
+
+  /* 10px radius, 1px brass border at 35%, 30/28/26 padding — the reference's
+     exact card. Measured off the live site rather than guessed. */
+  .card {
+    @apply rounded-[10px] border px-7 pb-[26px] pt-[30px];
+    border-color: rgba(154, 123, 63, 0.35);
+    background: #faf8f0;
+  }
+
+  /* The heavier variant used for pricing and hero panels. */
+  .card-lg {
+    @apply rounded-[14px] border-[1.5px] px-6 pb-5 pt-6 sm:px-8 sm:pb-7 sm:pt-8;
+    border-color: rgba(154, 123, 63, 0.5);
+    background: #fbf8f1;
+    box-shadow: 0 18px 60px rgba(15, 18, 21, 0.07);
+  }
+
+  /* Overlapping initials. Social proof that costs no vertical space and reads
+     as people rather than a statistic. */
+  .avatar-stack {
+    @apply inline-flex items-center;
+  }
+
+  .avatar-stack span {
+    @apply -ml-2 inline-flex h-[30px] w-[30px] items-center justify-center
+           rounded-full border-2 border-paper bg-ledger text-[13px] text-paper;
+    font-family: var(--font-serif), Fraunces, Georgia, serif;
+  }
+
+  .avatar-stack span:first-child {
+    @apply ml-0;
+  }
+
+  /* Gold tinge across the top of the landing page. Two offset radials rather
+     than one centred glow: the light has to look like it comes from somewhere,
+     and dead-centre reads as a vignette. */
+  .hero-glow {
+    @apply pointer-events-none absolute inset-x-0 top-0 -z-10;
+    height: 560px;
+    background:
+      radial-gradient(60% 70% at 22% 0%, rgba(194, 160, 91, 0.30) 0%, rgba(194, 160, 91, 0) 68%),
+      radial-gradient(50% 60% at 78% 6%, rgba(194, 160, 91, 0.16) 0%, rgba(194, 160, 91, 0) 70%),
+      linear-gradient(180deg, rgba(194, 160, 91, 0.10) 0%, rgba(194, 160, 91, 0) 100%);
+  }
+
+  /* The brass swoosh under "you". A box-shadow underline reads as a hyperlink;
+     this is a hand-drawn stroke that sits behind the glyphs and tapers. */
+  .u-you {
+    @apply relative z-0 font-semibold;
+  }
+
+  .u-you::after {
+    content: '';
+    @apply pointer-events-none absolute;
+    z-index: -1;
+    height: 0.14em;
+    bottom: 0.02em;
+    left: -2%;
+    right: -2%;
+    background: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 12' preserveAspectRatio='none'%3E%3Cpath d='M2 9.5 Q 50 2.5 98 7.5' stroke='%23C2A05B' stroke-width='4.5' fill='none' stroke-linecap='round'/%3E%3C/svg%3E")
+      50% center / 100% 100% no-repeat;
+  }
+
+  /* How-it-works cards. Dot field + a 4px brass-to-green bar across the top,
+     both measured off the reference. The bar is what stops three outlined
+     rectangles reading as a wireframe. */
+  .step-card {
+    @apply relative overflow-hidden rounded-[10px] border px-7 pb-[26px] pt-[30px];
+    border-color: rgba(154, 123, 63, 0.35);
+    background:
+      radial-gradient(circle at 8px 8px, rgba(154, 123, 63, 0.18) 1px, transparent 1.5px)
+        0 0 / 22px 22px,
+      #fbf8f1;
+  }
+
+  .step-card::before {
+    content: '';
+    @apply absolute inset-x-0 top-0 h-[4px];
+    background: linear-gradient(90deg, #c9a227, #2f7050);
+  }
+
+  .step-badge {
+    @apply inline-block rounded-full px-3.5 py-[5px] font-mono text-[10.5px]
+           uppercase tracking-[0.2em] text-paper;
+    background-image: linear-gradient(120deg, #3e8862, #245a40);
+  }
+
+  /* Pricing. One card holding stacked full-width plan rows, as the reference
+     does — side-by-side cards make the two plans read as a choice to agonise
+     over rather than a default with an alternative. */
+  .plan-row {
+    @apply relative flex items-baseline justify-between gap-3.5
+           rounded-[10px] border px-5 py-4 text-left transition-colors;
+    border-color: rgba(154, 123, 63, 0.35);
+  }
+
+  .plan-row-on {
+    @apply border-2 border-ledger-mid;
+    background: rgba(47, 112, 80, 0.05);
+  }
+
+  /*
+   * Skeleton bars, for content that is being COMPUTED.
+   *
+   * Distinct from `.locked`, which blurs real text that exists but is paid
+   * for. Conflating the two is a lie in both directions: a blur implies the
+   * text is already written, and a skeleton implies nothing is being withheld.
+   */
+  .skeleton {
+    @apply overflow-hidden rounded-full;
+    background: linear-gradient(
+      90deg,
+      rgba(154, 123, 63, 0.13) 0%,
+      rgba(154, 123, 63, 0.26) 40%,
+      rgba(154, 123, 63, 0.13) 80%
+    );
+    background-size: 220% 100%;
+    animation: skeleton-sweep 1.8s ease-in-out infinite;
+  }
+
+  /* Real copy behind the paywall: blurred, never replaced. The reader can see
+     how much is there, which is what makes the wall convert.
+     Clickable on purpose — reaching for blurred text IS the buying signal. */
+  .locked-text {
+    @apply cursor-pointer select-none;
+    filter: blur(5px);
+    opacity: 0.55;
+    transition: filter 0.2s ease-out, opacity 0.2s ease-out;
+  }
+
+  .locked-text:hover {
+    filter: blur(3.5px);
+    opacity: 0.7;
+  }
+
+  /*
+   * Hover affordance for every card-shaped surface.
+   *
+   * A card that does nothing on hover reads as printed; one that lifts and
+   * darkens its rule reads as a thing you can act on. Applied to `.card` so
+   * every surface in the app gets it without remembering to opt in.
+   */
+  .card,
+  .step-card {
+    transition:
+      border-color 0.18s ease-out,
+      box-shadow 0.22s ease-out,
+      transform 0.18s ease-out;
+  }
+
+  .card:hover,
+  .step-card:hover {
+    border-color: rgba(154, 123, 63, 0.6);
+    box-shadow: 0 6px 22px -10px rgba(15, 18, 21, 0.16);
+  }
+
+  /* Only surfaces that actually lead somewhere lift. A static card that moves
+     on hover promises a click that never happens. */
+  a.card:hover,
+  .card-interactive:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 10px 28px -12px rgba(15, 18, 21, 0.22);
+  }
+
+  /* Reading tabs. Selected reads as chosen without shouting. */
+  .chip {
+    @apply inline-flex min-h-[38px] shrink-0 items-center gap-1.5 whitespace-nowrap
+           rounded-full border px-4 text-[13px] transition-colors;
+    border-color: rgba(154, 123, 63, 0.4);
+    color: rgba(15, 18, 21, 0.7);
+  }
+
+  .chip:hover {
+    border-color: rgba(154, 123, 63, 0.75);
+    background: rgba(154, 123, 63, 0.07);
+  }
+
+  .chip-on:hover {
+    background: #fff;
+    border-color: var(--ledger-mid, #2f7050);
+  }
+
+  .chip-on {
+    @apply border-ledger-mid bg-white font-medium text-ink;
+  }
+
+  /* Onboarding controls are softer than the page furniture: 10px radius, white
+     fill, and a green ring on focus. Matches the reference's modal. */
+  .field {
+    @apply w-full rounded-[10px] border bg-white px-4 py-3.5 text-ink outline-none
+           transition-all placeholder:text-ink/35;
+    border-color: #0f121522;
+    min-height: 54px;
+  }
+
+  .field:focus {
+    border-color: #2f7050;
+    box-shadow: 0 0 0 3px rgba(47, 112, 80, 0.14);
+  }
+
+  /* The in-modal CTA is rounded, not the document-square landing button, and
+     its disabled state is muted sage rather than a faded dark slab. */
+  .cta-form {
+    @apply rounded-[10px];
+  }
+
+  .cta-form:disabled {
+    @apply opacity-100;
+    background: #9dbfa8;
+    border-color: #9dbfa8;
+    box-shadow: none;
+    animation: none;
+  }
+
+  /* Native chevron overlaps long option text ("September") without room. */
+  select.field {
+    @apply pr-9;
+    appearance: none;
+    background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='8' viewBox='0 0 12 8' fill='none'%3E%3Cpath d='M1 1.5L6 6.5L11 1.5' stroke='%230f1215' stroke-opacity='0.45' stroke-width='1.6' stroke-linecap='round' stroke-linejoin='round'/%3E%3C/svg%3E");
+    background-repeat: no-repeat;
+    background-position: right 14px center;
+  }
+
+  .field:focus {
+    border-color: var(--ledger);
+    box-shadow: 0 0 0 3px #22382d1f;
+  }
+
+  .hairline {
+    @apply h-px w-full;
+    background: linear-gradient(
+      90deg,
+      transparent,
+      var(--rule) 18%,
+      var(--rule) 82%,
+      transparent
+    );
+  }
+
+  /* Paywall: the real reading renders underneath, blurred. Shares its value
+     with .locked-text so the two can never drift apart. */
+  .locked {
+    @apply locked-text;
+    pointer-events: none;
+  }
+
+  .veil {
+    position: absolute;
+    inset: 0;
+    background: linear-gradient(
+      to bottom,
+      transparent 0%,
+      transparent 34%,
+      #ece7dd 86%,
+      #ece7dd 100%
+    );
+  }
+}
+
+@layer utilities {
+  .safe-b {
+    padding-bottom: max(env(safe-area-inset-bottom), 0.75rem);
+  }
+
+  .safe-t {
+    padding-top: env(safe-area-inset-top);
+  }
+
+  .text-balance {
+    text-wrap: balance;
+  }
+
+  .text-pretty {
+    text-wrap: pretty;
+  }
+
+  .no-bar::-webkit-scrollbar {
+    display: none;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  *,
+  *::before,
+  *::after {
+    animation-duration: 0.001ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.001ms !important;
+    scroll-behavior: auto !important;
+  }
+}
+
+@keyframes sheen {
+  0% { background-position: 0% center; }
+  100% { background-position: 200% center; }
+}
+
+@keyframes pill-glow {
+  0%, 100% { box-shadow: 0 2px 10px rgba(47, 112, 80, 0.25); }
+  50% { box-shadow: 0 4px 22px rgba(47, 112, 80, 0.45); }
+}
+
+/* A permanently travelling gradient is exactly what this setting is for. */
+@media (prefers-reduced-motion: reduce) {
+  .cta,
+  .cta-pill {
+    animation: none;
+  }
+}
+
+@keyframes skeleton-sweep {
+  0% { background-position: 140% 0; }
+  100% { background-position: -40% 0; }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .skeleton { animation: none; }
+}

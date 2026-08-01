@@ -1,126 +1,239 @@
-# Axon Careers
+# Axon
 
-**An AI mock interview coach for the people the other tools forgot.**
+Astrology for business. Computes a natal chart, numerology life path and Chinese
+zodiac sign from birth date, time and place, then generates a business-framed
+reading: founder archetype, strengths, blind spots, timing.
 
-Final Round, Pramp, Interview Kickstart — they all aim at the same person: a 25-year-old software engineer who lives on Reddit. Axon Careers is for everyone else. The 38-year-old returning to work after raising kids. The 52-year-old laid off after fifteen years. The teacher switching into corporate training. They're the most anxious job seekers out there, and almost nobody builds for them.
-
-Axon Careers gives them a private room to practice in. You answer real interview questions, an AI scores you on five dimensions, and you watch the number climb session after session. A score of 44 today becomes an 82 next week — and you proved it to yourself.
+Built 1:1 against `axon.app` — structure, funnel, design tokens and type
+scale captured live. See `../MONAD-CLONE-PRD.md` for the full teardown.
 
 ---
 
-## One main feature, two that feed it
+## Stack
 
-The product does one job and does it deep. Everything else was cut.
-
-### The main thing: Practice
-
-Eight questions matched to your role, situation, and the actual company and posting you paste in. Every answer is scored on **clarity, relevance, specificity, confidence, and conciseness**, with one specific fix. Then the interviewer asks a real follow-up that probes what you actually said — the way a live one tests whether your story holds up. You can speak your answers; the browser transcribes them and measures your pace, pauses, and words per minute.
-
-The **Anxiety Detector** runs on every answer, counting the filler words, hedges, apologies, and self-undermining qualifiers you don't hear yourself say.
-
-### The metrics page
-
-This is why people come back. Everything is computed from your own sessions in `lib/metrics.ts`:
-
-- **Readiness** and the **percentile** it puts you in ("you answer better than 73% of candidates")
-- **Estimated time to a top 1% interview** — a trend line fit through your last ten sessions gives your points-per-session, divided into the gap to 94 at your current practice frequency, projected to a real calendar date
-- **Trajectory chart** — your actual scores, plus a dashed line extending your pace to the Ready (80) and Top 1% (94) bars
-- **Streaks**, a 28-day activity strip, consistency percentage, week-over-week, best week, rest days
-- **Per-skill breakdown** — current, best, delta, rank, pace, and days-to-80 for each of the five dimensions
-- **Anxiety trends** — fillers, hedges, apologies and underminers per 100 words, versus where you started
-- **Answer spread**, performance by question type, delivery metrics, personal records
-- An **11-step milestone ladder** with the next one always in progress
-
-### The two builders that feed it
-
-| Tool | What it's for |
+| Layer | Choice |
 |---|---|
-| **Question Predictor** | Paste the posting, get the five questions they'll likely ask, ranked by probability — then drill all five in a scored session with one tap |
-| **Gap Story Builder** | Turns any résumé gap into three confident 30-second answers |
-
-Both exist because they make the practice loop better. Nothing else does, so nothing else ships.
+| Framework | Next.js 15 App Router + Tailwind |
+| Database & auth | Supabase (Postgres, RLS, magic link + Google) |
+| Payments | Stripe Checkout + webhooks + billing portal |
+| Generation | Anthropic `claude-opus-5`, structured outputs |
+| Email | Resend |
+| Analytics | PostHog + Meta Pixel |
+| Astronomy | `astronomy-engine` — no external ephemeris service |
+| Geocoding | Open-Meteo (free, keyless, returns IANA timezone) |
 
 ---
 
-## It works with zero setup
+## The engine
 
-**Axon Careers runs fully without any API keys.** Every score, every piece of feedback, and the Anxiety Detector are powered by a real heuristic engine (`lib/scoring.ts`) that analyzes your actual words — filler density, STAR structure, concrete numbers, hedging, length. So the product is demonstrable the second you start it.
+Three systems, all computed locally.
 
-Add an `ANTHROPIC_API_KEY` and the same routes quietly upgrade to live Claude scoring and generation. If a call ever fails, it falls straight back to the local engine. Nothing breaks.
+### 1. Western natal chart
+
+- **Ecliptic of date**, not J2000. Using J2000 directly drifts by the
+  accumulated precession since 2000 — enough to put a planet in the wrong sign
+  near a cusp.
+- **Ascendant**: `atan2(cos RAMC, −(sin RAMC·cos ε + tan φ·sin ε))`
+- **Midheaven**: `atan2(sin RAMC, cos RAMC·cos ε)`
+- **Houses**: whole sign. Chosen over Placidus deliberately — it is exact, has
+  no iterative solution to get subtly wrong, and does not break above the polar
+  circle where Placidus is undefined. Ascendant and Midheaven are computed
+  independently and are identical under any system.
+- **True lunar node** from the instantaneous orbital plane (`r × v`), not the
+  nearest crossing, which can be ~13 days away and therefore ~0.7° stale.
+- **Aspects** with conventional orbs, luminaries widened, applying/separating
+  determined by re-evaluating an hour later.
+
+### 2. Numerology
+
+Pythagorean life path. Month, day and year reduced separately, summed, reduced
+again, with master numbers (11, 22, 33) preserved at every step.
+
+### 3. Chinese zodiac
+
+The year boundary is **Chinese New Year, not 1 January**. A naive `year % 12`
+puts everyone born in January or early February in the wrong animal — roughly
+one user in nine. CNY is computed as the second new moon after the December
+solstice in China standard time, which is the actual rule, so it never runs out
+the way a lookup table would.
+
+### Verification
+
+```bash
+npm run verify
+```
+
+| Check | Result |
+|---|---|
+| Midheaven at solar transit | **0.00035°** — exact identity |
+| Ascendant on the horizon, every hour, every latitude | **1.07e-13°** |
+| Ascendant/MC quadrant relation | holds at every RAMC and latitude |
+| Chinese New Year, 10 published dates 1971–2026 | all exact |
+| Animal boundary either side of CNY | correct |
+| Life path incl. master numbers | correct |
+| Historical DST (incl. British Standard Time, Jan 1970 = UTC+1) | 9/9 |
+| Forgiving time parser | 15/15 |
+| No birth time → angles withheld, not fabricated | pass |
+
+The Ascendant test is worth calling out: rather than compare against another
+app, it places the computed Ascendant on the ecliptic, rotates it into the
+observer's horizontal frame, and asserts its altitude is zero and that it is
+rising. That is the definition of the Ascendant, so it either holds exactly or
+the formula is wrong. It holds to machine precision.
+
+---
+
+## Features
+
+All six advertised in the pricing block are built. `npm run verify:parity` fails
+the build if that ever stops being true — charging for a feature that does not
+exist is both a 1:1 failure and a consumer-protection problem.
+
+| Feature | Route | Notes |
+|---|---|---|
+| Full Reading | `/reading` | Six sections, generated once then cached |
+| Daily Briefings | `/brief` | One per day, plus live contacts to your chart |
+| Chat With Your Chart | `/chat` | Full chart in context, last 20 turns kept |
+| Timing & Windows | `/outlook` | Week/month as windows, not predictions |
+| Compatibility Reads | `/compat` | Up to 10 people, strictly business |
+| Weekly & Monthly Outlooks | `/outlook` | Sky sampled across the period |
+
+Free tier: archetype reveal, the big six data points, and the first two reading
+sections. The remaining four render for real underneath a blur — a solid panel
+converts noticeably worse than visible-but-obscured content.
+
+## The funnel
+
+```
+/                 landing page, 8 blocks, every CTA → /start
+/start            3-step modal over a dimmed page
+                    1. birth data   (three selects, type-ahead place, forgiving time)
+                    2. name + email ("Building your chart… Where should we send it?")
+                    3. reveal → /r/[id]
+/r/[id]           archetype reveal + 2 free sections + blurred rest + paywall
+/login            passwordless magic link
+/brief /chat /reading /account    paid
+```
+
+### Two bugs from the reference, fixed here
+
+Axon's own build log names both as conversion-killers on mobile, where 75% of
+paid traffic lands:
+
+1. **Place of birth silently mis-resolved.** Typing "London, United Kingdom" on
+   the live site resolves to *Londonthorpe* — a village of ~200 people, 160km
+   away — with no confirmation, and every downstream calculation is then wrong.
+   Here the place field is a type-ahead that **requires explicit selection** and
+   shows the resolved IANA timezone before accepting it.
+2. **Time field required a colon and never said so**, leaving the submit button
+   silently dead. Here `8:10`, `810`, `8.10`, `8 10` and `8` all parse, and the
+   button **always explains why it is disabled**.
+
+### The email gate
+
+Step 2 captures name and email **before** the reading is shown, framed as a
+delivery address for a chart that is already being computed. This is the
+mechanic that makes the nurture sequence possible — without it the drip has
+almost nobody in it. The hero says "no card required", never "no email".
+
+---
+
+## Setup
 
 ```bash
 npm install
-npm run dev          # → http://localhost:3000
+cp .env.example .env.local
 ```
 
-Optional, in `.env.local`:
+1. **Supabase** — run `supabase/schema.sql` in the SQL editor (idempotent).
+   Enable Email and optionally Google under Authentication → Providers, and add
+   `https://yourdomain.com/auth/callback` to the redirect allow-list.
+2. **Stripe** — create two prices and set `STRIPE_PRICE_WEEKLY` ($8.99/week) and
+   `STRIPE_PRICE_ANNUAL` ($98/year). Add a webhook at
+   `/api/webhooks/stripe` for `checkout.session.completed`,
+   `customer.subscription.{created,updated,deleted}`, `invoice.payment_failed`.
+   Locally: `stripe listen --forward-to localhost:3000/api/webhooks/stripe`.
+3. **Anthropic, Resend, PostHog** — set the keys.
+4. `npm run dev`
+
+> **Rename before you ship.** `src/lib/brand.ts` holds every brand string in one
+> place. It defaults to "Axon" because this build mirrors that product —
+> change it and the domain before pointing paid traffic at it.
+
+---
+
+## Access control
+
+`npm run verify:protection` audits all of this statically. Payment is checked in
+depth, not just in the UI:
+
+1. **`middleware.ts`** — redirects unauthenticated users away from `/brief`,
+   `/chat`, `/reading`, `/account`. No database read.
+2. **`(paid)/layout.tsx`** — reads `subscription_status` **and**
+   `subscription_expiry`, bouncing unpaid users back to their free reading. A
+   lapsed subscription whose webhook never landed still loses access.
+3. **Every paid API route** re-checks entitlement and returns `402`.
+
+The client is never trusted to report a payment. Access is granted only by the
+Stripe webhook, which verifies the signature against the **raw** request body
+and de-duplicates replays via the `stripe_events` primary key.
+
+Anonymous charts are protected by an unguessable `access_token` in an httpOnly
+cookie — knowing a chart's UUID is not enough to read it.
+
+---
+
+## Email automation
+
+Two Vercel cron jobs (`vercel.json`), both requiring
+`Authorization: Bearer $CRON_SECRET`:
+
+| Path | UTC | Does |
+|---|---|---|
+| `/api/cron/daily` | 11:00 | Generates and emails each subscriber's daily briefing |
+| `/api/cron/sequence` | 14:30 | Sends the day 0/2/3/5/7 nurture email to leads who have not converted |
+
+The sequence claims each send by inserting into `email_events` **before**
+sending — the unique constraint on `(chart_id, kind)` makes a double-run a
+no-op, and a failed send releases the claim so tomorrow retries it. Anyone who
+has since subscribed is skipped.
+
+---
+
+## Deploy
 
 ```bash
-ANTHROPIC_API_KEY=sk-ant-...
-ANTHROPIC_MODEL=claude-sonnet-4-6
+npx vercel deploy --prod
 ```
 
----
+Set every variable from `.env.example`, add the domain, then update
+`NEXT_PUBLIC_SITE_URL` and the Stripe webhook URL.
 
-## Pricing
+### Before spending over $50/day
 
-Two plans, both sized to a real job search. Defined once in `lib/pricing.ts`, read by the landing page, the paywall, and the upgrade screen.
-
-| Plan | Price | Effective |
-|---|---|---|
-| Monthly | $9.99 / month | $9.99 a month |
-| **3 months** | **$19.99 once** | **$6.66 a month — save 33%** |
-
-Three months, not a year: that's roughly how long a search runs, so it's the plan that actually covers the job you're interviewing for. And it costs less than buying two months alone.
-
----
-
-## Design
-
-The look is **"calm confidence, elevated."** The demographic is anxious, so the interface had to feel like a trusted mentor's office — warm, never clinical.
-
-- **Canvas:** a warm ivory with a faint grain and radial warmth, not flat white.
-- **Color:** deep ink navy text, a calm **teal** primary, sage / amber / coral for score states, and warm **gold** for premium (no cliché purple gradients).
-- **Type:** **Fraunces** (a warm editorial serif) for emotional headlines, **Hanken Grotesk** for the UI, **JetBrains Mono** for scores and data.
-- **Surfaces:** layered soft shadows, glass panels, a custom glass logo emblem, and count-up score animations.
-- **Charts:** Recharts with gradient fills, custom tooltips, and dashed reference lines at Ready and Top 1%.
-
-The whole system lives in `app/globals.css` and `tailwind.config.ts`.
+- [ ] Walk the whole funnel on a real phone — 75% of paid traffic is mobile
+- [ ] Both prices visible on the paywall without scrolling
+- [ ] Checkout opens without navigating away
+- [ ] Access unlocks with no manual refresh after payment
+- [ ] Geo targeting set **before** going live (a suspiciously cheap CPC is the tell)
+- [ ] Paywall verified firing — a silent auth bug cost the reference a full day of spend
 
 ---
 
-## Architecture
+## Images
 
-```
-app/
-  page.tsx                 Landing
-  start/                   Dedicated ad landing page for paid traffic
-  onboarding/              3-screen intake
-  practice/                The core Practice → Score loop
-  session/[id]/            Session results: radar, progress, per-answer review
-  dashboard/               The metrics page
-  tools/question-predictor Paste a posting → 5 questions → practice them
-  tools/gap-story          Three 30-second gap answers
-  signin/ upgrade/ settings/
-  api/                     11 routes — Claude when keyed, heuristic otherwise
-components/                ui / charts / layout / landing / practice
-lib/
-  scoring.ts               Heuristic scoring + Anxiety Detector engine
-  metrics.ts               Every number on the dashboard, computed from sessions
-  pricing.ts               Single source of truth for what we charge
-  stripe.ts supabase.ts    Payments and server-side subscription truth
-  store.ts cloud.ts        localStorage, mirrored to Supabase when signed in
-  ai.ts client.ts questions.ts examples.ts roles.ts share.ts
-```
-
-**Stack:** Next.js 14 (App Router) · TypeScript · Tailwind · Framer Motion · Recharts · Anthropic SDK · Supabase · Stripe.
-
-**Access is gated.** `components/layout/AppShell.tsx` is the single gate: not signed in goes to `/signin`, signed in without a subscription goes to `/upgrade`, and the decision is authoritative from the `subscriptions` table — never from a localStorage flag. A canceled-at-period-end subscriber keeps access until their paid time runs out. The gate is inert until the Supabase anon key is set, so local development keeps working.
-
-**Persistence** is `localStorage`, mirrored to Supabase when signed in. See `supabase/schema.sql` — three tables (`profiles`, `sessions`, `subscriptions`), all RLS-protected, with `subscriptions` writable only by the service role.
-
-**Payments** are real, key-gated Stripe Checkout. The full go-live runbook is in **[MONETIZATION.md](./MONETIZATION.md)**.
+`public/titans/` holds three public-domain portraits from Wikimedia Commons:
+J.P. Morgan by Edward Steichen, Ronald Reagan's official portrait by Michael
+Evans, and the Augustus of Prima Porta photographed by Till Niermann. The credit
+line under the titans band names all three — keep it. Citing sources is part of
+what makes the section read as credible rather than as a scam.
 
 ---
 
-Built by Keshav Krishnan. Axon Careers is a practice tool, not a guarantee of employment.
+## Compliance
+
+Every surface carries the disclaimer that this is for entertainment and
+self-reflection, not financial, legal, business or medical advice, and that no
+outcome is promised. The generation prompts explicitly ban prediction and
+outcome claims. Keep it that way — the category attracts scrutiny and the ad
+account is the thing you cannot easily replace.
