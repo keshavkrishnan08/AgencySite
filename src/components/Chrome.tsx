@@ -60,7 +60,7 @@ export function Nav({ authed = false }: { authed?: boolean }) {
         <div className="flex items-center gap-6">
           <Link
             href={authed ? '/chart' : '/login'}
-            className="hidden min-h-[44px] items-center font-mono text-[11.5px] uppercase tracking-nav text-ink/65 transition-colors hover:text-ink sm:flex"
+            className="flex min-h-[44px] items-center font-mono text-[11.5px] uppercase tracking-nav text-ink/65 transition-colors hover:text-ink"
           >
             {authed ? 'Dashboard' : 'Log in'}
           </Link>
