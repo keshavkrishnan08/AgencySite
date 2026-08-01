@@ -135,7 +135,7 @@ export function Sidebar({
                 footnote to the offer, not part of the button. */}
             <p className="bg-black/12 px-2 py-2 text-center font-mono text-[7px] uppercase leading-[1.6] tracking-[0.1em] text-paper/50">
               A new one every morning · from{' '}
-              {PRICING.annual.amount === '$79' ? '$6.58/mo' : PRICING.weekly.amount}
+              {PRICING.annual.amount === '$79' ? '$6.58/mo' : PRICING.weekly.amount.replace('.99', '/wk')}
             </p>
           </div>
         )}
