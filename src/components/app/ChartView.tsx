@@ -167,7 +167,7 @@ export function ChartView({
             const sysLocked = !isPaid && i > 0;
             const open = openSystem === s.eyebrow;
             return (
-              <div key={s.eyebrow} className="card card-interactive flex flex-col">
+              <div key={s.eyebrow} className="card card-interactive flex min-h-[200px] flex-col">
                 <p className="eyebrow">{s.eyebrow}</p>
                 <p className="mt-2 font-serif text-[20px] leading-tight">{s.title}</p>
                 {sysLocked ? (
