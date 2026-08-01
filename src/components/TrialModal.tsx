@@ -126,7 +126,7 @@ export function TrialModal({
             selected={plan === 'annual'}
             onSelect={() => setPlan('annual')}
             title="Yearly"
-            badge="Save 79%"
+            badge="Save 81%"
             body={`${PRICING.annual.amount}/yr, billed once`}
           />
         </div>
