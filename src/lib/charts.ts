@@ -73,6 +73,24 @@ export async function getChart(id: string): Promise<ChartRow | null> {
   return null;
 }
 
+/**
+ * Public chart fetch for the share page. The chart UUID is a 128-bit
+ * unguessable token, so knowledge of the id IS the authorization. No
+ * sensitive fields (email, raw birth data) are exposed on the /r/ page.
+ */
+export async function getChartPublic(id: string): Promise<ChartRow | null> {
+  try {
+    const res = await supabaseAdmin()
+      .from('charts')
+      .select('*')
+      .eq('id', id)
+      .maybeSingle<ChartRow>();
+    return res.data;
+  } catch {
+    return recallChart(id, undefined);
+  }
+}
+
 /** The chart a signed-in user should see: their most recent. */
 export async function getCurrentChart(userId: string): Promise<ChartRow | null> {
   const admin = supabaseAdmin();
