@@ -267,16 +267,17 @@
      exact card. Measured off the live site rather than guessed. */
   .card {
     @apply rounded-[10px] border px-7 pb-[26px] pt-[30px];
-    border-color: rgba(154, 123, 63, 0.35);
+    border-color: rgba(154, 123, 63, 0.25);
     background: #faf8f0;
+    box-shadow: 0 2px 8px -2px rgba(15, 18, 21, 0.06), 0 1px 2px -1px rgba(15, 18, 21, 0.04);
   }
 
   /* The heavier variant used for pricing and hero panels. */
   .card-lg {
     @apply rounded-[14px] border-[1.5px] px-6 pb-5 pt-6 sm:px-8 sm:pb-7 sm:pt-8;
-    border-color: rgba(154, 123, 63, 0.5);
+    border-color: rgba(154, 123, 63, 0.4);
     background: #fbf8f1;
-    box-shadow: 0 18px 60px rgba(15, 18, 21, 0.07);
+    box-shadow: 0 4px 16px -4px rgba(15, 18, 21, 0.08), 0 18px 60px rgba(15, 18, 21, 0.06);
   }
 
   /* Overlapping initials. Social proof that costs no vertical space and reads
@@ -423,7 +424,8 @@
   a.card:hover,
   .card-interactive:hover {
     transform: translateY(-2px);
-    box-shadow: 0 10px 28px -12px rgba(15, 18, 21, 0.22);
+    box-shadow: 0 12px 32px -12px rgba(15, 18, 21, 0.18), 0 4px 12px -4px rgba(15, 18, 21, 0.08);
+    border-color: rgba(154, 123, 63, 0.45);
   }
 
   /* Reading tabs. Selected reads as chosen without shouting. */
