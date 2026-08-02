@@ -3,6 +3,7 @@
 import { useEffect, useMemo, useRef, useState } from 'react';
 import { EVENTS, track } from './Analytics';
 import { CityPicker } from './CityPicker';
+import { supabaseBrowser } from '@/lib/supabase/client';
 import type { Place } from '@/lib/astro/geo';
 
 const THIS_YEAR = new Date().getFullYear();
@@ -52,6 +53,7 @@ export function StartFlow() {
 
   const [firstName, setFirstName] = useState('');
   const [email, setEmail] = useState('');
+  const [password, setPassword] = useState('');
 
   const [error, setError] = useState<string | null>(null);
   const [busy, setBusy] = useState(false);
@@ -97,7 +99,7 @@ export function StartFlow() {
               ? 'Time should look like 8:10 — hours between 1 and 12.'
               : null;
 
-  const step2Valid = firstName.trim().length > 0 && /^\S+@\S+\.\S+$/.test(email.trim());
+  const step2Valid = firstName.trim().length > 0 && /^\S+@\S+\.\S+$/.test(email.trim()) && password.length >= 6;
 
   async function submit() {
     if (!place || busy) return;
@@ -138,22 +140,28 @@ export function StartFlow() {
       }
 
       track(EVENTS.formComplete, { archetype: json.archetype });
-      // Remember the email so the login page can pre-fill it — the user
-      // already gave it, asking again is friction.
+
+      // Sign up the user with Supabase auth. This IS the account creation —
+      // no separate signup page. With autoconfirm enabled the session is
+      // returned immediately and the user lands on /chart already signed in.
       try {
-        localStorage.setItem('axon_email', email.trim());
-        localStorage.setItem('axon_name', firstName.trim());
-      } catch {}
+        const sb = supabaseBrowser();
+        const { error: authErr } = await sb.auth.signUp({
+          email: email.trim(),
+          password,
+          options: { data: { first_name: firstName.trim() } },
+        });
+        // If the email is already registered, sign them in instead.
+        if (authErr?.message?.toLowerCase().includes('already registered')) {
+          await sb.auth.signInWithPassword({ email: email.trim(), password });
+        }
+        // Link the chart to the new account.
+        await fetch('/api/claim', { method: 'POST' }).catch(() => {});
+      } catch {
+        // Auth failure must not block the chart — they can sign in later.
+      }
+
       setStep(2);
-      // Hold the reveal briefly — an instant result reads as a lookup table.
-      // Into the full app shell, not the bare reveal page: the sidebar, ask
-      // panel and locked surfaces are the product; /r/:id is only a shareable
-      // permalink.
-      //
-      // A hard navigation, not router.push. This flow also runs inside a modal
-      // on the landing page, and a client-side push leaves that overlay mounted
-      // on top of the app with body scroll still locked. It also guarantees the
-      // server reads the chart cookie that was set by the response above.
       setTimeout(() => window.location.assign('/chart'), 2200);
     } catch (e) {
       setError(e instanceof Error ? e.message : 'Something went wrong.');
@@ -294,10 +302,22 @@ export function StartFlow() {
                 type="email"
                 inputMode="email"
                 autoComplete="email"
-                enterKeyHint="go"
-                placeholder="Where to send your reading"
+                enterKeyHint="next"
+                placeholder="your@email.com"
                 value={email}
                 onChange={(e) => setEmail(e.target.value)}
+              />
+            </Field>
+            <Field label="Create a password">
+              <input
+                className="field"
+                type="password"
+                autoComplete="new-password"
+                enterKeyHint="go"
+                minLength={6}
+                placeholder="6+ characters"
+                value={password}
+                onChange={(e) => setPassword(e.target.value)}
               />
             </Field>
           </div>
