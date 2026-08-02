@@ -25,7 +25,7 @@ export const PLANS = {
   annual: {
     id: 'annual' as const,
     label: 'Annual',
-    price: '$79',
+    price: '$78.99',
     cadence: '/year',
     priceIdEnv: 'STRIPE_PRICE_ID_ANNUAL',
     blurb: 'Full access, billed once a year.',

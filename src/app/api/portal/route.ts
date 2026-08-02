@@ -11,6 +11,12 @@ export const runtime = 'nodejs';
  * `intent: 'cancel'` deep-links into Stripe's cancellation flow rather than
  * dropping the user on a dashboard to find it themselves — cancelling has to
  * be as easy as subscribing was.
+ *
+ * `intent: 'upgrade'` deep-links into the plan-switch flow. An existing
+ * subscriber cannot go through Checkout at all — /api/checkout bounces anyone
+ * already on `weekly`, `annual` or `trialing` back to /updates — so a weekly
+ * → annual move has to modify the live subscription instead of opening a
+ * second one. Stripe prorates the switch and never re-grants the free trial.
  */
 export async function POST(request: Request) {
   const ent = await getEntitlement();
@@ -55,6 +61,18 @@ export async function POST(request: Request) {
             after_completion: {
               type: 'redirect' as const,
               redirect: { return_url: `${site}/settings?cancelled=1` },
+            },
+          },
+        }
+      : {}),
+    ...(intent === 'upgrade' && ent.subscriptionId
+      ? {
+          flow_data: {
+            type: 'subscription_update' as const,
+            subscription_update: { subscription: ent.subscriptionId },
+            after_completion: {
+              type: 'redirect' as const,
+              redirect: { return_url: `${site}/settings?upgraded=1` },
             },
           },
         }
