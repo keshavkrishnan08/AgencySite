@@ -277,7 +277,7 @@
     @apply rounded-[14px] border-[1.5px] px-6 pb-5 pt-6 sm:px-8 sm:pb-7 sm:pt-8;
     border-color: rgba(154, 123, 63, 0.4);
     background: #fbf8f1;
-    box-shadow: 0 4px 16px -4px rgba(15, 18, 21, 0.08), 0 18px 60px rgba(15, 18, 21, 0.06);
+    box-shadow: 0 18px 60px rgba(15, 18, 21, 0.07);
   }
 
   /* Overlapping initials. Social proof that costs no vertical space and reads

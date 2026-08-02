@@ -17,7 +17,7 @@ export const BRAND = {
  */
 export const PRICING = {
   weekly: { label: 'Weekly', amount: '$7.99', cadence: '/week', badge: '3 days free' },
-  annual: { label: 'Annual', amount: '$79', cadence: '/year', badge: '3 days free · save 81%' },
+  annual: { label: 'Annual', amount: '$78.99', cadence: '/year', badge: '3 days free · save 81%' },
   trialDays: 3,
 } as const;
 

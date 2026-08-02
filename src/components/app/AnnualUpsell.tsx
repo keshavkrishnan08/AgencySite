@@ -7,7 +7,7 @@ import { PRICING } from '@/lib/brand';
 /**
  * Weekly → annual, offered inside the product rather than at the paywall.
  *
- * At the paywall a $79 charge competes with $7.99 and loses; two weeks in, the
+ * At the paywall a $78.99 charge competes with $7.99 and loses; two weeks in, the
  * same offer lands on someone who has already decided they want the thing. It
  * is also the safest way to raise ARPU: a subscriber who upgrades knowingly
  * disputes at a fraction of the rate of a trial that converted into a large
@@ -23,17 +23,21 @@ export function AnnualUpsell({ weeklySpendPerYear }: { weeklySpendPerYear: strin
     track(EVENTS.checkoutStarted, { plan: 'annual', source: 'annual_upsell' });
 
     try {
-      const res = await fetch('/api/checkout', {
+      // NOT /api/checkout: that route bounces anyone with an active
+      // subscription straight back to /updates, so pointing the upgrade at it
+      // made this button a no-op. Switching plans means updating the live
+      // subscription, which is the billing portal's job.
+      const res = await fetch('/api/portal', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ plan: 'annual' }),
+        body: JSON.stringify({ intent: 'upgrade' }),
       });
       // Next serves HTML on an unhandled error, so never assume JSON.
       const json = await res.json().catch(() => ({}) as { url?: string; error?: string });
-      if (!res.ok || !json.url) throw new Error(json.error ?? 'Could not start checkout.');
+      if (!res.ok || !json.url) throw new Error(json.error ?? 'Could not open billing.');
       window.location.href = json.url;
     } catch (e) {
-      setError(e instanceof Error ? e.message : 'Could not start checkout.');
+      setError(e instanceof Error ? e.message : 'Could not open billing.');
       setBusy(false);
     }
   }
