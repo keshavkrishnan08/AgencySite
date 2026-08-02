@@ -1,10 +1,10 @@
 import type { Metadata } from 'next';
 import Link from 'next/link';
-import { notFound } from 'next/navigation';
+import { notFound, redirect } from 'next/navigation';
 import { Footer, Glyph, Wordmark } from '@/components/Chrome';
 import { Paywall } from '@/components/Paywall';
 import { ReadingBody } from '@/components/ReadingBody';
-import { getChartPublic } from '@/lib/charts';
+import { getChartPublic, resolveChart } from '@/lib/charts';
 import { getEntitlement } from '@/lib/entitlement';
 import { supabaseAdminOrNull } from '@/lib/supabase/server';
 import { recallSections } from '@/lib/charts-ephemeral';
@@ -26,10 +26,16 @@ const FREE_SECTIONS = 2;
 
 export default async function ReadingPage({ params }: { params: Promise<{ id: string }> }) {
   const { id } = await params;
+
+  // If the visitor owns this chart (cookie or auth), send them to the real
+  // app shell — the share page is only for recipients who don't have it.
+  const ent = await getEntitlement();
+  const owned = await resolveChart(ent.userId);
+  if (owned && owned.id === id) redirect('/chart');
+
   const chart = await getChartPublic(id);
   if (!chart) notFound();
 
-  const ent = await getEntitlement();
   const c = chart.chart;
   const animal = ANIMAL_CONTENT[c.chinese.animal];
   const lp = LIFE_PATHS[c.lifePath];
