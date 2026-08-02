@@ -136,10 +136,21 @@ export default async function MyChartPage() {
     },
   ];
 
-  // Today is free in full; the week and the month are the paid horizons, so
-  // their tails are teasers unless the reader has paid for them.
+  // Server-side redaction: nothing paid reaches the browser in full.
+  // A CSS blur is a conversion device, not a boundary — the text behind it
+  // must be truncated server-side or it is readable from view-source.
+  // Every horizon's tail (the advice) is paywalled. Today's line (the
+  // observation) stays free — it proves the data is real and personal.
   const gatedTiming = timing.map((row, i) =>
-    ent.isPaid || i === 0 ? row : { ...row, tail: teaser(row.tail) },
+    ent.isPaid
+      ? row
+      : i === 0
+        ? { ...row, tail: teaser(row.tail) }
+        : { ...row, line: teaser(row.line), tail: teaser(row.tail) },
+  );
+
+  const gatedSystems = systems.map((s, i) =>
+    ent.isPaid || i === 0 ? s : { ...s, body: teaser(s.body) },
   );
 
   return (
@@ -151,11 +162,11 @@ export default async function MyChartPage() {
       code={chartCode(sun)}
       glyph={SIGN_GLYPH[sun]}
       placements={placements}
-      systems={systems}
+      systems={gatedSystems}
       sections={sections}
-      roles={fit.fits}
-      avoid={fit.avoid}
-      builtFor={c.archetype.builtFor}
+      roles={ent.isPaid ? fit.fits : fit.fits.slice(0, 2)}
+      avoid={ent.isPaid ? fit.avoid : teaser(fit.avoid)}
+      builtFor={ent.isPaid ? c.archetype.builtFor : teaser(c.archetype.builtFor)}
       rot={ent.isPaid ? fit.rot : teaser(fit.rot)}
       timing={gatedTiming}
       blockers={findBlockers(c)}
