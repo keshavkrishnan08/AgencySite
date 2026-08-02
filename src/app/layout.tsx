@@ -37,14 +37,14 @@ const mono = IBM_Plex_Mono({
 export const metadata: Metadata = {
   metadataBase: new URL(BRAND.domain),
   title: {
-    default: `${BRAND.name} — Find the Career You Were Built For`,
+    default: `${BRAND.name} — Find the Business You Were Built For`,
     template: `%s · ${BRAND.name}`,
   },
   description:
-    'Your birth chart decoded for your career. Archetype, timing windows, blind spots, and a daily briefing — computed from your exact birth data. Free reading in 60 seconds.',
+    'Your birth chart decoded for business. Founder archetype, timing windows, blind spots, and a daily briefing — computed from your exact birth data. Free reading in 60 seconds.',
   openGraph: {
-    title: `${BRAND.name} — Find the Career You Were Built For`,
-    description: 'Your birth chart decoded for your career. Archetype, timing windows, and a daily advisor. Free reading in 60 seconds, no card required.',
+    title: `${BRAND.name} — Find the Business You Were Built For`,
+    description: 'Your birth chart decoded for business. Founder archetype, timing windows, and a daily advisor. Free reading in 60 seconds, no card required.',
     url: BRAND.domain,
     siteName: BRAND.name,
     type: 'website',

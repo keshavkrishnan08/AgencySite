@@ -35,7 +35,7 @@ export default async function LandingPage() {
 
 /** Each word animates in individually, as on the reference. */
 function Headline() {
-  const words = ['Find', 'the', 'career'];
+  const words = ['Find', 'the', 'business'];
   const rest = ['were', 'built', 'for'];
   return (
     <h1 className="mx-auto mt-9 max-w-[820px] text-balance text-[42px] leading-[1.04] tracking-[-0.018em] sm:text-[60px] sm:leading-[1.04] lg:text-[80px] lg:leading-[1.04]">
@@ -75,9 +75,9 @@ function Hero() {
         <Headline />
 
         <p className="mx-auto mt-8 max-w-[640px] text-pretty text-[17.5px] leading-[1.7] text-ink/72">
-          Learn exactly how to succeed in your career based on your chart: your
-          archetype, the path that fits you, your strengths, your blind spots, and
-          when to make decisions. The blueprint for working your way.
+          Learn exactly how to succeed in business based on your chart: your founder
+          archetype, the business that fits you, your strengths, your blind spots, and
+          when to make decisions. The blueprint for building your way.
         </p>
 
         <div className="mt-9">
@@ -441,7 +441,7 @@ const FAQ = [
   { q: 'Does this actually work?',
     a: <p>The math does, provably: your chart is computed astronomically from your exact birth moment, and every calculation is shown. The interpretation is where 2,000 years of craft comes in, and the reading either describes you with unsettling accuracy or it doesn&rsquo;t. It&rsquo;s free to test, so the experiment costs you sixty seconds.</p> },
   { q: 'How is this different from a horoscope app?',
-    a: <p>A horoscope app gives everyone born in the same month the same paragraph. {BRAND.name} computes your full chart from your exact birth minute and place, reads it against your actual goals, and applies it to your career: your archetype, your blind spots, your timing windows, and an advisor you can question.</p> },
+    a: <p>A horoscope app gives everyone born in the same month the same paragraph. {BRAND.name} computes your full chart from your exact birth minute and place, reads it against your actual goals, and applies it to business: your archetype, your blind spots, your timing windows, and an advisor you can question.</p> },
   { q: 'I don’t believe in astrology.',
     a: <p>You don&rsquo;t have to. Read it the way Morgan did: as one more instrument. The math is computed astronomically and shown in full, and the reading either describes you with unsettling accuracy or it doesn&rsquo;t. Most skeptics forward the blind-spots section to someone before they finish reading it.</p> },
   { q: 'What do I get free?',
@@ -454,8 +454,8 @@ const FAQ = [
     a: <p>Your chart is computed in seconds. The full written reading is drawn fresh for you and takes a few minutes the first time; everything after that is instant.</p> },
   { q: 'Can I cancel anytime?',
     a: <p>Yes, in one click, no questions. If you cancel inside the {PRICING.trialDays}-day trial, you&rsquo;re never charged.</p> },
-  { q: 'Will it tell me what career to pursue?',
-    a: <p>It names the roles, sectors, and working styles that fit the way you&rsquo;re wired, and the ones that quietly drain you. The chart is information; the decisions are yours.</p> },
+  { q: 'Will it tell me what business to start?',
+    a: <p>It names the business models and sectors that fit the way you&rsquo;re wired, and the ones that quietly drain you. The chart is information; the decisions are yours.</p> },
 ];
 
 function Faq() {
