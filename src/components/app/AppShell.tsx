@@ -35,6 +35,7 @@ export const useShell = () => useContext(ShellContext);
 export function AppShell({
   firstName,
   isPaid,
+  authed,
   briefingTeaser,
   suggestions,
   transitPrompt,
@@ -43,6 +44,7 @@ export function AppShell({
 }: {
   firstName: string;
   isPaid: boolean;
+  authed: boolean;
   briefingTeaser: string | null;
   suggestions: string[];
   transitPrompt: string | null;
@@ -99,7 +101,7 @@ export function AppShell({
           onLocked={unlock}
         />
 
-        <TrialModal open={trial} onClose={() => setTrial(false)} chartId={chartId} authed />
+        <TrialModal open={trial} onClose={() => setTrial(false)} chartId={chartId} authed={authed} />
       </div>
     </ShellContext.Provider>
   );

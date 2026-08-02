@@ -34,6 +34,7 @@ function DevShellInner() {
     <AppShell
       firstName="Keshav"
       isPaid={paid}
+      authed={false}
       briefingTeaser="Mars is tightening a square to your Mercury and the Moon is waxing in Libra. What that means for the call you have been putting off is"
       suggestions={[
         'Is my current business actually a fit for my chart?',
