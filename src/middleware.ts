@@ -26,6 +26,8 @@ export async function middleware(request: NextRequest) {
     },
   );
 
+  // This call refreshes the session if the access token has expired.
+  // The refreshed tokens are written to `response` via setAll above.
   const {
     data: { user },
   } = await supabase.auth.getUser();
@@ -41,14 +43,19 @@ export async function middleware(request: NextRequest) {
     const url = request.nextUrl.clone();
     url.pathname = '/login';
     url.search = `?next=${encodeURIComponent(pathname + search)}`;
-    return NextResponse.redirect(url);
+    const redirect = NextResponse.redirect(url);
+    // Forward any refreshed session cookies onto the redirect.
+    response.cookies.getAll().forEach((c) => redirect.cookies.set(c));
+    return redirect;
   }
 
   if (user && pathname === '/login') {
     const url = request.nextUrl.clone();
     url.pathname = '/chart';
     url.search = '';
-    return NextResponse.redirect(url);
+    const redirect = NextResponse.redirect(url);
+    response.cookies.getAll().forEach((c) => redirect.cookies.set(c));
+    return redirect;
   }
 
   return response;
