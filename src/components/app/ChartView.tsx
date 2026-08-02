@@ -370,16 +370,15 @@ export function ChartView({
                 <h3 className="mt-2 font-serif text-[17px] font-normal leading-[1.3]">
                   {t.headline}
                 </h3>
-                <p className="mt-2 flex-1 text-[13px] leading-[1.6] text-ink/80">{t.line}</p>
 
                 {locked ? (
                   <>
                     <LockedZone
                       label={`Unlock your ${t.span.toLowerCase()} window`}
-                      className="relative mt-2 max-h-[100px] overflow-hidden"
+                      className="relative mt-2 flex-1 max-h-[160px] overflow-hidden"
                     >
                       <p aria-hidden className="locked-text text-[13px] leading-[1.6] text-ink">
-                        {t.tail}
+                        {t.line} {t.tail}
                       </p>
                     </LockedZone>
                     <div className="mt-auto pt-3">
@@ -387,7 +386,26 @@ export function ChartView({
                     </div>
                   </>
                 ) : (
-                  <p className="mt-2 text-[13px] leading-[1.6] text-ink/80">{t.tail}</p>
+                  <>
+                    <p className="mt-2 text-[13px] leading-[1.6] text-ink/80">{t.line}</p>
+                    {isPaid ? (
+                      <p className="mt-2 flex-1 text-[13px] leading-[1.6] text-ink/80">{t.tail}</p>
+                    ) : (
+                      <>
+                        <LockedZone
+                          label="Unlock the full briefing"
+                          className="relative mt-2 max-h-[80px] overflow-hidden"
+                        >
+                          <p aria-hidden className="locked-text text-[13px] leading-[1.6] text-ink">
+                            {t.tail}
+                          </p>
+                        </LockedZone>
+                        <div className="mt-auto pt-3">
+                          <LockedInline label="Read the full briefing" />
+                        </div>
+                      </>
+                    )}
+                  </>
                 )}
               </div>
             );

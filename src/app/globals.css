@@ -387,14 +387,14 @@
      Clickable on purpose — reaching for blurred text IS the buying signal. */
   .locked-text {
     @apply cursor-pointer select-none;
-    filter: blur(8px);
-    opacity: 0.35;
+    filter: blur(10px);
+    opacity: 0.28;
     transition: filter 0.2s ease-out, opacity 0.2s ease-out;
   }
 
   .locked-text:hover {
-    filter: blur(6px);
-    opacity: 0.45;
+    filter: blur(8px);
+    opacity: 0.35;
   }
 
   /*
