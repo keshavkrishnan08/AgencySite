@@ -67,7 +67,7 @@ async function createSession(plan: PlanId, chartId: string | null) {
       chart_id: chartId ?? '',
     },
     success_url: `${siteUrl()}/welcome?session_id={CHECKOUT_SESSION_ID}`,
-    cancel_url: chartId ? `${siteUrl()}/r/${chartId}` : `${siteUrl()}/#pricing`,
+    cancel_url: `${siteUrl()}/chart`,
   });
 
   return { url: session.url, status: 200 as const };
