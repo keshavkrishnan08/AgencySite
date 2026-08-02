@@ -94,6 +94,28 @@ export function ChartView({
       .catch(() => {});
   }, [sections, chartId, router]);
 
+  // Auto-trigger checkout if the user just signed in with a pending intent.
+  // The TrialModal stores { plan, chartId } in localStorage before sending
+  // the user to /login; when they return here authenticated, we pick it up
+  // and go straight to Stripe without making them click Unlock again.
+  useEffect(() => {
+    if (isPaid) return;
+    try {
+      const raw = localStorage.getItem('axon_checkout');
+      if (!raw) return;
+      localStorage.removeItem('axon_checkout');
+      const intent = JSON.parse(raw) as { plan: string; chartId: string };
+      void fetch('/api/checkout', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ plan: intent.plan, chartId: intent.chartId || chartId }),
+      })
+        .then((r) => r.json())
+        .then((json) => { if (json?.url) window.location.href = json.url; })
+        .catch(() => {});
+    } catch {}
+  }, [isPaid, chartId]);
+
   const TABS = SECTION_LABELS;
   const tabIndex = TABS.findIndex((t) => t.key === tab);
   const active = sections?.find((s) => s.key === tab) ?? null;
