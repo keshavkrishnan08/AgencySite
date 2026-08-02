@@ -70,8 +70,11 @@ export function TrialModal({
     }
 
     if (!authed) {
-      const next = `/api/checkout?plan=${plan}&chart=${chartId}`;
-      router.push(`/login?next=${encodeURIComponent(next)}`);
+      // Store checkout intent so it auto-triggers after sign-in.
+      // The magic link redirect chain is too fragile to carry the plan
+      // through email → callback → checkout in one hop.
+      try { localStorage.setItem('axon_checkout', JSON.stringify({ plan, chartId })); } catch {}
+      router.push('/login?next=/chart');
       return;
     }
     try {
