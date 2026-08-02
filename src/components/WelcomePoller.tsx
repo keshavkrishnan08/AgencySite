@@ -14,6 +14,7 @@ export function WelcomePoller() {
   const [stalled, setStalled] = useState(false);
 
   useEffect(() => {
+    track(EVENTS.trialStarted);
     track(EVENTS.purchased);
   }, []);
 

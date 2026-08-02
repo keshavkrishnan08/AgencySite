@@ -21,7 +21,9 @@ export const EVENTS = {
   resultViewed: 'result_viewed',
   paywallViewed: 'paywall_viewed',
   checkoutStarted: 'checkout_started',
+  trialStarted: 'trial_started',
   purchased: 'purchased',
+  pageView: 'page_view',
 } as const;
 
 export type FunnelEvent = (typeof EVENTS)[keyof typeof EVENTS];
@@ -50,10 +52,18 @@ export function track(event: FunnelEvent, props: Record<string, unknown> = {}) {
     [EVENTS.formComplete]: 'Lead',
     [EVENTS.paywallViewed]: 'AddToCart',
     [EVENTS.checkoutStarted]: 'InitiateCheckout',
+    [EVENTS.trialStarted]: 'StartTrial',
     [EVENTS.purchased]: 'Purchase',
   };
   const pixelEvent = pixelMap[event];
   if (pixelEvent) window.fbq?.('track', pixelEvent, props);
+}
+
+/** Track a named page view with the pixel — use on key conversion pages. */
+export function trackPage(page: string, params: Record<string, string> = {}) {
+  if (typeof window === 'undefined') return;
+  void posthog().then((p) => p?.capture('$pageview', { page, ...params }));
+  window.fbq?.('trackCustom', 'PageView', { page, ...params });
 }
 
 export function Analytics() {
