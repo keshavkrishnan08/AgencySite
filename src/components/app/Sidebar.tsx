@@ -134,8 +134,7 @@ export function Sidebar({
             {/* The price sits on its own darker plinth so it reads as a
                 footnote to the offer, not part of the button. */}
             <p className="bg-black/12 px-2 py-2 text-center font-mono text-[7px] uppercase leading-[1.6] tracking-[0.1em] text-paper/50">
-              A new one every morning · from{' '}
-              {PRICING.annual.amount === '$79' ? '$6.58/mo' : PRICING.weekly.amount.replace('.99', '/wk')}
+              A new one every morning · {PRICING.weekly.amount}/week
             </p>
           </div>
         )}
