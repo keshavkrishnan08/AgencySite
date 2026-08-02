@@ -3,7 +3,7 @@ export const BRAND = {
   name: 'Axon',
   /** Rendered after the wordmark in brass. */
   punctuation: '.',
-  tagline: 'Astrology for Business',
+  tagline: 'Astrology for Your Career',
   strapline: 'Ancient systems, computed for your decisions.',
   domain: process.env.NEXT_PUBLIC_SITE_URL ?? 'http://localhost:3000',
   supportEmail: 'hello@axon.app',
