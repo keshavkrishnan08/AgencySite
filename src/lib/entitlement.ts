@@ -63,7 +63,9 @@ export async function getEntitlement(): Promise<Entitlement> {
     email: profile?.email ?? user.email ?? null,
     firstName: profile?.first_name ?? null,
     status,
-    isPaid: (PAID_STATUSES as readonly string[]).includes(status) && notExpired,
+    // Active subscription OR canceled but still within the paid period.
+    // A user who cancels keeps access until their expiry date.
+    isPaid: ((PAID_STATUSES as readonly string[]).includes(status) || status === 'canceled') && notExpired && status !== 'free',
     expiresAt: expiry,
     trialEndsAt: profile?.trial_ends_at ?? null,
     oracleCredits: profile?.oracle_credits ?? 0,
