@@ -47,37 +47,47 @@ export async function POST(request: Request) {
 
   const site = process.env.NEXT_PUBLIC_SITE_URL ?? 'http://localhost:3000';
 
-  // Deep-link straight to the cancellation flow when that is what they asked
-  // for. Landing them on a generic billing dashboard and making them hunt is
-  // the pattern the FTC calls out.
-  const session = await stripe().billingPortal.sessions.create({
-    customer: profile.stripe_customer_id,
-    return_url: `${site}/settings`,
-    ...(intent === 'cancel' && ent.subscriptionId
-      ? {
-          flow_data: {
-            type: 'subscription_cancel' as const,
-            subscription_cancel: { subscription: ent.subscriptionId },
-            after_completion: {
-              type: 'redirect' as const,
-              redirect: { return_url: `${site}/settings?cancelled=1` },
+  // Try to deep-link into the specific flow. If the subscription ID is
+  // invalid or missing, fall back to the generic billing portal — never
+  // dead-end the user with an error when they're trying to cancel.
+  try {
+    const flowData =
+      intent === 'cancel' && ent.subscriptionId
+        ? {
+            flow_data: {
+              type: 'subscription_cancel' as const,
+              subscription_cancel: { subscription: ent.subscriptionId },
+              after_completion: {
+                type: 'redirect' as const,
+                redirect: { return_url: `${site}/settings?cancelled=1` },
+              },
             },
-          },
-        }
-      : {}),
-    ...(intent === 'upgrade' && ent.subscriptionId
-      ? {
-          flow_data: {
-            type: 'subscription_update' as const,
-            subscription_update: { subscription: ent.subscriptionId },
-            after_completion: {
-              type: 'redirect' as const,
-              redirect: { return_url: `${site}/settings?upgraded=1` },
-            },
-          },
-        }
-      : {}),
-  });
+          }
+        : intent === 'upgrade' && ent.subscriptionId
+          ? {
+              flow_data: {
+                type: 'subscription_update' as const,
+                subscription_update: { subscription: ent.subscriptionId },
+                after_completion: {
+                  type: 'redirect' as const,
+                  redirect: { return_url: `${site}/settings?upgraded=1` },
+                },
+              },
+            }
+          : {};
 
-  return NextResponse.json({ url: session.url });
+    const session = await stripe().billingPortal.sessions.create({
+      customer: profile.stripe_customer_id,
+      return_url: `${site}/settings`,
+      ...flowData,
+    });
+    return NextResponse.json({ url: session.url });
+  } catch {
+    // Deep-link failed (invalid subscription ID, etc.) — open generic portal.
+    const session = await stripe().billingPortal.sessions.create({
+      customer: profile.stripe_customer_id,
+      return_url: `${site}/settings`,
+    });
+    return NextResponse.json({ url: session.url });
+  }
 }
