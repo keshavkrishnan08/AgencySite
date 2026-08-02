@@ -95,16 +95,16 @@ export function ChartView({
   }, [sections, chartId, router]);
 
   // Auto-trigger checkout if the user just signed in with a pending intent.
-  // The TrialModal stores { plan, chartId } in localStorage before sending
-  // the user to /login; when they return here authenticated, we pick it up
-  // and go straight to Stripe without making them click Unlock again.
+  // Only fires if the intent is less than 5 minutes old — stale intents
+  // from previous sessions must not hijack the page.
   useEffect(() => {
     if (isPaid) return;
     try {
       const raw = localStorage.getItem('axon_checkout');
       if (!raw) return;
       localStorage.removeItem('axon_checkout');
-      const intent = JSON.parse(raw) as { plan: string; chartId: string };
+      const intent = JSON.parse(raw) as { plan: string; chartId: string; ts?: number };
+      if (intent.ts && Date.now() - intent.ts > 5 * 60 * 1000) return; // expired
       void fetch('/api/checkout', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },

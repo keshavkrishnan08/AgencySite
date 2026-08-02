@@ -73,7 +73,7 @@ export function TrialModal({
       // Store checkout intent so it auto-triggers after sign-in.
       // The magic link redirect chain is too fragile to carry the plan
       // through email → callback → checkout in one hop.
-      try { localStorage.setItem('axon_checkout', JSON.stringify({ plan, chartId })); } catch {}
+      try { localStorage.setItem('axon_checkout', JSON.stringify({ plan, chartId, ts: Date.now() })); } catch {}
       router.push('/login?next=/chart');
       return;
     }
