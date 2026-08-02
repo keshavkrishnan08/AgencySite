@@ -1,6 +1,6 @@
 'use client';
 
-import { useState } from 'react';
+import { useEffect, useRef, useState } from 'react';
 import { useSearchParams } from 'next/navigation';
 import { supabaseBrowser } from '@/lib/supabase/client';
 
@@ -8,10 +8,25 @@ export function AuthForm() {
   const params = useSearchParams();
   const next = params.get('next') ?? '/chart';
 
-  const [email, setEmail] = useState(params.get('email') ?? '');
+  // Pre-fill from URL param, or from the email saved during onboarding.
+  const saved = typeof window !== 'undefined'
+    ? (params.get('email') || localStorage.getItem('axon_email') || '')
+    : '';
+
+  const [email, setEmail] = useState(saved);
   const [busy, setBusy] = useState(false);
   const [error, setError] = useState<string | null>(null);
   const [sent, setSent] = useState(false);
+  const autoSent = useRef(false);
+
+  // If we already have the email from onboarding, auto-send the magic link
+  // so the user doesn't have to click anything — just check their inbox.
+  useEffect(() => {
+    if (autoSent.current || !saved || sent) return;
+    autoSent.current = true;
+    const form = document.querySelector('form');
+    if (form) form.requestSubmit();
+  }, [saved, sent]);
 
   async function handleSubmit(e: React.FormEvent) {
     e.preventDefault();
