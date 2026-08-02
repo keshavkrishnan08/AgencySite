@@ -187,7 +187,7 @@ export default function Dashboard() {
                     <td className="py-2 pr-4 text-amber-400/80">{c.archetype}</td>
                     <td className="py-2 pr-4 text-white/60">{c.sun_sign}</td>
                     <td className="py-2 tabular-nums text-white/40">
-                      {new Date(c.created_at).toLocaleString('en-US', { month: 'short', day: 'numeric', hour: '2-digit', minute: '2-digit' })}
+                      {new Date(c.created_at).toLocaleString('en-US', { month: 'short', day: 'numeric', hour: '2-digit', minute: '2-digit', timeZone: 'America/New_York' })} ET
                     </td>
                   </tr>
                 ))}
