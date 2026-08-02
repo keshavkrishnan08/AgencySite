@@ -138,6 +138,9 @@ export function StartFlow() {
       }
 
       track(EVENTS.formComplete, { archetype: json.archetype });
+      // Remember the email so the login page can pre-fill it — the user
+      // already gave it, asking again is friction.
+      try { localStorage.setItem('axon_email', email.trim()); } catch {}
       setStep(2);
       // Hold the reveal briefly — an instant result reads as a lookup table.
       // Into the full app shell, not the bare reveal page: the sidebar, ask
