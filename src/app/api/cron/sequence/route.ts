@@ -1,6 +1,7 @@
 import { NextResponse } from 'next/server';
 import { sendSequenceEmail, type SequenceKind } from '@/lib/email';
 import { supabaseAdmin } from '@/lib/supabase/server';
+import { provider } from '@/lib/ai/provider';
 import type { Chart } from '@/lib/astro/reading';
 
 export const runtime = 'nodejs';
@@ -9,11 +10,28 @@ export const maxDuration = 300;
 /** Day offset → which email in the sequence is due. */
 const SCHEDULE: { day: number; kind: SequenceKind }[] = [
   { day: 0, kind: 'day0' },
+  { day: 1, kind: 'day1' },
   { day: 2, kind: 'day2' },
   { day: 3, kind: 'day3' },
   { day: 5, kind: 'day5' },
   { day: 7, kind: 'day7' },
 ];
+
+/** Generate a cheap, chart-specific insight for the day1 "discovery" email. */
+async function generateInsight(chart: Chart, firstName: string): Promise<string | undefined> {
+  const p = provider();
+  if (!p) return undefined;
+  try {
+    return await p.generate<string>({
+      maxTokens: 300,
+      effort: 'low',
+      system: `You write one short, specific insight about this person's birth chart for an email. Two sentences maximum. Sound like an advisor who just noticed something in the data, not a mystic. Never predict events. Never use "energy", "vibration", "manifest", or "universe". Reference specific placements.`,
+      user: `${firstName}'s chart: ${chart.sunSign} Sun, ${chart.moonSign} Moon, ${chart.risingSign ?? 'unknown'} Rising, Life Path ${chart.lifePath}, ${chart.chinese.label}. ${chart.archetype.name}: ${chart.archetype.oneLine}. Write one unusual insight about this combination.`,
+    });
+  } catch {
+    return undefined;
+  }
+}
 
 function authorised(request: Request): boolean {
   const secret = process.env.CRON_SECRET;
@@ -80,11 +98,16 @@ export async function GET(request: Request) {
       if (claim) continue; // already sent
 
       try {
+        const insight = kind === 'day1'
+          ? await generateInsight(r.chart as Chart, r.first_name)
+          : undefined;
+
         await sendSequenceEmail(kind, {
           to: r.email!,
           firstName: r.first_name,
           chart: r.chart as Chart,
           chartId: r.id,
+          uniqueInsight: insight,
         });
         sent++;
       } catch (e) {
