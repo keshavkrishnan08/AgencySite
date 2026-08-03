@@ -21,10 +21,12 @@ export interface DecisionRow {
   body: string;
 }
 
-const CADENCES: { key: Cadence; label: string }[] = [
-  { key: 'daily', label: 'Daily' },
-  { key: 'weekly', label: 'Weekly' },
-  { key: 'monthly', label: 'Monthly' },
+const PROMPTS = [
+  'What did you decide today?',
+  'What call did you make?',
+  'What did you ship, send, or say yes to?',
+  'What did you commit to today?',
+  'What did you finally do?',
 ];
 
 export function UpdatesView({
@@ -55,9 +57,12 @@ export function UpdatesView({
   const [draft, setDraft] = useState('');
   const [saving, setSaving] = useState(false);
   const [error, setError] = useState<string | null>(null);
-
-  // null = undecided, so the prompt stays until the user answers either way.
   const [notify, setNotify] = useState<boolean | null>(emailOptIn ? true : null);
+  const [justLogged, setJustLogged] = useState(false);
+
+  const todayHasDecision = decisions.some(
+    (d) => d.decided_on === new Date().toISOString().slice(0, 10),
+  );
 
   async function log() {
     const body = draft.trim();
@@ -76,6 +81,7 @@ export function UpdatesView({
       }
       setDecisions((d) => [json.decision, ...d]);
       setDraft('');
+      setJustLogged(true);
     } catch (e) {
       setError(e instanceof Error ? e.message : 'Could not save.');
     } finally {
@@ -91,21 +97,18 @@ export function UpdatesView({
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ on }),
       });
-    } catch {
-      // A failed preference write is not worth an error state on this screen.
-    }
+    } catch {}
   }
 
-  // Formatted in UTC on purpose. Briefings are keyed by the UTC calendar date,
-  // so rendering in the viewer's zone would print a date that does not match
-  // the row it came from — and the ‹ › arrows would look off by one.
   const stamp = (iso: string) =>
     new Date(`${iso}T12:00:00Z`).toLocaleDateString('en-US', {
       weekday: 'short', month: 'short', day: 'numeric', timeZone: 'UTC',
     });
 
+  const prompt = PROMPTS[Math.floor(Date.now() / 86_400_000) % PROMPTS.length];
+
   return (
-    <div className="mx-auto max-w-[820px] space-y-12 pb-8">
+    <div className="mx-auto max-w-[820px] space-y-10 pb-8">
       {/* -------------------------------------------------- date navigation */}
       <div className="flex items-center justify-between gap-4">
         <h1 className="font-serif text-[23px] font-normal leading-tight sm:text-[29px]">
@@ -127,7 +130,7 @@ export function UpdatesView({
             <SkeletonLines lines={3} />
             <p className="mt-6 eyebrow">Not written yet</p>
             <p className="mt-3 font-serif text-[22px] leading-snug">
-              Your {cadence === 'daily' ? 'briefing' : `${cadence} outlook`} lands in the morning.
+              Your briefing lands in the morning.
             </p>
             <p className="mt-3 text-[15.5px] leading-relaxed text-ink/70">
               It is computed from where the sky is against your own chart, so it
@@ -136,12 +139,10 @@ export function UpdatesView({
           </div>
         ) : (
           <>
-            <p className="eyebrow">
-              {cadence === 'daily' ? stamp(entry.date) : `${cadence} outlook · from ${stamp(entry.date)}`}
-            </p>
-            <h1 className="mt-3 font-serif text-[23px] font-normal leading-[1.16] sm:text-[29px]">
+            <p className="eyebrow">{stamp(entry.date)}</p>
+            <h2 className="mt-3 font-serif text-[23px] font-normal leading-[1.16] sm:text-[29px]">
               {entry.headline}
-            </h1>
+            </h2>
             <p className="mt-3.5 text-[14px] leading-[1.7] text-ink/85">{entry.body}</p>
           </>
         )}
@@ -150,10 +151,7 @@ export function UpdatesView({
       {/* ---------------------------------------------------- your move today */}
       {entry && (
         <section>
-          <p className="eyebrow">
-            {cadence === 'daily' ? 'Your move today' : 'Your move'}
-          </p>
-
+          <p className="eyebrow">Your move today</p>
           <div className="mt-3">
             {isPaid ? (
               <div className="rounded-[10px] border-l-2 border-brass bg-ink/[0.03] p-5">
@@ -168,22 +166,146 @@ export function UpdatesView({
               />
             )}
           </div>
-
           <div className="mt-4">
             <AskChip label="Ask how to use this window" />
           </div>
         </section>
       )}
 
-      {/* ------------------------------------------------- tomorrow, delivered */}
+      {/* ──────────────────────── DECISION JOURNAL — the retention mechanic */}
+      <section className="card-lg">
+        <div className="flex items-baseline justify-between gap-3">
+          <p className="eyebrow">Decision journal</p>
+          {streak > 0 && (
+            <span className="rounded-full bg-ledger/[0.08] px-3 py-1 font-mono text-[10px] uppercase tracking-label text-ledger-mid">
+              {streak} day streak 🔥
+            </span>
+          )}
+        </div>
+
+        {justLogged ? (
+          /* ── Success state — reinforces the habit ── */
+          <div className="mt-4 text-center">
+            <p className="font-serif text-[22px]">Logged.</p>
+            <p className="mt-2 text-[14px] text-ink/60">
+              {logged + 1} decision{logged === 0 ? '' : 's'} tracked against your chart.
+              {logged >= 7 && ' You now have a week of data — your pattern is forming.'}
+              {logged >= 30 && ' A full month. Your chart is starting to prove itself.'}
+            </p>
+            <button
+              type="button"
+              onClick={() => setJustLogged(false)}
+              className="mt-4 font-mono text-[10px] uppercase tracking-label text-ledger-mid hover:text-ledger"
+            >
+              Log another →
+            </button>
+          </div>
+        ) : !todayHasDecision ? (
+          /* ── Prompt — appears when they haven't logged today ── */
+          <>
+            <p className="mt-3 font-serif text-[19px] leading-snug">
+              {prompt}
+            </p>
+            <p className="mt-2 text-[13.5px] leading-relaxed text-ink/60">
+              One sentence. The call you made, the thing you shipped, the conversation
+              you had. Your chart tracks which decisions land on which days — after 30
+              entries, it shows you the pattern.
+            </p>
+
+            <form
+              className="mt-4 flex gap-2.5"
+              onSubmit={(e) => { e.preventDefault(); void log(); }}
+            >
+              <input
+                className="field flex-1"
+                placeholder={'"Sent the proposal" or "Held the price"'}
+                maxLength={2000}
+                value={draft}
+                onChange={(e) => setDraft(e.target.value)}
+                aria-label="What you decided today"
+              />
+              <button
+                type="submit"
+                disabled={saving || !draft.trim()}
+                className="flex min-h-[48px] shrink-0 items-center justify-center rounded-[10px] bg-ledger-mid px-5 text-[14px] font-semibold text-paper transition-all hover:bg-ledger disabled:bg-ledger-mid/40"
+              >
+                {saving ? 'Saving…' : 'Log it'}
+              </button>
+            </form>
+
+            {error && <p role="alert" className="mt-3 text-sm text-oxblood">{error}</p>}
+          </>
+        ) : (
+          /* ── Already logged today ── */
+          <div className="mt-4">
+            <p className="text-[14px] text-ink/60">
+              ✓ You logged a decision today. Come back tomorrow after your briefing.
+            </p>
+          </div>
+        )}
+
+        {/* Streak + record */}
+        {logged > 0 && (
+          <div className="mt-6 flex items-center justify-between border-t pt-4 rule">
+            <div>
+              <p className="font-serif text-[28px] leading-none">{logged}</p>
+              <p className="mt-1 font-mono text-[9.5px] uppercase tracking-label text-ink/50">
+                decision{logged === 1 ? '' : 's'} logged
+              </p>
+            </div>
+            <div className="text-right">
+              <p className="font-serif text-[28px] leading-none">{streak}</p>
+              <p className="mt-1 font-mono text-[9.5px] uppercase tracking-label text-ink/50">
+                day streak
+              </p>
+            </div>
+          </div>
+        )}
+
+        {/* The lock-in message — appears after 3+ decisions */}
+        {logged >= 3 && logged < 30 && (
+          <p className="mt-4 rounded-[8px] bg-ledger/[0.05] px-4 py-3 text-[13px] leading-relaxed text-ink/65">
+            {30 - logged} more and your chart shows you which days your best calls land on.
+            That pattern is yours — no other product holds it.
+          </p>
+        )}
+        {logged >= 30 && (
+          <p className="mt-4 rounded-[8px] bg-ledger/[0.05] px-4 py-3 text-[13px] leading-relaxed text-ink/65">
+            You have {logged} decisions mapped against your chart&rsquo;s timing.
+            This record only exists here — it cannot be recreated.
+          </p>
+        )}
+      </section>
+
+      {/* ── Recent decisions ── */}
+      {decisions.length > 0 && (
+        <section>
+          <p className="eyebrow">Recent decisions</p>
+          <div className="mt-3 space-y-2">
+            {decisions.slice(0, 8).map((d) => (
+              <div key={d.id} className="card flex items-start gap-3 !py-4">
+                <span className="mt-0.5 h-2 w-2 shrink-0 rounded-full bg-brass" aria-hidden />
+                <div className="min-w-0 flex-1">
+                  <p className="text-[14px] leading-relaxed text-ink/80">{d.body}</p>
+                  <p className="mt-1 font-mono text-[9.5px] uppercase tracking-label text-brass-deep">
+                    {stamp(d.decided_on)}
+                  </p>
+                </div>
+              </div>
+            ))}
+          </div>
+        </section>
+      )}
+
+      {/* ── Email opt-in ── */}
       {notify === null ? (
         <section className="card flex flex-col items-start justify-between gap-4 sm:flex-row sm:items-center">
           <div>
             <p className="font-serif text-[17.5px] leading-snug">
-              Tomorrow&rsquo;s briefing, delivered.
+              Get your briefing delivered.
             </p>
             <p className="mt-1.5 text-[15px] leading-relaxed text-ink/68">
-              One notification each morning, when your read is drawn. Nothing else.
+              One email each morning with your briefing and a prompt to log yesterday&rsquo;s call.
             </p>
           </div>
           <div className="flex shrink-0 items-center gap-4">
@@ -219,91 +341,24 @@ export function UpdatesView({
         </section>
       )}
 
-      {/* The two halves of the record sit side by side, as on the reference:
-          what you did, and what that adds up to. Stacked they read as two
-          unrelated widgets. */}
-      <section className="grid gap-3.5 sm:grid-cols-2">
-        <div className="card flex flex-col">
-          <p className="eyebrow">Decision journal</p>
-          <p className="mt-2 text-[14.5px] leading-relaxed text-ink/80">
-            What did you get done today? Log the real move.
+      {!isPaid && (
+        <section className="rounded-[12px] border border-ledger-mid/30 bg-[#eef0e6] p-5 sm:p-6">
+          <p className="font-serif text-[19px] leading-snug">
+            Your briefing + journal are the product.
           </p>
-
-          <form
-            className="mt-4 flex flex-col gap-2.5 sm:flex-row"
-            onSubmit={(e) => { e.preventDefault(); void log(); }}
-          >
-            <input
-              className="field flex-1"
-              placeholder={'e.g. "Sent the proposal" or "Held the price"'}
-              maxLength={2000}
-              value={draft}
-              onChange={(e) => setDraft(e.target.value)}
-              aria-label="What you decided today"
-            />
-            <button
-              type="submit"
-              disabled={saving || !draft.trim()}
-              className="flex min-h-[54px] shrink-0 items-center justify-center rounded-[10px] bg-ledger-mid px-6 text-[15px] font-semibold text-paper transition-all hover:bg-ledger disabled:bg-ledger-mid/40"
-            >
-              {saving ? 'Saving…' : 'Log it'}
-            </button>
-          </form>
-
-          {error && <p role="alert" className="mt-3 text-sm text-oxblood">{error}</p>}
-
-          {decisions.length > 0 && (
-            <ul className="mt-5 divide-y rule">
-              {decisions.slice(0, 5).map((d) => (
-                <li key={d.id} className="py-3">
-                  <p className="font-mono text-[10px] uppercase tracking-label text-brass-deep">
-                    {stamp(d.decided_on)}
-                  </p>
-                  <p className="mt-1 text-[14.5px] leading-relaxed text-ink/80">{d.body}</p>
-                </li>
-              ))}
-            </ul>
-          )}
-        </div>
-
-        <div className="card flex flex-col">
-          <p className="eyebrow">Your record</p>
-          <p className="mt-2 font-serif text-[31px] leading-none">
-            {streak === 1 ? '1 day' : `${streak} days`}
+          <p className="mt-2 text-[13.5px] leading-relaxed text-ink/65">
+            The reading told you how you&rsquo;re built. The briefing tells you what to do
+            about it today. The journal proves whether you did. After 30 entries, your
+            chart shows you the pattern behind your best calls.
           </p>
-          <p className="mt-3 text-[15px] leading-relaxed text-ink/72">
-            Your chart has been tracking with you since day one. The record
-            deepens every reading.
-          </p>
-          {logged > 0 && (
-            <p className="mt-2 text-[15px] text-ink/60">
-              {logged} decision{logged === 1 ? '' : 's'} logged.
-            </p>
-          )}
-
-          <div className="mt-auto flex flex-wrap items-center justify-between gap-3 border-t pt-4 rule">
-            <p className="font-mono text-[10px] uppercase tracking-label text-ink/55">
-              {archetype}
-            </p>
-            <Link
-              href="/chart"
-              className="flex min-h-[44px] items-center font-mono text-[10px] uppercase tracking-label text-ledger-mid transition-colors hover:text-ledger"
-            >
-              View your chart <span aria-hidden className="ml-1.5">→</span>
-            </Link>
+          <div className="mt-4">
+            <LockedInline label="Unlock daily briefings" />
           </div>
-
-          {!isPaid && (
-            <div className="mt-3">
-              <LockedInline label="Unlock every briefing" />
-            </div>
-          )}
-        </div>
-      </section>
+        </section>
+      )}
     </div>
   );
 }
-
 
 function ArrowLink({ href, dir }: { href: string | null; dir: 'prev' | 'next' }) {
   const glyph = dir === 'prev' ? '‹' : '›';
