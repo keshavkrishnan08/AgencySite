@@ -10,6 +10,8 @@ import { navLabel } from '@/lib/nav';
 
 interface ShellApi {
   isPaid: boolean;
+  isTrialing: boolean;
+  hasAccess: boolean;
   /** Raise the trial modal. Every locked surface in the app calls this. */
   unlock: () => void;
   /** Open the ask panel, optionally seeded with a question. */
@@ -18,6 +20,8 @@ interface ShellApi {
 
 const ShellContext = createContext<ShellApi>({
   isPaid: false,
+  isTrialing: false,
+  hasAccess: false,
   unlock: () => {},
   ask: () => {},
 });
@@ -35,6 +39,8 @@ export const useShell = () => useContext(ShellContext);
 export function AppShell({
   firstName,
   isPaid,
+  isTrialing,
+  hasAccess,
   authed,
   briefingTeaser,
   suggestions,
@@ -44,6 +50,8 @@ export function AppShell({
 }: {
   firstName: string;
   isPaid: boolean;
+  isTrialing: boolean;
+  hasAccess: boolean;
   authed: boolean;
   briefingTeaser: string | null;
   suggestions: string[];
@@ -68,7 +76,7 @@ export function AppShell({
   }, []);
 
   return (
-    <ShellContext.Provider value={{ isPaid, unlock, ask }}>
+    <ShellContext.Provider value={{ isPaid, isTrialing, hasAccess, unlock, ask }}>
       <div className="min-h-dvh bg-shell">
         <Sidebar
           isPaid={isPaid}

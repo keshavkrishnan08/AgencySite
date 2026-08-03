@@ -74,7 +74,7 @@ export function ChartView({
   pressure: string;
   shareUrl: string;
 }) {
-  const { isPaid } = useShell();
+  const { isPaid, hasAccess } = useShell();
   const router = useRouter();
   const [tab, setTab] = useState(SECTION_LABELS[0].key);
   const [copied, setCopied] = useState(false);
@@ -120,7 +120,8 @@ export function ChartView({
   const TABS = SECTION_LABELS;
   const tabIndex = TABS.findIndex((t) => t.key === tab);
   const active = sections?.find((s) => s.key === tab) ?? null;
-  const tabLocked = !isPaid && tabIndex >= FREE_TABS;
+  // Trial: all reading tabs unlocked. Free: only first tab.
+  const tabLocked = !hasAccess && tabIndex >= FREE_TABS;
 
   async function share() {
     const data = { title: `${firstName} — ${archetype}`, text: oneLine, url: shareUrl };
@@ -187,7 +188,7 @@ export function ChartView({
         <p className="eyebrow">The three systems</p>
         <div className="mt-3 grid gap-3 sm:grid-cols-3">
           {systems.map((s, i) => {
-            const sysLocked = !isPaid && i > 0;
+            const sysLocked = !hasAccess && i > 0;
             const open = openSystem === s.eyebrow;
             return (
               <div key={s.eyebrow} className="card card-interactive flex min-h-[200px] flex-col">
@@ -232,7 +233,7 @@ export function ChartView({
         <div className="-mx-4 mt-2.5 overflow-x-auto px-4 sm:mx-0 sm:px-0">
           <div className="flex gap-2 pb-1">
             {TABS.map((t, i) => {
-              const locked = !isPaid && i >= FREE_TABS;
+              const locked = !hasAccess && i >= FREE_TABS;
               return (
                 <button
                   key={t.key}
@@ -313,7 +314,7 @@ export function ChartView({
                         {r}
                       </span>
                     ))}
-                    {!isPaid && roles.length > 2 && (
+                    {!hasAccess && roles.length > 2 && (
                       <LockedZone label="Unlock all roles" className="flex flex-wrap gap-2">
                         {roles.slice(2).map((r) => (
                           <span
