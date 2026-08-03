@@ -7,6 +7,7 @@ import { AskChip, LockedCta, LockedInline, LockGlyph, useShell } from './AppShel
 import { LockedZone } from './LockedZone';
 import { SkeletonLines } from './Skeleton';
 import { SECTION_LABELS, type ReadingSection } from '@/lib/sections';
+import { PRICING } from '@/lib/brand';
 import type { Blocker, Chapter } from '@/lib/astro/blockers';
 
 export interface SystemCard {
@@ -264,9 +265,11 @@ export function ChartView({
               <h2 className="mt-2 font-serif text-[21px] font-normal leading-tight sm:text-[25px]">
                 {active?.title ?? ''}
               </h2>
-              {/* Fixed height, not max-height: the server now sends a short
-                  teaser, and a box that shrank to fit it would read as "there
-                  is barely anything here" rather than "there is more". */}
+              {/* The standfirst is visible — it names the problem clearly enough
+                  to create the need to read the answer. */}
+              {active?.standfirst && (
+                <p className="mt-2 text-[14.5px] leading-relaxed text-ink/75">{active.standfirst}</p>
+              )}
               <LockedZone
                 label={`Unlock ${TABS[tabIndex].label}`}
                 className="relative mt-2.5 h-[172px] overflow-hidden"
@@ -276,15 +279,10 @@ export function ChartView({
                     <p key={i} className="text-[14px] leading-[1.7] text-ink">{p}</p>
                   ))}
                 </div>
-                <div
-                  aria-hidden
-                  className="absolute inset-x-0 bottom-0 h-16"
-                  style={{ background: 'linear-gradient(to bottom, rgba(250,248,240,0), #faf8f0 92%)' }}
-                />
               </LockedZone>
               <span className="sr-only">Locked. Subscribe to read this section.</span>
-              <div className="mt-3">
-                <LockedInline label={`Read ${TABS[tabIndex].label}`} />
+              <div className="mt-4">
+                <LockedInline label={`See what this costs you`} />
               </div>
             </>
           ) : active ? (
@@ -446,12 +444,12 @@ export function ChartView({
 
       {/* ─────────────────────────────────── the diagnosis, one card, one link */}
       <section>
-        <p className="eyebrow">Why you&rsquo;re stuck</p>
+        <p className="eyebrow text-oxblood">Your biggest problem right now</p>
         <Link href="/stuck" className="card card-interactive mt-3 block">
           <div className="flex flex-wrap items-baseline justify-between gap-2">
-            <p className="font-mono text-[9.5px] uppercase tracking-label text-brass-deep">
+            <p className="font-mono text-[9.5px] uppercase tracking-label text-oxblood">
               {blockers.length
-                ? `${blockers.length} pattern${blockers.length === 1 ? '' : 's'} in your chart`
+                ? `${blockers.length} pattern${blockers.length === 1 ? '' : 's'} holding you back`
                 : 'Read from your hard aspects'}
             </p>
             <p className="font-mono text-[9.5px] uppercase tracking-label text-ink/45">
@@ -489,17 +487,22 @@ export function ChartView({
       </section>
 
       {!isPaid && (
-        <section className="flex flex-col items-start justify-between gap-4 rounded-[12px] border border-ledger-mid/30 bg-[#eef0e6] p-5 sm:flex-row sm:items-center sm:p-6">
-          <div>
-            <p className="font-serif text-[17.5px] leading-snug sm:text-[19px]">
-              Your chart-aware advisor is one tap away.
+        <section className="rounded-[12px] border border-ledger-mid/30 bg-[#eef0e6] p-5 sm:p-6">
+          <p className="font-serif text-[20px] leading-snug sm:text-[23px]">
+            You already know what you are. The question is what it&rsquo;s costing you.
+          </p>
+          <p className="mt-2 text-[14px] leading-relaxed text-ink/72">
+            Your blind spots, the pattern that keeps repeating, the exact days to
+            make the move you&rsquo;ve been sitting on — it&rsquo;s all computed
+            and waiting. {PRICING.trialDays} days free to see if it changes how you operate.
+          </p>
+          <div className="mt-4 flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
+            <div className="shrink-0">
+              <LockedCta label={`Start ${PRICING.trialDays} days free`} />
+            </div>
+            <p className="font-mono text-[10px] uppercase tracking-label text-ink/45">
+              {PRICING.weekly.amount}/week after trial · cancel anytime
             </p>
-            <p className="mt-1 text-[13px] leading-relaxed text-ink/68">
-              Ask it anything, plus your daily briefing and timing windows.
-            </p>
-          </div>
-          <div className="shrink-0">
-            <LockedCta label="Unlock everything" />
           </div>
         </section>
       )}

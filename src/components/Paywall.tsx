@@ -45,13 +45,13 @@ export function Paywall({
   return (
     <div ref={ref} className="relative z-10 mx-auto max-w-2xl px-5 text-center">
       <p className="eyebrow">The rest of your reading</p>
-      <h2 className="mt-4 text-balance text-[30px] leading-tight sm:text-[40px]">
-        Unlock your full reading.
+      <h2 className="mt-4 text-balance font-serif text-[30px] font-normal leading-tight sm:text-[40px]">
+        You know who you are.<br />Now see what&rsquo;s holding you back.
       </h2>
       <p className="mx-auto mt-5 max-w-measure text-[15px] leading-relaxed text-ink/70">
-        {firstName}, you know you are {archetype.startsWith('The') ? archetype : `a ${archetype}`}.
-        The rest is what to do about it — your blind spots, your timing windows, and
-        an advisor who has read your chart.
+        {firstName}, your chart identified patterns that are actively costing you — in
+        how you decide, who you hire, when you move.
+        The sections below name them, and the counter-moves that fix them.
       </p>
 
       <ul className="mx-auto mt-8 grid max-w-lg gap-2.5 text-left">
@@ -67,7 +67,7 @@ export function Paywall({
       </ul>
 
       <button type="button" onClick={() => setOpen(true)} className="cta mt-9 w-full">
-        Unlock full access <span aria-hidden>→</span>
+        See what&rsquo;s costing you — {PRICING.trialDays} days free <span aria-hidden>→</span>
       </button>
 
       <TrialModal open={open} onClose={() => setOpen(false)} chartId={chartId} authed={authed} />
