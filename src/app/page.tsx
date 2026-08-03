@@ -74,19 +74,19 @@ function Hero() {
 
         <Headline />
 
-        <p className="mx-auto mt-8 max-w-[640px] text-pretty text-[17.5px] leading-[1.7] text-ink/72">
-          Learn exactly how to succeed in business based on your chart: your founder
-          archetype, the business that fits you, your strengths, your blind spots, and
-          when to make decisions. The blueprint for building your way.
+        <p className="mx-auto mt-6 max-w-[640px] text-pretty text-[17.5px] leading-[1.7] text-ink/72">
+          The reason your last venture stalled, the pattern behind every bad hire,
+          and the week you should have launched instead — it&rsquo;s all in your chart.
+          60 seconds to see what&rsquo;s been holding you back.
         </p>
 
-        <div className="mt-9">
+        <div className="mt-7">
           <Cta modal location="hero" className="w-full sm:w-auto">
-            Get My Free Reading <span aria-hidden>→</span>
+            See What&rsquo;s Holding You Back <span aria-hidden>→</span>
           </Cta>
         </div>
 
-        <p className="eyebrow mt-5">Takes 60 seconds · No card required</p>
+        <p className="eyebrow mt-4">Free · 60 seconds · No card</p>
 
         <div className="mt-9 inline-flex items-center">
           {/* Initials rather than stock faces: invented headshots would be a
