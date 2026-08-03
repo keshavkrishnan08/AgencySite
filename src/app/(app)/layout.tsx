@@ -59,6 +59,8 @@ export default async function AppLayout({ children }: { children: React.ReactNod
     <AppShell
       firstName={firstName}
       isPaid={ent.isPaid}
+      isTrialing={ent.isTrialing}
+      hasAccess={ent.hasAccess}
       authed={Boolean(ent.userId)}
       briefingTeaser={teaser}
       chartId={chart.id}

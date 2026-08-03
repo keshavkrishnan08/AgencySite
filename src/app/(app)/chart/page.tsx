@@ -54,7 +54,8 @@ export default async function MyChartPage() {
 
   // Tab one is free, so only tab one leaves the server intact. Without this the
   // whole reading ships in the HTML and the blur is decorative.
-  sections = redactSections(sections, ent.isPaid ? sections?.length ?? 0 : 1);
+  // Trial: full reading (all 7 sections). Free: 1 section. Paid: all.
+  sections = redactSections(sections, ent.hasAccess ? sections?.length ?? 0 : 1);
 
   const placements = [
     `${SIGN_GLYPH[sun]} ${c.sunSign} Sun`,
@@ -141,16 +142,19 @@ export default async function MyChartPage() {
   // must be truncated server-side or it is readable from view-source.
   // Every horizon's tail (the advice) is paywalled. Today's line (the
   // observation) stays free — it proves the data is real and personal.
+  // Trial: today's timing only (line free, tail locked). Paid: everything.
+  // Free: all locked.
   const gatedTiming = timing.map((row, i) =>
     ent.isPaid
       ? row
-      : i === 0
+      : (ent.isTrialing && i === 0)
         ? { ...row, tail: teaser(row.tail) }
         : { ...row, line: teaser(row.line), tail: teaser(row.tail) },
   );
 
+  // Trial: all systems visible (part of the reading). Free: only first.
   const gatedSystems = systems.map((s, i) =>
-    ent.isPaid || i === 0 ? s : { ...s, body: teaser(s.body) },
+    ent.hasAccess || i === 0 ? s : { ...s, body: teaser(s.body) },
   );
 
   return (
@@ -164,10 +168,10 @@ export default async function MyChartPage() {
       placements={placements}
       systems={gatedSystems}
       sections={sections}
-      roles={ent.isPaid ? fit.fits : fit.fits.slice(0, 2)}
-      avoid={ent.isPaid ? fit.avoid : teaser(fit.avoid)}
-      builtFor={ent.isPaid ? c.archetype.builtFor : teaser(c.archetype.builtFor)}
-      rot={ent.isPaid ? fit.rot : teaser(fit.rot)}
+      roles={ent.hasAccess ? fit.fits : fit.fits.slice(0, 2)}
+      avoid={ent.hasAccess ? fit.avoid : teaser(fit.avoid)}
+      builtFor={ent.hasAccess ? c.archetype.builtFor : teaser(c.archetype.builtFor)}
+      rot={ent.hasAccess ? fit.rot : teaser(fit.rot)}
       timing={gatedTiming}
       blockers={findBlockers(c)}
       chapter={currentChapter(new Date(chart.birth_utc))}
