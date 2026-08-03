@@ -61,7 +61,7 @@ export async function GET(request: Request) {
 
     const { data: charts } = await admin
       .from('charts')
-      .select('id, email, first_name, chart, user_id')
+      .select('id, email, first_name, chart, user_id, access_token')
       .not('email', 'is', null)
       .gte('created_at', windowStart.toISOString())
       .lt('created_at', windowEnd.toISOString())
@@ -107,6 +107,7 @@ export async function GET(request: Request) {
           firstName: r.first_name,
           chart: r.chart as Chart,
           chartId: r.id,
+          accessToken: r.access_token as string,
           uniqueInsight: insight,
         });
         sent++;
