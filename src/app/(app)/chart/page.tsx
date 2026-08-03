@@ -52,10 +52,10 @@ export default async function MyChartPage() {
     sections = (reading?.sections ?? null) as ReadingSection[] | null;
   }
 
-  // Tab one is free, so only tab one leaves the server intact. Without this the
-  // whole reading ships in the HTML and the blur is decorative.
-  // Trial: full reading (all 7 sections). Free: 1 section. Paid: all.
-  sections = redactSections(sections, ent.hasAccess ? sections?.length ?? 0 : 1);
+  // Free: ZERO full sections — they see the title + first paragraph teaser
+  // only. The reading is the trial product, not the free product.
+  // Trial: all 7 sections. Paid: all.
+  sections = redactSections(sections, ent.hasAccess ? sections?.length ?? 0 : 0);
 
   const placements = [
     `${SIGN_GLYPH[sun]} ${c.sunSign} Sun`,
