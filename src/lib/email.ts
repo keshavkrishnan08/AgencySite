@@ -96,6 +96,7 @@ export interface SequenceContext {
   firstName: string;
   chart: Chart;
   chartId: string;
+  accessToken: string;
   /** AI-generated unique insight, computed cheaply before sending. */
   uniqueInsight?: string;
 }
@@ -111,6 +112,8 @@ export async function sendSequenceEmail(kind: SequenceKind, ctx: SequenceContext
   const lp = LIFE_PATHS[c.lifePath];
   const link = `${SITE}/r/${ctx.chartId}`;
   const trialLink = `${SITE}/r/${ctx.chartId}#pricing`;
+  const insightUrl = (type: string) =>
+    `${SITE}/insight?chart=${ctx.chartId}&token=${ctx.accessToken}&type=${type}`;
 
   const t: Record<SequenceKind, { subject: string; body: string; preheader: string }> = {
     day0: {
@@ -134,7 +137,7 @@ export async function sendSequenceEmail(kind: SequenceKind, ctx: SequenceContext
         <p style="margin:0 0 16px;">${ctx.uniqueInsight ?? `Your ${c.sunSign} Sun with a ${c.moonSign} Moon and Life Path ${c.lifePath} creates a specific operating signature that appears in roughly 1 in 8 charts. It explains why ${a.name}s like you tend to start strong and then hit the same wall around month six of any new venture.`}</p>
         <p style="margin:0 0 8px;font-weight:600;">What it means for your career right now:</p>
         ${blurred(`The pattern suggests you are in a window where the instinct to pivot is strongest, but the data says hold. Your ${c.chinese.label} cycle reinforces this — the next 90 days favour building proof over chasing reach. The specific dates that support your next move are...`)}
-        ${button(link, 'See the full analysis')}
+        ${button(insightUrl('unusual'), 'See the full analysis')}
         <p style="margin:0;font-size:13px;color:#0f121577;">This insight is computed from your exact birth data, not a generic horoscope.</p>`,
     },
     day2: {
@@ -145,7 +148,7 @@ export async function sendSequenceEmail(kind: SequenceKind, ctx: SequenceContext
         <p style="margin:0 0 16px;">Most people around you have noticed. Almost nobody says it, because it is bound up with the thing you are best at.</p>
         <p style="margin:0 0 8px;font-weight:600;">What it actually costs you:</p>
         ${blurred(`This blind spot shows up most clearly in how you handle the gap between your first instinct and the final decision. For ${a.name}s it manifests as a pattern of over-committing to the vision and under-investing in the structure that holds it. The specific cost in your chart is...`)}
-        ${button(link, 'Read the full blind spots section')}`,
+        ${button(insightUrl('blindspot'), 'Read the full blind spots section')}`,
     },
     day3: {
       subject: `How you actually make decisions, ${ctx.firstName}`,
@@ -155,7 +158,7 @@ export async function sendSequenceEmail(kind: SequenceKind, ctx: SequenceContext
         <p style="margin:0 0 16px;"><strong>Under pressure</strong>, your Life Path ${lp.number} (${lp.title}) pulls you a specific way: ${lp.underPressure}</p>
         <p style="margin:0 0 8px;font-weight:600;">The one decision you keep getting wrong:</p>
         ${blurred(`Your chart identifies a repeating pattern in how you handle irreversible decisions. The ${c.sunSign}-Life Path ${c.lifePath} combination means you tend to commit at the moment of highest emotion rather than highest information. The counter-move that fixes this is...`)}
-        ${button(link, 'Read the decisions section')}`,
+        ${button(insightUrl('decision'), 'Read the decisions section')}`,
     },
     day5: {
       subject: `Your timing this month, ${ctx.firstName}`,
@@ -165,7 +168,7 @@ export async function sendSequenceEmail(kind: SequenceKind, ctx: SequenceContext
         <p style="margin:0 0 16px;">Your ${c.chinese.label} adds to that: ${animal.operating}</p>
         <p style="margin:0 0 8px;font-weight:600;">Your best window this month:</p>
         ${blurred(`Based on your natal chart, the strongest day for a launch or major decision falls in the next two weeks. Mars is making a contact to your Sun that supports bold, visible moves. The specific date and the reasoning behind it are...`)}
-        ${button(trialLink, `Unlock my timing \u2014 ${PRICING.trialDays} days free`)}
+        ${button(insightUrl('timing'), `See my timing window`)}
         ${badge(`${PRICING.trialDays}-day free trial · no card charged today`)}`,
     },
     day7: {
