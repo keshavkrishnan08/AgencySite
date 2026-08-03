@@ -23,8 +23,8 @@ export interface TimingRow {
   tail: string;
 }
 
-/** Only the first tab is free. It has to be genuinely good on its own. */
-const FREE_TABS = 1;
+/** No tabs are free. The reading is the trial product. */
+const FREE_TABS = 0;
 
 /**
  * My Chart — four sections, matching the reference.
@@ -226,14 +226,13 @@ export function ChartView({
 
       {/* ──────────────────────────────────────────────── 3. the reading */}
       <section>
-        <p className="eyebrow">The reading</p>
+        <p className="eyebrow">Your 7-section reading</p>
 
-        {/* Horizontal scroll rather than wrap: a wrapping row reflows the whole
-            page every time the selection changes. */}
+        {/* Tab bar — free users see all tabs with locks to show what's waiting */}
         <div className="-mx-4 mt-2.5 overflow-x-auto px-4 sm:mx-0 sm:px-0">
           <div className="flex gap-2 pb-1">
             {TABS.map((t, i) => {
-              const locked = !hasAccess && i >= FREE_TABS;
+              const locked = !hasAccess;
               return (
                 <button
                   key={t.key}
@@ -250,8 +249,6 @@ export function ChartView({
           </div>
         </div>
 
-        {/* ONE card. Roles, the business, the seat to refuse and where you rot
-            all belong in here — every one of them is the reading. */}
         <article className="card mt-3.5">
           {!sections ? (
             <>
@@ -260,30 +257,66 @@ export function ChartView({
                 Computing your full reading · this page updates automatically
               </p>
             </>
-          ) : tabLocked ? (
+          ) : !hasAccess ? (
+            /* ── FREE: show title + standfirst + first paragraph, blur mid-way,
+                 trial CTA overlaid. The reading is the trial product. ── */
             <>
               <p className="eyebrow">{TABS[tabIndex].label}</p>
               <h2 className="mt-2 font-serif text-[21px] font-normal leading-tight sm:text-[25px]">
-                {active?.title ?? ''}
+                {active?.title ?? 'Your reading has been written.'}
               </h2>
-              {/* The standfirst is visible — it names the problem clearly enough
-                  to create the need to read the answer. */}
               {active?.standfirst && (
                 <p className="mt-2 text-[14.5px] leading-relaxed text-ink/75">{active.standfirst}</p>
               )}
-              <LockedZone
-                label={`Unlock ${TABS[tabIndex].label}`}
-                className="relative mt-2.5 h-[172px] overflow-hidden"
-              >
-                <div className="locked-text space-y-3" aria-hidden>
-                  {(active?.paragraphs ?? []).map((p, i) => (
-                    <p key={i} className="text-[14px] leading-[1.7] text-ink">{p}</p>
+
+              {/* First paragraph readable — proves the reading is real and specific */}
+              {active?.paragraphs?.[0] && (
+                <p className="mt-3 text-[14px] leading-[1.7] text-ink/85">{active.paragraphs[0]}</p>
+              )}
+
+              {/* Blur wall — interrupts mid-read */}
+              <div className="relative mt-2">
+                <div style={{ filter: 'blur(10px)', opacity: 0.28, userSelect: 'none' }} aria-hidden>
+                  <p className="text-[14px] leading-[1.7] text-ink">
+                    This section continues with specific guidance drawn from your natal placements.
+                    Your chart identifies the pattern that repeats in how you operate, the structural
+                    advantage most people in your position overlook, and the counter-move that turns
+                    the weakness into leverage. The remaining six sections cover your decision-making
+                    under pressure, your blind spots, how you land on other people versus how you
+                    think you land, the business models that fit your wiring, and your timing.
+                  </p>
+                </div>
+
+                {/* Trial CTA overlaid on the blur */}
+                <div className="absolute inset-0 flex items-center justify-center">
+                  <div className="w-full max-w-sm rounded-[12px] border border-ledger-mid/30 bg-[#eef0e6] p-5 text-center shadow-[0_12px_40px_-12px_rgba(15,18,21,0.25)]">
+                    <p className="font-serif text-[19px] leading-snug">
+                      Your full reading is ready.
+                    </p>
+                    <p className="mt-2 text-[13.5px] leading-relaxed text-ink/65">
+                      7 sections written for your chart. {PRICING.trialDays === 1 ? '24 hours' : `${PRICING.trialDays} days`} free to read it all.
+                    </p>
+                    <LockedCta label={`Unlock my reading — ${PRICING.trialDays === 1 ? '24hr' : `${PRICING.trialDays} days`} free`} />
+                    <p className="mt-2 font-mono text-[9.5px] uppercase tracking-label text-ink/40">
+                      {PRICING.weekly.amount}/week after · cancel anytime
+                    </p>
+                  </div>
+                </div>
+              </div>
+
+              {/* Show what's locked below — the 7 section titles create FOMO */}
+              <div className="mt-10 border-t pt-5 rule">
+                <p className="font-mono text-[9.5px] uppercase tracking-label text-ink/45">
+                  Your reading covers:
+                </p>
+                <div className="mt-3 grid gap-2 sm:grid-cols-2">
+                  {TABS.map((t) => (
+                    <div key={t.key} className="flex items-center gap-2 text-[13.5px] text-ink/55">
+                      <LockGlyph />
+                      {t.label}
+                    </div>
                   ))}
                 </div>
-              </LockedZone>
-              <span className="sr-only">Locked. Subscribe to read this section.</span>
-              <div className="mt-4">
-                <LockedInline label={`See what this costs you`} />
               </div>
             </>
           ) : active ? (
