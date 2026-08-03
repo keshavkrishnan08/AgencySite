@@ -16,9 +16,9 @@ export const BRAND = {
  * plan, which is the exact disclosure failure the FTC actions turn on.
  */
 export const PRICING = {
-  weekly: { label: 'Weekly', amount: '$7.99', cadence: '/week', badge: '3 days free' },
-  annual: { label: 'Annual', amount: '$78.99', cadence: '/year', badge: '3 days free · save 81%' },
-  trialDays: 3,
+  weekly: { label: 'Weekly', amount: '$7.99', cadence: '/week', badge: '24hr free trial' },
+  annual: { label: 'Annual', amount: '$78.99', cadence: '/year', badge: '24hr free trial · save 81%' },
+  trialDays: 1,
 } as const;
 
 /** The six things a subscription unlocks, in the order Axon lists them. */
