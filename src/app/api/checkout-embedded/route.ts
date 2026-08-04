@@ -55,7 +55,7 @@ export async function POST(request: Request) {
     const session = await stripe().checkout.sessions.create({
       mode: 'subscription',
       customer: customerId,
-      ui_mode: 'embedded',
+      ui_mode: 'embedded_page',
       line_items: [{ price: priceIdFor(plan), quantity: 1 }],
       allow_promotion_codes: true,
       client_reference_id: user.id,
