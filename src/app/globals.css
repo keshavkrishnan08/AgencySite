@@ -556,6 +556,12 @@
   }
 }
 
+/* Stripe Embedded Checkout — match the app aesthetic */
+.embedded-checkout iframe {
+  border-radius: 8px;
+  min-height: 320px;
+}
+
 @keyframes sheen {
   0% { background-position: 0% center; }
   100% { background-position: 200% center; }
