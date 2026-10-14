@@ -1,12 +1,22 @@
+import { createHash, timingSafeEqual } from 'node:crypto';
 import { NextResponse } from 'next/server';
 import { supabaseAdmin } from '@/lib/supabase/server';
 
 export const runtime = 'nodejs';
 export const dynamic = 'force-dynamic';
 
+// The dashboard password lives in the FUNNEL_PASSWORD environment variable, never in source.
+// With it unset, the endpoint stays locked.
+function authorized(pw: string | null): boolean {
+  const expected = process.env.FUNNEL_PASSWORD;
+  if (!expected || !pw) return false;
+  const digest = (s: string) => createHash('sha256').update(s).digest();
+  return timingSafeEqual(digest(pw), digest(expected));
+}
+
 export async function GET(request: Request) {
   const pw = new URL(request.url).searchParams.get('pw');
-  if (pw !== '123456') {
+  if (!authorized(pw)) {
     return NextResponse.json({ error: 'unauthorized' }, { status: 401 });
   }
 

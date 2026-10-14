@@ -30,7 +30,7 @@ export default function Dashboard() {
   const [error, setError] = useState('');
 
   async function load(password: string) {
-    const res = await fetch(`/api/funnel?pw=${password}`);
+    const res = await fetch(`/api/funnel?pw=${encodeURIComponent(password)}`);
     if (!res.ok) { setError('Wrong password'); return; }
     setData(await res.json());
     setAuthed(true);
