@@ -7,7 +7,7 @@ export const runtime = 'nodejs';
 
 /**
  * OAuth and magic-link landing point. Exchanges the code for a session and
- * explicitly forwards the session cookies onto the redirect response — without
+ * explicitly forwards the session cookies onto the redirect response, without
  * this, NextResponse.redirect() drops the cookies and the user is immediately
  * signed out on the next page load.
  */
@@ -50,7 +50,7 @@ export async function GET(request: Request) {
 
   await claimChartForUser(data.user.id, data.user.email ?? '');
 
-  // `next` is used as a path only — never trust it as a full URL, or this
+  // `next` is used as a path only: never trust it as a full URL, or this
   // becomes an open redirect.
   const dest = next.startsWith('/') ? next : '/chart';
   const response = NextResponse.redirect(new URL(dest, url.origin));

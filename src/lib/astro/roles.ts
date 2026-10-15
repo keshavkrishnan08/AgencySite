@@ -2,7 +2,7 @@ import type { Sign } from './zodiac';
 
 /**
  * The seats each archetype actually holds well, and the seat it should never
- * take. Shown as chips on My Chart — concrete job titles land harder than
+ * take. Shown as chips on My Chart: concrete job titles land harder than
  * adjectives, and they are what people screenshot.
  */
 export interface RoleFit {

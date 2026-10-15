@@ -6,7 +6,7 @@ import { redactSections, teaser, type ReadingSection } from '../src/lib/sections
  * The full reading used to ship inside the HTML of every unpaid page view:
  * `filter: blur(5px)` hides it from a reader, not from view-source, reader
  * mode, or a disabled stylesheet. These gates assert that paid copy is removed
- * on the server, and — separately — that a live unpaid page does not contain it.
+ * on the server, and: separately, that a live unpaid page does not contain it.
  *
  * Run with BASE set to exercise the HTTP half:
  *   BASE=http://localhost:3000 npx tsx scripts/verify-leak.ts
@@ -45,7 +45,7 @@ check(
   `${leakedChars}/${originalChars} chars`,
 );
 
-check('titles survive — they have to sell the section', free.slice(1).every((s) => s.title.length > 0));
+check('titles survive, they have to sell the section', free.slice(1).every((s) => s.title.length > 0));
 check('a paid reader is redacted at no index', redactSections(sample, sample.length)!.every((s) => !s.locked));
 check('an empty reading stays null rather than throwing', redactSections(null, 1) === null);
 check('a section with no paragraphs does not crash', redactSections([{ key: 'k', title: 't', standfirst: 's', paragraphs: [] }], 0)![0].paragraphs.length === 0);
@@ -94,8 +94,8 @@ if (!BASE) {
     // that is leaking everything. The end of the last paragraph is the part
     // that must be absent.
     // Match whole paragraphs, not fragments. Short fragments legitimately
-    // recur in free copy — a life-path line appears both in Strengths and in
-    // the free systems card — and a fragment probe reports those as leaks.
+    // recur in free copy: a life-path line appears both in Strengths and in
+    // the free systems card: and a fragment probe reports those as leaks.
     // A complete paid paragraph appearing verbatim is unambiguous.
     for (const s of sections.slice(2)) {
       const dropped = s.paragraphs.slice(1);
@@ -117,5 +117,5 @@ if (!BASE) {
   }
 }
 
-console.log(bad ? `\n${bad} leak(s) — paid copy is reaching unpaid browsers` : '\nPAYWALL IS A BOUNDARY, NOT A BLUR');
+console.log(bad ? `\n${bad} leak(s), paid copy is reaching unpaid browsers` : '\nPAYWALL IS A BOUNDARY, NOT A BLUR');
 process.exit(bad ? 1 : 0);

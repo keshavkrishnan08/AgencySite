@@ -142,7 +142,7 @@ export function LockedInline({ label }: { label: string }) {
 }
 
 /**
- * Seeds the ask panel with a specific question — the highest-converting nudge
+ * Seeds the ask panel with a specific question: the highest-converting nudge
  * in the product, because a named question gets tapped and an empty box doesn't.
  *
  * `prominent` is the hero variant: green outline, heavier text.

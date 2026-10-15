@@ -16,7 +16,7 @@ export const SIGNS: Sign[] = [
  * Each glyph carries U+FE0E (VARIATION SELECTOR-15).
  *
  * Without it iOS, Android and macOS render the zodiac characters as full-colour
- * emoji — purple rounded squares, not typography. Appending it here rather than
+ * emoji: purple rounded squares, not typography. Appending it here rather than
  * at each render site means a new call site cannot reintroduce the bug.
  */
 export const SIGN_GLYPH: Record<Sign, string> = {
@@ -49,10 +49,10 @@ export function norm360(d: number): number {
 }
 
 export interface Position {
-  /** Ecliptic longitude, 0–360. */
+  /** Ecliptic longitude, 0-360. */
   lon: number;
   sign: Sign;
-  /** Degrees into the sign, 0–30. */
+  /** Degrees into the sign, 0-30. */
   degree: number;
   minute: number;
   /** e.g. "12°34' Leo" */
@@ -69,7 +69,7 @@ export function toPosition(lon: number): Position {
   return { lon: l, sign, degree, minute, label: `${degree}°${String(minute).padStart(2, '0')}' ${sign}` };
 }
 
-/** Shortest angular separation between two longitudes, 0–180. */
+/** Shortest angular separation between two longitudes, 0-180. */
 export function separation(a: number, b: number): number {
   const d = Math.abs(norm360(a) - norm360(b));
   return d > 180 ? 360 - d : d;

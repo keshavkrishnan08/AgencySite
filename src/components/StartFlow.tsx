@@ -84,7 +84,7 @@ export function StartFlow() {
   const step1Valid =
     Boolean(month && day && year && place) && (timeUnknown || parsedTime !== null);
 
-  // Tell the user WHY the button is disabled — never leave it silently dead.
+  // Tell the user WHY the button is disabled: never leave it silently dead.
   const step1Blocker = !month
     ? 'Choose your birth month.'
     : !day
@@ -96,7 +96,7 @@ export function StartFlow() {
           : !timeUnknown && timeRaw.trim() === ''
             ? 'Enter your birth time, or tick that you don’t know it.'
             : !timeUnknown && parsedTime === null
-              ? 'Time should look like 8:10 — hours between 1 and 12.'
+              ? 'Time should look like 8:10, hours between 1 and 12.'
               : null;
 
   const step2Valid = firstName.trim().length > 0 && /^\S+@\S+\.\S+$/.test(email.trim()) && password.length >= 6;
@@ -129,7 +129,7 @@ export function StartFlow() {
         }),
       });
       // A crashed route returns an HTML error page, and res.json() then throws
-      // "The string did not match the expected pattern" — a browser internal
+      // "The string did not match the expected pattern": a browser internal
       // that tells the user nothing. Parse defensively and say something real.
       const json = await res.json().catch(() => null);
       if (!res.ok || !json) {
@@ -141,7 +141,7 @@ export function StartFlow() {
 
       track(EVENTS.formComplete, { archetype: json.archetype });
 
-      // Sign up the user with Supabase auth. This IS the account creation —
+      // Sign up the user with Supabase auth. This IS the account creation,
       // no separate signup page. With autoconfirm enabled the session is
       // returned immediately and the user lands on /chart already signed in.
       try {
@@ -158,7 +158,7 @@ export function StartFlow() {
         // Link the chart to the new account.
         await fetch('/api/claim', { method: 'POST' }).catch(() => {});
       } catch {
-        // Auth failure must not block the chart — they can sign in later.
+        // Auth failure must not block the chart: they can sign in later.
       }
 
       setStep(2);
@@ -443,7 +443,7 @@ function Building({ firstName }: { firstName: string }) {
         ))}
       </div>
 
-      {/* The Mercury sigil, drawn rather than spun — a spinner reads as
+      {/* The Mercury sigil, drawn rather than spun, a spinner reads as
           "waiting", the mark reads as "working". */}
       <svg
         viewBox="0 0 24 24"

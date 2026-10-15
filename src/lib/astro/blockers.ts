@@ -3,12 +3,12 @@ import type { AspectHit, Placement } from './chart';
 import { SIGNS, type Sign } from './zodiac';
 
 /**
- * Why You're Stuck — the diagnosis.
+ * Why You're Stuck: the diagnosis.
  *
  * Every other surface describes who someone is. This one names the specific,
  * repeating pattern that costs them money, and says what it costs. It is
- * computed from the HARD aspects in the natal chart — the ones traditional
- * astrology treats as friction — plus where they sit in the Saturn cycle.
+ * computed from the HARD aspects in the natal chart: the ones traditional
+ * astrology treats as friction: plus where they sit in the Saturn cycle.
  *
  * This is deterministic astronomy, not model output: the same chart always
  * produces the same diagnosis, which is what makes it defensible when someone
@@ -44,7 +44,7 @@ const PATTERNS: Record<string, Omit<Blocker, 'evidence' | 'severity'>> = {
   'Moon|Saturn': {
     title: 'You absorb the cost rather than name it',
     costs:
-      'You carry underperformers, discount quietly, and take on scope that was never agreed — then resent it privately instead of renegotiating it out loud.',
+      'You carry underperformers, discount quietly, and take on scope that was never agreed, then resent it privately instead of renegotiating it out loud.',
     fix: 'Put the uncomfortable number in writing within 48 hours of noticing it. Written is easier than spoken for this placement, and it stops the drift.',
   },
   'Mercury|Saturn': {
@@ -57,7 +57,7 @@ const PATTERNS: Record<string, Omit<Blocker, 'evidence' | 'severity'>> = {
     title: 'You hold control past the point it helps',
     costs:
       'The business cannot grow beyond your personal bandwidth because the decisions that matter still route through you. You are the bottleneck and the reason it is stable.',
-    fix: 'Hand over one decision class entirely — not the task, the decision — and let it be made worse than you would make it for one quarter.',
+    fix: 'Hand over one decision class entirely, not the task, the decision, and let it be made worse than you would make it for one quarter.',
   },
   'Mars|Saturn': {
     title: 'You start and stall in the same motion',
@@ -87,19 +87,19 @@ const PATTERNS: Record<string, Omit<Blocker, 'evidence' | 'severity'>> = {
     title: 'You avoid the conversation until it is a rupture',
     costs:
       'Small corrections go unsaid until they become exits. Partnerships and hires end in one large conversation that three small ones would have prevented.',
-    fix: 'Say the small version within a week. Your instinct is that raising it makes it real — it is already real, and only the timing is still yours.',
+    fix: 'Say the small version within a week. Your instinct is that raising it makes it real, it is already real, and only the timing is still yours.',
   },
   'Mars|Neptune': {
     title: 'Your effort goes where the feedback is softest',
     costs:
       'You drift toward the work that feels good over the work that pays, and the two diverge for months before the numbers make it obvious.',
-    fix: 'Pick the metric on Monday and check it on Friday. Not a dashboard — one number, written on paper.',
+    fix: 'Pick the metric on Monday and check it on Friday. Not a dashboard, one number, written on paper.',
   },
   'Jupiter|Saturn': {
     title: 'You expand and contract in the same quarter',
     costs:
       'Commitments made in optimism get cut in caution. The stop-start reads to everyone around you as a strategy that keeps changing.',
-    fix: 'Separate the two decisions in time. Commit in one week, size it the next — never both in the same conversation.',
+    fix: 'Separate the two decisions in time. Commit in one week, size it the next, never both in the same conversation.',
   },
   'Mercury|Mars': {
     title: 'You win the argument and lose the room',
@@ -130,7 +130,7 @@ export function findBlockers(chart: Chart): Blocker[] {
 
     found.push({
       ...pattern,
-      evidence: `${hit.a} ${hit.type.toLowerCase()} ${hit.b}, orb ${hit.orb}° — ${hit.applying ? 'applying' : 'separating'}.`,
+      evidence: `${hit.a} ${hit.type.toLowerCase()} ${hit.b}, orb ${hit.orb}°, ${hit.applying ? 'applying' : 'separating'}.`,
       severity: severity(hit),
     });
   }
@@ -148,7 +148,7 @@ export function findBlockers(chart: Chart): Blocker[] {
 export interface Chapter {
   /** e.g. "The Proving Ground". */
   name: string;
-  /** Where in the ~29.5-year Saturn cycle they are, 0–1. */
+  /** Where in the ~29.5-year Saturn cycle they are, 0-1. */
   progress: number;
   /** How many years into this chapter. */
   yearsIn: number;
@@ -165,13 +165,13 @@ const CHAPTERS: { upTo: number; name: string; what: string; ends: string }[] = [
   {
     upTo: 0.25,
     name: 'The Build',
-    what: 'You are laying foundations that will not pay out for years. Effort is high and evidence is thin, which is exactly what this quarter of the cycle looks like from inside it — and why most people quit here.',
+    what: 'You are laying foundations that will not pay out for years. Effort is high and evidence is thin, which is exactly what this quarter of the cycle looks like from inside it, and why most people quit here.',
     ends: 'It lifts when the first structure holds weight without you propping it.',
   },
   {
     upTo: 0.5,
     name: 'The Proving Ground',
-    what: 'What you built is being tested against reality rather than intention. This is the stretch where the flaw in the model surfaces — not as a crisis, as a slow leak you keep patching.',
+    what: 'What you built is being tested against reality rather than intention. This is the stretch where the flaw in the model surfaces, not as a crisis, as a slow leak you keep patching.',
     ends: 'It ends when you stop defending the original plan and fix the actual leak.',
   },
   {
@@ -192,7 +192,7 @@ const CHAPTERS: { upTo: number; name: string; what: string; ends: string }[] = [
  * Where they are in the Saturn cycle, derived from age.
  *
  * Saturn's period is ~29.46 years, so the cycle position is a real astronomical
- * quantity — this is not a personality quiz dressed as a timeline.
+ * quantity: this is not a personality quiz dressed as a timeline.
  */
 export function currentChapter(birthUtc: Date, now = new Date()): Chapter {
   const years = (now.getTime() - birthUtc.getTime()) / (365.2425 * 86_400_000);
@@ -216,7 +216,7 @@ export function currentChapter(birthUtc: Date, now = new Date()): Chapter {
   };
 }
 
-/** The sign Saturn is transiting now — the area currently under pressure. */
+/** The sign Saturn is transiting now: the area currently under pressure. */
 export function pressurePoint(chart: Chart): string {
   const saturn = chart.natal.placements.find((p: Placement) => p.point === 'Saturn');
   if (!saturn) return SIGNS[0];

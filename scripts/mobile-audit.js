@@ -36,7 +36,7 @@
     .map((e) => parseFloat(getComputedStyle(e).fontSize))
     .filter((s) => s < 16);
 
-  // Widest block-level content vs viewport — a low ratio means the page reads
+  // Widest block-level content vs viewport: a low ratio means the page reads
   // as a small widget floating in a large empty frame.
   let widest = 0;
   document.querySelectorAll('main *, section, article').forEach((el) => {

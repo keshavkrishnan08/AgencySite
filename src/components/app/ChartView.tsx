@@ -27,11 +27,11 @@ export interface TimingRow {
 const FREE_TABS = 0;
 
 /**
- * My Chart — four sections, matching the reference.
+ * My Chart: four sections, matching the reference.
  *
  * Archetype, the three systems, the reading, the timing. Everything that used
- * to be its own card — recommended roles, the business you were built for, the
- * seat to refuse, where you quietly rot — now lives INSIDE the reading card,
+ * to be its own card: recommended roles, the business you were built for, the
+ * seat to refuse, where you quietly rot: now lives INSIDE the reading card,
  * because that is what all of it is: the reading. Fifteen cards on one page
  * reads as a dashboard; four sections read as a document.
  */
@@ -96,7 +96,7 @@ export function ChartView({
   }, [sections, chartId, router]);
 
   // Auto-trigger checkout if the user just signed in with a pending intent.
-  // Only fires if the intent is less than 5 minutes old — stale intents
+  // Only fires if the intent is less than 5 minutes old, stale intents
   // from previous sessions must not hijack the page.
   useEffect(() => {
     if (isPaid) return;
@@ -124,7 +124,7 @@ export function ChartView({
   const tabLocked = !hasAccess && tabIndex >= FREE_TABS;
 
   async function share() {
-    const data = { title: `${firstName} — ${archetype}`, text: oneLine, url: shareUrl };
+    const data = { title: `${firstName}, ${archetype}`, text: oneLine, url: shareUrl };
     if (typeof navigator !== 'undefined' && navigator.share) {
       try { await navigator.share(data); return; } catch { /* dismissed */ }
     }
@@ -228,7 +228,7 @@ export function ChartView({
       <section>
         <p className="eyebrow">Your 7-section reading</p>
 
-        {/* Tab bar — free users see all tabs with locks to show what's waiting */}
+        {/* Tab bar, free users see all tabs with locks to show what's waiting */}
         <div className="-mx-4 mt-2.5 overflow-x-auto px-4 sm:mx-0 sm:px-0">
           <div className="flex gap-2 pb-1">
             {TABS.map((t, i) => {
@@ -269,12 +269,12 @@ export function ChartView({
                 <p className="mt-2 text-[14.5px] leading-relaxed text-ink/75">{active.standfirst}</p>
               )}
 
-              {/* First paragraph readable — proves the reading is real and specific */}
+              {/* First paragraph readable, proves the reading is real and specific */}
               {active?.paragraphs?.[0] && (
                 <p className="mt-3 text-[14px] leading-[1.7] text-ink/85">{active.paragraphs[0]}</p>
               )}
 
-              {/* Blur wall — interrupts mid-read */}
+              {/* Blur wall, interrupts mid-read */}
               <div className="relative mt-2">
                 <div style={{ filter: 'blur(10px)', opacity: 0.28, userSelect: 'none' }} aria-hidden>
                   <p className="text-[14px] leading-[1.7] text-ink">
@@ -296,7 +296,7 @@ export function ChartView({
                     <p className="mt-2 text-[13.5px] leading-relaxed text-ink/65">
                       7 sections written for your chart. {PRICING.trialDays === 1 ? '24 hours' : `${PRICING.trialDays} days`} free to read it all.
                     </p>
-                    <LockedCta label={`Unlock my reading — ${PRICING.trialDays === 1 ? '24hr' : `${PRICING.trialDays} days`} free`} />
+                    <LockedCta label={`Unlock my reading, ${PRICING.trialDays === 1 ? '24hr' : `${PRICING.trialDays} days`} free`} />
                     <p className="mt-2 font-mono text-[9.5px] uppercase tracking-label text-ink/40">
                       {PRICING.weekly.amount}/week after · cancel anytime
                     </p>
@@ -304,7 +304,7 @@ export function ChartView({
                 </div>
               </div>
 
-              {/* Show what's locked below — the 7 section titles create FOMO */}
+              {/* Show what's locked below, the 7 section titles create FOMO */}
               <div className="mt-10 border-t pt-5 rule">
                 <p className="font-mono text-[9.5px] uppercase tracking-label text-ink/45">
                   Your reading covers:
@@ -332,7 +332,7 @@ export function ChartView({
                 ))}
               </div>
 
-              {/* The free section carries the roles and the business fit — the
+              {/* The free section carries the roles and the business fit, the
                   same argument continued, not a new card. */}
               {tabIndex === 0 && (
                 <>
@@ -527,7 +527,7 @@ export function ChartView({
           </p>
           <p className="mt-2 text-[14px] leading-relaxed text-ink/72">
             Your blind spots, the pattern that keeps repeating, the exact days to
-            make the move you&rsquo;ve been sitting on — it&rsquo;s all computed
+            make the move you&rsquo;ve been sitting on, it&rsquo;s all computed
             and waiting. {PRICING.trialDays} days free to see if it changes how you operate.
           </p>
           <div className="mt-4 flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">

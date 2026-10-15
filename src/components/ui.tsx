@@ -10,7 +10,7 @@ import { StartFlow } from './StartFlow';
  * Primary call to action.
  *
  * `modal` opens the birth-data flow in a popup over the landing page instead of
- * navigating away — the reference's behaviour. Keeping the marketing context
+ * navigating away: the reference's behaviour. Keeping the marketing context
  * behind the form is worth real conversion: a full page change costs intent.
  */
 export function Cta({
@@ -104,7 +104,7 @@ export function Tabs({ tabs }: { tabs: { key: string; label: string; body: strin
             role="tab"
             aria-selected={i === active}
             onClick={() => setActive(i)}
-            // Fully rounded, 22px gutters, 1.84px tracking — the reference's
+            // Fully rounded, 22px gutters, 1.84px tracking: the reference's
             // pill, not a rounded rectangle.
             className={`flex min-h-[44px] shrink-0 items-center rounded-full border px-[22px] font-mono text-[11.5px] uppercase tracking-[0.16em] transition-colors ${
               i === active
@@ -164,7 +164,7 @@ export function AnnouncementBar({
 
 /**
  * The birth-data flow as an overlay. Dimmed and blurred behind, escape closes,
- * body scroll locked — the same treatment /start gives it as a full page, so
+ * body scroll locked: the same treatment /start gives it as a full page, so
  * the two entry points behave identically.
  *
  * Portalled to <body> on purpose. The nav CTA lives inside a header carrying

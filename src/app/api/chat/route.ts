@@ -14,7 +14,7 @@ export const maxDuration = 120;
 const Body = z.object({ message: z.string().trim().min(1).max(2000) });
 
 /**
- * Chat with your chart — the retention feature and the upsell.
+ * Chat with your chart: the retention feature and the upsell.
  *
  * An unpaid visitor gets ONE real answer per day. Locking chat outright puts
  * the paywall before the value; letting them feel it work once puts the
@@ -33,7 +33,7 @@ export async function POST(request: Request) {
   const chart = await resolveChart(ent.userId);
   if (!chart) return NextResponse.json({ error: 'No chart found.' }, { status: 404 });
 
-  // Spend the allowance only once we know there is a chart to answer about —
+  // Spend the allowance only once we know there is a chart to answer about,
   // otherwise a visitor with no chart burns their one free answer on a 404.
   if (!ent.isPaid) {
     const spent = guard(request, 'chatFree', ent.userId, 'That was your free answer for today.');

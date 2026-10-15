@@ -1,7 +1,7 @@
 import { chineseNewYear, chineseSign } from '../src/lib/astro/chinese';
 import { lifePath } from '../src/lib/astro/numerology';
 
-/** Published Chinese New Year dates — the animal boundary must land exactly. */
+/** Published Chinese New Year dates: the animal boundary must land exactly. */
 const CNY: [number, string][] = [
   [1971,'1971-01-27'],[1984,'1984-02-02'],[1990,'1990-01-27'],[2000,'2000-02-05'],
   [2008,'2008-02-07'],[2020,'2020-01-25'],[2023,'2023-01-22'],[2024,'2024-02-10'],

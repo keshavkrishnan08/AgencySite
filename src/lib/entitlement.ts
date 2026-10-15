@@ -8,11 +8,11 @@ export interface Entitlement {
   email: string | null;
   firstName: string | null;
   status: string;
-  /** Full paid access — briefings, timing, diagnosis, journal. */
+  /** Full paid access: briefings, timing, diagnosis, journal. */
   isPaid: boolean;
-  /** Trial access — reading + 1 chat + today's timing only. */
+  /** Trial access: reading + 1 chat + today's timing only. */
   isTrialing: boolean;
-  /** Either paid or trialing — has SOME level of access beyond free. */
+  /** Either paid or trialing: has SOME level of access beyond free. */
   hasAccess: boolean;
   expiresAt: string | null;
   trialEndsAt: string | null;
@@ -38,7 +38,7 @@ export const ANONYMOUS: Entitlement = {
  * Two-tier entitlement:
  *
  * Trial (24hr): full reading, 1 chat answer, today's timing.
- * Paid (weekly/annual): everything — briefings, full timing, diagnosis, journal, unlimited chat.
+ * Paid (weekly/annual): everything: briefings, full timing, diagnosis, journal, unlimited chat.
  *
  * This prevents the "read everything in 10 minutes and cancel" pattern.
  * The reading hooks them; the daily product is what they pay for.

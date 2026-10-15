@@ -27,7 +27,7 @@ export async function supabaseServer() {
 }
 
 /**
- * Service-role client. Bypasses RLS entirely — only ever construct this inside
+ * Service-role client. Bypasses RLS entirely: only ever construct this inside
  * a server route that has already established who the caller is.
  */
 export function supabaseAdmin() {
@@ -40,7 +40,7 @@ export function supabaseAdmin() {
  * The same client, returning null instead of throwing when unconfigured.
  *
  * Read paths use this. A page that renders a *cached* row must not 500 the
- * whole screen because the cache is unreachable — it should render without the
+ * whole screen because the cache is unreachable: it should render without the
  * cached part. Writes keep using `supabaseAdmin()`, where failing loudly is
  * correct.
  */

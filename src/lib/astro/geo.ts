@@ -70,7 +70,7 @@ export async function searchPlaces(query: string, limit = 8): Promise<Place[]> {
 /**
  * Offset in milliseconds between the named zone and UTC at a given instant.
  * Derived from Intl, so it respects historical DST rules from the ICU tz
- * database — which matters a lot: a 1975 US birth in July was on DST under
+ * database: which matters a lot: a 1975 US birth in July was on DST under
  * rules that no longer apply today.
  */
 function zoneOffsetMs(timeZone: string, utcMs: number): number {
@@ -124,7 +124,7 @@ export function localToUtc(
  * Validate by construction, NOT against `Intl.supportedValuesOf('timeZone')`.
  * That list holds only one spelling of each zone, and which one depends on the
  * ICU build: this runtime lists `Asia/Calcutta` and `Europe/Kiev` but not
- * `Asia/Kolkata` or `Europe/Kyiv` — which are exactly the names the geocoder
+ * `Asia/Kolkata` or `Europe/Kyiv`: which are exactly the names the geocoder
  * returns. Checking membership rejected every birth in India, Ukraine and
  * Argentina at the last step of the funnel.
  */

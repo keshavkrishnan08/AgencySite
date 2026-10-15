@@ -5,7 +5,7 @@ import { useRouter } from 'next/navigation';
 
 /**
  * Fires a one-off generation on mount, then refreshes the server component.
- * Generation takes 30–60s, which cannot happen inside a page render without
+ * Generation takes 30-60s, which cannot happen inside a page render without
  * blowing the request timeout.
  */
 export function GenerateOnMount({

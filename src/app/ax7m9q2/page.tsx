@@ -69,10 +69,10 @@ export default function Dashboard() {
   const e = data.engagement;
 
   const paidTotal = f.paid_trialing + f.paid_weekly + f.paid_annual;
-  const rate = (a: number, b: number) => b === 0 ? '—' : `${Math.round((a / b) * 100)}%`;
+  const rate = (a: number, b: number) => b === 0 ? '-' : `${Math.round((a / b) * 100)}%`;
 
   const steps = [
-    { label: 'Landing Page Visits', value: '—', sub: 'From Meta Pixel', color: 'bg-white/10' },
+    { label: 'Landing Page Visits', value: '-', sub: 'From Meta Pixel', color: 'bg-white/10' },
     { label: 'Charts Created', value: f.charts_total, sub: `${f.charts_today} today`, color: 'bg-amber-500/20' },
     { label: 'Email Captured', value: f.charts_with_email, sub: rate(f.charts_with_email, f.charts_total) + ' of charts', color: 'bg-amber-500/30' },
     { label: 'Account Created', value: f.accounts_created, sub: `${f.accounts_today} today · ${rate(f.accounts_created, f.charts_total)} of charts`, color: 'bg-emerald-500/20' },

@@ -59,7 +59,7 @@ export interface NatalChart {
   houseSystem: 'whole-sign' | null;
   aspects: AspectHit[];
 
-  /** Counts across the ten bodies — drives the "how you're weighted" read. */
+  /** Counts across the ten bodies: drives the "how you're weighted" read. */
   elements: Record<Element, number>;
   modalities: Record<Modality, number>;
   dominantElement: Element;
@@ -69,7 +69,7 @@ export interface NatalChart {
 }
 
 /**
- * Ascendant — the ecliptic degree rising on the eastern horizon.
+ * Ascendant: the ecliptic degree rising on the eastern horizon.
  *
  *   Asc = atan2( cos(RAMC), −(sin(RAMC)·cos ε + tan φ·sin ε) )
  *
@@ -87,7 +87,7 @@ export function ascendant(ramcDeg: number, latDeg: number, eps: number): number 
 }
 
 /**
- * Midheaven — where the local meridian cuts the ecliptic.
+ * Midheaven: where the local meridian cuts the ecliptic.
  *
  *   MC = atan2( sin(RAMC), cos(RAMC)·cos ε )
  *
@@ -104,8 +104,8 @@ export function midheaven(ramcDeg: number, eps: number): number {
  *
  * Chosen over Placidus deliberately. Whole sign is exact, has no iterative
  * solution to get subtly wrong, and does not break above the polar circle
- * where Placidus is undefined. The Ascendant and Midheaven — the two angles
- * the product actually talks about — are computed independently and are
+ * where Placidus is undefined. The Ascendant and Midheaven, the two angles
+ * the product actually talks about: are computed independently and are
  * identical under any system.
  */
 export function wholeSignHouses(ascLon: number): number[] {

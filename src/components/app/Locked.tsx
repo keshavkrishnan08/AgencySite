@@ -6,7 +6,7 @@ import { LockedZone } from './LockedZone';
 /**
  * The standard locked block: real first line, then a gradient-obscured tail.
  *
- * The teaser is genuine copy from the section being sold, not lorem — the whole
+ * The teaser is genuine copy from the section being sold, not lorem, the whole
  * reason this converts is that the visible sentence is specific enough to prove
  * the rest is worth paying for.
  */

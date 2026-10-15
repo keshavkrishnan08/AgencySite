@@ -35,7 +35,7 @@ const DOCS: Record<string, Doc> = {
       {
         h: 'Subscriptions and billing',
         p: [
-          'Paid access is billed through Stripe on a recurring basis — weekly at $7.99 or annually at $78.99 — until cancelled. Where a free trial applies (24 hours), you will be charged when the trial ends unless you cancel before then.',
+          'Paid access is billed through Stripe on a recurring basis, weekly at $7.99 or annually at $78.99, until cancelled. Where a free trial applies (24 hours), you will be charged when the trial ends unless you cancel before then.',
           'You can cancel at any time from the billing portal in your settings. Cancelling stops future renewals; access continues until the end of the period you have already paid for.',
         ],
       },
@@ -70,7 +70,7 @@ const DOCS: Record<string, Doc> = {
         h: 'What we collect',
         p: [
           'Birth data: your first name, date of birth, time of birth (if known), and place of birth. This is the input to your chart and is the only reason we ask for it.',
-          'Account data: your email address, and a Stripe customer reference if you subscribe. We never see or store your card details — those go directly to Stripe.',
+          'Account data: your email address, and a Stripe customer reference if you subscribe. We never see or store your card details, those go directly to Stripe.',
           'Usage data: pages viewed and funnel events, via PostHog and the Meta Pixel, used to understand where the product loses people.',
         ],
       },
@@ -78,7 +78,7 @@ const DOCS: Record<string, Doc> = {
         h: 'How we use it',
         p: [
           'Birth data is used to compute your chart and to generate your reading, daily briefings and chat responses. Your chart is sent to Anthropic as context for generating that text.',
-          'Your email is used for transactional messages, your daily briefing if you are subscribed, and — for free users who did not convert — a short sequence of follow-up emails you can unsubscribe from at any time.',
+          'Your email is used for transactional messages, your daily briefing if you are subscribed, and, for free users who did not convert, a short sequence of follow-up emails you can unsubscribe from at any time.',
         ],
       },
       {
@@ -121,7 +121,7 @@ const DOCS: Record<string, Doc> = {
       {
         h: 'How to request one',
         p: [
-          `Email ${CONTACT} from the address on your account. Refunds are processed to your original payment method and usually appear within 5–10 business days.`,
+          `Email ${CONTACT} from the address on your account. Refunds are processed to your original payment method and usually appear within 5-10 business days.`,
         ],
       },
       {

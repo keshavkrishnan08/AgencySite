@@ -109,7 +109,7 @@ export function ReadingBody({
 
       {locked.length > 0 && (
         <section className="relative">
-          {/* Real content, blurred — the reader can see how much is there. */}
+          {/* Real content, blurred, the reader can see how much is there. */}
           <div className="relative h-[460px] overflow-hidden sm:h-[520px]">
             <div className="locked mx-auto max-w-2xl space-y-12 px-5" aria-hidden>
               {locked.map((s) => (

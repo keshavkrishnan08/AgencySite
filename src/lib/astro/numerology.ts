@@ -1,5 +1,5 @@
 /**
- * Pythagorean life path number — one of the three inputs Axon's reading is
+ * Pythagorean life path number: one of the three inputs Axon's reading is
  * built on, alongside the zodiac sign and the Chinese animal.
  *
  * Method: reduce month, day and year separately, sum them, reduce again.

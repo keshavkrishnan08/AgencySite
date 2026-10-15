@@ -28,7 +28,7 @@ export default async function ReadingPage({ params }: { params: Promise<{ id: st
   const { id } = await params;
 
   // If the visitor owns this chart (cookie or auth), send them to the real
-  // app shell — the share page is only for recipients who don't have it.
+  // app shell: the share page is only for recipients who don't have it.
   const ent = await getEntitlement();
   const owned = await resolveChart(ent.userId);
   if (owned && owned.id === id) redirect('/chart');
@@ -91,13 +91,13 @@ export default async function ReadingPage({ params }: { params: Promise<{ id: st
               {c.archetype.oneLine}
             </p>
 
-            {/* The big three — the fastest credibility signal there is. */}
+            {/* The big three, the fastest credibility signal there is. */}
             <dl className="mx-auto mt-9 grid max-w-lg gap-px overflow-hidden rounded-[3px] border sm:grid-cols-3 rule">
               <Datum label="Sun" glyph={SIGN_GLYPH[c.natal.sun.sign]} value={c.natal.sun.label} />
               <Datum label="Moon" glyph={SIGN_GLYPH[c.natal.moon.sign]} value={c.natal.moon.label} />
               <Datum
                 label="Rising"
-                glyph={c.natal.ascendant ? SIGN_GLYPH[c.natal.ascendant.sign] : '—'}
+                glyph={c.natal.ascendant ? SIGN_GLYPH[c.natal.ascendant.sign] : '-'}
                 value={c.natal.ascendant?.label ?? 'Needs birth time'}
               />
             </dl>
@@ -105,7 +105,7 @@ export default async function ReadingPage({ params }: { params: Promise<{ id: st
             <div className="mx-auto mt-3 grid max-w-lg gap-px overflow-hidden rounded-[3px] border sm:grid-cols-3 rule">
               <Datum
                 label="Midheaven"
-                glyph={c.natal.midheaven ? SIGN_GLYPH[c.natal.midheaven.sign] : '—'}
+                glyph={c.natal.midheaven ? SIGN_GLYPH[c.natal.midheaven.sign] : '-'}
                 value={c.natal.midheaven?.label ?? 'Needs birth time'}
               />
               <Datum label="Life path" glyph={String(c.lifePath)} value={lp.title} />
@@ -119,7 +119,7 @@ export default async function ReadingPage({ params }: { params: Promise<{ id: st
             {c.partial && (
               <p className="mx-auto mt-6 max-w-measure rounded-[3px] border border-brass/40 bg-brass/[0.07] px-4 py-3 text-[13px] leading-relaxed text-ink/70">
                 Computed without a birth time, so your Rising sign, Midheaven and
-                house placements are unavailable — those are the parts that move
+                house placements are unavailable, those are the parts that move
                 fastest. Everything else here is exact.
               </p>
             )}

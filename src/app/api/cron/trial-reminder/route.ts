@@ -14,7 +14,7 @@ export const maxDuration = 300;
  * requires notice before a trial converts; and ROSCA treats the gap between
  * what a buyer was told and what actually happens as the violation itself.
  *
- * It therefore ignores marketing preferences entirely — a billing notice is
+ * It therefore ignores marketing preferences entirely, a billing notice is
  * not something a user can be opted out of.
  */
 export async function GET(request: Request) {
@@ -25,7 +25,7 @@ export async function GET(request: Request) {
 
   const admin = supabaseAdmin();
 
-  // Everyone whose trial ends within the next 24–48h. A wide window on purpose:
+  // Everyone whose trial ends within the next 24-48h. A wide window on purpose:
   // sending the notice twice is harmless, sending it late is a violation.
   const from = new Date(Date.now() + 24 * 3_600_000).toISOString();
   const to = new Date(Date.now() + 48 * 3_600_000).toISOString();
@@ -54,7 +54,7 @@ export async function GET(request: Request) {
     const kind = `trial_ending:${endsAt.toISOString().slice(0, 10)}`;
 
     // Claim the send first. The unique constraint is what makes a double run
-    // safe — the second insert loses and we skip rather than double-send.
+    // safe: the second insert loses and we skip rather than double-send.
     const { error: claimError } = await admin
       .from('email_events')
       .insert({ user_id: p.id, email: p.email, kind });

@@ -21,8 +21,8 @@ export const metadata: Metadata = {
  * rather than dumping them somewhere that still says "locked".
  */
 export default async function WelcomePage() {
-  // If the webhook already landed before the redirect resolved — which is the
-  // common case — skip the poller entirely and go straight in.
+  // If the webhook already landed before the redirect resolved, which is the
+  // common case: skip the poller entirely and go straight in.
   const ent = await getEntitlement();
   if (ent.isPaid) redirect('/chart');
 

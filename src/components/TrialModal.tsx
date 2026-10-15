@@ -141,7 +141,7 @@ export function TrialModal({
             </h2>
             <p className="mt-3 text-[15px] leading-relaxed text-ink/72">
               Your 7-section reading is written and waiting. Start your {trialLabel} free
-              trial to read every section — blind spots, timing, the pattern that keeps
+              trial to read every section, blind spots, timing, the pattern that keeps
               costing you.
             </p>
 

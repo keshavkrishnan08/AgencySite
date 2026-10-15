@@ -9,7 +9,7 @@ import { BRAND } from '@/lib/brand';
  *
  * Loaded as the VARIABLE font with the optical-size axis, which is what the
  * reference does. Requesting static weights instead drops `opsz`, and Fraunces
- * pinned to one optical size renders thick and low-contrast at 80px — the
+ * pinned to one optical size renders thick and low-contrast at 80px, the
  * single biggest reason a copy of this design looks subtly wrong.
  */
 const serif = Fraunces({
@@ -37,13 +37,13 @@ const mono = IBM_Plex_Mono({
 export const metadata: Metadata = {
   metadataBase: new URL(BRAND.domain),
   title: {
-    default: `${BRAND.name} — Find the Business You Were Built For`,
+    default: `${BRAND.name}, Find the Business You Were Built For`,
     template: `%s · ${BRAND.name}`,
   },
   description:
-    'Your birth chart decoded for business. Founder archetype, timing windows, blind spots, and a daily briefing — computed from your exact birth data. Free reading in 60 seconds.',
+    'Your birth chart decoded for business. Founder archetype, timing windows, blind spots, and a daily briefing, computed from your exact birth data. Free reading in 60 seconds.',
   openGraph: {
-    title: `${BRAND.name} — Find the Business You Were Built For`,
+    title: `${BRAND.name}, Find the Business You Were Built For`,
     description: 'Your birth chart decoded for business. Founder archetype, timing windows, and a daily advisor. Free reading in 60 seconds, no card required.',
     url: BRAND.domain,
     siteName: BRAND.name,
@@ -56,7 +56,7 @@ export const viewport: Viewport = {
   themeColor: '#f2ede3',
   width: 'device-width',
   initialScale: 1,
-  // Never disable zoom — it fails accessibility and iOS ignores it anyway.
+  // Never disable zoom: it fails accessibility and iOS ignores it anyway.
   maximumScale: 5,
 };
 

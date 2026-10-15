@@ -50,7 +50,7 @@ function Headline() {
       &nbsp;
       {rest.map((w, i) => (
         <span key={w} className="inline-block animate-word-in" style={{ animationDelay: `${(i + 4) * 70}ms` }}>
-          {/* No trailing space on the last word — the brass full stop must sit
+          {/* No trailing space on the last word, the brass full stop must sit
               flush against it, not float away from the sentence. */}
           {w}
           {i < rest.length - 1 ? '\u00A0' : ''}
@@ -76,7 +76,7 @@ function Hero() {
 
         <p className="mx-auto mt-6 max-w-[640px] text-pretty text-[17.5px] leading-[1.7] text-ink/72">
           The reason your last venture stalled, the pattern behind every bad hire,
-          and the week you should have launched instead — it&rsquo;s all in your chart.
+          and the week you should have launched instead, it&rsquo;s all in your chart.
           60 seconds to see what&rsquo;s been holding you back.
         </p>
 
@@ -148,7 +148,7 @@ const TITANS = [
   {
     img: '/titans/jp-morgan.jpg',
     name: 'J.P. Morgan',
-    credential: 'The most powerful banker in American history · 1837–1913',
+    credential: 'The most powerful banker in American history · 1837-1913',
     stat: 'Net worth · ≈ $2.1 billion today',
     // Per-image framing, measured off the reference: each portrait's face sits
     // at a different height in the source crop.
@@ -158,7 +158,7 @@ const TITANS = [
   {
     img: '/titans/ronald-reagan.jpg',
     name: 'Ronald Reagan',
-    credential: '40th President of the United States · 1911–2004',
+    credential: '40th President of the United States · 1911-2004',
     stat: null,
     position: '50% 22%',
     body: 'Not ancient history. Reagan\u2019s own chief of staff wrote in his memoir that “virtually every major move and decision” in the Reagan White House was cleared in advance with an astrologer in San Francisco. Her color-coded calendars shaped the schedule of the most powerful office on earth, for 7 years.',
@@ -166,7 +166,7 @@ const TITANS = [
   {
     img: '/titans/augustus.jpg',
     name: 'Augustus Caesar',
-    credential: 'First Emperor of Rome · 63 BC–14 AD',
+    credential: 'First Emperor of Rome · 63 BC-14 AD',
     stat: null,
     position: '50% 20%',
     body: 'The man who built the Roman Empire\u2019s economy didn\u2019t hide his chart. He published his horoscope publicly and minted his sign, Capricorn, onto silver coins circulated across the known world. The most powerful executive in history used astrology as strategy and as brand.',
@@ -339,7 +339,7 @@ function Pricing() {
           Everything {BRAND.name}, from your first reading on.
         </p>
 
-        {/* One card: plan rows, CTA, trust line, then the feature list — the
+        {/* One card: plan rows, CTA, trust line, then the feature list, the
             reference's structure. Everything the decision needs is inside a
             single frame instead of scattered down the band. */}
         <div className="card-lg mx-auto mt-11 max-w-[560px] text-left">

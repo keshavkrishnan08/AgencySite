@@ -15,7 +15,7 @@ function resend(): Resend {
 const FROM = process.env.RESEND_FROM ?? `${BRAND.name} <hello@axon.app>`;
 const SITE = BRAND.domain;
 
-/** Inline styles only — every mail client strips <style> blocks. */
+/** Inline styles only: every mail client strips <style> blocks. */
 function shell(body: string, preheader: string): string {
   return `<!doctype html><html><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"></head>
 <body style="margin:0;padding:0;background:#f2ede3;">
@@ -47,7 +47,7 @@ function h(text: string): string {
   return `<h1 style="font-family:Georgia,serif;font-weight:400;font-size:26px;line-height:1.2;color:#0f1215;margin:0 0 18px;">${text}</h1>`;
 }
 
-/** Blurred text block — visible enough to intrigue, unreadable enough to convert. */
+/** Blurred text block: visible enough to intrigue, unreadable enough to convert. */
 function blurred(text: string): string {
   return `<div style="filter:blur(6px);-webkit-filter:blur(6px);opacity:0.4;user-select:none;margin:12px 0;font-size:14px;line-height:1.7;color:#0f1215;">${text}</div>`;
 }
@@ -59,7 +59,7 @@ function badge(text: string): string {
 
 async function send(opts: { to: string; subject: string; html: string }): Promise<void> {
   if (!process.env.RESEND_API_KEY) {
-    console.warn('[email] RESEND_API_KEY not set — skipping', opts.subject);
+    console.warn('[email] RESEND_API_KEY not set, skipping', opts.subject);
     return;
   }
   const { error } = await resend().emails.send({
@@ -77,7 +77,7 @@ export async function sendWelcomeEmail(opts: { to: string; firstName: string }) 
     html: shell(
       `${h(`You just locked in something most people won&rsquo;t get.`)}
        ${badge('Early access pricing')}
-       <p style="margin:0 0 16px;">${opts.firstName}, you&rsquo;re in at <strong>${PRICING.weekly.amount}/week</strong> — the lowest price ${BRAND.name} will ever offer. When we raise prices (and we will), yours stays locked.</p>
+       <p style="margin:0 0 16px;">${opts.firstName}, you&rsquo;re in at <strong>${PRICING.weekly.amount}/week</strong>, the lowest price ${BRAND.name} will ever offer. When we raise prices (and we will), yours stays locked.</p>
        <p style="margin:0 0 16px;">Your full reading is unlocked. Your first daily briefing lands tomorrow morning. And your chart-aware advisor is ready now.</p>
        <p style="margin:0 0 16px;"><strong>Start here:</strong> Open your blind spots section. It is the part people screenshot and send to someone before they finish reading it.</p>
        ${button(`${SITE}/chart`, 'Open my full reading')}
@@ -136,7 +136,7 @@ export async function sendSequenceEmail(kind: SequenceKind, ctx: SequenceContext
         <p style="margin:0 0 16px;">${ctx.firstName}, when we computed your chart, one pattern stood out.</p>
         <p style="margin:0 0 16px;">${ctx.uniqueInsight ?? `Your ${c.sunSign} Sun with a ${c.moonSign} Moon and Life Path ${c.lifePath} creates a specific operating signature that appears in roughly 1 in 8 charts. It explains why ${a.name}s like you tend to start strong and then hit the same wall around month six of any new venture.`}</p>
         <p style="margin:0 0 8px;font-weight:600;">What it means for your career right now:</p>
-        ${blurred(`The pattern suggests you are in a window where the instinct to pivot is strongest, but the data says hold. Your ${c.chinese.label} cycle reinforces this — the next 90 days favour building proof over chasing reach. The specific dates that support your next move are...`)}
+        ${blurred(`The pattern suggests you are in a window where the instinct to pivot is strongest, but the data says hold. Your ${c.chinese.label} cycle reinforces this, the next 90 days favour building proof over chasing reach. The specific dates that support your next move are...`)}
         ${button(insightUrl('unusual'), 'See the full analysis')}
         <p style="margin:0;font-size:13px;color:#0f121577;">This insight is computed from your exact birth data, not a generic horoscope.</p>`,
     },
@@ -178,9 +178,9 @@ export async function sendSequenceEmail(kind: SequenceKind, ctx: SequenceContext
         <p style="margin:0 0 16px;">${ctx.firstName}, you are ${a.name}. That part is free and yours to keep. Your chart doesn&rsquo;t expire.</p>
         <p style="margin:0 0 16px;">What you don&rsquo;t have yet:</p>
         <ul style="margin:0 0 16px;padding-left:20px;">
-          <li style="margin-bottom:8px;">The daily briefing — what today&rsquo;s sky means for your specific chart</li>
-          <li style="margin-bottom:8px;">Your timing windows — the exact dates to move on what you&rsquo;re deciding</li>
-          <li style="margin-bottom:8px;">The diagnosis — the pattern that keeps costing you, named plainly</li>
+          <li style="margin-bottom:8px;">The daily briefing, what today&rsquo;s sky means for your specific chart</li>
+          <li style="margin-bottom:8px;">Your timing windows, the exact dates to move on what you&rsquo;re deciding</li>
+          <li style="margin-bottom:8px;">The diagnosis, the pattern that keeps costing you, named plainly</li>
           <li style="margin-bottom:8px;">An advisor that has read your chart and answers in real time</li>
         </ul>
         <p style="margin:0 0 16px;">${PRICING.trialDays} days free, then ${PRICING.weekly.amount}/week. Most people choose annual at ${PRICING.annual.amount}/year. Cancel in two taps.</p>
@@ -219,7 +219,7 @@ export async function sendTrialEndingEmail(ctx: {
 
   return send({
     to: ctx.to,
-    subject: `Your free trial ends tomorrow — ${ctx.amount} on ${when}`,
+    subject: `Your free trial ends tomorrow, ${ctx.amount} on ${when}`,
     html: shell(
       `${h('Your trial ends tomorrow.')}
       <p style="margin:0 0 16px;">${ctx.firstName}, this is the heads-up we promised. Nothing has been charged yet.</p>

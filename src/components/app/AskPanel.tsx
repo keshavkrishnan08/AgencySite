@@ -9,7 +9,7 @@ const DAILY_LIMIT = 15;
 /**
  * Right rail. Always present on desktop, a slide-over on mobile.
  *
- * The suggestion chips are the whole conversion mechanic — an empty chat box
+ * The suggestion chips are the whole conversion mechanic, an empty chat box
  * gets ignored, whereas a specific question about their own chart gets tapped.
  * The last chip is transit-aware so it changes every day.
  */
@@ -41,7 +41,7 @@ export function AskPanel({
   const [used, setUsed] = useState(0);
   const [error, setError] = useState<string | null>(null);
   // Set when the server says the one free answer is gone. Drives the inline
-  // upsell rather than a modal — the pitch belongs in the conversation.
+  // upsell rather than a modal: the pitch belongs in the conversation.
   const [freeSpent, setFreeSpent] = useState(false);
   const endRef = useRef<HTMLDivElement>(null);
   const sendRef = useRef<(t: string) => void>(() => {});
@@ -61,7 +61,7 @@ export function AskPanel({
   async function send(text: string) {
     const body = text.trim();
     if (!body || busy) return;
-    // Unpaid visitors are NOT blocked here — the server grants one real answer
+    // Unpaid visitors are NOT blocked here: the server grants one real answer
     // and tells us when it is spent. Blocking client-side would put the
     // paywall before the value instead of immediately after it.
     if (!isPaid && freeSpent) return onLocked();
@@ -80,7 +80,7 @@ export function AskPanel({
       const json = await res.json().catch(() => null);
       if (res.status === 402) {
         setFreeSpent(true);
-        // Drop the question we optimistically appended — it was never answered.
+        // Drop the question we optimistically appended: it was never answered.
         setMessages((m) => m.slice(0, -1));
         return;
       }

@@ -84,7 +84,7 @@ function parsePlan(value: string | null): PlanId {
   return value === 'annual' ? 'annual' : 'weekly';
 }
 
-/** POST from the paywall — returns the URL for the client to redirect to. */
+/** POST from the paywall: returns the URL for the client to redirect to. */
 export async function POST(request: Request) {
   try {
     const body = await request.json().catch(() => ({}));

@@ -6,7 +6,7 @@ import { PLANS, TRIAL_DAYS } from '../src/lib/stripe';
  * The live Stripe account must agree with what the app tells people.
  *
  * This exists because the paywall advertised "$79/year" while Stripe charged
- * $78.99 — a number nobody would notice in review and every customer sees on
+ * $78.99: a number nobody would notice in review and every customer sees on
  * their statement. Quoting a price you don't charge is the kind of small
  * discrepancy that turns into a chargeback argument you lose.
  *
@@ -22,8 +22,8 @@ const check = (name: string, pass: boolean, detail = '') => {
 
 /* ------------------------------------------------- offline: copy coherence */
 
-// The trial is granted by the Checkout Session, not by the price — Stripe has
-// no settable trial field on a Price in the current API — so the only thing
+// The trial is granted by the Checkout Session, not by the price, Stripe has
+// no settable trial field on a Price in the current API, so the only thing
 // keeping the offer honest is that every plan badge says so.
 check(
   'every plan badge discloses the trial',

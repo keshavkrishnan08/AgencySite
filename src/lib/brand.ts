@@ -12,7 +12,7 @@ export const BRAND = {
 /**
  * Both plans receive `trial_period_days` at checkout, so both badges have to
  * say so. The annual badge previously read "Save 79%" alone while the code
- * still granted the trial — an undisclosed trial term on the more expensive
+ * still granted the trial: an undisclosed trial term on the more expensive
  * plan, which is the exact disclosure failure the FTC actions turn on.
  */
 export const PRICING = {

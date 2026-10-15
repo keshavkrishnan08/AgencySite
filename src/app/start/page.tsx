@@ -9,7 +9,7 @@ export const metadata: Metadata = {
 };
 
 /**
- * The modal sits over a dimmed, blurred page — the same treatment the
+ * The modal sits over a dimmed, blurred page: the same treatment the
  * reference uses. Keeps the marketing context visible without letting it
  * compete for attention.
  */

@@ -12,7 +12,7 @@ export const maxDuration = 300;
 /**
  * Generates the six-section reading once, then serves it from the database.
  * The free portion is public to whoever holds the chart token; the paywall is
- * applied at render, not here — the reading itself is cheap to store and the
+ * applied at render, not here: the reading itself is cheap to store and the
  * user paid for it with their email.
  */
 export async function POST(request: Request) {
@@ -57,7 +57,7 @@ export async function POST(request: Request) {
   }
 
   // Storing is best-effort. A reading the user is already reading must not be
-  // withheld because the write failed — it is regenerated next time at worst.
+  // withheld because the write failed: it is regenerated next time at worst.
   try {
     // upsert, not insert: two tabs racing the first load would otherwise hit
     // the unique constraint and surface as an error.

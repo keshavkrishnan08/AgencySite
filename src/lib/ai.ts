@@ -6,7 +6,7 @@ import { fallbackBrief, fallbackReading, FALLBACK_CHAT } from './ai/fallback';
 export type { ReadingSection };
 
 /**
- * Thrown where there is no honest authored substitute — a compatibility read or
+ * Thrown where there is no honest authored substitute, a compatibility read or
  * an outlook is either computed against two real charts or it does not exist.
  * Routes turn this into a 503, never a 500.
  */
@@ -35,7 +35,7 @@ const VOICE = `You write readings for a business-astrology product used by found
 
 Voice rules, in order:
 1. Lead with the specific placement, then the business consequence. "Your Midheaven in Scorpio" then what it means for how they are hired and trusted.
-2. Every paragraph must end somewhere actionable — a decision, a hire, a timing call, a structure.
+2. Every paragraph must end somewhere actionable, a decision, a hire, a timing call, a structure.
 3. Sound like an advisor who has read a thousand charts, not a mystic. Confident, dry, unsentimental.
 4. Banned: "the universe", "energy" (say capacity or drive), "vibration", "manifest", "spiritual journey", "cosmic", "soul", "destined". No emoji. No exclamation marks.
 5. Be specific to the point of discomfort. Name the thing they have not admitted. The blind-spots section should feel like being read.
@@ -79,7 +79,7 @@ const READING_SCHEMA = {
 
 /** The full six-section reading. Generated once, then cached forever. */
 export async function generateReading(chart: Chart, firstName: string): Promise<ReadingSection[]> {
-  const outline = SECTIONS.map(([k, t, d], i) => `${i + 1}. key "${k}" — subject "${t}". ${d}`).join('\n');
+  const outline = SECTIONS.map(([k, t, d], i) => `${i + 1}. key "${k}", subject "${t}". ${d}`).join('\n');
 
   const p = provider();
   if (!p) return fallbackReading(chart, firstName);
@@ -92,10 +92,10 @@ export async function generateReading(chart: Chart, firstName: string): Promise<
       schemaName: 'reading',
       system: `${VOICE}
 
-Write exactly seven sections, in this order, using these keys. The quoted name is the section's subject, NOT its title — write a fresh Title Case headline of three to six words for each:
+Write exactly seven sections, in this order, using these keys. The quoted name is the section's subject, NOT its title, write a fresh Title Case headline of three to six words for each:
 ${outline}
 
-Every section must cite at least one concrete element of THIS chart — a sign and degree, a house, an aspect, the life path number, or the Chinese animal — rather than generic sun-sign traits. Specificity is the entire product.`,
+Every section must cite at least one concrete element of THIS chart, a sign and degree, a house, an aspect, the life path number, or the Chinese animal, rather than generic sun-sign traits. Specificity is the entire product.`,
       user: `Write the full reading.\n\n${chartBrief(chart, firstName)}`,
     })
   ).sections;
@@ -134,7 +134,7 @@ export async function generateDailyBrief(
     schemaName: 'daily_brief',
     system: `${VOICE}
 
-You write one short morning briefing. It reads like a note from an advisor who knows this person's chart, not a horoscope. Never predict events. Describe what today's transits touch in THEIR chart and how they should work because of it. If nothing significant is contacting their chart, say so plainly and give them a steady-state instruction — a quiet day is useful information.`,
+You write one short morning briefing. It reads like a note from an advisor who knows this person's chart, not a horoscope. Never predict events. Describe what today's transits touch in THEIR chart and how they should work because of it. If nothing significant is contacting their chart, say so plainly and give them a steady-state instruction, a quiet day is useful information.`,
     user: `Date: ${date}\n\n${transits}\n\nTHE PERSON:\n${chartBrief(chart, firstName)}`,
   });
 }
@@ -150,7 +150,7 @@ function firstHit(transits: string): string | null {
   return line ? line.trim() : null;
 }
 
-/** Chat with your chart — the retention feature. */
+/** Chat with your chart: the retention feature. */
 export async function chatWithChart(
   chart: Chart,
   firstName: string,
@@ -227,7 +227,7 @@ const OUTLOOK_SCHEMA = {
   additionalProperties: false,
 } as const;
 
-/** Weekly or monthly outlook — the "plan the month in windows" feature. */
+/** Weekly or monthly outlook: the "plan the month in windows" feature. */
 export async function generateOutlook(
   chart: Chart,
   firstName: string,

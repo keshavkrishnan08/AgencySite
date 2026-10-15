@@ -57,7 +57,7 @@
   /*
    * Visible focus for keyboard users.
    *
-   * Tailwind's preflight strips the UA outline, and nothing replaced it — so
+   * Tailwind's preflight strips the UA outline, and nothing replaced it, so
    * tabbing through the site moved focus invisibly. `:focus-visible` keeps it
    * off mouse clicks, which is why the outline was removed in the first place.
    */
@@ -74,7 +74,7 @@
     outline-color: var(--paper);
   }
 
-  /* Skip link — the first tab stop on every page. */
+  /* Skip link: the first tab stop on every page. */
   .skip-link {
     @apply sr-only;
   }
@@ -114,7 +114,7 @@
 }
 
 @layer components {
-  /* 3px double brass rule between sections — the reference's separator. A
+  /* 3px double brass rule between sections: the reference's separator. A
      single hairline reads as a table border; the double rule reads as a
      printed page. Applied by the class so no section can forget it. */
   .band {
@@ -126,7 +126,7 @@
     @apply mx-auto w-full max-w-[1060px];
   }
 
-  /* Every section heading. 32px flat on mobile, 44px from sm — the reference
+  /* Every section heading. 32px flat on mobile, 44px from sm, the reference
      runs 32px at its own measure and this is the same optical size. */
   .band-h {
     @apply mx-auto text-balance text-[32px] leading-[1.12] tracking-[-0.01em] sm:text-[44px];
@@ -151,7 +151,7 @@
     border-color: var(--rule);
   }
 
-  /* Primary CTA — 2px radius reads as document, never as app chrome.
+  /* Primary CTA: 2px radius reads as document, never as app chrome.
      Gradient, outline, inset highlight and the travelling sheen are all lifted
      from the reference; the sheen is what makes it read as pressed metal. */
   .cta {
@@ -203,7 +203,7 @@
     transform: translateX(4px);
   }
 
-  /* In-app CTA. Same material as .cta, one size down — the landing button is
+  /* In-app CTA. Same material as .cta, one size down: the landing button is
      scaled to carry a whole page and reads as oversized inside a card. */
   .cta-sm {
     @apply relative inline-flex items-center justify-center gap-2 rounded-[2px]
@@ -263,7 +263,7 @@
     min-height: 52px;
   }
 
-  /* 10px radius, 1px brass border at 35%, 30/28/26 padding — the reference's
+  /* 10px radius, 1px brass border at 35%, 30/28/26 padding, the reference's
      exact card. Measured off the live site rather than guessed. */
   .card {
     @apply rounded-[10px] border px-7 pb-[26px] pt-[30px];
@@ -351,7 +351,7 @@
   }
 
   /* Pricing. One card holding stacked full-width plan rows, as the reference
-     does — side-by-side cards make the two plans read as a choice to agonise
+     does, side-by-side cards make the two plans read as a choice to agonise
      over rather than a default with an alternative. */
   .plan-row {
     @apply relative flex items-baseline justify-between gap-3.5
@@ -385,7 +385,7 @@
 
   /* Real copy behind the paywall: blurred, never replaced. The reader can see
      how much is there, which is what makes the wall convert.
-     Clickable on purpose — reaching for blurred text IS the buying signal. */
+     Clickable on purpose, reaching for blurred text IS the buying signal. */
   .locked-text {
     @apply cursor-pointer select-none;
     filter: blur(10px);
@@ -556,7 +556,7 @@
   }
 }
 
-/* Stripe Embedded Checkout — match the app aesthetic */
+/* Stripe Embedded Checkout: match the app aesthetic */
 .embedded-checkout iframe {
   border-radius: 8px;
   min-height: 320px;

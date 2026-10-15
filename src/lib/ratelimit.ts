@@ -6,7 +6,7 @@ import { NextResponse } from 'next/server';
  * These routes cost real money per call, so the limit is a spend control as
  * much as an abuse control. It is deliberately in-process: a single Vercel
  * region holds one map, and the worst case for a user who lands on a cold
- * instance is that they get one extra call — acceptable, whereas a Redis
+ * instance is that they get one extra call: acceptable, whereas a Redis
  * round-trip on every generate is not. Swap `store` for Redis if the app ever
  * runs wide enough that per-instance windows stop biting.
  */
@@ -42,12 +42,12 @@ export const LIMITS = {
    * The free taste. One answer per day for an unpaid visitor.
    *
    * A hard lock on chat converts worse than letting them feel the thing work
-   * once — the paywall lands after the value, not before it.
+   * once: the paywall lands after the value, not before it.
    */
   chatFree: { max: 1, windowSec: 86_400 },
   /** Weekly and monthly outlooks. */
   outlook: { max: 8, windowSec: 3_600 },
-  /** Anonymous chart computation — cheap, but a spam vector. */
+  /** Anonymous chart computation: cheap, but a spam vector. */
   chart: { max: 20, windowSec: 3_600 },
 } as const satisfies Record<string, Limit>;
 
@@ -111,7 +111,7 @@ export function rateHeaders(r: RateResult): Record<string, string> {
   };
 }
 
-/** The 429 body. Always JSON — clients parse every response. */
+/** The 429 body. Always JSON: clients parse every response. */
 export function tooMany(r: RateResult, message: string): NextResponse {
   return NextResponse.json(
     { error: message, retryAfter: r.retryAfterSec },

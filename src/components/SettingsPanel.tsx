@@ -9,7 +9,7 @@ import { BRAND } from '@/lib/brand';
 /**
  * Account actions.
  *
- * Cancellation is a named, primary action — not a step buried inside a
+ * Cancellation is a named, primary action: not a step buried inside a
  * "manage billing" portal. ROSCA and the state auto-renewal laws require
  * cancelling to be as easy to find and complete as subscribing was, and the
  * FTC's June 2026 action against a competitor in this exact category turned

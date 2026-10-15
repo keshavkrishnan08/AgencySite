@@ -6,7 +6,7 @@ import { useShell } from './AppShell';
  * Wraps any blurred region so that clicking it opens checkout.
  *
  * Someone reaching for text they cannot read is the strongest buying signal in
- * the product — a blurred block that swallows the click wastes it. This makes
+ * the product: a blurred block that swallows the click wastes it. This makes
  * the whole region a target, keyboard-reachable, and announced properly, while
  * the visual blur stays exactly as it was.
  */

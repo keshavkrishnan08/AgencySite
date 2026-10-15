@@ -5,7 +5,7 @@ import type { ReadingSection } from './sections';
 /**
  * Last-resort in-process store for charts that could not be persisted.
  *
- * This exists so a database outage — or a deploy missing its service-role key —
+ * This exists so a database outage: or a deploy missing its service-role key,
  * costs the visitor nothing at the moment of highest intent: the chart is pure
  * mathematics and needs no database to be correct, so refusing to show it would
  * be throwing away the conversion for an infrastructure reason.

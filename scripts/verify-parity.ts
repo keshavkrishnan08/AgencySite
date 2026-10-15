@@ -37,7 +37,7 @@ for (const name of advertised) {
   }
 }
 
-// 2. And nothing is built that is never advertised — dead surfaces are worse
+// 2. And nothing is built that is never advertised: dead surfaces are worse
 //    than missing ones, because they still have to be maintained.
 for (const name of Object.keys(SURFACES)) {
   if (!advertised.includes(name)) {
@@ -49,6 +49,6 @@ for (const name of Object.keys(SURFACES)) {
 console.log(
   bad
     ? `\n${bad} advertised feature(s) not implemented`
-    : `\nFEATURE PARITY OK — all ${advertised.length} advertised features are built`,
+    : `\nFEATURE PARITY OK, all ${advertised.length} advertised features are built`,
 );
 process.exit(bad ? 1 : 0);

@@ -4,7 +4,7 @@ import { supabaseAdmin } from '@/lib/supabase/server';
 
 export const runtime = 'nodejs';
 
-/** Log a decision against today. Free — the journal is the retention hook. */
+/** Log a decision against today. Free: the journal is the retention hook. */
 export async function POST(req: Request) {
   const ent = await getEntitlement();
   if (!ent.userId) return NextResponse.json({ error: 'Sign in first.' }, { status: 401 });

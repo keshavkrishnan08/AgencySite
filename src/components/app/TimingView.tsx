@@ -21,7 +21,7 @@ export interface IntentResult {
 }
 
 /**
- * Timing — the one surface that answers "when".
+ * Timing: the one surface that answers "when".
  *
  * Two zoom levels on one page. The intent picker answers "when should I do
  * this specific thing" with dates; the outlook underneath answers "what shape
@@ -84,7 +84,7 @@ export function TimingView({
       `UID:axon-${intent}-${stamp}`,
       `DTSTART;VALUE=DATE:${stamp}`,
       `DTEND;VALUE=DATE:${stamp}`,
-      `SUMMARY:${label} — your window`,
+      `SUMMARY:${label}, your window`,
       `DESCRIPTION:${day.reasons.join(' ').replace(/[,;]/g, '')}`,
       'END:VEVENT',
       'END:VCALENDAR',
@@ -109,7 +109,7 @@ export function TimingView({
         </h1>
         <p className="mt-2 max-w-measure text-[14.5px] leading-relaxed text-ink/65">
           Pick what you are deciding. Your next 30 days are scored against your
-          chart — real transits, not a general horoscope.
+          chart, real transits, not a general horoscope.
         </p>
       </header>
 
@@ -138,7 +138,7 @@ export function TimingView({
           <input
             type="text"
             className="w-full bg-transparent text-[14px] outline-none placeholder:text-ink/35"
-            placeholder="Or describe your move — e.g. &quot;raise a seed round&quot;"
+            placeholder="Or describe your move, e.g. &quot;raise a seed round&quot;"
             readOnly
             onClick={() => {
               const { ask } = window as unknown as { ask?: (q: string) => void };
@@ -185,7 +185,7 @@ export function TimingView({
                   {day.quiet ? (
                     <p className="mt-3 text-[13.5px] leading-[1.6] text-ink/75">
                       Nothing is making an exact contact to your chart. For this
-                      move that is neutral ground — it will neither carry you nor
+                      move that is neutral ground, it will neither carry you nor
                       fight you, so it comes down to preparation.
                     </p>
                   ) : (
@@ -210,7 +210,7 @@ export function TimingView({
                 </>
               ) : (
                 <>
-                  {/* Free users see the date but not why — the reasoning is
+                  {/* Free users see the date but not why, the reasoning is
                       the product. Show just enough to prove it's real. */}
                   <p className="mt-3 text-[13.5px] leading-[1.6] text-ink/75">
                     {day.reasons.length} transit{day.reasons.length === 1 ? '' : 's'} support this date for your chart.
@@ -239,7 +239,7 @@ export function TimingView({
             <>
               <LockedZone label="Unlock the day to avoid">
                 <p className="locked-text mt-2 text-[14.5px] leading-relaxed text-ink" aria-hidden>
-                  {fmt(active.worst.date)} — {active.worst.headline}
+                  {fmt(active.worst.date)}, {active.worst.headline}
                 </p>
               </LockedZone>
               <span className="sr-only">Locked.</span>
@@ -260,7 +260,7 @@ export function TimingView({
       )}
 
       {/* The wider shape, underneath the specific dates. Same question, lower
-          resolution — which is why it belongs here and not on its own page. */}
+          resolution, which is why it belongs here and not on its own page. */}
       {(week ?? month) && (
         <section className="space-y-3.5">
           <p className="eyebrow">The shape of it</p>

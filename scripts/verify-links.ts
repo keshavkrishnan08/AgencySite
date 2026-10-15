@@ -24,7 +24,7 @@ const routes = new Set(
     p.replace('src/app', '').replace('/page.tsx', '').replace(/\/\([^)]+\)/g, '') || '/',
   ),
 );
-// Redirect sources are reachable destinations but are deliberately unlinked —
+// Redirect sources are reachable destinations but are deliberately unlinked,
 // they exist for URLs already out in emails and Stripe return URLs.
 const redirectSources = new Set(
   (read('next.config.mjs').match(/source: '([^']+)', destination/g) ?? [])
@@ -49,13 +49,13 @@ for (const f of files) {
   const src = read(f);
   for (const m of src.matchAll(/href=["'](\/[^"'{}]*)["']/g)) {
     checked += 1;
-    if (!resolves(m[1])) fail(`${f.replace('src/', '')} links to ${m[1]} — no such route`);
+    if (!resolves(m[1])) fail(`${f.replace('src/', '')} links to ${m[1]}, no such route`);
   }
   // Template-literal hrefs we can only spot-check for their static prefix.
   for (const m of src.matchAll(/href=\{`(\/[a-z-]+)\//g)) {
     checked += 1;
     if (![...routes].some((r) => r.startsWith(m[1]))) {
-      fail(`${f.replace('src/', '')} links under ${m[1]}/ — no route with that prefix`);
+      fail(`${f.replace('src/', '')} links under ${m[1]}/, no route with that prefix`);
     }
   }
 }
@@ -85,8 +85,8 @@ for (const f of files) {
 ok('every form has a submit handler');
 
 // ---- no orphan pages: every route is linked from somewhere, or is an entry point
-// Entry points are reached from outside the app — an ad, an email, or a
-// payment-provider redirect — so nothing internal needs to link to them.
+// Entry points are reached from outside the app: an ad, an email, or a
+// payment-provider redirect: so nothing internal needs to link to them.
 const ENTRY = [
   '/', '/start', '/login', '/auth/callback',
   '/welcome', // Stripe success_url
@@ -97,7 +97,7 @@ for (const r of routes) {
   if (ENTRY.includes(r) || r.includes('[') || redirectSources.has(r)) continue;
   allSource.includes(`"${r}"`) || allSource.includes(`'${r}'`) || allSource.includes(`\`${r}`)
     ? ok(`${r} is linked from the app`)
-    : fail(`${r} is an orphan — no link points to it`);
+    : fail(`${r} is an orphan, no link points to it`);
 }
 
 // ---- every fetch().json() on the client must be guarded. A crashed route
@@ -121,7 +121,7 @@ for (const m of checkout.matchAll(/(?:success_url|cancel_url): `\$\{siteUrl\(\)\
   const path = m[1].replace(/\/\$\{[^}]+\}/g, '/x').replace(/#.*$/, '') || '/';
   resolves(path)
     ? ok(`Stripe returns to ${path}, which exists`)
-    : fail(`Stripe returns to ${path} — no such route`);
+    : fail(`Stripe returns to ${path}, no such route`);
 }
 
 console.log(bad ? `\n${bad} LINK/INTERACTION FAILURE(S)` : '\nLINKS AND INTERACTIONS OK');

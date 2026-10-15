@@ -22,7 +22,7 @@ const post = (p: string, body: unknown) =>
   fetch(`${BASE}${p}`, { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify(body) });
 
 // The journal and the email toggle are free features, but they still must
-// refuse an unauthenticated caller — they write rows keyed by user id.
+// refuse an unauthenticated caller: they write rows keyed by user id.
 for (const [p, body] of [['/api/decisions', { body: 'x' }], ['/api/notify', { on: true }]] as const) {
   await check(`${p} 401s when unauthenticated`, async () => {
     const r = await post(p, body);
@@ -31,7 +31,7 @@ for (const [p, body] of [['/api/decisions', { body: 'x' }], ['/api/notify', { on
 }
 
 // Chat now grants one free answer, so an unpaid caller is not refused outright
-// — but a caller with no chart at all has nothing to talk to.
+// but a caller with no chart at all has nothing to talk to.
 await check('/api/chat 404s when there is no chart', async () => {
   const r = await post('/api/chat', { message: 'hello' });
   return { pass: r.status === 404, detail: String(r.status) };
@@ -44,7 +44,7 @@ for (const p of ['/api/brief']) {
   });
 }
 
-// The app shell is reachable with a chart cookie alone — a visitor who has just
+// The app shell is reachable with a chart cookie alone, a visitor who has just
 // computed a chart must not hit a login wall. With NO chart they still cannot
 // get in: they are sent to /start to make one.
 //

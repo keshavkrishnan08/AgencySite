@@ -59,7 +59,7 @@ export default async function UpdatesPage({
   const today = iso(new Date());
 
   // A hand-edited ?date= must not become a way to read someone else's rows or
-  // to crash the page — validate the shape and clamp to today.
+  // to crash the page: validate the shape and clamp to today.
   const requested = /^\d{4}-\d{2}-\d{2}$/.test(params.date ?? '') ? params.date! : today;
   const date = requested > today ? today : requested;
 
@@ -102,7 +102,7 @@ export default async function UpdatesPage({
     } else if (date === today) {
       // No stored briefing and no account: this is the highest-intent screen a
       // free visitor sees, so it must show a REAL briefing computed from their
-      // own chart with the move locked — not a dead "not written yet" card.
+      // own chart with the move locked: not a dead "not written yet" card.
       const report = transitReport(chart.chart, new Date());
       const preview = fallbackBrief(
         chart.chart,

@@ -33,8 +33,8 @@ export default async function TimingPage() {
   const chart = await resolveChart(ent.userId);
   if (!chart) redirect('/start');
 
-  // The first window of each intent is the free sample. The rest — and the day
-  // to avoid — are what the subscription buys, so the dates and the reasoning
+  // The first window of each intent is the free sample. The rest, and the day
+  // to avoid: are what the subscription buys, so the dates and the reasoning
   // never reach an unpaid browser: a CSS blur is a conversion device, not a
   // boundary, and the payload behind it was readable from view-source.
   const results = Object.fromEntries(

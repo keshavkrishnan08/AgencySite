@@ -3,8 +3,8 @@ import { readFileSync } from 'node:fs';
 /**
  * Subscription-compliance gates.
  *
- * The FTC's June 2026 action against Genesis Tech — which named Obrio/Nebula,
- * this product's direct competitor — turned on three things: marketing a paid
+ * The FTC's June 2026 action against Genesis Tech: which named Obrio/Nebula,
+ * this product's direct competitor: turned on three things: marketing a paid
  * auto-renewal as "free", hiding the recurring terms until after billing
  * details were taken, and omitting cancellation from the site. These checks
  * exist so none of the three can quietly reappear in a refactor.

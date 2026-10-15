@@ -5,7 +5,7 @@ import type { Place } from '@/lib/astro/geo';
 
 /**
  * Type-ahead over the geocoder. Debounced, out-of-order-safe, and touch-sized
- * — the city field is where mobile forms usually lose people.
+ * the city field is where mobile forms usually lose people.
  */
 export function CityPicker({
   value,
@@ -53,7 +53,7 @@ export function CityPicker({
   }, [query, value]);
 
   return (
-    // z-30 lifts the whole picker above later siblings — without it the submit
+    // z-30 lifts the whole picker above later siblings: without it the submit
     // button paints over the results list and swallows the second option.
     <div className="relative z-30">
       <input
@@ -120,7 +120,7 @@ export function CityPicker({
         query.trim().length >= 2 &&
         results.length === 0 && (
           <p className="mt-3 text-sm text-ink/55">
-            No match. Try the nearest large city — the timezone is what matters.
+            No match. Try the nearest large city, the timezone is what matters.
           </p>
         )}
     </div>

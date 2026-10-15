@@ -3,7 +3,7 @@
 create extension if not exists "pgcrypto";
 
 -- ---------------------------------------------------------------------------
--- profiles — one per authenticated user, created by trigger on signup.
+-- profiles: one per authenticated user, created by trigger on signup.
 -- subscription_status is the single source of truth for entitlement.
 -- ---------------------------------------------------------------------------
 create table if not exists public.profiles (
@@ -25,7 +25,7 @@ create index if not exists profiles_stripe_customer_idx on public.profiles(strip
 create index if not exists profiles_status_idx on public.profiles(subscription_status);
 
 -- ---------------------------------------------------------------------------
--- charts — created at step 2 of /start, BEFORE any account exists.
+-- charts: created at step 2 of /start, BEFORE any account exists.
 -- access_token gates anonymous reads; email is captured at the same moment,
 -- which is what makes the nurture sequence possible.
 -- ---------------------------------------------------------------------------
@@ -62,7 +62,7 @@ create index if not exists charts_email_idx   on public.charts(email);
 create index if not exists charts_created_idx on public.charts(created_at desc);
 
 -- ---------------------------------------------------------------------------
--- readings — the six-section document. Generated once, then served from here.
+-- readings: the six-section document. Generated once, then served from here.
 -- ---------------------------------------------------------------------------
 create table if not exists public.readings (
   id         uuid primary key default gen_random_uuid(),
@@ -75,7 +75,7 @@ create table if not exists public.readings (
 );
 
 -- ---------------------------------------------------------------------------
--- daily_briefs — one per user per day.
+-- daily_briefs: one per user per day.
 -- ---------------------------------------------------------------------------
 create table if not exists public.daily_briefs (
   id           uuid primary key default gen_random_uuid(),
@@ -91,7 +91,7 @@ create table if not exists public.daily_briefs (
 );
 
 -- ---------------------------------------------------------------------------
--- chat_messages — "chat with your chart".
+-- chat_messages: "chat with your chart".
 -- ---------------------------------------------------------------------------
 create table if not exists public.chat_messages (
   id         uuid primary key default gen_random_uuid(),
@@ -104,7 +104,7 @@ create table if not exists public.chat_messages (
 create index if not exists chat_user_idx on public.chat_messages(user_id, created_at);
 
 -- ---------------------------------------------------------------------------
--- email_events — drives the nurture sequence and prevents doubles.
+-- email_events: drives the nurture sequence and prevents doubles.
 -- ---------------------------------------------------------------------------
 create table if not exists public.email_events (
   id         uuid primary key default gen_random_uuid(),
@@ -119,7 +119,7 @@ create table if not exists public.email_events (
 create index if not exists email_events_email_idx on public.email_events(email);
 
 -- ---------------------------------------------------------------------------
--- stripe_events — webhook idempotency. Stripe retries; never double-apply.
+-- stripe_events: webhook idempotency. Stripe retries; never double-apply.
 -- ---------------------------------------------------------------------------
 create table if not exists public.stripe_events (
   id           text primary key,
@@ -204,7 +204,7 @@ group by 1
 order by 1 desc;
 
 -- ---------------------------------------------------------------------------
--- compatibility — cofounders, partners, hires. One row per person compared.
+-- compatibility: cofounders, partners, hires. One row per person compared.
 -- ---------------------------------------------------------------------------
 create table if not exists public.compatibility (
   id               uuid primary key default gen_random_uuid(),
@@ -228,7 +228,7 @@ create table if not exists public.compatibility (
 create index if not exists compatibility_user_idx on public.compatibility(user_id);
 
 -- ---------------------------------------------------------------------------
--- outlooks — weekly and monthly. Cached per user per period.
+-- outlooks: weekly and monthly. Cached per user per period.
 -- ---------------------------------------------------------------------------
 create table if not exists public.outlooks (
   id           uuid primary key default gen_random_uuid(),
@@ -257,7 +257,7 @@ drop policy if exists "own outlooks" on public.outlooks;
 create policy "own outlooks" on public.outlooks for select using (auth.uid() = user_id);
 
 -- ---------------------------------------------------------------------------
--- decisions — the decision journal on Updates.
+-- decisions: the decision journal on Updates.
 --
 -- The retention mechanic: a user who has logged calls against their windows has
 -- a record only this product holds, and that record is what they come back for.

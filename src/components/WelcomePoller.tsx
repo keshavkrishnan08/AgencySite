@@ -30,7 +30,7 @@ export function WelcomePoller() {
           return;
         }
       } catch {
-        // Network blip — the next attempt will pick it up.
+        // Network blip: the next attempt will pick it up.
       }
 
       if (attempts + 1 >= MAX_ATTEMPTS) setStalled(true);
@@ -45,7 +45,7 @@ export function WelcomePoller() {
       <div className="max-w-sm text-center">
         <h1 className="font-serif text-3xl">Your payment went through.</h1>
         <p className="mt-4 text-[15px] leading-relaxed text-ink/65">
-          Access is taking longer than usual to activate. Refresh in a moment —
+          Access is taking longer than usual to activate. Refresh in a moment,
           if it still is not there, email{' '}
           <a
             href={`mailto:${BRAND.supportEmail}?subject=Payment went through but access is not active`}

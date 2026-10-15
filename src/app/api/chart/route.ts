@@ -31,8 +31,8 @@ const Body = z.object({
 /**
  * The public entry point for the whole funnel.
  *
- * Wrapped so that ANY unexpected throw — a missing service-role key, a DB
- * outage — still comes back as JSON. An unhandled throw returns Next's HTML
+ * Wrapped so that ANY unexpected throw: a missing service-role key, a DB
+ * outage: still comes back as JSON. An unhandled throw returns Next's HTML
  * error page, and the browser's `res.json()` then fails with an internal
  * message ("The string did not match the expected pattern"), which is both
  * useless to the user and impossible to diagnose from a support email.
@@ -92,7 +92,7 @@ async function handle(request: Request) {
     timeKnown: p.timeKnown,
   });
 
-  // Auth is optional here — an anonymous visitor is the common case.
+  // Auth is optional here: an anonymous visitor is the common case.
   let userId: string | null = null;
   try {
     const supabase = await supabaseServer();
@@ -124,7 +124,7 @@ async function handle(request: Request) {
       utm: p.utm ?? null,
   };
 
-  // The chart is already computed and correct at this point — it is pure
+  // The chart is already computed and correct at this point, it is pure
   // astronomy and owes the database nothing. If persistence fails we keep it in
   // process rather than throwing away the visitor at the moment of highest
   // intent; the row is ephemeral and the caller is told so.

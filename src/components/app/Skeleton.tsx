@@ -1,7 +1,7 @@
 /**
  * Loading bars for content being computed.
  *
- * Deliberately irregular widths — a stack of equal bars reads as a graphic,
+ * Deliberately irregular widths: a stack of equal bars reads as a graphic,
  * uneven ones read as a paragraph that has not arrived yet.
  */
 export function SkeletonLines({

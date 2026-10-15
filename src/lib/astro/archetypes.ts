@@ -1,7 +1,7 @@
 import type { Sign } from './zodiac';
 
 /**
- * The twelve founder archetypes — the free hook.
+ * The twelve founder archetypes: the free hook.
  *
  * Mapped one-to-one onto the Sun sign deliberately. Everyone already knows
  * their sign, so the archetype costs zero seconds to explain, while the name
@@ -60,7 +60,7 @@ export const ARCHETYPES: Record<Sign, Archetype> = {
   Cancer: {
     sign: 'Cancer',
     name: 'The Custodian',
-    oneLine: 'Builds businesses people stay inside — customers and staff both.',
+    oneLine: 'Builds businesses people stay inside, customers and staff both.',
     builtFor: 'Retention-led businesses, communities, services, and long client relationships.',
     tease: 'Custodians post retention numbers that make acquisition costs look cheap, because people do not leave. The cost is that the same instinct keeps the wrong people on the payroll a quarter past the point everyone else noticed.',
     blindSpot: 'You read every business problem as a relationship problem. Some of them are just maths, and you will lose money treating them gently.',

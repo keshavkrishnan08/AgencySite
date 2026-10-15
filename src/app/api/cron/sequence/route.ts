@@ -72,7 +72,7 @@ export async function GET(request: Request) {
       continue;
     }
 
-    // Skip anyone who has since converted — nothing sours a new customer like
+    // Skip anyone who has since converted: nothing sours a new customer like
     // still being sold to.
     const userIds = charts.map((r) => r.user_id).filter(Boolean) as string[];
     const paid = new Set<string>();

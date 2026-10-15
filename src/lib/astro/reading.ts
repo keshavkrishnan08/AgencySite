@@ -24,7 +24,7 @@ export interface Chart {
 
 export interface ChartInput {
   birthUtc: Date;
-  /** Local calendar date of birth — numerology uses the local date, not UTC. */
+  /** Local calendar date of birth: numerology uses the local date, not UTC. */
   localYear: number;
   localMonth: number;
   localDay: number;
@@ -67,7 +67,7 @@ export function chartBrief(chart: Chart, firstName: string): string {
   const placements = n.placements
     .map(
       (p) =>
-        `  ${p.point.padEnd(10)} ${p.label}${p.retrograde && p.point !== 'NorthNode' ? ' (retrograde)' : ''}${p.house ? ` — house ${p.house}` : ''}`,
+        `  ${p.point.padEnd(10)} ${p.label}${p.retrograde && p.point !== 'NorthNode' ? ' (retrograde)' : ''}${p.house ? `, house ${p.house}` : ''}`,
     )
     .join('\n');
 
@@ -81,20 +81,20 @@ export function chartBrief(chart: Chart, firstName: string): string {
 
   return `SUBJECT: ${firstName}
 
-FOUNDER ARCHETYPE: ${a.name} — from a ${chart.sunSign} Sun
+FOUNDER ARCHETYPE: ${a.name}, from a ${chart.sunSign} Sun
   Built for: ${a.builtFor}
   Known blind spot: ${a.blindSpot}
   Decision style: ${a.decisionStyle}
   Needs beside them: ${a.hire}
 
 THE BIG THREE
-  Sun       ${n.sun.label}  (${ELEMENT[n.sun.sign]}, ${MODALITY[n.sun.sign]}) — core drive
-  Moon      ${n.moon.label}  — what they need privately to function
-  Rising    ${n.ascendant ? n.ascendant.label : 'UNKNOWN — no birth time supplied'} — how the market reads them
-  Midheaven ${n.midheaven ? n.midheaven.label : 'UNKNOWN — no birth time supplied'} — public career point
+  Sun       ${n.sun.label}  (${ELEMENT[n.sun.sign]}, ${MODALITY[n.sun.sign]}), core drive
+  Moon      ${n.moon.label}, what they need privately to function
+  Rising    ${n.ascendant ? n.ascendant.label : 'UNKNOWN, no birth time supplied'}, how the market reads them
+  Midheaven ${n.midheaven ? n.midheaven.label : 'UNKNOWN, no birth time supplied'}, public career point
 
 NUMEROLOGY
-  Life path ${lp.number} — ${lp.title}
+  Life path ${lp.number}, ${lp.title}
   Drive: ${lp.drive}
   Under pressure: ${lp.underPressure}
 
@@ -105,9 +105,9 @@ CHINESE ZODIAC
   Predictable friction with: ${animal.clashesWith}
 
 CHART WEIGHTING
-  Elements: Fire ${n.elements.Fire}, Earth ${n.elements.Earth}, Air ${n.elements.Air}, Water ${n.elements.Water} — dominant ${n.dominantElement}
-  Modalities: Cardinal ${n.modalities.Cardinal}, Fixed ${n.modalities.Fixed}, Mutable ${n.modalities.Mutable} — dominant ${n.dominantModality}
-  ${n.stellium ? `Stellium in ${n.stellium} — three or more bodies in one sign, a concentration worth naming.` : 'No stellium.'}
+  Elements: Fire ${n.elements.Fire}, Earth ${n.elements.Earth}, Air ${n.elements.Air}, Water ${n.elements.Water}, dominant ${n.dominantElement}
+  Modalities: Cardinal ${n.modalities.Cardinal}, Fixed ${n.modalities.Fixed}, Mutable ${n.modalities.Mutable}, dominant ${n.dominantModality}
+  ${n.stellium ? `Stellium in ${n.stellium}, three or more bodies in one sign, a concentration worth naming.` : 'No stellium.'}
 
 PLACEMENTS
 ${placements}
@@ -115,5 +115,5 @@ ${placements}
 TIGHTEST ASPECTS
 ${aspects || '  none within orb'}
 
-${chart.partial ? 'IMPORTANT: no birth time was given. Rising sign, Midheaven and all house placements are UNAVAILABLE. Do not invent them, do not reference houses, and say plainly which parts of the reading need an exact birth time.' : 'Birth time supplied — houses, Rising and Midheaven are reliable.'}`;
+${chart.partial ? 'IMPORTANT: no birth time was given. Rising sign, Midheaven and all house placements are UNAVAILABLE. Do not invent them, do not reference houses, and say plainly which parts of the reading need an exact birth time.' : 'Birth time supplied, houses, Rising and Midheaven are reliable.'}`;
 }

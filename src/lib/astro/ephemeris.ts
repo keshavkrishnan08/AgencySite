@@ -3,7 +3,7 @@ import { norm360 } from './zodiac';
 
 /**
  * Geocentric apparent ecliptic longitudes, referred to the true ecliptic and
- * equinox of date (ECT) — the frame tropical astrology uses.
+ * equinox of date (ECT): the frame tropical astrology uses.
  *
  * astronomy-engine returns J2000 vectors by default; using those directly
  * would drift by the accumulated precession since 2000 (~0.36° per 25 years),
@@ -46,7 +46,7 @@ export function bodyLongitude(body: BodyName, time: A.AstroTime): number {
 
 /**
  * Osculating true lunar node, from the instantaneous lunar orbital plane
- * (r × v) rather than the nearest node crossing — which can be up to ~13 days
+ * (r × v) rather than the nearest node crossing: which can be up to ~13 days
  * away and therefore up to ~0.7° stale.
  */
 export function trueNorthNode(time: A.AstroTime): number {
@@ -100,7 +100,7 @@ export function obliquity(time: A.AstroTime): number {
 }
 
 /**
- * Local Sidereal Time in degrees — the Right Ascension of the Midheaven.
+ * Local Sidereal Time in degrees: the Right Ascension of the Midheaven.
  * astronomy-engine's SiderealTime returns Greenwich apparent sidereal time in
  * hours; east longitude is added directly.
  */

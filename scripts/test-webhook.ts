@@ -3,7 +3,7 @@ import { createHmac, randomUUID } from 'node:crypto';
 /**
  * End-to-end test of the live Stripe webhook.
  *
- * The endpoint's rejection paths can be probed from anywhere — post junk and
+ * The endpoint's rejection paths can be probed from anywhere, post junk and
  * you get a 400. Proving the *success* path needs a payload signed with the
  * real endpoint secret, which is the whole point of the signature: nobody who
  * lacks the secret can make this route do anything.
@@ -93,14 +93,14 @@ const stale = Math.floor(Date.now() / 1000) - 60 * 60;
 const old = await post(payload, sign(payload, SECRET, stale));
 check('a stale timestamp is rejected', old.status === 400, `${old.status} ${old.body}`);
 
-// 5. Signed with the wrong secret — the case that matters if the secret in
+// 5. Signed with the wrong secret: the case that matters if the secret in
 //    Vercel ever drifts from the one on the endpoint.
 const wrong = await post(payload, sign(payload, 'whsec_definitely_not_the_secret', now));
 check('a wrong signing secret is rejected', wrong.status === 400, `${wrong.status} ${wrong.body}`);
 
 console.log(
   bad
-    ? `\n${bad} WEBHOOK FAILURE(S) — payments may not grant access`
+    ? `\n${bad} WEBHOOK FAILURE(S), payments may not grant access`
     : '\nWEBHOOK IS LIVE, SIGNED AND IDEMPOTENT',
 );
 process.exit(bad ? 1 : 0);

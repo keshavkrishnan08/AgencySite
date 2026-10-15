@@ -12,7 +12,7 @@ export const dynamic = 'force-dynamic';
  * Chart gate, not an auth gate.
  *
  * You need a chart to be here; you do not need an account. Payment is enforced
- * per feature inside the shell, because the locked surfaces *are* the upsell —
+ * per feature inside the shell, because the locked surfaces *are* the upsell,
  * redirecting an unpaid visitor away removes the only place they can see what
  * they would be buying.
  */

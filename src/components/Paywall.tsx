@@ -49,7 +49,7 @@ export function Paywall({
         You know who you are.<br />Now see what&rsquo;s holding you back.
       </h2>
       <p className="mx-auto mt-5 max-w-measure text-[15px] leading-relaxed text-ink/70">
-        {firstName}, your chart identified patterns that are actively costing you — in
+        {firstName}, your chart identified patterns that are actively costing you, in
         how you decide, who you hire, when you move.
         The sections below name them, and the counter-moves that fix them.
       </p>
@@ -60,14 +60,14 @@ export function Paywall({
             <span className="mt-0.5 shrink-0 font-bold text-ledger-mid" aria-hidden>✓</span>
             <span>
               <span className="font-medium">{title}</span>
-              <span className="text-ink/60"> — {body}</span>
+              <span className="text-ink/60">, {body}</span>
             </span>
           </li>
         ))}
       </ul>
 
       <button type="button" onClick={() => setOpen(true)} className="cta mt-9 w-full">
-        See what&rsquo;s costing you — {PRICING.trialDays} days free <span aria-hidden>→</span>
+        See what&rsquo;s costing you, {PRICING.trialDays} days free <span aria-hidden>→</span>
       </button>
 
       <TrialModal open={open} onClose={() => setOpen(false)} chartId={chartId} authed={authed} />

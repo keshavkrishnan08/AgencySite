@@ -9,12 +9,12 @@ export const runtime = 'nodejs';
  * Stripe billing portal.
  *
  * `intent: 'cancel'` deep-links into Stripe's cancellation flow rather than
- * dropping the user on a dashboard to find it themselves — cancelling has to
+ * dropping the user on a dashboard to find it themselves, cancelling has to
  * be as easy as subscribing was.
  *
  * `intent: 'upgrade'` deep-links into the plan-switch flow. An existing
- * subscriber cannot go through Checkout at all — /api/checkout bounces anyone
- * already on `weekly`, `annual` or `trialing` back to /updates — so a weekly
+ * subscriber cannot go through Checkout at all: /api/checkout bounces anyone
+ * already on `weekly`, `annual` or `trialing` back to /updates, so a weekly
  * → annual move has to modify the live subscription instead of opening a
  * second one. Stripe prorates the switch and never re-grants the free trial.
  */
@@ -33,7 +33,7 @@ export async function POST(request: Request) {
   if (!profile?.stripe_customer_id) {
     // Never dead-end someone trying to cancel. If there is no Stripe customer
     // there is nothing to charge them, and saying so plainly is the honest
-    // answer — a bare error here reads as an obstruction.
+    // answer: a bare error here reads as an obstruction.
     return NextResponse.json(
       { error: 'You have no active subscription, so there is nothing to cancel.' },
       { status: 400 },
@@ -48,7 +48,7 @@ export async function POST(request: Request) {
   const site = process.env.NEXT_PUBLIC_SITE_URL ?? 'http://localhost:3000';
 
   // Try to deep-link into the specific flow. If the subscription ID is
-  // invalid or missing, fall back to the generic billing portal — never
+  // invalid or missing, fall back to the generic billing portal, never
   // dead-end the user with an error when they're trying to cancel.
   try {
     const flowData =
@@ -83,7 +83,7 @@ export async function POST(request: Request) {
     });
     return NextResponse.json({ url: session.url });
   } catch {
-    // Deep-link failed (invalid subscription ID, etc.) — open generic portal.
+    // Deep-link failed (invalid subscription ID, etc.): open generic portal.
     const session = await stripe().billingPortal.sessions.create({
       customer: profile.stripe_customer_id,
       return_url: `${site}/settings`,

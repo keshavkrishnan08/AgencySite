@@ -31,7 +31,7 @@ export default async function SettingsPage() {
 
       <section className="card">
         <dl className="space-y-3 text-[15px]">
-          <Row k="Email" v={ent.email ?? '—'} />
+          <Row k="Email" v={ent.email ?? '-'} />
           <Row k="Plan" v={PLAN_LABEL[ent.status] ?? ent.status} />
           {ent.expiresAt && (
             <Row
@@ -42,7 +42,7 @@ export default async function SettingsPage() {
         </dl>
       </section>
 
-      {/* Only for people already paying weekly — offering annual to a trialist
+      {/* Only for people already paying weekly, offering annual to a trialist
           is the trial-to-large-charge pattern we deliberately avoid. */}
       {ent.status === 'weekly' && (
         <AnnualUpsell
@@ -64,7 +64,7 @@ export default async function SettingsPage() {
           </dl>
           <p className="mt-4 text-[13px] leading-relaxed text-ink/50">
             Your chart is computed from this and nothing else. If any of it is
-            wrong, recalculate — your reading regenerates against the new chart.
+            wrong, recalculate, your reading regenerates against the new chart.
           </p>
         </section>
       )}

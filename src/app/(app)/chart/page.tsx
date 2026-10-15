@@ -21,9 +21,9 @@ export const metadata = { title: 'My Chart' };
 function moonHeadline(r: ReturnType<typeof transitReport>): string {
   if (!r.hits.length) return 'A day for the work that needs no momentum';
   const t = r.hits[0].type.toLowerCase();
-  if (t === 'square' || t === 'opposition') return 'A friction day — use it on the hard conversation';
-  if (t === 'trine' || t === 'sextile') return 'An open day — spend it on the ask';
-  return 'A foundation day — close loops, restore the ground';
+  if (t === 'square' || t === 'opposition') return 'A friction day, use it on the hard conversation';
+  if (t === 'trine' || t === 'sextile') return 'An open day, spend it on the ask';
+  return 'A foundation day, close loops, restore the ground';
 }
 
 export default async function MyChartPage() {
@@ -52,7 +52,7 @@ export default async function MyChartPage() {
     sections = (reading?.sections ?? null) as ReadingSection[] | null;
   }
 
-  // Free: ZERO full sections — they see the title + first paragraph teaser
+  // Free: ZERO full sections: they see the title + first paragraph teaser
   // only. The reading is the trial product, not the free product.
   // Trial: all 7 sections. Paid: all.
   sections = redactSections(sections, ent.hasAccess ? sections?.length ?? 0 : 0);
@@ -101,7 +101,7 @@ export default async function MyChartPage() {
     span: 'Today',
     headline,
     line: r.hits.length
-      ? `${describeHit(r.hits[0])} — orb ${r.hits[0].orb}°. ${visible}`
+      ? `${describeHit(r.hits[0])}, orb ${r.hits[0].orb}°. ${visible}`
       : visible,
     tail,
   });
@@ -124,8 +124,8 @@ export default async function MyChartPage() {
       headline: `Your ${c.sunSign} Sun and Life Path ${c.lifePath} want reach, but this week asks for proof before noise`,
       line: `${
         week.hits.length ? `${describeHit(week.hits[0])} at ${week.hits[0].orb}°.` : 'The week runs quiet against your chart.'
-      } The front half is best for quiet work: pricing, terms, edits, and operational cleanup. Build one clean asset that turns attention into structure — a pitch, an offer page, a script, or a partnership memo.`,
-      tail: `The back half is better for outward moves: outreach, community touchpoints, and testing the message in public. Your ${c.moonSign} Moon can mistake momentum for progress here, so hold the exit rule you set on Monday. If you only do one thing, make it the asset — a week spent talking about the work leaves you where you started, and a week spent building the proof leaves you with something that keeps arguing for you after you stop.`,
+      } The front half is best for quiet work: pricing, terms, edits, and operational cleanup. Build one clean asset that turns attention into structure, a pitch, an offer page, a script, or a partnership memo.`,
+      tail: `The back half is better for outward moves: outreach, community touchpoints, and testing the message in public. Your ${c.moonSign} Moon can mistake momentum for progress here, so hold the exit rule you set on Monday. If you only do one thing, make it the asset, a week spent talking about the work leaves you where you started, and a week spent building the proof leaves you with something that keeps arguing for you after you stop.`,
     },
     {
       span: 'This month',
@@ -133,15 +133,15 @@ export default async function MyChartPage() {
       line: `${
         month.hits.length ? `${describeHit(month.hits[0])} at ${month.hits[0].orb}°.` : 'No slow contact dominates the month.'
       } The launch window favours announcements, demos, publishing, and putting your name on the work. Your ${c.sunSign} core, life path ${c.lifePath}, and ${c.chinese.label} pattern all point to the same assignment: build proof, package it cleanly, then let the work be seen without overexplaining it.`,
-      tail: `The friction is perfectionism — you go one more round refining what already has enough structure to ship. The second half of the month is the sell window: choose one clear campaign, one offer, one message, and repeat it until it lands rather than replacing it the moment it stops feeling novel to you. What you decide structurally this month will still be paying out, or still costing you, in six.`,
+      tail: `The friction is perfectionism, you go one more round refining what already has enough structure to ship. The second half of the month is the sell window: choose one clear campaign, one offer, one message, and repeat it until it lands rather than replacing it the moment it stops feeling novel to you. What you decide structurally this month will still be paying out, or still costing you, in six.`,
     },
   ];
 
   // Server-side redaction: nothing paid reaches the browser in full.
-  // A CSS blur is a conversion device, not a boundary — the text behind it
+  // A CSS blur is a conversion device, not a boundary: the text behind it
   // must be truncated server-side or it is readable from view-source.
   // Every horizon's tail (the advice) is paywalled. Today's line (the
-  // observation) stays free — it proves the data is real and personal.
+  // observation) stays free: it proves the data is real and personal.
   // Trial: today's timing only (line free, tail locked). Paid: everything.
   // Free: all locked.
   const gatedTiming = timing.map((row, i) =>

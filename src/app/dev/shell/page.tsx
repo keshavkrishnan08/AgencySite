@@ -124,34 +124,34 @@ function DevShellInner() {
           timing={[
             {
               span: 'Today',
-              headline: 'A friction day — use it on the hard conversation',
-              line: 'Mercury is tightening into a square to your Midheaven — orb 1.4°. The Moon is waning gibbous in Pisces.',
+              headline: 'A friction day, use it on the hard conversation',
+              line: 'Mercury is tightening into a square to your Midheaven, orb 1.4°. The Moon is waning gibbous in Pisces.',
               tail: 'Say the number first and stop talking after it. The contact makes you sound more certain than you feel, which is exactly what the price conversation needs.',
             },
             {
               span: 'This week',
               headline: 'Your Scorpio Sun wants reach, but this week asks for proof first',
-              line: 'Venus is separating from a trine to your Venus — orb 2.1°. The back half carries the ask better than the front.',
+              line: 'Venus is separating from a trine to your Venus, orb 2.1°. The back half carries the ask better than the front.',
               tail: 'Build one clean asset that turns attention into structure: a pitch, an offer page, or a partnership memo. Then let it be seen.',
             },
             {
               span: 'This month',
               headline: 'This month asks you to separate visibility from ego',
-              line: 'Saturn is tightening into a conjunction to your Sun — orb 0.8°. One structural decision beats four tactical ones.',
+              line: 'Saturn is tightening into a conjunction to your Sun, orb 0.8°. One structural decision beats four tactical ones.',
               tail: 'The launch window favours announcements, demos and putting your name on the work. Package the proof cleanly, then let it carry itself.',
             },
           ]}
           blockers={[
             {
               title: 'You research past the point of decision',
-              evidence: 'Mercury square Saturn, orb 1.8° — applying.',
+              evidence: 'Mercury square Saturn, orb 1.8°, applying.',
               costs: 'Diligence becomes the delay. The window you were analysing closes while you are still building confidence you were never going to reach analytically.',
               fix: 'Cap the research with a date, not a feeling. Decide on the date with whatever you have.',
               severity: 2.1,
             },
             {
               title: 'You hold control past the point it helps',
-              evidence: 'Sun conjunction Pluto, orb 3.2° — separating.',
+              evidence: 'Sun conjunction Pluto, orb 3.2°, separating.',
               costs: 'The business cannot grow beyond your personal bandwidth because the decisions that matter still route through you.',
               fix: 'Hand over one decision class entirely and let it be made worse than you would make it for one quarter.',
               severity: 1.4,
@@ -162,7 +162,7 @@ function DevShellInner() {
             progress: 0.38,
             yearsIn: 3.8,
             span: 'age 37 to 44',
-            what: 'What you built is being tested against reality rather than intention. This is the stretch where the flaw in the model surfaces — not as a crisis, as a slow leak you keep patching.',
+            what: 'What you built is being tested against reality rather than intention. This is the stretch where the flaw in the model surfaces, not as a crisis, as a slow leak you keep patching.',
             ends: 'It ends when you stop defending the original plan and fix the actual leak.',
           }}
           pressure="Capricorn"

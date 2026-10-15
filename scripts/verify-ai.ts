@@ -28,7 +28,7 @@ for (const r of AI_ROUTES) {
 // 2. The provider is chosen at call time, never imported directly by a route.
 for (const f of walk('src/app/api')) {
   if (/@anthropic-ai\/sdk|from 'openai'/.test(read(f))) {
-    fail(`${f} imports a model SDK directly — go through lib/ai`);
+    fail(`${f} imports a model SDK directly, go through lib/ai`);
   }
 }
 ok('no route imports a model SDK directly');

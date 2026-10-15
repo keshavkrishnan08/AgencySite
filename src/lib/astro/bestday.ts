@@ -2,7 +2,7 @@ import { transitReport, type TransitHit } from './transits';
 import type { Chart } from './reading';
 
 /**
- * Best Day — "when should I do this?", answered with dates.
+ * Best Day: "when should I do this?", answered with dates.
  *
  * Every other surface in the product describes the user. This one answers the
  * question they actually arrived with, and answers it with a date they can put
@@ -27,7 +27,7 @@ export const INTENTS: { id: Intent; label: string; blurb: string }[] = [
  *
  * Harmonious aspects help a visible move and hinder a confrontation; hard
  * aspects are the reverse. A hard conversation genuinely goes better under a
- * square — the friction is the point — which is why this is not one scale.
+ * square: the friction is the point, which is why this is not one scale.
  */
 const WEIGHTS: Record<Intent, { points: string[]; harmonious: number; hard: number }> = {
   launch:              { points: ['Sun', 'Midheaven', 'Jupiter', 'Mars'],     harmonious: 3, hard: -2 },
@@ -67,7 +67,7 @@ function scoreHit(hit: TransitHit, intent: Intent): number {
 }
 
 /**
- * Scores each day in the window. Pure astronomy — no model call, so this is
+ * Scores each day in the window. Pure astronomy: no model call, so this is
  * instant, free, and identical on every run for the same inputs.
  */
 export function bestDays(
@@ -100,7 +100,7 @@ export function bestDays(
     const reasons = scored.slice(0, 3).map(({ hit, value }) => {
       const helps = value > 0;
       const verb = hit.applying ? 'tightening into' : 'separating from';
-      return `${hit.transiting} is ${verb} a ${hit.type.toLowerCase()} to your ${hit.natal} (orb ${hit.orb}°) — ${helps ? 'this supports the move' : 'this argues against it'}.`;
+      return `${hit.transiting} is ${verb} a ${hit.type.toLowerCase()} to your ${hit.natal} (orb ${hit.orb}°), ${helps ? 'this supports the move' : 'this argues against it'}.`;
     });
 
     out.push({
@@ -126,7 +126,7 @@ export function rankDays(scores: DayScore[], take = 3): DayScore[] {
     .slice(0, take);
 }
 
-/** The day to actively avoid — useful, and it makes the ranking credible. */
+/** The day to actively avoid: useful, and it makes the ranking credible. */
 export function worstDay(scores: DayScore[]): DayScore | null {
   const sorted = [...scores].sort((a, b) => a.score - b.score);
   const worst = sorted[0];

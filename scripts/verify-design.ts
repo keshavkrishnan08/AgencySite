@@ -19,12 +19,12 @@ let bad = 0;
 const ok = (m: string) => console.log(`ok    ${m}`);
 const fail = (m: string) => { bad++; console.log(`FAIL  ${m}`); };
 const has = (src: string, needle: string, label: string) =>
-  src.includes(needle) ? ok(label) : fail(`${label} — expected \`${needle}\``);
+  src.includes(needle) ? ok(label) : fail(`${label}, expected \`${needle}\``);
 
 // Typography
 has(css, 'line-height: 1.65', 'body line-height is 1.65, matching the reference');
 has(page, 'leading-[1.04]', 'h1 line-height is 1.04');
-has(page, 'lg:leading-[1.04]', 'h1 keeps 1.04 at lg — text-6xl would otherwise force 1');
+has(page, 'lg:leading-[1.04]', 'h1 keeps 1.04 at lg, text-6xl would otherwise force 1');
 has(css, 'max-width: 720px', 'section headings cap at 720px');
 has(page, 'max-w-[820px]', 'h1 measure is 820px');
 has(page, 'max-w-[520px]', 'hero quote measure is 520px');
@@ -32,10 +32,10 @@ has(page, 'max-w-[640px]', 'hero subhead measure is 640px');
 has(page, 'max-w-[680px]', 'essay measure is 680px');
 has(css, 'font-optical-sizing: auto', 'Fraunces uses its optical-size axis');
 
-// The opacity scale — the largest single source of visual drift.
+// The opacity scale: the largest single source of visual drift.
 cfg.includes('opacity: Object.fromEntries')
   ? ok('opacity scale covers every integer, so /72 /65 /45 render correctly')
-  : fail('opacity scale is Tailwind default — off-scale steps render FULL opacity');
+  : fail('opacity scale is Tailwind default, off-scale steps render FULL opacity');
 
 // Components, all measured
 has(css, 'py-[17px]', 'CTA vertical padding is 17px');

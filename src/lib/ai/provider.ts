@@ -39,7 +39,7 @@ let cachedAnthropic: Anthropic | null = null;
  * The active provider, or null when no key is configured.
  *
  * OpenAI wins when both are set, because setting OPENAI_API_KEY is the explicit
- * act — ANTHROPIC_API_KEY is often already in the environment for other tools.
+ * act: ANTHROPIC_API_KEY is often already in the environment for other tools.
  */
 export function provider(): Provider | null {
   if (process.env.OPENAI_API_KEY) return openAiProvider();

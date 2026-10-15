@@ -1,7 +1,7 @@
 import * as A from 'astronomy-engine';
 
 /**
- * Chinese zodiac animal — the third input to the reading.
+ * Chinese zodiac animal: the third input to the reading.
  *
  * The year boundary is Chinese New Year, NOT 1 January. A naive `year % 12`
  * puts everyone born in January or early February in the wrong animal, which
@@ -26,7 +26,7 @@ const CST_OFFSET_MS = 8 * 3600 * 1000;
 
 /**
  * Chinese New Year for a given Gregorian year, as the CST calendar date
- * represented at UTC midnight — so `toISOString().slice(0, 10)` prints the
+ * represented at UTC midnight: so `toISOString().slice(0, 10)` prints the
  * date people actually publish.
  */
 export function chineseNewYear(year: number): Date {
@@ -45,7 +45,7 @@ export function chineseNewYear(year: number): Date {
   t = second;
 
   // CNY is the CST calendar day containing that new moon. Return it as a
-  // date, not an instant — subtracting the offset here would make the ISO
+  // date, not an instant: subtracting the offset here would make the ISO
   // string render the previous day.
   const cst = new Date(t.date.getTime() + CST_OFFSET_MS);
   return new Date(Date.UTC(cst.getUTCFullYear(), cst.getUTCMonth(), cst.getUTCDate()));
@@ -71,7 +71,7 @@ export function chineseSign(birthUtc: Date): ChineseSign {
   // the hour. Comparing timestamps makes the boundary hour-sensitive and wrong.
   const zodiacYear = isoDay(birthUtc) < isoDay(chineseNewYear(y)) ? y - 1 : y;
 
-  // 1984 was a Wood Rat year — the start of a 60-year cycle.
+  // 1984 was a Wood Rat year: the start of a 60-year cycle.
   const animal = ANIMALS[(((zodiacYear - 1984) % 12) + 12) % 12];
   // The element advances every two years across a 10-year cycle.
   const element = ELEMENTS_CN[(((Math.floor((zodiacYear - 1984) / 2) % 5) + 5) % 5 + 2) % 5];

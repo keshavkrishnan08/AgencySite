@@ -7,7 +7,7 @@ import type { Blocker, Chapter } from '@/lib/astro/blockers';
 /**
  * The diagnosis, as a section of My Chart rather than a page of its own.
  *
- * It is the only surface that is diagnostic instead of descriptive — it names
+ * It is the only surface that is diagnostic instead of descriptive, it names
  * the repeating pattern that costs money and says what it costs. That makes it
  * the strongest upsell in the product, which is why it belongs on the screen
  * everyone lands on rather than behind a nav item most people never click.
@@ -31,7 +31,7 @@ export function Diagnosis({
           The pattern that keeps costing you
         </h2>
         <p className="mt-2 max-w-measure text-[13.5px] leading-relaxed text-ink/65">
-          Read from the hard aspects in your chart — the tense pairs, not the
+          Read from the hard aspects in your chart, the tense pairs, not the
           flattering ones. Each cites the placement it came from.
         </p>
       </div>
@@ -100,7 +100,7 @@ export function Diagnosis({
               Your chart carries no tight hard aspects between the pairs that
               usually cause trouble in working life. That is genuinely uncommon,
               and it means your constraint is more likely circumstance than
-              wiring — which the timing windows speak to better than this page.
+              wiring, which the timing windows speak to better than this page.
             </p>
           </div>
         ) : (
@@ -138,7 +138,7 @@ export function Diagnosis({
                   </>
                 ) : (
                   <>
-                    {/* The costs (the pain) are free — feel the problem.
+                    {/* The costs (the pain) are free, feel the problem.
                         The fix (the solution) is the product. */}
                     <p className="mt-2.5 text-[13.5px] leading-[1.65] text-ink/80">{b.costs}</p>
 
@@ -175,7 +175,7 @@ export function Diagnosis({
         {isPaid ? (
           <p className="mt-1.5 text-[13.5px] leading-[1.65] text-ink/80">
             Your Saturn is in {pressure}. That is the area of life where the bill
-            arrives last but always arrives — the one you are most tempted to
+            arrives last but always arrives, the one you are most tempted to
             under-resource because the consequences are slow.
           </p>
         ) : (
@@ -183,7 +183,7 @@ export function Diagnosis({
             <LockedZone label="Unlock where your pressure sits" className="relative mt-1.5 h-[52px] overflow-hidden">
               <p aria-hidden className="locked-text text-[13.5px] leading-[1.65] text-ink">
                 Your Saturn is in {pressure}. That is the area of life where the bill
-                arrives last but always arrives — the one you are most tempted to
+                arrives last but always arrives, the one you are most tempted to
                 under-resource because the consequences are slow.
               </p>
             </LockedZone>

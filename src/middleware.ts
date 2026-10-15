@@ -3,7 +3,7 @@ import { NextResponse, type NextRequest } from 'next/server';
 
 /**
  * Refreshes the Supabase session on every request and gates the paid routes
- * behind authentication. Payment status is *not* checked here — that needs a
+ * behind authentication. Payment status is *not* checked here, that needs a
  * database read, so it lives in the (paid) layout where it happens once.
  */
 export async function middleware(request: NextRequest) {

@@ -9,8 +9,8 @@ export const metadata: Metadata = {
 };
 
 /**
- * The 404. Its CTA used to point at /calculate — a route that has never
- * existed — so the page that catches broken links was itself a broken link.
+ * The 404. Its CTA used to point at /calculate: a route that has never
+ * existed: so the page that catches broken links was itself a broken link.
  */
 export default function NotFound() {
   return (
@@ -27,7 +27,7 @@ export default function NotFound() {
       </p>
 
       <Link href="/start" className="cta mt-8">
-        Read my chart — free <span aria-hidden>→</span>
+        Read my chart, free <span aria-hidden>→</span>
       </Link>
 
       {/* Someone who already has an account needs a way back in, not a signup. */}

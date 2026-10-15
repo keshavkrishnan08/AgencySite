@@ -43,7 +43,7 @@ export async function chartCookie(): Promise<{ id: string; token: string } | nul
  * hold the secret token issued when it was computed. A bare id is never enough.
  */
 export async function getChart(id: string): Promise<ChartRow | null> {
-  // A database blip must surface as "not found", never as a 500 — a stack
+  // A database blip must surface as "not found", never as a 500, a stack
   // trace on the reading page is the worst possible moment to leak one.
   let data: ChartRow | null = null;
   try {
@@ -103,7 +103,7 @@ export async function getCurrentChart(userId: string): Promise<ChartRow | null> 
     .maybeSingle<ChartRow>();
   if (data) return data;
 
-  // Not claimed yet — adopt the one in the cookie.
+  // Not claimed yet: adopt the one in the cookie.
   const cookie = await chartCookie();
   if (!cookie) return null;
   const { data: anon } = await admin

@@ -13,7 +13,7 @@ declare global {
   }
 }
 
-/** Funnel events. Keep these names stable — dashboards query them by string. */
+/** Funnel events. Keep these names stable: dashboards query them by string. */
 export const EVENTS = {
   ctaClick: 'cta_click',
   formStart: 'form_start',
@@ -30,7 +30,7 @@ export type FunnelEvent = (typeof EVENTS)[keyof typeof EVENTS];
 
 /**
  * posthog-js is browser-only and heavy. It is imported lazily rather than at
- * module scope so it never enters the server bundle — a static import breaks
+ * module scope so it never enters the server bundle: a static import breaks
  * Next's static-paths worker on any prerendered route.
  */
 let ph: typeof import('posthog-js').default | null = null;
@@ -59,7 +59,7 @@ export function track(event: FunnelEvent, props: Record<string, unknown> = {}) {
   if (pixelEvent) window.fbq?.('track', pixelEvent, props);
 }
 
-/** Track a named page view with the pixel — use on key conversion pages. */
+/** Track a named page view with the pixel: use on key conversion pages. */
 export function trackPage(page: string, params: Record<string, string> = {}) {
   if (typeof window === 'undefined') return;
   void posthog().then((p) => p?.capture('$pageview', { page, ...params }));

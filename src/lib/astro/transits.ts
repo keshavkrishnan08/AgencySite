@@ -5,7 +5,7 @@ import type { Chart } from './reading';
 
 /**
  * Today's sky, and specifically what it touches in *this* chart. A generic
- * transit list is worthless on its own — the value is the hits against the
+ * transit list is worthless on its own: the value is the hits against the
  * user's own placements.
  */
 
@@ -14,7 +14,7 @@ export interface TransitHit {
   natal: string;
   type: 'Conjunction' | 'Sextile' | 'Square' | 'Trine' | 'Opposition';
   orb: number;
-  /** Tightening rather than separating — the ones that actually matter today. */
+  /** Tightening rather than separating: the ones that actually matter today. */
   applying: boolean;
 }
 
@@ -114,7 +114,7 @@ export function transitReport(chart: Chart, when: Date): TransitReport {
  * One transit contact as a readable English sentence.
  *
  * Shared because it was being written inline in three places and had already
- * drifted into "Mercury is separating opposition your Saturn" — the aspect
+ * drifted into "Mercury is separating opposition your Saturn", the aspect
  * name needs both an article and its prepositions, and "opposition" takes
  * "an", not "a".
  */
@@ -134,7 +134,7 @@ export function transitBrief(r: TransitReport): string {
     ? r.hits
         .map(
           (h) =>
-            `  transiting ${h.transiting} ${h.type.toLowerCase()} natal ${h.natal} (orb ${h.orb}°, ${h.applying ? 'applying — tightening today' : 'separating'})`,
+            `  transiting ${h.transiting} ${h.type.toLowerCase()} natal ${h.natal} (orb ${h.orb}°, ${h.applying ? 'applying, tightening today' : 'separating'})`,
         )
         .join('\n')
     : '  no exact contacts to their chart today';

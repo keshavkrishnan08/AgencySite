@@ -12,7 +12,7 @@ export const SECTIONS = [
   ['strengths', 'Strengths', 'The three things you do better than the people you compare yourself to.'],
   ['blindspots', 'Blind Spot', 'Where you consistently undercut yourself. Be direct; this is the section people forward.'],
   ['communication', 'Communication With Others', 'How you land on other people versus how you think you land, and the one adjustment that changes the most.'],
-  ['business', 'Built For', 'Models, sectors and structures that fit this wiring — and the ones that drain it.'],
+  ['business', 'Built For', 'Models, sectors and structures that fit this wiring, and the ones that drain it.'],
   ['timing', 'Your Timing', 'How you should sequence launches, asks, hiring and rest. Cadence, not prediction.'],
 ] as const;
 
@@ -39,7 +39,7 @@ const TEASER_CHARS = 90;
  *
  * The cap is *also* proportional. A fixed ceiling alone looked fine against
  * 400-character test paragraphs and did nothing at all to the real ones, which
- * average nearer ninety — the fix truncated a paragraph to its own full length
+ * average nearer ninety: the fix truncated a paragraph to its own full length
  * and reported success. Half, capped at ninety, holds for both.
  */
 export function teaser(text: string): string {
@@ -57,7 +57,7 @@ export function teaser(text: string): string {
  * A CSS blur is a conversion device, not a boundary: the full text was sitting
  * in the HTML of every unpaid page view, readable from view-source. Sections
  * past `freeCount` now leave the server as a single truncated paragraph, so the
- * blur has nothing behind it worth extracting. The title and standfirst stay —
+ * blur has nothing behind it worth extracting. The title and standfirst stay,
  * they are the part that has to stay legible to sell the section.
  */
 export function redactSections(

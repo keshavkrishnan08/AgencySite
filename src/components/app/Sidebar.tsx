@@ -94,7 +94,7 @@ export function Sidebar({
           </button>
         </nav>
 
-        {/* Pinned upsell — real teaser copy, tail obscured. */}
+        {/* Pinned upsell, real teaser copy, tail obscured. */}
         {!isPaid && (
           <div className="mx-2.5 mb-2.5 overflow-hidden rounded-[12px] bg-[#2e4739] text-paper shadow-[0_8px_22px_-10px_rgba(34,56,45,0.42)]">
             <div className="px-3.5 pb-3.5 pt-3">

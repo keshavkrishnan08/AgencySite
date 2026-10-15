@@ -8,7 +8,7 @@ export const runtime = 'nodejs';
 
 /**
  * Stripe webhook. Everything that grants or revokes paid access flows through
- * here — the client is never trusted to report a successful payment.
+ * here: the client is never trusted to report a successful payment.
  */
 export async function POST(request: Request) {
   const secret = process.env.STRIPE_WEBHOOK_SECRET;
@@ -22,7 +22,7 @@ export async function POST(request: Request) {
     return NextResponse.json({ error: 'missing signature' }, { status: 400 });
   }
 
-  // Signature verification needs the exact raw body — never re-serialise it.
+  // Signature verification needs the exact raw body: never re-serialise it.
   const raw = await request.text();
 
   let event: Stripe.Event;
@@ -173,7 +173,7 @@ function resolvePlan(
   const fromMeta = sub.metadata?.plan || metadata.plan;
   if (fromMeta === 'weekly' || fromMeta === 'annual') return fromMeta;
 
-  // No metadata (e.g. created in the dashboard) — infer from the interval.
+  // No metadata (e.g. created in the dashboard): infer from the interval.
   const interval = sub.items.data[0]?.price?.recurring?.interval;
   return interval === 'year' ? 'annual' : 'weekly';
 }

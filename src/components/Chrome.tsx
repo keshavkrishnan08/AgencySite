@@ -12,7 +12,7 @@ export function Wordmark({ className = '' }: { className?: string }) {
   );
 }
 
-/** Mercury sigil — small enough to read as a mark, not an illustration. */
+/** Mercury sigil: small enough to read as a mark, not an illustration. */
 export function Glyph({ size = 22 }: { size?: number }) {
   return (
     <svg width={size} height={size} viewBox="0 0 24 24" fill="none" aria-hidden className="text-brass-deep">
@@ -32,7 +32,7 @@ export function Nav({ authed = false }: { authed?: boolean }) {
     // Not sticky itself: the landing page pins it together with the
     // announcement bar in one chrome block, the way the reference does.
     <header className="border-b bg-paper/92 backdrop-blur-md rule">
-      {/* Three columns spread apart, capped at 1060px — the reference's exact
+      {/* Three columns spread apart, capped at 1060px, the reference's exact
           measure. Without the cap the nav drifts to the right edge on wide
           screens and the wordmark ends up stranded on its own. */}
       <div className="mx-auto grid max-w-[1060px] grid-flow-col items-center justify-between gap-4 px-6 py-3.5">

@@ -9,10 +9,10 @@ export default {
   theme: {
     extend: {
       /*
-       * Every integer 0–100.
+       * Every integer 0-100.
        *
        * Tailwind ships a coarse default scale (…60, 70, 75, 80…) and silently
-       * renders anything off it at FULL opacity — no error, no warning. 96
+       * renders anything off it at FULL opacity: no error, no warning. 96
        * usages across 25 files (text-ink/72, /65, /45, /55 …) were rendering
        * opaque, which was the single largest visual drift from the reference.
        */

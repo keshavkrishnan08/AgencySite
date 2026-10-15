@@ -1,5 +1,5 @@
 // On-device speech-to-text with Whisper (transformers.js v3). Runs fully in the
-// browser — audio never leaves the device, no API key. Loaded from CDN as a
+// browser: audio never leaves the device, no API key. Loaded from CDN as a
 // module worker so it doesn't touch the Next/webpack build.
 //
 // Performance:

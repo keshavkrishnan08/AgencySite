@@ -3,7 +3,7 @@ import { join } from 'node:path';
 
 /**
  * Static audit of the entitlement gates. A paywall that exists only in the UI
- * is not a paywall — every paid surface must re-check server-side.
+ * is not a paywall: every paid surface must re-check server-side.
  */
 function walk(dir: string): string[] {
   return readdirSync(dir).flatMap((f) => {
@@ -32,7 +32,7 @@ for (const name of PAID_APIS) {
 
 // 2. The app shell gates on HAVING A CHART, not on having an account: someone
 //    who has just computed one must not hit a login wall. Payment is
-//    deliberately not gated here either — the locked surfaces are the upsell —
+//    deliberately not gated here either: the locked surfaces are the upsell,
 //    so each paid feature checks entitlement itself, which 2b verifies.
 const layout = read('src/app/(app)/layout.tsx');
 layout.includes('resolveChart') && layout.includes('!chart') && layout.includes("redirect('/start')")
@@ -57,7 +57,7 @@ for (const file of [
     : fail(`${file} renders paid content without checking entitlement`);
 }
 
-// 2c. And every blurred region must be clickable through to checkout —
+// 2c. And every blurred region must be clickable through to checkout,
 //     reaching for text you cannot read is the strongest buying signal there
 //     is, and a blur that swallows the click wastes it.
 for (const file of [

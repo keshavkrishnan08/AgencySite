@@ -117,7 +117,7 @@ export function UpdatesView({
         <div className="flex items-center gap-1">
           <ArrowLink href={prevDate ? `/updates?date=${prevDate}` : null} dir="prev" />
           <span className="min-w-[110px] text-center font-mono text-[11px] uppercase tracking-label text-ink/60">
-            {entry ? stamp(entry.date) : '—'}
+            {entry ? stamp(entry.date) : '-'}
           </span>
           <ArrowLink href={nextDate ? `/updates?date=${nextDate}` : null} dir="next" />
         </div>
@@ -134,7 +134,7 @@ export function UpdatesView({
             </p>
             <p className="mt-3 text-[15.5px] leading-relaxed text-ink/70">
               It is computed from where the sky is against your own chart, so it
-              is written after the positions for the period settle — not in advance.
+              is written after the positions for the period settle, not in advance.
             </p>
           </div>
         ) : (
@@ -172,7 +172,7 @@ export function UpdatesView({
         </section>
       )}
 
-      {/* ──────────────────────── DECISION JOURNAL — the retention mechanic */}
+      {/* ──────────────────────── DECISION JOURNAL, the retention mechanic */}
       <section className="card-lg">
         <div className="flex items-baseline justify-between gap-3">
           <p className="eyebrow">Decision journal</p>
@@ -184,12 +184,12 @@ export function UpdatesView({
         </div>
 
         {justLogged ? (
-          /* ── Success state — reinforces the habit ── */
+          /* ── Success state: reinforces the habit ── */
           <div className="mt-4 text-center">
             <p className="font-serif text-[22px]">Logged.</p>
             <p className="mt-2 text-[14px] text-ink/60">
               {logged + 1} decision{logged === 0 ? '' : 's'} tracked against your chart.
-              {logged >= 7 && ' You now have a week of data — your pattern is forming.'}
+              {logged >= 7 && ' You now have a week of data, your pattern is forming.'}
               {logged >= 30 && ' A full month. Your chart is starting to prove itself.'}
             </p>
             <button
@@ -201,14 +201,14 @@ export function UpdatesView({
             </button>
           </div>
         ) : !todayHasDecision ? (
-          /* ── Prompt — appears when they haven't logged today ── */
+          /* ── Prompt: appears when they haven't logged today ── */
           <>
             <p className="mt-3 font-serif text-[19px] leading-snug">
               {prompt}
             </p>
             <p className="mt-2 text-[13.5px] leading-relaxed text-ink/60">
               One sentence. The call you made, the thing you shipped, the conversation
-              you had. Your chart tracks which decisions land on which days — after 30
+              you had. Your chart tracks which decisions land on which days, after 30
               entries, it shows you the pattern.
             </p>
 
@@ -262,17 +262,17 @@ export function UpdatesView({
           </div>
         )}
 
-        {/* The lock-in message — appears after 3+ decisions */}
+        {/* The lock-in message, appears after 3+ decisions */}
         {logged >= 3 && logged < 30 && (
           <p className="mt-4 rounded-[8px] bg-ledger/[0.05] px-4 py-3 text-[13px] leading-relaxed text-ink/65">
             {30 - logged} more and your chart shows you which days your best calls land on.
-            That pattern is yours — no other product holds it.
+            That pattern is yours, no other product holds it.
           </p>
         )}
         {logged >= 30 && (
           <p className="mt-4 rounded-[8px] bg-ledger/[0.05] px-4 py-3 text-[13px] leading-relaxed text-ink/65">
             You have {logged} decisions mapped against your chart&rsquo;s timing.
-            This record only exists here — it cannot be recreated.
+            This record only exists here, it cannot be recreated.
           </p>
         )}
       </section>
